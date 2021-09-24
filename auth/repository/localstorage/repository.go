@@ -2,8 +2,8 @@ package localstorage
 
 import (
 	"backend/models"
-	"errors"
 	"sync"
+	"backend/auth"
 )
 
 type RepositoryUserLocalStorage struct {
@@ -42,5 +42,5 @@ func (s *RepositoryUserLocalStorage) GetUser(username, password string) (*models
 		}
 	}
 
-	return nil, errors.New("No user found")
+	return nil, auth.ErrUserNotFound
 }

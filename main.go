@@ -4,16 +4,15 @@ import (
 	deliveryAuth "backend/auth/delivery/http"
 	localStorageAuth "backend/auth/repository/localstorage"
 	useCaseAuth "backend/auth/usecase"
-	"fmt"
 	"github.com/gorilla/mux"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
 
 
 func main() {
-	fmt.Println("Hello, World!")
+	log.Println("Hello, World!")
 
 	r := mux.NewRouter()
 
@@ -21,13 +20,14 @@ func main() {
 	useCase := useCaseAuth.NewUseCaseAuth(repo)
 	handler := deliveryAuth.NewHandlerAuth(useCase)
 
-	r.HandleFunc("/signup", handler.SignUp)
-	r.HandleFunc("/signin", handler.SignIn)
+	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
+	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
+	//Нужен метод для SignIn с методом GET
 
-	log.Println("start serving :8080")
+	log.Info("start serving :8080")
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
-		fmt.Println(err)
+		log.Error("main error: ", err)
 	}
 
 }
