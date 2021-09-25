@@ -85,7 +85,7 @@ func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
 
 func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	cookies := make(map[string]string)
 	log.Println("In auth")
