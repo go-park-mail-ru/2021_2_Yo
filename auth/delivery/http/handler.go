@@ -99,7 +99,9 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 		//w.WriteHeader(http.StatusNotFound)
 		cookie := http.Cookie{Name: "auth", Value: "rarara"}
 		http.SetCookie(w, &cookie)
+		log.Println(cookie.Value)
 	} else {
+		log.Println(kukan.Value)
 		_, ok := cookies[kukan.Value]
 		if ok {
 			w.WriteHeader(http.StatusOK)
