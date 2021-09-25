@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+var cookies = make(map[string]string)
+
 type HandlerAuth struct {
 	useCase auth.UseCase
 }
@@ -87,7 +89,7 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	cookies := make(map[string]string)
+	
 	log.Println("In auth")
 	defer r.Body.Close()
 	kukan, err := r.Cookie("Auth")
