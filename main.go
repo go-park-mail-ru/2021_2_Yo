@@ -38,6 +38,7 @@ func main() {
 	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
 	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
 	r.HandleFunc("/test",handler.Test).Methods("GET")
+	r.HandleFunc("/auth", handler.Auth).Methods("GET")
 	//Нужен метод для SignIn с методом GET
 
 	c := cors.New(cors.Options{

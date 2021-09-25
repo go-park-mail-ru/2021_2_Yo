@@ -82,3 +82,12 @@ func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
 	smth := "smth"
 	w.Write([]byte(smth))
 }
+
+func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	log.Println("In auth")
+	defer r.Body.Close()
+	log.Println(r.Body)
+}
