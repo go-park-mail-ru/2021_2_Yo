@@ -17,7 +17,6 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	fmt.Fprintln(w, "Главная страница")
-	w.Write([]byte("{}"))
 	http.Redirect(w,r,"http://bmstusa.herokuapp.com/",http.StatusSeeOther)
 }
 
