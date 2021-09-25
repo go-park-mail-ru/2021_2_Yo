@@ -96,8 +96,11 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		cookies[1] = "Blabla"
 		w.WriteHeader(http.StatusTeapot)
+		cookie := http.Cookie{Name: "auth",Value:"1"}
+		http.SetCookie(w, &cookie)
 	} else {
 		w.WriteHeader(http.StatusOK)
+		
 	}
 	
 }
