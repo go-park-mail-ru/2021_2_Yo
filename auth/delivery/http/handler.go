@@ -37,20 +37,26 @@ func getUserFromJSON(r *http.Request) (*userDataForSignup, error) {
 }
 
 func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	newUserInput, err := getUserFromJSON(r)
-	if err != nil {
-		http.Error(w, `{"error":"signup_json"}`, 500)
-		return
-	}
-	err = h.useCase.SignUp(newUserInput.Username, newUserInput.Password)
-	switch err {
-	case auth.ErrUserNotFound:
-		http.Error(w, `{"error":"signup_signup"}`, 500)
-		return
-		//Возможно, будут другие случаи
-	default:
-		return
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	if r.Method == http.MethodPost {
+		defer r.Body.Close()
+		newUserInput, err := getUserFromJSON(r)
+		if err != nil {
+			http.Error(w, `{"error":"signup_json"}`, 500)
+			return
+		}
+		err = h.useCase.SignUp(newUserInput.Username, newUserInput.Password)
+		switch err {
+		case auth.ErrUserNotFound:
+			http.Error(w, `{"error":"signup_signup"}`, 500)
+			return
+			//Возможно, будут другие случаи
+		default:
+			return
+		}
 	}
 }
 
@@ -68,5 +74,4 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	//По факту, я должен буду ответить на w, что всё хорошо и отправить токен.
 	w.Write([]byte(jwtToken))
-	return
 }

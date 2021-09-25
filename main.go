@@ -13,8 +13,12 @@ import (
 )
 
 func mainPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	fmt.Fprintln(w, "Главная страница")
 	w.Write([]byte("{}"))
+	http.Redirect(w,r,"http://bmstusa.herokuapp.com/",http.StatusSeeOther)
 }
 
 func main() {
@@ -32,7 +36,7 @@ func main() {
 	handler := deliveryAuth.NewHandlerAuth(useCase)
 
 	r.HandleFunc("/", mainPage)
-	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
+	r.HandleFunc("/signup", handler.SignUp).Methods("GET","POST")
 	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
 	//Нужен метод для SignIn с методом GET
 
@@ -41,5 +45,8 @@ func main() {
 	if err != nil {
 		log.Error("main error: ", err)
 	}
+	mux.
+
+
 
 }
