@@ -74,7 +74,7 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Origin",r.Header.Get("Origin"))
 
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	log.Println("In test")
