@@ -1,9 +1,9 @@
 package localstorage
 
 import (
+	"backend/auth"
 	"backend/models"
 	"sync"
-	"backend/auth"
 )
 
 type RepositoryUserLocalStorage struct {

@@ -3,7 +3,7 @@ package auth
 import "errors"
 
 var (
-	ErrUserNotFound = errors.New("user not found")
+	ErrUserNotFound       = errors.New("user not found")
 	ErrInvalidAccessToken = errors.New("invalid access token")
-	ErrInvalidUserData = errors.New("invalid user data")
+	ErrInvalidUserData    = errors.New("invalid user data")
 )

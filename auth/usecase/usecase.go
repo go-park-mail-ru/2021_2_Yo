@@ -6,14 +6,14 @@ import (
 )
 
 type UseCaseAuth struct {
-	userRepo auth.RepositoryUser
+	userRepo   auth.RepositoryUser
 	secretWord []byte
 	//Добавить какую-нибудь информацию для токенов!
 }
 
 func NewUseCaseAuth(userRepo auth.RepositoryUser) *UseCaseAuth {
 	return &UseCaseAuth{
-		userRepo: userRepo,
+		userRepo:   userRepo,
 		secretWord: []byte("welcometosanandreasimcjfromgrovestreet"),
 	}
 }
