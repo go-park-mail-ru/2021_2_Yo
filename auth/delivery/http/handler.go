@@ -7,6 +7,9 @@ import (
 	"net/http"
 )
 
+var cookies map[int] string
+
+
 type HandlerAuth struct {
 	useCase auth.UseCase
 }
@@ -89,5 +92,14 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	log.Println("In auth")
 	defer r.Body.Close()
-	log.Println(r.Body)
+	_,err := r.Cookie("Auth")
+	if err != nil {
+		cookies[1] = "Blabla"
+		w.WriteHeader(http.StatusTeapot)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+	
 }
+
+
