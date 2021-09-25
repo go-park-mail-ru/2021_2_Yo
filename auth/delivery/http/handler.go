@@ -7,9 +7,6 @@ import (
 	"net/http"
 )
 
-var cookies map[int] string
-
-
 type HandlerAuth struct {
 	useCase auth.UseCase
 }
@@ -86,23 +83,27 @@ func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(smth))
 }
 
-func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request){
+func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	cookies := make(map[string]string)
 	log.Println("In auth")
 	defer r.Body.Close()
-	_,err := r.Cookie("Auth")
+	kukan, err := r.Cookie("Auth")
 	if err != nil {
-		cookies[1] = "Blabla"
+		cookies["rarara"] = "Blabla"
 		w.WriteHeader(http.StatusTeapot)
-		cookie := http.Cookie{Name: "auth",Value:"1"}
+		cookie := http.Cookie{Name: "auth", Value: "1"}
 		http.SetCookie(w, &cookie)
 	} else {
-		w.WriteHeader(http.StatusOK)
-		
+		_, ok := cookies[kukan.Value]
+		if ok {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			w.WriteHeader(http.StatusBadGateway)
+		}
+
 	}
-	
+
 }
-
-

@@ -5,9 +5,9 @@ import (
 	localStorageAuth "backend/auth/repository/localstorage"
 	useCaseAuth "backend/auth/usecase"
 	"fmt"
+	"github.com/rs/cors"
 	"net/http"
 	"os"
-	"github.com/rs/cors"
 	//"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -37,14 +37,13 @@ func main() {
 	r.HandleFunc("/", mainPage)
 	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
 	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
-	r.HandleFunc("/test",handler.Test).Methods("GET")
+	r.HandleFunc("/test", handler.Test).Methods("GET")
 	r.HandleFunc("/auth", handler.Auth).Methods("GET")
 	//Нужен метод для SignIn с методом GET
 
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://bmstusa.herokuapp.com/"},
+		AllowedOrigins:   []string{"http://bmstusa.herokuapp.com/"},
 		AllowCredentials: true,
-
 	})
 
 	mainHandler := c.Handler(r)
@@ -54,6 +53,5 @@ func main() {
 	if err != nil {
 		log.Error("main error: ", err)
 	}
-
 
 }
