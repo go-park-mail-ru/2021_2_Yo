@@ -3,6 +3,7 @@ package http
 import (
 	"backend/auth"
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -40,23 +41,20 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-	if r.Method == http.MethodPost {
-		defer r.Body.Close()
-		newUserInput, err := getUserFromJSON(r)
-		if err != nil {
-			http.Error(w, `{"error":"signup_json"}`, 500)
-			return
-		}
-		err = h.useCase.SignUp(newUserInput.Username, newUserInput.Password)
-		switch err {
-		case auth.ErrUserNotFound:
-			http.Error(w, `{"error":"signup_signup"}`, 500)
-			return
-			//Возможно, будут другие случаи
-		default:
-			return
-		}
+	defer r.Body.Close()
+	newUserInput, err := getUserFromJSON(r)
+	if err != nil {
+		http.Error(w, `{"error":"signup_json"}`, 500)
+		return
+	}
+	err = h.useCase.SignUp(newUserInput.Username, newUserInput.Password)
+	switch err {
+	case auth.ErrUserNotFound:
+		http.Error(w, `{"error":"signup_signup"}`, 500)
+		return
+		//Возможно, будут другие случаи
+	default:
+		return
 	}
 }
 
@@ -72,6 +70,12 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"signin_signin"}`, 500)
 		return
 	}
-	//По факту, я должен буду ответить на w, что всё хорошо и отправить токен.
 	w.Write([]byte(jwtToken))
+}
+
+func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
+	log.Println("In test")
+	defer r.Body.Close()
+	smth := "smth"
+	w.Write([]byte(smth))
 }
