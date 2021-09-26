@@ -99,7 +99,7 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 		log.Println("in error")
 		cookies["rarara"] = "Blabla"
 		//w.WriteHeader(http.StatusNotFound)
-		cookie := http.Cookie{Name: "auth", Value: "rarara"}
+		cookie := http.Cookie{Name: "auth", Value: "rarara",SameSite: http.SameSiteNoneMode , Secure: true}
 		http.SetCookie(w, &cookie)
 		log.Println(cookie.Value)
 	} else {
