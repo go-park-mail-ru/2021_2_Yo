@@ -160,7 +160,8 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Главная страница")
 	cookie, err := r.Cookie("session_id")
 	if err != nil{
-		w.WriteHeader(http.StatusBadRequest)
+		log.Println("No cookie")
+		//w.WriteHeader(http.Statu)
 	}
 	log.Println("Nice cookie")
 	username,err := h.useCase.Parse(cookie.Value)
