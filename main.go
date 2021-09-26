@@ -37,7 +37,6 @@ func main() {
 	r.Use(handler.MiddleWare)
 
 	r.HandleFunc("/", handler.MainPage).Methods("GET")
-	r.HandleFunc("/signup", handler.Cors).Methods("OPTIONS")
 	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
 	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
 	r.HandleFunc("/test", handler.Test).Methods("GET")
