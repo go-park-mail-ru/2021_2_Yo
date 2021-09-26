@@ -172,7 +172,7 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
 		//http.Error(w, `{"error":"signin_signin"}`, 500)
-		//w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusNotFound)
 		log.Println("No cookie")
 		return
 	}
