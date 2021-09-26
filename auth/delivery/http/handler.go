@@ -20,6 +20,7 @@ const (
 type response struct {
 	Status int `json:"status"`
 	Msg    string `json:"message,omitempty"`
+	Name string `json:"name"`
 }
 
 func newResponse(status int, msg string) *response {
@@ -129,8 +130,10 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	cs := w.Header().Get("Set-Cookie")
 	cs += "; SameSite=None"
 	w.Header().Set("Set-Cookie", cs)
+	username, err := h.useCase.ParseKsenia(jwtToken)
+	
 	w.WriteHeader(http.StatusOK)
-	m := response{200,"smth"}
+	m := response{200,"smth",username}
 	b,err := json.Marshal(m)
 	if err != nil{
 		panic(err)

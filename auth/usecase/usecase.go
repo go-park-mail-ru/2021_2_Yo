@@ -61,3 +61,11 @@ func (a *UseCaseAuth) Parse(cookie string) (string, error) {
 	}
 	return username, nil
 }
+
+func (a *UseCaseAuth) ParseKsenia(cookie string) (string, error) {
+	username, err := parser.ParseTokenForKsenia(cookie, a.secretWord)
+	if err != nil {
+		return "", err
+	}
+	return username, nil
+}
