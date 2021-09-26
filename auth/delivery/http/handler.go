@@ -131,7 +131,9 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	cs += "; SameSite=None"
 	w.Header().Set("Set-Cookie", cs)
 	username, err := h.useCase.ParseKsenia(jwtToken)
-	
+	if err != nil {
+		log.Info(err)
+	}
 	w.WriteHeader(http.StatusOK)
 	m := response{200,"smth",username}
 	b,err := json.Marshal(m)
