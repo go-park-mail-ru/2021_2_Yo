@@ -1,8 +1,8 @@
 package auth
 
 type UseCase interface {
-	SignUp(username, password string) error
-	SignIn(username, password string) (string, error)
+	SignUp(name, surname, mail,password string) error
+	SignIn(name, surname, mail,password string) (string, error)
 	Parse(cookie string) (string, error)
 	List() []string
 }

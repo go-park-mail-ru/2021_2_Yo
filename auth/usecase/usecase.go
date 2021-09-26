@@ -22,21 +22,23 @@ func NewUseCaseAuth(userRepo auth.RepositoryUser) *UseCaseAuth {
 	}
 }
 
-func (a *UseCaseAuth) SignUp(username, password string) error {
+func (a *UseCaseAuth) SignUp(name, surname, mail,password string) error {
 	user := &models.User{
-		Username: username,
+		Name: name,
+		Surname: surname,
+		Mail: mail,
 		Password: password,
 	}
 	return a.userRepo.CreateUser(user)
 }
 
-func (a *UseCaseAuth) SignIn(username, password string) (string, error) {
-	user, err := a.userRepo.GetUser(username, password)
+func (a *UseCaseAuth) SignIn(name, surname, mail,password string) (string, error) {
+	user, err := a.userRepo.GetUser(name, surname, mail,password)
 	if err == auth.ErrUserNotFound {
 		return "", err
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &auth.Claims{
-		Username: user.Username,
+		Mail: user.Mail,
 		
 	})
 	//return user.Username, nil
@@ -47,7 +49,7 @@ func (a *UseCaseAuth) List() []string {
 	users := a.userRepo.List()
 	var usersUsernames []string
 	for _, user := range users {
-		usersUsernames = append(usersUsernames, user.Username)
+		usersUsernames = append(usersUsernames, user.Mail)
 	}
 	return usersUsernames
 }

@@ -44,7 +44,9 @@ func NewHandlerAuth(useCase auth.UseCase) *HandlerAuth {
 //Структура, в которую мы попытаемся перевести JSON-запрос
 //Эта структура - неполная, она, например, не содержит ID и чего-нибудь ещё (дату рождения, например)
 type userDataForSignup struct {
-	Username string `json:"username"`
+	Name string `json:"name"`
+	Surname string `json:"surname"`
+	Mail string `json:"mail"`
 	Password string `json:"password"`
 }
 
@@ -75,7 +77,7 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"signup_json"}`, 500)
 		return
 	}
-	err = h.useCase.SignUp(newUserInput.Username, newUserInput.Password)
+	err = h.useCase.SignUp(newUserInput.Name, newUserInput.Surname, newUserInput.Mail, newUserInput.Password)
 	switch err {
 	case auth.ErrUserNotFound:
 		http.Error(w, `{"error":"signup_signup"}`, 500)
@@ -94,7 +96,7 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	jwtToken, err := h.useCase.SignIn(userInput.Username, userInput.Password)
+	jwtToken, err := h.useCase.SignIn(userInput.Name, userInput.Surname, userInput.Mail, userInput.Password)
 	if err != nil {
 		http.Error(w, `{"error":"signin_signin"}`, 500)
 		w.WriteHeader(http.StatusNotFound)

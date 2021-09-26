@@ -17,7 +17,7 @@ func NewRepositoryUserLocalStorage() *RepositoryUserLocalStorage {
 		users: make([]*User, 1),
 		mutex: new(sync.Mutex),
 	}
-	result.users[0] = &User{0,"Dasha","123"}
+	result.users[0] = &User{0,"Dasha","Petrova","funnyduck@yandex.ru","1234567890"}
 	return result
 }
 
@@ -34,12 +34,12 @@ func (s *RepositoryUserLocalStorage) CreateUser(user *models.User) error {
 	return nil
 }
 
-func (s *RepositoryUserLocalStorage) GetUser(username, password string) (*models.User, error) {
+func (s *RepositoryUserLocalStorage) GetUser(name, surname, mail,password string) (*models.User, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
 	for _, user := range s.users {
-		if user.Username == username && user.Password == password {
+		if user.Mail == mail && user.Password == password {
 			return toModelUser(user), nil
 		}
 	}
