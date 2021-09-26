@@ -171,7 +171,8 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Главная страница")
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		http.Error(w, `{"error":"signin_signin"}`, 500)
+		//w.WriteHeader(http.StatusNotFound)
 		log.Println("No cookie")
 		return
 	}
@@ -181,7 +182,8 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	log.Println(username)
 
 	if err1 != nil {
-		w.WriteHeader(http.StatusNotFound)
+		http.Error(w, `{"error":"signin_signin"}`, 500)
+		//w.WriteHeader(http.StatusNotFound)
 		log.Println("wrong parse")
 		return
 	}
