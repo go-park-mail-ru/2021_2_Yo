@@ -4,10 +4,10 @@ import (
 	deliveryAuth "backend/auth/delivery/http"
 	localStorageAuth "backend/auth/repository/localstorage"
 	useCaseAuth "backend/auth/usecase"
-	//"github.com/rs/cors"
+	"github.com/rs/cors"
 	"net/http"
 	"os"
-	"github.com/gorilla/handlers"
+	//"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -34,13 +34,14 @@ func main() {
 	r.HandleFunc("/list", handler.List).Methods("GET")
 	//Нужен метод для SignIn с методом GET
 
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"https://bmstusa.herokuapp.com"},
+	})
 
+	mainHandler := c.Handler(r)
 
-	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
-	originsOk := handlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
-	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
 	log.Info("Deploying. Port: ", port)
-	err := http.ListenAndServe(":"+port,  handlers.CORS(originsOk, headersOk, methodsOk)(r))
+	err := http.ListenAndServe(":"+port, mainHandler)
 	if err != nil {
 		log.Error("main error: ", err)
 	}

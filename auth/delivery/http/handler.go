@@ -99,7 +99,7 @@ func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "https://bmstusa.herokuapp.com/")
+	w.Header().Set("Access-Control-Allow-Origin", "https://bmstusa.herokuapp.com")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
