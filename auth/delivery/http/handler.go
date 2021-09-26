@@ -94,7 +94,7 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	kukan, _ := r.Cookie("auth")
 	log.Println(cookies)
-	//log.Println(kukan.Value)
+	log.Println(kukan.Value)
 	if kukan.Value == "" {
 		log.Println("in error")
 		cookies["rarara"] = "Blabla"
@@ -112,7 +112,7 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			w.WriteHeader(http.StatusOK)
 		} else {
-			w.WriteHeader(http.StatusBadGateway)
+			//w.WriteHeader(http.StatusBadGateway)
 		}
 
 	}
