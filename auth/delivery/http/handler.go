@@ -46,12 +46,12 @@ func NewHandlerAuth(useCase auth.UseCase) *HandlerAuth {
 type userDataForSignup struct {
 	Name string `json:"name"`
 	Surname string `json:"surname"`
-	Mail string `json:"mail"`
+	Mail string `json:"email"`
 	Password string `json:"password"`
 }
 
 type userDataForSignin struct {
-	Mail string `json:"mail"`
+	Mail string `json:"email"`
 	Password string `json:"password"`
 }
 
