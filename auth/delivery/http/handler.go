@@ -102,7 +102,7 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 		cookie := http.Cookie{Name: "auth", Value: "rarara", Secure: true}
 		http.SetCookie(w, &cookie)
 		cs := w.Header().Get("Set-Cookie")
-		cs += "; SameSite=none"
+		cs += "; SameSite=None"
 		w.Header().Set("Set-Cookie", cs)
 		log.Println(w.Header().Get("Set-Cookie"))
 		log.Println(cookie.Value)
