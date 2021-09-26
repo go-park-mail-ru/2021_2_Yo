@@ -37,6 +37,7 @@ func (a *UseCaseAuth) SignIn(username, password string) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &auth.Claims{
 		Username: user.Username,
+		
 	})
 	//return user.Username, nil
 	return token.SignedString(a.secretWord)
