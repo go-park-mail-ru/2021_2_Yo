@@ -76,7 +76,7 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie := &http.Cookie{
-		Name: "session_id",
+		Name:  "session_id",
 		Value: jwtToken,
 	}
 	http.SetCookie(w, cookie)
@@ -84,7 +84,7 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin",r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	log.Println("In test")
@@ -97,7 +97,7 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	
+
 	log.Println("In auth")
 	defer r.Body.Close()
 	kukan, _ := r.Cookie("auth")
@@ -126,6 +126,7 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
 /*
 
 func (h *HandlerAuth) mySignUp(w http.ResponseWriter, r *http.Request) {
@@ -147,7 +148,7 @@ func (h *HandlerAuth) List(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	defer r.Body.Close()
 	usernames := h.useCase.List()
-	for _,username := range usernames {
+	for _, username := range usernames {
 		fmt.Println(username)
 	}
 }
@@ -159,19 +160,20 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	fmt.Fprintln(w, "Главная страница")
 	cookie, err := r.Cookie("session_id")
-	if err != nil{
+	if err != nil {
 		log.Println("No cookie")
 		return
 		//w.WriteHeader(http.Statu)
 	}
 	log.Println("Nice cookie")
-	username,err := h.useCase.Parse(cookie.Value)
+	username, err1 := h.useCase.Parse(cookie.Value)
 	log.Println("After Parse")
-	if err != nil{
+
+	if err1 != nil {
 		log.Println("hello " + username)
 		w.Write([]byte("hello " + username))
-			return
+		return
 	}
 	log.Println("Parse error")
-	log.Println(err)
+	log.Println(err1)
 }

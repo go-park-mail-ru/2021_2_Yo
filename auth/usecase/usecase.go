@@ -42,19 +42,19 @@ func (a *UseCaseAuth) SignIn(username, password string) (string, error) {
 	return token.SignedString(a.secretWord)
 }
 
-func (a *UseCaseAuth) List() []string{
+func (a *UseCaseAuth) List() []string {
 	users := a.userRepo.List()
 	var usersUsernames []string
-	for _,user := range users {
+	for _, user := range users {
 		usersUsernames = append(usersUsernames, user.Username)
 	}
 	return usersUsernames
 }
 
-func (a *UseCaseAuth) Parse(cookie string) (string,error) {
-	username,err := parser.ParseToken(cookie,a.secretWord)
+func (a *UseCaseAuth) Parse(cookie string) (string, error) {
+	username, err := parser.ParseToken(cookie, a.secretWord)
 	if err != nil {
-		return username,nil
+		return username, nil
 	}
 	return "", err
 }

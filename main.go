@@ -35,7 +35,7 @@ func main() {
 	//Нужен метод для SignIn с методом GET
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://bmstusa.herokuapp.com/"},
+		AllowedOrigins: []string{"https://bmstusa.herokuapp.com/"},
 	})
 
 	mainHandler := c.Handler(r)

@@ -49,7 +49,7 @@ func (s *RepositoryUserLocalStorage) List() []*models.User {
 	var UsersFromStorage []*models.User
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	for _,user := range s.users {
+	for _, user := range s.users {
 		UsersFromStorage = append(UsersFromStorage, toModelUser(user))
 	}
 	return UsersFromStorage
