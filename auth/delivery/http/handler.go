@@ -74,6 +74,12 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"signin_signin"}`, 500)
 		return
 	}
+
+	cookie := &http.Cookie{
+		Name: "session_id",
+		Value: jwtToken,
+	}
+	http.SetCookie(w, cookie)
 	w.Write([]byte(jwtToken))
 }
 
@@ -144,4 +150,22 @@ func (h *HandlerAuth) List(w http.ResponseWriter, r *http.Request) {
 	for _,username := range usernames {
 		fmt.Println(username)
 	}
+}
+
+func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	defer r.Body.Close()
+	fmt.Fprintln(w, "Главная страница")
+	cookie, err := r.Cookie("session_id")
+	if err != nil{
+		w.WriteHeader(http.StatusBadRequest)
+	}
+	username,err := h.useCase.Parse(cookie.Value)
+	if err != nil{
+		w.Write([]byte("hello " + username))
+			return
+	}
+	
 }

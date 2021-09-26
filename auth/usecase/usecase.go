@@ -6,6 +6,7 @@ import (
 	"time"
 	"github.com/dgrijalva/jwt-go/v4"
 	//"crypto/sha1"
+	"backend/parser"
 )
 
 type UseCaseAuth struct {
@@ -52,4 +53,12 @@ func (a *UseCaseAuth) List() []string{
 		usersUsernames = append(usersUsernames, user.Username)
 	}
 	return usersUsernames
+}
+
+func (a *UseCaseAuth) Parse(cookie string) (string,error) {
+	username,err := parser.ParseToken(cookie,a.secretWord)
+	if err != nil {
+		return username,nil
+	}
+	return "", err
 }
