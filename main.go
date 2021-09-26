@@ -42,14 +42,14 @@ func main() {
 	r.HandleFunc("/test", handler.Test).Methods("GET")
 	r.HandleFunc("/user", handler.User).Methods("GET")
 	r.HandleFunc("/list", handler.List).Methods("GET")
-	r.Methods("OPTIONS").HandlerFunc(Preflight)
+	//r.Methods("OPTIONS").HandlerFunc(Preflight)
 	//Нужен метод для SignIn с методом GET
 
 	r.Use(gorilla_handlers.CORS(
-		gorilla_handlers.AllowedOrigins([]string{"https://bmstusssa.herokuapp.com/"}),
+		gorilla_handlers.AllowedOrigins([]string{"https://bmstusssa.herokuapp.com"}),
 		gorilla_handlers.AllowedHeaders([]string{
 			"Accept", "Content-Type", "Content-Length",
-			"Accept-Encoding", "X-CSRF-Token", "csrf-token", "Authorization"}),
+			"Accept-Encoding", "Content-Language", "X-CSRF-Token", "csrf-token", "Authorization"}),
 		gorilla_handlers.AllowCredentials(),
 		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
 	))
