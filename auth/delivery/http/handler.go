@@ -43,12 +43,19 @@ func getUserFromJSON(r *http.Request) (*userDataForSignup, error) {
 	return userInput, nil
 }
 
+func(h *HandlerAuth) Cors (w http.ResponseWriter, r *http.Request){
+	log.Println()
+	w.Write([]byte("smth"))
+
+}
+
 func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "https://bmstusa.herokuapp.com")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.Header().Set("Access-Control-Allow-Methods", "GET,POST")
 	defer r.Body.Close()
+
 	newUserInput, err := getUserFromJSON(r)
 	if err != nil {
 		http.Error(w, `{"error":"signup_json"}`, 500)
@@ -162,9 +169,7 @@ func (h *HandlerAuth) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	
 	defer r.Body.Close()
 	fmt.Fprintln(w, "Главная страница")
 	cookie, err := r.Cookie("session_id")
@@ -186,4 +191,16 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 	log.Println("hello " + username)
 	w.Write([]byte("hello " + username))
 
+}
+
+func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler{
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+		log.Println("in middleware")
+		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Content-Type","application/json")
+		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
+		handler.ServeHTTP(w,r)
+	})
 }
