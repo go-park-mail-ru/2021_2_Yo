@@ -43,7 +43,6 @@ func main() {
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"https://bmstusa.herokuapp.com/"},
-		AllowCredentials: true,
 	})
 
 	mainHandler := c.Handler(r)
