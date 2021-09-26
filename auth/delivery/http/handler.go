@@ -161,6 +161,7 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil{
 		log.Println("No cookie")
+		return
 		//w.WriteHeader(http.Statu)
 	}
 	log.Println("Nice cookie")
@@ -171,5 +172,5 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hello " + username))
 			return
 	}
-	
+	log.Println("Parse error")
 }
