@@ -46,7 +46,7 @@ func main() {
 	//Нужен метод для SignIn с методом GET
 
 	r.Use(gorilla_handlers.CORS(
-		gorilla_handlers.AllowedOrigins([]string{"https://bmstusa.herokuapp.com/"}),
+		gorilla_handlers.AllowedOrigins([]string{"https://bmstusa.herokuapp.com"}),
 		gorilla_handlers.AllowedHeaders([]string{
 			"Accept", "Content-Type", "Content-Length",
 			"Accept-Encoding", "X-CSRF-Token", "csrf-token", "Authorization"}),
