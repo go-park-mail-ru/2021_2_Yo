@@ -11,16 +11,15 @@ import (
 
 var cookies = make(map[string]string)
 
-
 const (
 	STATUS_OK    = "ok"
 	STATUS_ERROR = "error"
 )
 
 type response struct {
-	Status int `json:"status"`
+	Status int    `json:"status"`
 	Msg    string `json:"message,omitempty"`
-	Name string `json:"name"`
+	Name   string `json:"name"`
 }
 
 func newResponse(status int, msg string) *response {
@@ -45,18 +44,16 @@ func NewHandlerAuth(useCase auth.UseCase) *HandlerAuth {
 //Структура, в которую мы попытаемся перевести JSON-запрос
 //Эта структура - неполная, она, например, не содержит ID и чего-нибудь ещё (дату рождения, например)
 type userDataForSignup struct {
-	Name string `json:"name"`
-	Surname string `json:"surname"`
-	Mail string `json:"email"`
+	Name     string `json:"name"`
+	Surname  string `json:"surname"`
+	Mail     string `json:"email"`
 	Password string `json:"password"`
 }
 
 type userDataForSignin struct {
-	Mail string `json:"email"`
+	Mail     string `json:"email"`
 	Password string `json:"password"`
 }
-
-
 
 func getUserFromJSON(r *http.Request) (*userDataForSignup, error) {
 	userInput := new(userDataForSignup)
@@ -69,7 +66,7 @@ func getUserFromJSON(r *http.Request) (*userDataForSignup, error) {
 	return userInput, nil
 }
 
-func getUserFromJSONLogin (r *http.Request) (*userDataForSignin, error) {
+func getUserFromJSONLogin(r *http.Request) (*userDataForSignin, error) {
 	userInput := new(userDataForSignin)
 	//Пытаемся декодировать JSON-запрос в структуру
 	//Валидность данных проверяется на фронтенде (верно?...)
@@ -80,7 +77,7 @@ func getUserFromJSONLogin (r *http.Request) (*userDataForSignin, error) {
 	return userInput, nil
 }
 
-func(h *HandlerAuth) Cors (w http.ResponseWriter, r *http.Request){
+func (h *HandlerAuth) Cors(w http.ResponseWriter, r *http.Request) {
 	log.Println()
 	w.Write([]byte("smth"))
 
@@ -92,15 +89,33 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	newUserInput, err := getUserFromJSON(r)
 	if err != nil {
 		http.Error(w, `{"error":"signup_json"}`, 500)
+		m := response{404, "smth", ""}
+		b, err := json.Marshal(m)
+		if err != nil {
+			panic(err)
+		}
+		w.Write(b)
 		return
 	}
 	err = h.useCase.SignUp(newUserInput.Name, newUserInput.Surname, newUserInput.Mail, newUserInput.Password)
 	switch err {
 	case auth.ErrUserNotFound:
 		http.Error(w, `{"error":"signup_signup"}`, 500)
+		m := response{404, "smth", ""}
+		b, err := json.Marshal(m)
+		if err != nil {
+			panic(err)
+		}
+		w.Write(b)
 		return
 		//Возможно, будут другие случаи
 	default:
+		m := response{200, "smth", ""}
+		b, err := json.Marshal(m)
+		if err != nil {
+			panic(err)
+		}
+		w.Write(b)
 		return
 	}
 }
@@ -135,9 +150,9 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		log.Info(err)
 	}
 	w.WriteHeader(http.StatusOK)
-	m := response{200,"smth",username}
-	b,err := json.Marshal(m)
-	if err != nil{
+	m := response{200, "smth", username}
+	b, err := json.Marshal(m)
+	if err != nil {
 		panic(err)
 	}
 	w.Write(b)
@@ -205,7 +220,7 @@ func (h *HandlerAuth) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
-	
+
 	defer r.Body.Close()
 	fmt.Fprintln(w, "Главная страница")
 	cookie, err := r.Cookie("session_id")
@@ -229,14 +244,14 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler{
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Info("in middleware")
 		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Content-Type","application/json")
+		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
-		handler.ServeHTTP(w,r)
+		handler.ServeHTTP(w, r)
 	})
 }

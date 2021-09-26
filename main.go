@@ -5,11 +5,11 @@ import (
 	localStorageAuth "backend/auth/repository/localstorage"
 	useCaseAuth "backend/auth/usecase"
 	//"github.com/rs/cors"
-	"net/http"
-	"os"
 	gorilla_handlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"net/http"
+	"os"
 )
 
 func Preflight(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +53,6 @@ func main() {
 		gorilla_handlers.AllowCredentials(),
 		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
 	))
-
 
 	log.Info("Deploying. Port: ", port)
 	err := http.ListenAndServe(":"+port, r)
