@@ -31,13 +31,6 @@ type userDataForSignup struct {
 }
 
 
-func (h *HandlerAuth) CorsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "OPTIONS" {
-		w.Header().Set("Access-Control-Allow-Origin", "https://bmstusa.herokuapp.com")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	}
-}
 
 func getUserFromJSON(r *http.Request) (*userDataForSignup, error) {
 	userInput := new(userDataForSignup)
@@ -54,6 +47,7 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "https://bmstusa.herokuapp.com")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Access-Control-Allow-Methods", "GET,POST")
 	defer r.Body.Close()
 	newUserInput, err := getUserFromJSON(r)
 	if err != nil {
