@@ -42,8 +42,8 @@ func getUserFromJSON(r *http.Request) (*userDataForSignup, error) {
 }
 
 func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	defer r.Body.Close()
 	newUserInput, err := getUserFromJSON(r)
@@ -78,6 +78,9 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	cookie := &http.Cookie{
 		Name:  "session_id",
 		Value: jwtToken,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+		Secure: true,
 	}
 	http.SetCookie(w, cookie)
 	w.Write([]byte(jwtToken))
