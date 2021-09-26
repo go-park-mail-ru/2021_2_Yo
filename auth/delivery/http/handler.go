@@ -169,10 +169,11 @@ func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
 func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	cookie, err := r.Cookie("session_id")
+	log.Info(cookie.Value)
 	if err != nil {
 		//http.Error(w, `{"error":"signin_signin"}`, 500)
 		log.Println("No cookie")
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusTeapot)
 		return
 	}
 	log.Println("Nice cookie")
@@ -183,7 +184,7 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	if err1 != nil {
 		log.Println("wrong parse")
 		//http.Error(w, `{"error":"signin_signin"}`, 500)
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusTeapot)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
