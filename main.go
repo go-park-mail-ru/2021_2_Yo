@@ -42,7 +42,8 @@ func main() {
 	r.HandleFunc("/test", handler.Test).Methods("GET")
 	r.HandleFunc("/user", handler.User).Methods("GET")
 	r.HandleFunc("/list", handler.List).Methods("GET")
-	//r.Methods("OPTIONS").HandlerFunc(Preflight)
+	r.Methods("OPTIONS").HandlerFunc(Preflight)
+	r.Methods("GET").HandlerFunc(Preflight)
 	//Нужен метод для SignIn с методом GET
 
 	r.Use(gorilla_handlers.CORS(
