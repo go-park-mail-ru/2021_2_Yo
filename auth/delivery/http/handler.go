@@ -162,8 +162,11 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 	if err != nil{
 		w.WriteHeader(http.StatusBadRequest)
 	}
+	log.Println("Nice cookie")
 	username,err := h.useCase.Parse(cookie.Value)
+	log.Println("After Parse")
 	if err != nil{
+		log.Println("hello " + username)
 		w.Write([]byte("hello " + username))
 			return
 	}
