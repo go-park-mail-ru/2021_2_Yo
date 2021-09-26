@@ -6,7 +6,7 @@ import (
 	useCaseAuth "backend/auth/usecase"
 	"github.com/rs/cors"
 	"net/http"
-	//"os"
+	"os"
 	//"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -22,11 +22,11 @@ func Preflight(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	log.Println("Hello, World!")
-	/*
+	
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal("$PORT must be set")
-	}*/
+	}
 
 	r := mux.NewRouter()
 
@@ -51,8 +51,8 @@ func main() {
 
 	mainHandler := c.Handler(r)
 
-	log.Info("Deploying. Port: ", )
-	err := http.ListenAndServe(":8080", mainHandler)
+	log.Info("Deploying. Port: ",port )
+	err := http.ListenAndServe(":"+port, mainHandler)
 	if err != nil {
 		log.Error("main error: ", err)
 	}
