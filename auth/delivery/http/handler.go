@@ -79,7 +79,6 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		Name:  "session_id",
 		Value: jwtToken,
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
 		Secure: true,
 	}
 	http.SetCookie(w, cookie)
