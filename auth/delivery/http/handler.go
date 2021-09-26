@@ -173,4 +173,5 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 			return
 	}
 	log.Println("Parse error")
+	log.Println(err)
 }
