@@ -4,7 +4,6 @@ import (
 	deliveryAuth "backend/auth/delivery/http"
 	localStorageAuth "backend/auth/repository/localstorage"
 	useCaseAuth "backend/auth/usecase"
-	"fmt"
 	"github.com/rs/cors"
 	"net/http"
 	"os"
@@ -12,14 +11,6 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
-
-func mainPage(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	fmt.Fprintln(w, "Главная страница")
-	
-}
 
 func main() {
 	log.Println("Hello, World!")
@@ -35,7 +26,7 @@ func main() {
 	useCase := useCaseAuth.NewUseCaseAuth(repo)
 	handler := deliveryAuth.NewHandlerAuth(useCase)
 
-	r.HandleFunc("/", mainPage)
+	r.HandleFunc("/", handler.MainPage).Methods("GET")
 	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
 	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
 	r.HandleFunc("/test", handler.Test).Methods("GET")
