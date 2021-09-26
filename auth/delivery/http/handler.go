@@ -166,7 +166,7 @@ func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(smth))
 }
 
-func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
+func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	fmt.Fprintln(w, "Главная страница")
 	cookie, err := r.Cookie("session_id")
@@ -176,12 +176,13 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("Nice cookie")
-	username, err1 := h.useCase.Parse(cookie.Value)
+	username, err1 := h.useCase.ParseKsenia(cookie.Value)
 	log.Println("After Parse")
 	log.Println(username)
 
 	if err1 != nil {
 		w.WriteHeader(http.StatusNotFound)
+		log.Println("wrong parse")
 		return
 	}
 	w.WriteHeader(http.StatusOK)

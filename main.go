@@ -40,7 +40,7 @@ func main() {
 	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
 	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
 	r.HandleFunc("/test", handler.Test).Methods("GET")
-	r.HandleFunc("/user", handler.Auth).Methods("GET")
+	r.HandleFunc("/user", handler.User).Methods("GET")
 	r.HandleFunc("/list", handler.List).Methods("GET")
 	r.Methods("OPTIONS").HandlerFunc(Preflight)
 	//Нужен метод для SignIn с методом GET
