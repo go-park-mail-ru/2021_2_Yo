@@ -168,6 +168,7 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 	log.Println("Nice cookie")
 	username, err1 := h.useCase.Parse(cookie.Value)
 	log.Println("After Parse")
+	log.Println(username)
 
 	if err1 != nil {
 		log.Println("hello " + username)
