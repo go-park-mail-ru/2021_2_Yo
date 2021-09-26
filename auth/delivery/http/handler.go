@@ -30,6 +30,15 @@ type userDataForSignup struct {
 	Password string `json:"password"`
 }
 
+
+func (h *HandlerAuth) CorsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Origin", "https://bmstusa.herokuapp.com")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	}
+}
+
 func getUserFromJSON(r *http.Request) (*userDataForSignup, error) {
 	userInput := new(userDataForSignup)
 	//Пытаемся декодировать JSON-запрос в структуру
@@ -76,10 +85,10 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie := &http.Cookie{
-		Name:  "session_id",
-		Value: jwtToken,
+		Name:     "session_id",
+		Value:    jwtToken,
 		HttpOnly: true,
-		Secure: true,
+		Secure:   true,
 	}
 	http.SetCookie(w, cookie)
 	cs := w.Header().Get("Set-Cookie")
@@ -179,8 +188,8 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 		log.Println("Parse error")
 		log.Println(err1)
 		return
-	} 
+	}
 	log.Println("hello " + username)
 	w.Write([]byte("hello " + username))
-		
+
 }

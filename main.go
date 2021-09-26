@@ -27,6 +27,7 @@ func main() {
 	handler := deliveryAuth.NewHandlerAuth(useCase)
 
 	r.HandleFunc("/", handler.MainPage).Methods("GET")
+	r.HandleFunc("/signup", handler.CorsHandler).Methods("OPTIONS")
 	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
 	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
 	r.HandleFunc("/test", handler.Test).Methods("GET")
