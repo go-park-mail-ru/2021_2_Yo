@@ -13,10 +13,12 @@ type RepositoryUserLocalStorage struct {
 
 //Функции, создающие все хендлеры, юзкейсы и репозитории, вызываются непосредственно перед инициализированием сервера
 func NewRepositoryUserLocalStorage() *RepositoryUserLocalStorage {
-	return &RepositoryUserLocalStorage{
-		users: make([]*User, 0),
+	result := &RepositoryUserLocalStorage{
+		users: make([]*User, 1),
 		mutex: new(sync.Mutex),
 	}
+	result.users[0] = &User{0,"Dasha","123"}
+	return result
 }
 
 func (s *RepositoryUserLocalStorage) CreateUser(user *models.User) error {
