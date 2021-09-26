@@ -3,6 +3,7 @@ package usecase
 import (
 	"backend/auth"
 	"backend/models"
+	//"crypto/sha1"
 )
 
 type UseCaseAuth struct {
@@ -33,4 +34,13 @@ func (a *UseCaseAuth) SignIn(username, password string) (string, error) {
 	}
 	//Здесь нужна работа с токенами!
 	return user.Username, nil
+}
+
+func (a *UseCaseAuth) List() []string{
+	users := a.userRepo.List()
+	var usersUsernames []string
+	for _,user := range users {
+		usersUsernames = append(usersUsernames, user.Username)
+	}
+	return usersUsernames
 }

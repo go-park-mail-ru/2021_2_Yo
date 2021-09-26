@@ -2,6 +2,8 @@ package http
 
 import (
 	"backend/auth"
+	"fmt"
+	//"backend/models"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -117,4 +119,29 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+}
+/*
+
+func (h *HandlerAuth) mySignUp(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	defer r.Body.Close()
+	newUserInput, err := getUserFromJSON(r)
+	if err != nil {
+		http.Error(w, `{"error":"signup_json"}`, 500)
+		return
+	}
+}
+*/
+
+func (h *HandlerAuth) List(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	defer r.Body.Close()
+	usernames := h.useCase.List()
+	for _,username := range usernames {
+		fmt.Println(username)
+	}
 }
