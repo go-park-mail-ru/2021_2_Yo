@@ -91,11 +91,13 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	userInput, err := getUserFromJSON(r)
 	if err != nil {
 		http.Error(w, `{"error":"signin_json"}`, 500)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 	jwtToken, err := h.useCase.SignIn(userInput.Username, userInput.Password)
 	if err != nil {
 		http.Error(w, `{"error":"signin_signin"}`, 500)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
