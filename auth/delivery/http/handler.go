@@ -171,6 +171,7 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Главная страница")
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
 		log.Println("No cookie")
 		m := response{404, "smth", ""}
 		b, err := json.Marshal(m)
@@ -186,6 +187,7 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 	log.Println(username)
 
 	if err1 != nil {
+		w.WriteHeader(http.StatusNotFound)
 		m := response{404, "smth", ""}
 		b, err := json.Marshal(m)
 		if err != nil {
@@ -194,7 +196,7 @@ func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
 		w.Write(b)
 		return
 	}
-
+	w.WriteHeader(http.StatusOK)
 	m := response{200, "smth", ""}
 	b, err := json.Marshal(m)
 	if err != nil {
