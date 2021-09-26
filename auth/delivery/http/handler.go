@@ -18,11 +18,11 @@ const (
 )
 
 type response struct {
-	Status string `json:"status"`
+	Status int `json:"status"`
 	Msg    string `json:"message,omitempty"`
 }
 
-func newResponse(status, msg string) *response {
+func newResponse(status int, msg string) *response {
 	return &response{
 		Status: status,
 		Msg:    msg,
@@ -130,7 +130,13 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	cs += "; SameSite=None"
 	w.Header().Set("Set-Cookie", cs)
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(jwtToken))
+	m := response{200,"smth"}
+	b,err := json.Marshal(m)
+	if err != nil{
+		panic(err)
+	}
+	w.Write(b)
+	//w.Write([]byte(jwtToken))
 }
 
 func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
