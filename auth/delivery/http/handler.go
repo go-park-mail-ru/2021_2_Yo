@@ -86,14 +86,13 @@ func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "https://bmstusa.herokuapp.com/")
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	
 	log.Println("In auth")
 	defer r.Body.Close()
 	kukan, err := r.Cookie("auth")
-	//log.Println(kukan.Value)
 	if err != nil {
 		log.Println("in error")
 		cookies["rarara"] = "Blabla"
