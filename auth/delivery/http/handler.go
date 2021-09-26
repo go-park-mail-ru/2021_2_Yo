@@ -11,6 +11,24 @@ import (
 
 var cookies = make(map[string]string)
 
+
+const (
+	STATUS_OK    = "ok"
+	STATUS_ERROR = "error"
+)
+
+type response struct {
+	Status string `json:"status"`
+	Msg    string `json:"message,omitempty"`
+}
+
+func newResponse(status, msg string) *response {
+	return &response{
+		Status: status,
+		Msg:    msg,
+	}
+}
+
 type HandlerAuth struct {
 	useCase auth.UseCase
 }
@@ -91,6 +109,7 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	cs := w.Header().Get("Set-Cookie")
 	cs += "; SameSite=None"
 	w.Header().Set("Set-Cookie", cs)
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(jwtToken))
 }
 
