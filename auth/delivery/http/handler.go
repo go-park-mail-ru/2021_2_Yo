@@ -169,7 +169,7 @@ func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
 func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	cookie, err := r.Cookie("session_id")
-	log.Info(cookie.Value)
+	log.Println(cookie.Value)
 	if err != nil {
 		//http.Error(w, `{"error":"signin_signin"}`, 500)
 		log.Println("No cookie")
