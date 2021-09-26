@@ -42,7 +42,7 @@ func getUserFromJSON(r *http.Request) (*userDataForSignup, error) {
 }
 
 func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "https://bmstusa.herokuapp.com/")
+	w.Header().Set("Access-Control-Allow-Origin", "https://bmstusa.herokuapp.com")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	defer r.Body.Close()
