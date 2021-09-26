@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-func Preflight(w http.ResponseWriter, r *http.Request) {
+func PreflightOptions(w http.ResponseWriter, r *http.Request) {
 	log.Info("In preflight")
 	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -20,6 +20,16 @@ func Preflight(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
 }
+
+func PreflightGet(w http.ResponseWriter, r *http.Request) {
+	log.Info("In preflight")
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
+}
+
 
 func main() {
 	log.Println("Hello, World!")
@@ -42,8 +52,8 @@ func main() {
 	r.HandleFunc("/test", handler.Test).Methods("GET")
 	r.HandleFunc("/user", handler.User).Methods("GET")
 	r.HandleFunc("/list", handler.List).Methods("GET")
-	r.Methods("OPTIONS").HandlerFunc(Preflight)
-	r.Methods("GET").HandlerFunc(Preflight)
+	r.Methods("OPTIONS").HandlerFunc(PreflightOptions)
+	r.Methods("GET").HandlerFunc(PreflightGet)
 	//Нужен метод для SignIn с методом GET
 
 	r.Use(gorilla_handlers.CORS(
