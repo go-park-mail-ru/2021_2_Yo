@@ -167,33 +167,40 @@ func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
-	log.Println("In auth")
 	defer r.Body.Close()
-	kukan, _ := r.Cookie("auth")
-	log.Println(cookies)
-	log.Println(kukan.Value)
-	if kukan.Value == "" {
-		log.Println("in error")
-		cookies["rarara"] = "Blabla"
-		//w.WriteHeader(http.StatusNotFound)
-		cookie := http.Cookie{Name: "auth", Value: "rarara", Secure: true}
-		http.SetCookie(w, &cookie)
-		cs := w.Header().Get("Set-Cookie")
-		cs += "; SameSite=None"
-		w.Header().Set("Set-Cookie", cs)
-		log.Println(w.Header().Get("Set-Cookie"))
-		log.Println(cookie.Value)
-	} else {
-		log.Println(kukan.Value)
-		_, ok := cookies[kukan.Value]
-		if ok {
-			w.WriteHeader(http.StatusOK)
-		} else {
-			//w.WriteHeader(http.StatusBadGateway)
+	fmt.Fprintln(w, "Главная страница")
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		log.Println("No cookie")
+		m := response{404, "smth", ""}
+		b, err := json.Marshal(m)
+		if err != nil {
+			panic(err)
 		}
+		w.Write(b)
+		return
+	}
+	log.Println("Nice cookie")
+	username, err1 := h.useCase.Parse(cookie.Value)
+	log.Println("After Parse")
+	log.Println(username)
 
+	if err1 != nil {
+		m := response{404, "smth", ""}
+		b, err := json.Marshal(m)
+		if err != nil {
+			panic(err)
+		}
+		w.Write(b)
+		return
 	}
 
+	m := response{200, "smth", ""}
+	b, err := json.Marshal(m)
+	if err != nil {
+		panic(err)
+	}
+	w.Write(b)
 }
 
 /*
