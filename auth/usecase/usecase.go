@@ -3,6 +3,8 @@ package usecase
 import (
 	"backend/auth"
 	"backend/models"
+	"time"
+	"github.com/dgrijalva/jwt-go/v4"
 	//"crypto/sha1"
 )
 
@@ -32,8 +34,15 @@ func (a *UseCaseAuth) SignIn(username, password string) (string, error) {
 	if err == auth.ErrUserNotFound {
 		return "", err
 	}
-	//Здесь нужна работа с токенами!
-	return user.Username, nil
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &auth.Claims{
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt:  jwt.At(time.Now().Add(time.Hour*100)),
+			IssuedAt: jwt.At(time.Now()),
+		},
+		Username: user.Username,
+	})
+	//return user.Username, nil
+	return token.SignedString(a.secretWord)
 }
 
 func (a *UseCaseAuth) List() []string{
