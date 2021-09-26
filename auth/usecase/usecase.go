@@ -54,7 +54,7 @@ func (a *UseCaseAuth) List() []string {
 func (a *UseCaseAuth) Parse(cookie string) (string, error) {
 	username, err := parser.ParseToken(cookie, a.secretWord)
 	if err != nil {
-		return username, nil
+		return "", err
 	}
-	return "", err
+	return username, nil
 }
