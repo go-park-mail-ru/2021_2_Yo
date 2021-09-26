@@ -83,6 +83,9 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		Secure: true,
 	}
 	http.SetCookie(w, cookie)
+	cs := w.Header().Get("Set-Cookie")
+	cs += "; SameSite=None"
+	w.Header().Set("Set-Cookie", cs)
 	w.Write([]byte(jwtToken))
 }
 
