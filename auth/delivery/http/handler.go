@@ -174,7 +174,8 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 		log.Println("hello " + username)
 		w.Write([]byte("hello " + username))
 		return
+	} else {
+		log.Println("Parse error")
+		log.Println(err1)
 	}
-	log.Println("Parse error")
-	log.Println(err1)
 }
