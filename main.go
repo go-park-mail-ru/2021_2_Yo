@@ -12,6 +12,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func Preflight(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Content-Type","application/json")
+	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
+}
+
 func main() {
 	log.Println("Hello, World!")
 	/*
@@ -34,6 +42,7 @@ func main() {
 	r.HandleFunc("/test", handler.Test).Methods("GET")
 	r.HandleFunc("/auth", handler.Auth).Methods("GET")
 	r.HandleFunc("/list", handler.List).Methods("GET")
+	r.Methods("OPTIONS").HandlerFunc(Preflight)
 	//Нужен метод для SignIn с методом GET
 
 	c := cors.New(cors.Options{

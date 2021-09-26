@@ -50,10 +50,6 @@ func(h *HandlerAuth) Cors (w http.ResponseWriter, r *http.Request){
 }
 
 func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "https://bmstusa.herokuapp.com")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Access-Control-Allow-Methods", "GET,POST")
 	defer r.Body.Close()
 
 	newUserInput, err := getUserFromJSON(r)
@@ -99,9 +95,6 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	log.Println("In test")
 	defer r.Body.Close()
 	smth := "smth"
@@ -109,10 +102,6 @@ func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *HandlerAuth) Auth(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "https://bmstusa.herokuapp.com")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
 	log.Println("In auth")
 	defer r.Body.Close()
 	kukan, _ := r.Cookie("auth")
@@ -158,9 +147,6 @@ func (h *HandlerAuth) mySignUp(w http.ResponseWriter, r *http.Request) {
 */
 
 func (h *HandlerAuth) List(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	defer r.Body.Close()
 	usernames := h.useCase.List()
 	for _, username := range usernames {
