@@ -226,8 +226,13 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
 		log.Println("No cookie")
+		m := response{404, "smth", ""}
+		b, err := json.Marshal(m)
+		if err != nil {
+			panic(err)
+		}
+		w.Write(b)
 		return
-		//w.WriteHeader(http.Statu)
 	}
 	log.Println("Nice cookie")
 	username, err1 := h.useCase.Parse(cookie.Value)
@@ -235,13 +240,21 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 	log.Println(username)
 
 	if err1 != nil {
-		log.Println("Parse error")
-		log.Println(err1)
+		m := response{404, "smth", ""}
+		b, err := json.Marshal(m)
+		if err != nil {
+			panic(err)
+		}
+		w.Write(b)
 		return
 	}
-	log.Println("hello " + username)
-	w.Write([]byte("hello " + username))
 
+	m := response{200, "smth", ""}
+	b, err := json.Marshal(m)
+	if err != nil {
+		panic(err)
+	}
+	w.Write(b)
 }
 
 func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
