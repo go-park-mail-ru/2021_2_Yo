@@ -50,10 +50,26 @@ type userDataForSignup struct {
 	Password string `json:"password"`
 }
 
+type userDataForSignin struct {
+	Mail string `json:"mail"`
+	Password string `json:"password"`
+}
+
 
 
 func getUserFromJSON(r *http.Request) (*userDataForSignup, error) {
 	userInput := new(userDataForSignup)
+	//Пытаемся декодировать JSON-запрос в структуру
+	//Валидность данных проверяется на фронтенде (верно?...)
+	err := json.NewDecoder(r.Body).Decode(userInput)
+	if err != nil {
+		return nil, err
+	}
+	return userInput, nil
+}
+
+func getUserFromJSONLogin (r *http.Request) (*userDataForSignin, error) {
+	userInput := new(userDataForSignin)
 	//Пытаемся декодировать JSON-запрос в структуру
 	//Валидность данных проверяется на фронтенде (верно?...)
 	err := json.NewDecoder(r.Body).Decode(userInput)
@@ -90,13 +106,13 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 
 func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	userInput, err := getUserFromJSON(r)
+	userInput, err := getUserFromJSONLogin(r)
 	if err != nil {
 		http.Error(w, `{"error":"signin_json"}`, 500)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	jwtToken, err := h.useCase.SignIn(userInput.Name, userInput.Surname, userInput.Mail, userInput.Password)
+	jwtToken, err := h.useCase.SignIn(userInput.Mail, userInput.Password)
 	if err != nil {
 		http.Error(w, `{"error":"signin_signin"}`, 500)
 		w.WriteHeader(http.StatusNotFound)

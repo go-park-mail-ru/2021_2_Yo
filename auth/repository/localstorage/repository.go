@@ -34,7 +34,7 @@ func (s *RepositoryUserLocalStorage) CreateUser(user *models.User) error {
 	return nil
 }
 
-func (s *RepositoryUserLocalStorage) GetUser(name, surname, mail,password string) (*models.User, error) {
+func (s *RepositoryUserLocalStorage) GetUser(mail,password string) (*models.User, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 

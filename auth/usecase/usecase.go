@@ -32,8 +32,8 @@ func (a *UseCaseAuth) SignUp(name, surname, mail,password string) error {
 	return a.userRepo.CreateUser(user)
 }
 
-func (a *UseCaseAuth) SignIn(name, surname, mail,password string) (string, error) {
-	user, err := a.userRepo.GetUser(name, surname, mail,password)
+func (a *UseCaseAuth) SignIn(mail,password string) (string, error) {
+	user, err := a.userRepo.GetUser(mail,password)
 	if err == auth.ErrUserNotFound {
 		return "", err
 	}
