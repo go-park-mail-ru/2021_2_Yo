@@ -3,7 +3,7 @@ package usecase
 import (
 	"backend/auth"
 	"backend/models"
-	"time"
+	//"time"
 	"github.com/dgrijalva/jwt-go/v4"
 	//"crypto/sha1"
 	"backend/parser"
@@ -36,10 +36,6 @@ func (a *UseCaseAuth) SignIn(username, password string) (string, error) {
 		return "", err
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &auth.Claims{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt:  jwt.At(time.Now().Add(time.Hour*100)),
-			IssuedAt: jwt.At(time.Now()),
-		},
 		Username: user.Username,
 	})
 	//return user.Username, nil
