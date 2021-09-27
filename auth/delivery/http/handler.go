@@ -148,6 +148,7 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	//TODO: Вроде сделал
 	h.setCookieWithJwtToken(w, userFromRequest.Mail, userFromRequest.Password)
 	w.WriteHeader(http.StatusOK)
+	////////////////////////////////
 	m := response{200, "smth", ""}
 	b, err := json.Marshal(m)
 	if err != nil {
@@ -157,6 +158,7 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(b)
+	/////////////////////////////////
 	/////////
 	log.Info("SignUp : ended")
 	/////////
@@ -180,6 +182,17 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	h.setCookieWithJwtToken(w, userFromRequest.Mail, userFromRequest.Password)
+	////////////////////////////////
+	m := response{200, "smth", ""}
+	b, err := json.Marshal(m)
+	if err != nil {
+		/////////
+		log.Error("SignIn : Response error")
+		/////////
+		return
+	}
+	w.Write(b)
+	/////////////////////////////////
 	/////////
 	log.Info("SignIn : ended")
 	/////////
@@ -291,3 +304,6 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	log.Info("User : ended")
 	/////////
 }
+
+//TODO: 1. User: response(status, Name, Surname, Mail)
+//TODO: 2.
