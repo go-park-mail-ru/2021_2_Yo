@@ -197,6 +197,8 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	h.setCookieWithJwtToken(w, userFromRequest.Mail, userFromRequest.Password)
+	w.WriteHeader(http.StatusOK)
+	sendRespose(w, &response{200, "Cookie sent!", ""})
 	////////////////////////////////
 	/*
 	m := response{200, "smth", ""}
