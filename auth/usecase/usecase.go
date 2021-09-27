@@ -3,16 +3,16 @@ package usecase
 import (
 	"backend/auth"
 	"backend/models"
+	"fmt"
+
 	//"time"
 	"github.com/dgrijalva/jwt-go/v4"
 	//"crypto/sha1"
-	"backend/parser"
 )
 
 type UseCaseAuth struct {
 	userRepo   auth.RepositoryUser
 	secretWord []byte
-	//Добавить какую-нибудь информацию для токенов!
 }
 
 func NewUseCaseAuth(userRepo auth.RepositoryUser) *UseCaseAuth {
@@ -21,6 +21,35 @@ func NewUseCaseAuth(userRepo auth.RepositoryUser) *UseCaseAuth {
 		secretWord: []byte("welcometosanandreasimcjfromgrovestreet"),
 	}
 }
+
+//////////////////////////////////////////////////////
+
+type claims struct {
+	jwt.StandardClaims
+	//По сути, нужен только ID пользователя
+	ID string `json:"user_id"`
+	//Name    string `json:"name"`
+	//Surname string `json:"Surname"`
+	//Mail    string `json:"mail"`
+}
+
+func parseToken(accessToken string, signingKey []byte) (string, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &claims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return signingKey, nil
+	})
+	if err != nil {
+		return "", err
+	}
+	if claims, ok := token.Claims.(*claims); ok && token.Valid {
+		return claims.ID, nil
+	}
+	return "", auth.ErrInvalidAccessToken
+}
+
+//////////////////////////////////////////////////////
 
 func (a *UseCaseAuth) SignUp(name, surname, mail, password string) error {
 	user := &models.User{
@@ -37,36 +66,26 @@ func (a *UseCaseAuth) SignIn(mail, password string) (string, error) {
 	if err == auth.ErrUserNotFound {
 		return "", err
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &auth.Claims{
-		Name:    user.Name,
-		Surname: user.Surname,
-		Mail:    user.Mail,
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
+		ID:    user.ID,
 	})
-	//return user.Username, nil
-	return token.SignedString(a.secretWord)
+	signedString, err := token.SignedString(a.secretWord)
+	return signedString, err
 }
 
-func (a *UseCaseAuth) List() []string {
+func (a *UseCaseAuth) List() []models.User {
 	users := a.userRepo.List()
-	var usersUsernames []string
+	var usersUsernames []models.User
 	for _, user := range users {
-		usersUsernames = append(usersUsernames, user.Mail)
+		usersUsernames = append(usersUsernames, *user)
 	}
 	return usersUsernames
 }
 
-func (a *UseCaseAuth) Parse(cookie string) (string, error) {
-	username, err := parser.ParseToken(cookie, a.secretWord)
+func (a *UseCaseAuth) ParseToken(cookie string) (string, error) {
+	userID, err := parseToken(cookie, a.secretWord)
 	if err != nil {
 		return "", err
 	}
-	return username, nil
-}
-
-func (a *UseCaseAuth) ParseKsenia(cookie string) (string, error) {
-	username, err := parser.ParseTokenForKsenia(cookie, a.secretWord)
-	if err != nil {
-		return "", err
-	}
-	return username, nil
+	return userID, nil
 }

@@ -1,9 +1,10 @@
 package auth
 
+import "backend/models"
+
 type UseCase interface {
 	SignUp(name, surname, mail, password string) error
 	SignIn(mail, password string) (string, error)
-	Parse(cookie string) (string, error)
-	ParseKsenia(cookie string) (string, error)
-	List() []string
+	ParseToken(cookie string) (string, error)
+	List() []models.User
 }

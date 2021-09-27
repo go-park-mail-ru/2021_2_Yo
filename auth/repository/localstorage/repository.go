@@ -17,6 +17,7 @@ func NewRepositoryUserLocalStorage() *RepositoryUserLocalStorage {
 		users: make([]*User, 1),
 		mutex: new(sync.Mutex),
 	}
+	//КОСТЫЛЬ!!!
 	result.users[0] = &User{0, "Dasha", "Petrova", "funnyduck@yandex.ru", "1234567890"}
 	return result
 }
@@ -50,9 +51,9 @@ func (s *RepositoryUserLocalStorage) GetUser(mail, password string) (*models.Use
 func (s *RepositoryUserLocalStorage) List() []*models.User {
 	var UsersFromStorage []*models.User
 	s.mutex.Lock()
-	defer s.mutex.Unlock()
 	for _, user := range s.users {
 		UsersFromStorage = append(UsersFromStorage, toModelUser(user))
 	}
+	s.mutex.Unlock()
 	return UsersFromStorage
 }

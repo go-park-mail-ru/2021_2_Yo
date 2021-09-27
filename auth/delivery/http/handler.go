@@ -2,6 +2,7 @@ package http
 
 import (
 	"backend/auth"
+	"backend/models"
 	"fmt"
 	//"backend/models"
 	"encoding/json"
@@ -15,19 +16,6 @@ const (
 	STATUS_OK    = "ok"
 	STATUS_ERROR = "error"
 )
-
-type response struct {
-	Status int    `json:"status"`
-	Msg    string `json:"message,omitempty"`
-	Name   string `json:"name"`
-}
-
-func newResponse(status int, msg string) *response {
-	return &response{
-		Status: status,
-		Msg:    msg,
-	}
-}
 
 type HandlerAuth struct {
 	useCase auth.UseCase
@@ -43,20 +31,34 @@ func NewHandlerAuth(useCase auth.UseCase) *HandlerAuth {
 
 //Структура, в которую мы попытаемся перевести JSON-запрос
 //Эта структура - неполная, она, например, не содержит ID и чего-нибудь ещё (дату рождения, например)
-type userDataForSignup struct {
+type userDataForSignUp struct {
 	Name     string `json:"name"`
 	Surname  string `json:"surname"`
 	Mail     string `json:"email"`
 	Password string `json:"password"`
 }
 
-type userDataForSignin struct {
+type userDataForSignIn struct {
 	Mail     string `json:"email"`
 	Password string `json:"password"`
 }
 
-func getUserFromJSON(r *http.Request) (*userDataForSignup, error) {
-	userInput := new(userDataForSignup)
+type userDataForResponse struct {
+	Name    string `json:"name"`
+	Surname string `json:"surname"`
+	Mail    string `json:"mail"`
+}
+
+func makeUserDataForResponse(user *models.User) *userDataForResponse {
+	return &userDataForResponse{
+		Name:    user.Name,
+		Surname: user.Surname,
+		Mail:    user.Mail,
+	}
+}
+
+func getUserFromJSONSignUp(r *http.Request) (*userDataForSignUp, error) {
+	userInput := new(userDataForSignUp)
 	//Пытаемся декодировать JSON-запрос в структуру
 	//Валидность данных проверяется на фронтенде (верно?...)
 	err := json.NewDecoder(r.Body).Decode(userInput)
@@ -66,8 +68,8 @@ func getUserFromJSON(r *http.Request) (*userDataForSignup, error) {
 	return userInput, nil
 }
 
-func getUserFromJSONLogin(r *http.Request) (*userDataForSignin, error) {
-	userInput := new(userDataForSignin)
+func getUserFromJSONSignIn(r *http.Request) (*userDataForSignIn, error) {
+	userInput := new(userDataForSignIn)
 	//Пытаемся декодировать JSON-запрос в структуру
 	//Валидность данных проверяется на фронтенде (верно?...)
 	err := json.NewDecoder(r.Body).Decode(userInput)
@@ -77,187 +79,115 @@ func getUserFromJSONLogin(r *http.Request) (*userDataForSignin, error) {
 	return userInput, nil
 }
 
-func (h *HandlerAuth) Cors(w http.ResponseWriter, r *http.Request) {
-	log.Println()
-	w.Write([]byte("smth"))
-
-}
-
-func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-
-	newUserInput, err := getUserFromJSON(r)
-	if err != nil {
-		http.Error(w, `{"error":"signup_json"}`, 500)
-		m := response{301, "smth", ""}
-		b, err := json.Marshal(m)
-		if err != nil {
-			panic(err)
-		}
-		w.Write(b)
+//Не уверен, что здесь указатель, проверить!
+func (h *HandlerAuth) setCookieWithJwtToken(w *http.ResponseWriter, userMail, userPassword string) {
+	/////////
+	log.Debug("setCookieWithJwtToken : started")
+	/////////
+	//TODO: Сделать так, чтобы SignIn возвращал только токен и ошибку. информация о user будет возвращаться в User (функция)
+	//TODO: Вроде сделал
+	jwtToken, err := h.useCase.SignIn(userMail, userPassword)
+	if err == auth.ErrUserNotFound {
+		/////////
+		log.Error("SignIn : setCookieWithJwtToken error")
+		/////////
+		http.Error(*w, `{"error":"signin_user_not_found"}`, 500)
 		return
 	}
-	err = h.useCase.SignUp(newUserInput.Name, newUserInput.Surname, newUserInput.Mail, newUserInput.Password)
-	switch err {
-	case auth.ErrUserNotFound:
-		http.Error(w, `{"error":"signup_signup"}`, 500)
-		m := response{404, "smth", ""}
-		b, err := json.Marshal(m)
-		if err != nil {
-			panic(err)
-		}
-		w.Write(b)
-		return
-		//Возможно, будут другие случаи
-	default:
-		m := response{200, "smth", ""}
-		b, err := json.Marshal(m)
-		if err != nil {
-			panic(err)
-		}
-		w.Write(b)
-		return
-	}
-}
-
-func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	userInput, err := getUserFromJSONLogin(r)
-	if err != nil {
-		http.Error(w, `{"error":"signin_json"}`, 500)
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-	jwtToken, err := h.useCase.SignIn(userInput.Mail, userInput.Password)
-	if err != nil {
-		http.Error(w, `{"error":"signin_signin"}`, 500)
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
 	cookie := &http.Cookie{
 		Name:     "session_id",
 		Value:    jwtToken,
 		HttpOnly: true,
 		Secure:   true,
 	}
-	http.SetCookie(w, cookie)
-	cs := w.Header().Get("Set-Cookie")
+	//Костыль, добавляем ещё одну куку, которая не записывается голангом
+	http.SetCookie(*w, cookie)
+	cs := (*w).Header().Get("Set-Cookie")
 	cs += "; SameSite=None"
-	w.Header().Set("Set-Cookie", cs)
-	username, err := h.useCase.ParseKsenia(jwtToken)
-	if err != nil {
-		log.Info(err)
-	}
-	w.WriteHeader(http.StatusOK)
-	m := response{200, "smth", username}
-	b, err := json.Marshal(m)
-	if err != nil {
-		panic(err)
-	}
-	w.Write(b)
-	//w.Write([]byte(jwtToken))
+	(*w).Header().Set("Set-Cookie", cs)
+	/////////
+	log.Debug("setCookieWithJwtToken : ended")
+	/////////
 }
 
-func (h *HandlerAuth) Test(w http.ResponseWriter, r *http.Request) {
-	log.Println("In test")
+func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	smth := "smth"
-	w.Write([]byte(smth))
-}
-
-func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	cookie, err := r.Cookie("session_id")
-	//log.Println(cookie.Value)
+	/////////
+	log.Debug("SignUp : started")
+	/////////
+	userFromRequest, err := getUserFromJSONSignUp(r)
 	if err != nil {
-		//http.Error(w, `{"error":"signin_signin"}`, 500)
-		log.Println("No cookie")
-		w.WriteHeader(http.StatusTeapot)
-		return
-	}
-	log.Println("Nice cookie")
-	username, err1 := h.useCase.ParseKsenia(cookie.Value)
-	log.Println("After Parse")
-	log.Println(username)
-
-	if err1 != nil {
-		log.Println("wrong parse")
-		//http.Error(w, `{"error":"signin_signin"}`, 500)
-		w.WriteHeader(http.StatusTeapot)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	m := response{200, "smth", username}
-	b, err := json.Marshal(m)
-	if err != nil {
-		log.Info(err)
-	}
-	w.Write(b)
-}
-
-/*
-
-func (h *HandlerAuth) mySignUp(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	defer r.Body.Close()
-	newUserInput, err := getUserFromJSON(r)
-	if err != nil {
+		/////////
+		log.Error("SignUp : didn't get user from JSON")
+		/////////
 		http.Error(w, `{"error":"signup_json"}`, 500)
 		return
 	}
+	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
+	if err != nil {
+		log.Error("SignUp : SignUp error")
+		http.Error(w, `{"error":"signup_signup"}`, 500)
+		return
+	}
+	//TODO: Поставить Cookie с jwt-токеном при регистрации
+	//TODO: Вроде сделал
+	h.setCookieWithJwtToken(&w, userFromRequest.Mail, userFromRequest.Password)
+	/////////
+	log.Debug("SignUp : ended")
+	/////////
+	return
 }
-*/
+
+func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
+	/////////
+	log.Debug("SignIn : started")
+	/////////
+	defer r.Body.Close()
+	userFromRequest, err := getUserFromJSONSignIn(r)
+	if err != nil {
+		/////////
+		log.Error("SignIn : getUserFromJSON error")
+		/////////
+		http.Error(w, `{"error":"signin_json"}`, 500)
+		return
+	}
+	h.setCookieWithJwtToken(&w, userFromRequest.Mail, userFromRequest.Password)
+	/////////
+	log.Debug("SignIn : ended")
+	/////////
+	return
+}
 
 func (h *HandlerAuth) List(w http.ResponseWriter, r *http.Request) {
+	/////////
+	log.Debug("List : started")
+	/////////
+	fmt.Println("")
+	fmt.Println("=============================")
+	fmt.Println("=========U==S==E==R==S=======")
+	fmt.Println("=============================")
 	defer r.Body.Close()
-	usernames := h.useCase.List()
-	for _, username := range usernames {
-		fmt.Println(username)
+	users := h.useCase.List()
+	for _, user := range users {
+		fmt.Println(user)
+		userData := makeUserDataForResponse(&user)
+		userDataToWrite, _ := json.Marshal(userData)
+		w.Write(userDataToWrite)
 	}
-}
-
-func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
-
-	defer r.Body.Close()
-	fmt.Fprintln(w, "Главная страница")
-	cookie, err := r.Cookie("session_id")
-	if err != nil {
-		log.Println("No cookie")
-		m := response{404, "smth", ""}
-		b, err := json.Marshal(m)
-		if err != nil {
-			panic(err)
-		}
-		w.Write(b)
-		return
-	}
-	log.Println("Nice cookie")
-	username, err1 := h.useCase.Parse(cookie.Value)
-	log.Println("After Parse")
-	log.Println(username)
-
-	if err1 != nil {
-		m := response{404, "smth", ""}
-		b, err := json.Marshal(m)
-		if err != nil {
-			panic(err)
-		}
-		w.Write(b)
-		return
-	}
-
-	m := response{200, "smth", ""}
-	b, err := json.Marshal(m)
-	if err != nil {
-		panic(err)
-	}
-	w.Write(b)
+	fmt.Println("=============================")
+	fmt.Println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+	fmt.Println("=============================")
+	fmt.Println("")
+	/////////
+	log.Debug("List : ended")
+	/////////
+	return
 }
 
 func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
+	/////////
+	log.Debug("MiddleWare : started & ended")
+	/////////
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Info("in middleware")
 		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
@@ -267,4 +197,61 @@ func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
 		handler.ServeHTTP(w, r)
 	})
+}
+
+func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
+	/////////
+	log.Debug("User : started")
+	/////////
+	//TODO: Отправить информацию о пользователе таким образом:
+	/*
+		//Получаем данные о пользователе для того, чтобы отправить их пользователю
+		userData := makeUserDataForResponse(foundUser)
+		w.WriteHeader(http.StatusOK)
+		userDataToWrite, err := json.Marshal(userData)
+		if err != nil {
+			/////////
+			log.Error("User : json.Marshall error")
+			/////////
+			return
+		}
+		w.Write(userDataToWrite)
+	 */
+
+	defer r.Body.Close()
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		/////////
+		log.Error("User : getting cookie error")
+		/////////
+		w.WriteHeader(http.StatusTeapot)
+		return
+	}
+	//TODO: Разобраться, как работает ParseToken и что возвращает
+	userID, err := h.useCase.ParseToken(cookie.Value)
+	if err != nil {
+		/////////
+		log.Debug("User : parse error")
+		/////////
+		w.WriteHeader(http.StatusTeapot)
+		return
+	}
+	log.Info("User : userID = ", userID)
+	w.WriteHeader(http.StatusOK)
+	//TODO: отправить информацию пользователю
+	response := makeUserDataForResponse(&models.User{
+		ID:       userID,
+		Name:     "",
+		Surname:  "",
+		Mail:     "",
+		Password: "",
+	})
+	b, err := json.Marshal(response)
+	if err != nil {
+		log.Info(err)
+	}
+	w.Write(b)
+	/////////
+	log.Debug("User : ended")
+	/////////
 }
