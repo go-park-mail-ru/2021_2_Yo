@@ -49,6 +49,13 @@ type userDataForResponse struct {
 	Mail    string `json:"mail"`
 }
 
+//TODO: Нормальный response для каждых случаев, когда нужно посылать ответ
+type response struct {
+	Status int    `json:"status"`
+	Msg    string `json:"message,omitempty"`
+	Name   string `json:"name"`
+}
+
 func makeUserDataForResponse(user *models.User) *userDataForResponse {
 	return &userDataForResponse{
 		Name:    user.Name,
@@ -141,6 +148,15 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	//TODO: Вроде сделал
 	h.setCookieWithJwtToken(w, userFromRequest.Mail, userFromRequest.Password)
 	w.WriteHeader(http.StatusOK)
+	m := response{200, "smth", ""}
+	b, err := json.Marshal(m)
+	if err != nil {
+		/////////
+		log.Error("SignUp : Response error")
+		/////////
+		return
+	}
+	w.Write(b)
 	/////////
 	log.Info("SignUp : ended")
 	/////////
