@@ -105,9 +105,9 @@ func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, userMail, use
 	}
 	//Костыль, добавляем ещё одну куку, которая не записывается голангом
 	http.SetCookie(w, cookie)
-	cs := (w).Header().Get("Set-Cookie")
+	cs := w.Header().Get("Set-Cookie")
 	cs += "; SameSite=None"
-	(w).Header().Set("Set-Cookie", cs)
+	w.Header().Set("Set-Cookie", cs)
 	/////////
 	log.Info("setCookieWithJwtToken : ended")
 	/////////
@@ -140,6 +140,7 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	//TODO: Поставить Cookie с jwt-токеном при регистрации
 	//TODO: Вроде сделал
 	h.setCookieWithJwtToken(w, userFromRequest.Mail, userFromRequest.Password)
+	w.WriteHeader(http.StatusOK)
 	/////////
 	log.Info("SignUp : ended")
 	/////////
