@@ -89,3 +89,12 @@ func (a *UseCaseAuth) ParseToken(cookie string) (string, error) {
 	}
 	return userID, nil
 }
+
+//КОСТЫЛИ!!!
+func (a *UseCaseAuth) GetUser(mail, password string) (*models.User, error) {
+	return a.userRepo.GetUser(mail, password)
+}
+
+func (a *UseCaseAuth) GetUserById(userID string) (*models.User, error) {
+	return a.userRepo.GetUserById(userID)
+}

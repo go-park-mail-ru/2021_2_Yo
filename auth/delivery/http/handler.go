@@ -3,7 +3,6 @@ package http
 import (
 	"backend/auth"
 	"backend/models"
-	"fmt"
 	//"backend/models"
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
@@ -86,6 +85,20 @@ func getUserFromJSONSignIn(r *http.Request) (*userDataForSignIn, error) {
 	return userInput, nil
 }
 
+//КОСТЫЛЬ
+func sendRespose(w http.ResponseWriter, responseToSend *response) {
+	////////////////////////////////
+	b, err := json.Marshal(responseToSend)
+	if err != nil {
+		/////////
+		log.Error("SignUp : Response error")
+		/////////
+		return
+	}
+	w.Write(b)
+	/////////////////////////////////
+}
+
 //Не уверен, что здесь указатель, проверить!
 func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, userMail, userPassword string) {
 	/////////
@@ -101,8 +114,6 @@ func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, userMail, use
 		/////////
 		log.Error("SignIn : setCookieWithJwtToken error")
 		/////////
-		http.Error(w, `{"error":"signin_user_not_found"}`, 500)
-		return
 	}
 	cookie := &http.Cookie{
 		Name:     "session_id",
@@ -133,7 +144,6 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 		/////////
 		log.Error("SignUp : didn't get user from JSON")
 		/////////
-		http.Error(w, `{"error":"signup_json"}`, 500)
 		return
 	}
 	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
@@ -141,24 +151,13 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 		/////////
 		log.Error("SignUp : SignUp error")
 		/////////
-		http.Error(w, `{"error":"signup_signup"}`, 500)
 		return
 	}
 	//TODO: Поставить Cookie с jwt-токеном при регистрации
 	//TODO: Вроде сделал
 	h.setCookieWithJwtToken(w, userFromRequest.Mail, userFromRequest.Password)
 	w.WriteHeader(http.StatusOK)
-	////////////////////////////////
-	m := response{200, "smth", ""}
-	b, err := json.Marshal(m)
-	if err != nil {
-		/////////
-		log.Error("SignUp : Response error")
-		/////////
-		return
-	}
-	w.Write(b)
-	/////////////////////////////////
+	sendRespose(w, &response{200, "smth", ""})
 	/////////
 	log.Info("SignUp : ended")
 	/////////
@@ -178,7 +177,14 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		/////////
 		log.Error("SignIn : getUserFromJSON error")
 		/////////
-		http.Error(w, `{"error":"signin_json"}`, 500)
+		return
+	}
+	_, err1 := h.useCase.GetUser(userFromRequest.Mail, userFromRequest.Password)
+	if err1 == auth.ErrUserNotFound {
+		/////////
+		log.Error("SignIn : GetUser error")
+		/////////
+		sendRespose(w, &response{301, "User not found!", ""})
 		return
 	}
 	h.setCookieWithJwtToken(w, userFromRequest.Mail, userFromRequest.Password)
@@ -195,32 +201,6 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	/////////////////////////////////
 	/////////
 	log.Info("SignIn : ended")
-	/////////
-	return
-}
-
-func (h *HandlerAuth) List(w http.ResponseWriter, r *http.Request) {
-	/////////
-	log.Info("List : started")
-	/////////
-	fmt.Println("")
-	fmt.Println("=============================")
-	fmt.Println("=========U==S==E==R==S=======")
-	fmt.Println("=============================")
-	defer r.Body.Close()
-	users := h.useCase.List()
-	for _, user := range users {
-		fmt.Println(user)
-		userData := makeUserDataForResponse(&user)
-		userDataToWrite, _ := json.Marshal(userData)
-		w.Write(userDataToWrite)
-	}
-	fmt.Println("=============================")
-	fmt.Println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
-	fmt.Println("=============================")
-	fmt.Println("")
-	/////////
-	log.Info("List : ended")
 	/////////
 	return
 }
@@ -284,26 +264,35 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusTeapot)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 	//TODO: отправить информацию пользователю
-	response := makeUserDataForResponse(&models.User{
-		ID:       userID,
-		Name:     "Faked name",
-		Surname:  "Faked surname",
-		Mail:     "FakedMail@mail.ru",
-		Password: "",
-	})
-	b, err := json.Marshal(response)
+	foundUser, err := h.useCase.GetUserById(userID)
+	if err == auth.ErrUserNotFound {
+		/////////
+		log.Info("User : GetUser error")
+		/////////
+		w.WriteHeader(http.StatusTeapot)
+		return
+	}
+	///////////////////
+	userData := makeUserDataForResponse(foundUser)
+	w.WriteHeader(http.StatusOK)
+	userDataToWrite, err := json.Marshal(userData)
 	if err != nil {
 		/////////
-		log.Info("User : marshal error")
+		log.Error("User : json.Marshall error")
 		/////////
+		return
 	}
-	w.Write(b)
+	sendRespose(w, &response{
+		Status: http.StatusOK,
+		Msg:    string(userDataToWrite),
+		Name:   "",
+	})
+
 	/////////
 	log.Info("User : ended")
 	/////////
 }
 
 //TODO: 1. User: response(status, Name, Surname, Mail)
-//TODO: 2.
+//TODO: 2. Login: если неправильно, отправлять response(status, body : {error : "Didn't login"})

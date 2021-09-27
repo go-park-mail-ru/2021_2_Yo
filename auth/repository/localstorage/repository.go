@@ -3,6 +3,7 @@ package localstorage
 import (
 	"backend/auth"
 	"backend/models"
+	"strconv"
 	"sync"
 )
 
@@ -22,6 +23,7 @@ func NewRepositoryUserLocalStorage() *RepositoryUserLocalStorage {
 	return result
 }
 
+//TODO: проверка на уникальность почты
 func (s *RepositoryUserLocalStorage) CreateUser(user *models.User) error {
 	newUser := toLocalstorageUser(user)
 	s.mutex.Lock()
@@ -41,6 +43,23 @@ func (s *RepositoryUserLocalStorage) GetUser(mail, password string) (*models.Use
 
 	for _, user := range s.users {
 		if user.Mail == mail && user.Password == password {
+			return toModelUser(user), nil
+		}
+	}
+
+	return nil, auth.ErrUserNotFound
+}
+
+//КОСТЫЛЬ
+func (s *RepositoryUserLocalStorage) GetUserById(userId string) (*models.User, error) {
+
+	userIdInt, _ := strconv.Atoi(userId)
+
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	for _, user := range s.users {
+		if user.ID == userIdInt {
 			return toModelUser(user), nil
 		}
 	}
