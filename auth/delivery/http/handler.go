@@ -231,7 +231,9 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	cookie, err := r.Cookie("session_id")
 	/////////
-	log.Info("User : cookie.value = ", cookie.Value)
+	if cookie != nil {
+		log.Info("User : cookie.value = ", cookie.Value)
+	}
 	/////////
 	if err != nil {
 		/////////
