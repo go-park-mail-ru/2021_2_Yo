@@ -27,6 +27,11 @@ func NewRepositoryUserLocalStorage() *RepositoryUserLocalStorage {
 func (s *RepositoryUserLocalStorage) CreateUser(user *models.User) error {
 	newUser := toLocalstorageUser(user)
 	s.mutex.Lock()
+	for _, tempUser := range s.users {
+		if tempUser.Mail == user.Mail {
+			return auth.ErrUserExists
+		}
+	}
 	if len(s.users) > 0 {
 		newUser.ID = s.users[len(s.users)-1].ID + 1
 	} else {

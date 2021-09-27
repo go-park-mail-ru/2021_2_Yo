@@ -155,6 +155,9 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 		/////////
 		log.Error("SignUp : SignUp error")
 		/////////
+		w.WriteHeader(http.StatusOK)
+		b, _ := json.Marshal(&responseError{Error: err.Error()})
+		w.Write(b)
 		return
 	}
 	//TODO: Поставить Cookie с jwt-токеном при регистрации
