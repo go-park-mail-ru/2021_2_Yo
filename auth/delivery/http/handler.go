@@ -288,6 +288,12 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	}
 	///////////////////
 	userData := makeUserDataForResponse(foundUser)
+	sendRespose(w, &response{
+		Status: http.StatusOK,
+		Msg:    "sending name",
+		Name:   userData.Name,
+	})
+	/*
 	w.WriteHeader(http.StatusOK)
 	userDataToWrite, err := json.Marshal(userData)
 	if err != nil {
@@ -296,11 +302,12 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 		/////////
 		return
 	}
-	sendRespose(w, &response{
-		Status: http.StatusOK,
-		Msg:    string(userDataToWrite),
-		Name:   "",
-	})
+		sendRespose(w, &response{
+			Status: http.StatusOK,
+			Msg:    string(userDataToWrite),
+			Name:   "",
+		})
+	 */
 
 	/////////
 	log.Info("User : ended")
