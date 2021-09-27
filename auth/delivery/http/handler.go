@@ -82,7 +82,7 @@ func getUserFromJSONSignIn(r *http.Request) (*userDataForSignIn, error) {
 //Не уверен, что здесь указатель, проверить!
 func (h *HandlerAuth) setCookieWithJwtToken(w *http.ResponseWriter, userMail, userPassword string) {
 	/////////
-	log.Debug("setCookieWithJwtToken : started")
+	log.Info("setCookieWithJwtToken : started")
 	/////////
 	//TODO: Сделать так, чтобы SignIn возвращал только токен и ошибку. информация о user будет возвращаться в User (функция)
 	//TODO: Вроде сделал
@@ -106,14 +106,14 @@ func (h *HandlerAuth) setCookieWithJwtToken(w *http.ResponseWriter, userMail, us
 	cs += "; SameSite=None"
 	(*w).Header().Set("Set-Cookie", cs)
 	/////////
-	log.Debug("setCookieWithJwtToken : ended")
+	log.Info("setCookieWithJwtToken : ended")
 	/////////
 }
 
 func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	/////////
-	log.Debug("SignUp : started")
+	log.Info("SignUp : started")
 	/////////
 	userFromRequest, err := getUserFromJSONSignUp(r)
 	if err != nil {
@@ -133,14 +133,14 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	//TODO: Вроде сделал
 	h.setCookieWithJwtToken(&w, userFromRequest.Mail, userFromRequest.Password)
 	/////////
-	log.Debug("SignUp : ended")
+	log.Info("SignUp : ended")
 	/////////
 	return
 }
 
 func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	/////////
-	log.Debug("SignIn : started")
+	log.Info("SignIn : started")
 	/////////
 	defer r.Body.Close()
 	userFromRequest, err := getUserFromJSONSignIn(r)
@@ -153,14 +153,14 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	h.setCookieWithJwtToken(&w, userFromRequest.Mail, userFromRequest.Password)
 	/////////
-	log.Debug("SignIn : ended")
+	log.Info("SignIn : ended")
 	/////////
 	return
 }
 
 func (h *HandlerAuth) List(w http.ResponseWriter, r *http.Request) {
 	/////////
-	log.Debug("List : started")
+	log.Info("List : started")
 	/////////
 	fmt.Println("")
 	fmt.Println("=============================")
@@ -179,14 +179,14 @@ func (h *HandlerAuth) List(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("=============================")
 	fmt.Println("")
 	/////////
-	log.Debug("List : ended")
+	log.Info("List : ended")
 	/////////
 	return
 }
 
 func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
 	/////////
-	log.Debug("MiddleWare : started & ended")
+	log.Info("MiddleWare : started & ended")
 	/////////
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Info("in middleware")
@@ -201,7 +201,7 @@ func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
 
 func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	/////////
-	log.Debug("User : started")
+	log.Info("User : started")
 	/////////
 	//TODO: Отправить информацию о пользователе таким образом:
 	/*
@@ -231,7 +231,7 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	userID, err := h.useCase.ParseToken(cookie.Value)
 	if err != nil {
 		/////////
-		log.Debug("User : parse error")
+		log.Info("User : parse error")
 		/////////
 		w.WriteHeader(http.StatusTeapot)
 		return
@@ -252,6 +252,6 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(b)
 	/////////
-	log.Debug("User : ended")
+	log.Info("User : ended")
 	/////////
 }
