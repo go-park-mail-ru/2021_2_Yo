@@ -5,13 +5,14 @@ import (
 	localStorageAuth "backend/auth/repository/localstorage"
 	useCaseAuth "backend/auth/usecase"
 	//"github.com/rs/cors"
-	"net/http"
-	"os"
 	gorilla_handlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"net/http"
+	"os"
 )
 
+//Установка допустимых параметров запросов с фронта (или наоборот - на фронт, не оч понял)
 func Preflight(w http.ResponseWriter, r *http.Request) {
 	log.Info("In preflight")
 	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
@@ -26,7 +27,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatal("$PORT must be set")
+		log.Error("$PORT must be set")
 	}
 
 	r := mux.NewRouter()
@@ -39,7 +40,6 @@ func main() {
 	r.HandleFunc("/", handler.MainPage).Methods("GET")
 	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
 	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
-	r.HandleFunc("/test", handler.Test).Methods("GET")
 	r.HandleFunc("/auth", handler.Auth).Methods("GET")
 	r.HandleFunc("/list", handler.List).Methods("GET")
 	r.Methods("OPTIONS").HandlerFunc(Preflight)
@@ -54,9 +54,10 @@ func main() {
 		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
 	))
 
-
 	log.Info("Deploying. Port: ", port)
-	err := http.ListenAndServe(":"+port, r)
+
+	//err := http.ListenAndServe(":"+port, r)
+	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		log.Error("main error: ", err)
 	}
