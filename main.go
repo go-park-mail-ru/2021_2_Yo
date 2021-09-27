@@ -48,7 +48,7 @@ func main() {
 
 	r.HandleFunc("/", handler.MainPage).Methods("GET")
 	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
-	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
+	r.HandleFunc("/login", handler.SignIn).Methods("POST")
 	r.HandleFunc("/test", handler.Test).Methods("GET")
 	r.HandleFunc("/user", handler.User).Methods("GET")
 	r.HandleFunc("/list", handler.List).Methods("GET")

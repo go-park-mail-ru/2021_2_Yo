@@ -89,7 +89,7 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	newUserInput, err := getUserFromJSON(r)
 	if err != nil {
 		http.Error(w, `{"error":"signup_json"}`, 500)
-		m := response{404, "smth", ""}
+		m := response{301, "smth", ""}
 		b, err := json.Marshal(m)
 		if err != nil {
 			panic(err)
