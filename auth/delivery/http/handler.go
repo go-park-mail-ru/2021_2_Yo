@@ -59,6 +59,7 @@ func makeUserDataForResponse(user *models.User) *userDataForResponse {
 
 func getUserFromJSONSignUp(r *http.Request) (*userDataForSignUp, error) {
 	userInput := new(userDataForSignUp)
+
 	//Пытаемся декодировать JSON-запрос в структуру
 	//Валидность данных проверяется на фронтенде (верно?...)
 	err := json.NewDecoder(r.Body).Decode(userInput)
@@ -70,6 +71,7 @@ func getUserFromJSONSignUp(r *http.Request) (*userDataForSignUp, error) {
 
 func getUserFromJSONSignIn(r *http.Request) (*userDataForSignIn, error) {
 	userInput := new(userDataForSignIn)
+
 	//Пытаемся декодировать JSON-запрос в структуру
 	//Валидность данных проверяется на фронтенде (верно?...)
 	err := json.NewDecoder(r.Body).Decode(userInput)
@@ -90,6 +92,12 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 		log.Error("SignUp : didn't get user from JSON")
 		/////////
 		http.Error(w, `{"error":"signup_json"}`, 500)
+		m := response{404, "smth", ""}
+		b, err := json.Marshal(m)
+		if err != nil {
+			panic(err)
+		}
+		w.Write(b)
 		return
 	}
 	fmt.Println(newUserInput)
@@ -97,6 +105,12 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error("SignUp : SignUp error")
 		http.Error(w, `{"error":"signup_signup"}`, 500)
+		m := response{404, "smth", ""}
+		b, err := json.Marshal(m)
+		if err != nil {
+			panic(err)
+		}
+		w.Write(b)
 		return
 	}
 	/////////
@@ -142,6 +156,7 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	//Получаем данные о пользователе для того, чтобы отправить их пользователю
 	userData := makeUserDataForResponse(foundUser)
 	w.WriteHeader(http.StatusOK)
+
 	userDataToWrite, err := json.Marshal(userData)
 	if err != nil {
 		/////////
@@ -216,8 +231,15 @@ func (h *HandlerAuth) MainPage(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
 		log.Println("No cookie")
+		m := response{404, "smth", ""}
+		b, err := json.Marshal(m)
+		if err != nil {
+			panic(err)
+		}
+		w.Write(b)
 		return
 	}
+
 	username, err := h.useCase.ParseToken(cookie.Value)
 	if err != nil {
 		log.Println("Parse error", err)
@@ -231,6 +253,7 @@ func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
 	/////////
 	log.Debug("MiddleWare : started & ended")
 	/////////
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Info("in middleware")
 		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
