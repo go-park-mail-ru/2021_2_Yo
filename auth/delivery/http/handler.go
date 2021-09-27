@@ -133,6 +133,7 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	//TODO: Вроде сделал
 	h.setCookieWithJwtToken(&w, userFromRequest.Mail, userFromRequest.Password)
 	/////////
+	log.Info("SignUp : userFromRequest = ", userFromRequest)
 	log.Info("SignUp : ended")
 	/////////
 	return
