@@ -53,7 +53,7 @@ func main() {
 	repo := localStorageAuth.NewRepositoryUserLocalStorage()
 	useCase := useCaseAuth.NewUseCaseAuth(repo)
 	handler := deliveryAuth.NewHandlerAuth(useCase)
-	//r.Use(handler.MiddleWare)
+	r.Use(handler.MiddleWare)
 
 	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
 	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
@@ -73,8 +73,8 @@ func main() {
 
 	log.Info("Deploying. Port: ", port)
 
-	//err := http.ListenAndServe(":"+port, r)
-	err := http.ListenAndServe(":8080", r)
+	err := http.ListenAndServe(":"+port, r)
+	//err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		log.Error("main error: ", err)
 	}
