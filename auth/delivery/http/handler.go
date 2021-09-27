@@ -55,6 +55,10 @@ type response struct {
 	Name   string `json:"name"`
 }
 
+type responseError struct {
+	Error string `json:"error"`
+}
+
 func makeUserDataForResponse(user *models.User) *userDataForResponse {
 	return &userDataForResponse{
 		Name:    user.Name,
@@ -184,11 +188,17 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		/////////
 		log.Error("SignIn : GetUser error")
 		/////////
-		sendRespose(w, &response{301, "User not found!", ""})
+		/////////////////////////////////////////////////
+		w.WriteHeader(http.StatusOK)
+		b, _ := json.Marshal(&responseError{Error: "User not found"})
+		w.Write(b)
+		/////////////////////////////////////////////////
+		//sendRespose(w, &response{301, "User not found!", ""})
 		return
 	}
 	h.setCookieWithJwtToken(w, userFromRequest.Mail, userFromRequest.Password)
 	////////////////////////////////
+	/*
 	m := response{200, "smth", ""}
 	b, err := json.Marshal(m)
 	if err != nil {
@@ -198,6 +208,7 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(b)
+	 */
 	/////////////////////////////////
 	/////////
 	log.Info("SignIn : ended")
