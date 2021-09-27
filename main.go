@@ -53,7 +53,7 @@ func main() {
 	repo := localStorageAuth.NewRepositoryUserLocalStorage()
 	useCase := useCaseAuth.NewUseCaseAuth(repo)
 	handler := deliveryAuth.NewHandlerAuth(useCase)
-	r.Use(handler.MiddleWare)
+	//r.Use(handler.MiddleWare)
 
 	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
 	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
