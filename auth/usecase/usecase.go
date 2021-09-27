@@ -67,19 +67,10 @@ func (a *UseCaseAuth) SignIn(mail, password string) (string, error) {
 		return "", err
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
-		ID:    user.ID,
+		ID: user.ID,
 	})
 	signedString, err := token.SignedString(a.secretWord)
 	return signedString, err
-}
-
-func (a *UseCaseAuth) List() []models.User {
-	users := a.userRepo.List()
-	var usersUsernames []models.User
-	for _, user := range users {
-		usersUsernames = append(usersUsernames, *user)
-	}
-	return usersUsernames
 }
 
 func (a *UseCaseAuth) ParseToken(cookie string) (string, error) {
@@ -88,11 +79,6 @@ func (a *UseCaseAuth) ParseToken(cookie string) (string, error) {
 		return "", err
 	}
 	return userID, nil
-}
-
-//КОСТЫЛИ!!!
-func (a *UseCaseAuth) GetUser(mail, password string) (*models.User, error) {
-	return a.userRepo.GetUser(mail, password)
 }
 
 func (a *UseCaseAuth) GetUserById(userID string) (*models.User, error) {

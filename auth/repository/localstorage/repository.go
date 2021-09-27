@@ -12,18 +12,16 @@ type RepositoryUserLocalStorage struct {
 	mutex *sync.Mutex
 }
 
-//Функции, создающие все хендлеры, юзкейсы и репозитории, вызываются непосредственно перед инициализированием сервера
 func NewRepositoryUserLocalStorage() *RepositoryUserLocalStorage {
 	result := &RepositoryUserLocalStorage{
 		users: make([]*User, 1),
 		mutex: new(sync.Mutex),
 	}
-	//КОСТЫЛЬ!!!
+	//TODO: Убрать костыль
 	result.users[0] = &User{0, "Dasha", "Petrova", "funnyduck@yandex.ru", "1234567890"}
 	return result
 }
 
-//TODO: проверка на уникальность почты
 func (s *RepositoryUserLocalStorage) CreateUser(user *models.User) error {
 	newUser := toLocalstorageUser(user)
 
@@ -59,7 +57,6 @@ func (s *RepositoryUserLocalStorage) GetUser(mail, password string) (*models.Use
 	return nil, auth.ErrUserNotFound
 }
 
-//КОСТЫЛЬ
 func (s *RepositoryUserLocalStorage) GetUserById(userId string) (*models.User, error) {
 
 	userIdInt, _ := strconv.Atoi(userId)
@@ -74,14 +71,4 @@ func (s *RepositoryUserLocalStorage) GetUserById(userId string) (*models.User, e
 	}
 
 	return nil, auth.ErrUserNotFound
-}
-
-func (s *RepositoryUserLocalStorage) List() []*models.User {
-	var UsersFromStorage []*models.User
-	s.mutex.Lock()
-	for _, user := range s.users {
-		UsersFromStorage = append(UsersFromStorage, toModelUser(user))
-	}
-	s.mutex.Unlock()
-	return UsersFromStorage
 }

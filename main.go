@@ -4,7 +4,6 @@ import (
 	deliveryAuth "backend/auth/delivery/http"
 	localStorageAuth "backend/auth/repository/localstorage"
 	useCaseAuth "backend/auth/usecase"
-	//"github.com/rs/cors"
 	gorilla_handlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -12,7 +11,6 @@ import (
 	"os"
 )
 
-//Установка допустимых параметров запросов с фронта (или наоборот - на фронт, не оч понял)
 func Preflight(w http.ResponseWriter, r *http.Request) {
 	log.Info("In preflight")
 	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
@@ -21,24 +19,6 @@ func Preflight(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
 }
-
-/*
-Курлы:
-
-Регистрация:
-curl -X POST -H "Content-Type: application/json" -d '{"name": "John", "surname": "Brown", "email": "lol@mail.ru", "password": "1224"}' http://localhost:8080/signup
-
-Логин:
-
-Список пользователей:
-~(master*) » curl -X GET -H "Content-Type: application/json" -d '' http://localhost:8080/list
-
-User:
-
-
-
-
- */
 
 func main() {
 	log.Println("Hello, World!")
@@ -53,13 +33,11 @@ func main() {
 	repo := localStorageAuth.NewRepositoryUserLocalStorage()
 	useCase := useCaseAuth.NewUseCaseAuth(repo)
 	handler := deliveryAuth.NewHandlerAuth(useCase)
-	//r.Use(handler.MiddleWare)
 
 	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
 	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
 	r.HandleFunc("/user", handler.User).Methods("GET")
 	r.Methods("OPTIONS").HandlerFunc(Preflight)
-	//Нужен метод для SignIn с методом GET
 
 	r.Use(gorilla_handlers.CORS(
 		gorilla_handlers.AllowedOrigins([]string{"https://bmstusssa.herokuapp.com"}),
