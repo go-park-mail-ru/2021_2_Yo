@@ -38,8 +38,8 @@ func makeUserDataForResponse(user *models.User) *userDataResponse {
 func getUserFromJSON(r *http.Request) (*response.Response, error) {
 	userInput := new(response.Response)
 	err := json.NewDecoder(r.Body).Decode(userInput)
-	log.Info(userInput.Body)
-	log.Info(userInput.Body.Name)
+	log.Info("UserInputBody = ", userInput.Body)
+	log.Info("UserInputBodyName = ",userInput.Body.Name)
 	if err != nil {
 		return nil, err
 	}
