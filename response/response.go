@@ -28,7 +28,7 @@ func OkResponse() *Response {
 	return &Response{
 		Status: 200,
 		Body :ResponseBody {
-			
+			Message: "Всё ок",
 		},
 	}
 }
@@ -37,6 +37,7 @@ func UsernameResponse(name string) *Response {
 	return &Response{
 		Status: 200,
 		Body :ResponseBody {
+			Message: "Держи имя",
 			Name :name,
 		},
 	}
