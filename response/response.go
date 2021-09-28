@@ -1,5 +1,8 @@
 package response
 
+import (
+	log "github.com/sirupsen/logrus"
+)
 type ResponseBody struct {
 	Message  string `json:"message,omitempty"`
 	Name     string `json:"name,omitempty"`
@@ -34,6 +37,7 @@ func OkResponse() *Response {
 }
 
 func UsernameResponse(name string) *Response {
+	log.Info(name)
 	return &Response{
 		Status: 200,
 		Body :ResponseBody {

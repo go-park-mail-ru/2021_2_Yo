@@ -191,7 +191,7 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 		sendResponse(w, response.ErrorResponse("User not found"))
 		return
 	}
-	log.Info("User : Found User = ", foundUser)
+	log.Info("User : Found User = ", *foundUser)
 	sendResponse(w, response.UsernameResponse(foundUser.Name))
 
 	log.Info("User : ended")
