@@ -19,8 +19,6 @@ func NewUseCaseAuth(userRepo auth.RepositoryUser) *UseCaseAuth {
 	}
 }
 
-//////////////////////////////////////////////////////
-
 type claims struct {
 	jwt.StandardClaims
 	//По сути, нужен только ID пользователя
@@ -45,8 +43,6 @@ func parseToken(accessToken string, signingKey []byte) (string, error) {
 	}
 	return "", auth.ErrInvalidAccessToken
 }
-
-//////////////////////////////////////////////////////
 
 func (a *UseCaseAuth) SignUp(name, surname, mail, password string) error {
 	user := &models.User{

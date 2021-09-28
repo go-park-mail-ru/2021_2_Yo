@@ -34,8 +34,6 @@ func main() {
 
 	r := mux.NewRouter()
 
-	
-
 	repo := localStorageAuth.NewRepositoryUserLocalStorage()
 	useCase := useCaseAuth.NewUseCaseAuth(repo)
 	handler := deliveryAuth.NewHandlerAuth(useCase)
