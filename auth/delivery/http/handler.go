@@ -36,9 +36,9 @@ func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, jwtToken stri
 		SameSite: 4,
 	}
 	http.SetCookie(w, cookie)
-	cs := w.Header().Get("Set-Cookie")
-	cs += "; SameSite=None"
-	w.Header().Set("Set-Cookie", cs)
+	//cs := w.Header().Get("Set-Cookie")
+	//cs += "; SameSite=None"
+	//w.Header().Set("Set-Cookie", cs)
 }
 
 func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
