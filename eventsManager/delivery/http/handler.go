@@ -24,6 +24,5 @@ func (h *HandlerEventsManager) List(w http.ResponseWriter, r *http.Request) {
 		response.SendResponse(w, response.ErrorResponse("Can't get list of events"))
 		return
 	}
-	log.Info("List : list of events = ", eventsList[0])
 	response.SendResponse(w, response.EventsListResponse(eventsList))
 }

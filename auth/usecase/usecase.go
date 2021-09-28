@@ -21,11 +21,7 @@ func NewUseCaseAuth(userRepo auth.RepositoryUser) *UseCaseAuth {
 
 type claims struct {
 	jwt.StandardClaims
-	//По сути, нужен только ID пользователя
 	ID string `json:"user_id"`
-	//Name    string `json:"name"`
-	//Surname string `json:"Surname"`
-	//Mail    string `json:"mail"`
 }
 
 func parseToken(accessToken string, signingKey []byte) (string, error) {

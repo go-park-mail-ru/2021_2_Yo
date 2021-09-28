@@ -28,7 +28,7 @@ type ResponseBodyEventList struct {
 
 func MakeEventListForResponse(events []*models.Event) []ResponseBodyEvent {
 	result := make([]ResponseBodyEvent, len(events))
-	for i := 0; i<len(events); i++ {
+	for i := 0; i < len(events); i++ {
 		result[i].Name = events[i].Name
 		result[i].Description = events[i].Description
 		result[i].Viewed = events[i].Views
@@ -69,7 +69,7 @@ func UsernameResponse(name string) *Response {
 
 func EventsListResponse(events []*models.Event) *Response {
 	return &Response{
-		Status: 200,
+		Status:  200,
 		Message: "Sending list of events",
 		Body: ResponseBodyEventList{
 			Events: MakeEventListForResponse(events),
@@ -77,7 +77,6 @@ func EventsListResponse(events []*models.Event) *Response {
 	}
 }
 
-//TODO: Проверить, возможно ли так писать
 func SendResponse(w http.ResponseWriter, response interface{}) {
 	w.WriteHeader(http.StatusOK)
 	b, err := json.Marshal(response)

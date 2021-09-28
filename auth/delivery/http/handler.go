@@ -20,12 +20,10 @@ func NewHandlerAuth(useCase auth.UseCaseAuth) *HandlerAuth {
 
 func getUserFromJSON(r *http.Request) (*response.ResponseBodyUser, error) {
 	userInput := new(response.ResponseBodyUser)
-	log.Info(r.Body)
 	err := json.NewDecoder(r.Body).Decode(userInput)
 	if err != nil {
 		return nil, err
 	}
-	log.Info("getUserFromJSON : UserInputBody = ", userInput)
 	return userInput, nil
 }
 
@@ -35,6 +33,7 @@ func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, jwtToken stri
 		Value:    jwtToken,
 		HttpOnly: true,
 		Secure:   true,
+		//TODO: SameSite = 4
 	}
 	http.SetCookie(w, cookie)
 	cs := w.Header().Get("Set-Cookie")
@@ -59,7 +58,7 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
-		log.Error("SignIn : setCookieWithJwtToken error", err)
+		log.Error("SignIn : useCase.SignIn error", err)
 		response.SendResponse(w, response.ErrorResponse("User not found"))
 		return
 	}
@@ -74,16 +73,16 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	userFromRequest, err := getUserFromJSON(r)
 	log.Info("SignIn : userFromRequest = ", userFromRequest)
 	if err != nil {
-		log.Error("SignIn : getUserFromJSON error")
+		log.Error("SignIn : getUserFromJSON error", err)
 		return
 	}
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
-		log.Error("SignIn : setCookieWithJwtToken error", err)
+		log.Error("SignIn : useCase.SignIn error", err)
 		response.SendResponse(w, response.ErrorResponse("User not found"))
 		return
 	}
-	log.Info("setCookieWithJwtToken : jwtToken = ", jwtToken)
+	log.Info("SignIn : jwtToken = ", jwtToken)
 	h.setCookieWithJwtToken(w, jwtToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Info("SignIn : ended")
@@ -105,7 +104,7 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	log.Info("User : started")
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		log.Error("User : getting cookie error", err)
+		log.Error("User : cookie error", err)
 		response.SendResponse(w, response.ErrorResponse("Error with getting cookie"))
 		return
 	}
@@ -121,7 +120,7 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	log.Info("User : userID = ", userID)
 	foundUser, err := h.useCase.GetUserById(userID)
 	if err == auth.ErrUserNotFound {
-		log.Info("User : GetUser error", err)
+		log.Info("User : GetUserById error", err)
 		response.SendResponse(w, response.ErrorResponse("User not found"))
 		return
 	}

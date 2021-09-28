@@ -7,11 +7,11 @@ import (
 	deliveryEventsManager "backend/eventsManager/delivery/http"
 	localStorageEventsManager "backend/eventsManager/repository/localstorage"
 	useCaseEventsManager "backend/eventsManager/usecase"
-	"net/http"
-	"os"
 	gorilla_handlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"net/http"
+	"os"
 )
 
 //@title BMSTUsa App API
@@ -73,5 +73,4 @@ func main() {
 	if err != nil {
 		log.Error("Main : ListenAndServe error: ", err)
 	}
-
 }
