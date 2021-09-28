@@ -49,8 +49,7 @@ func getUserFromJSON(r *http.Request) (*response.Response, error) {
 func sendResponse(w http.ResponseWriter, response *response.Response) {
 	w.WriteHeader(http.StatusOK)
 	b, err := json.Marshal(response)
-	log.Info("what is this ",b)
-	log.Info("what is this name ",b)
+	log.Info("what is this ",string(b))
 	if err != nil {
 		log.Error("Cound't Marshal")
 		return
@@ -192,8 +191,7 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Info("User : Found User = ", foundUser)
-	userData := makeUserDataForResponse(foundUser)
-	sendResponse(w, response.UsernameResponse(userData.Name))
+	sendResponse(w, response.UsernameResponse(foundUser.Name))
 
 	log.Info("User : ended")
 
