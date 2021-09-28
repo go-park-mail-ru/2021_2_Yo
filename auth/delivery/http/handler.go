@@ -37,7 +37,7 @@ func makeUserDataForResponse(user *models.User) *userDataResponse {
 
 func getUserFromJSON(r *http.Request) (*response.Response, error) {
 	userInput := new(response.Response)
-	err := json.NewDecoder(r.Body).Decode(userInput)
+	err := json.NewDecoder(r.Body).Decode(userInput.Body)
 	log.Info("UserInputBody = ", userInput.Body)
 	log.Info("UserInputBodyName = ",userInput.Body.Name)
 	if err != nil {
@@ -191,7 +191,7 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 		sendResponse(w, response.ErrorResponse("User not found"))
 		return
 	}
-	log.Info("User : Found User = ", *foundUser)
+	log.Info("User : Found User = ", foundUser)
 	sendResponse(w, response.UsernameResponse(foundUser.Name))
 
 	log.Info("User : ended")
