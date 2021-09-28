@@ -12,10 +12,10 @@ type UseCaseAuth struct {
 	secretWord []byte
 }
 
-func NewUseCaseAuth(userRepo auth.RepositoryUser) *UseCaseAuth {
+func NewUseCaseAuth(userRepo auth.RepositoryUser, secretWord []byte) *UseCaseAuth {
 	return &UseCaseAuth{
 		userRepo:   userRepo,
-		secretWord: []byte("welcometosanandreasimcjfromgrovestreet"),
+		secretWord: secretWord,
 	}
 }
 

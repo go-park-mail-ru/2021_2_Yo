@@ -7,6 +7,7 @@ import (
 	deliveryEventsManager "backend/eventsManager/delivery/http"
 	localStorageEventsManager "backend/eventsManager/repository/localstorage"
 	useCaseEventsManager "backend/eventsManager/usecase"
+	"bufio"
 	gorilla_handlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -25,7 +26,20 @@ func Preflight(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	log.Println("Hello, World!")
+	log.Info("Main : start")
+
+	f, err := os.Open("auth/secret.txt")
+	if err != nil {
+		log.Fatal("Main : can't open file with secret keyword!", err)
+	}
+	scanner := bufio.NewScanner(f)
+	scanner.Scan()
+	secret := scanner.Text()
+	if err := f.Close(); err != nil {
+		log.Fatal("Main : can't close file with secret keyword!", err)
+	}
+
+	log.Println(secret)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -36,7 +50,7 @@ func main() {
 	r := mux.NewRouter()
 
 	repositoryAuth := localStorageAuth.NewRepositoryUserLocalStorage()
-	usecaseAuth := useCaseAuth.NewUseCaseAuth(repositoryAuth)
+	usecaseAuth := useCaseAuth.NewUseCaseAuth(repositoryAuth, []byte(secret))
 	handlerAuth := deliveryAuth.NewHandlerAuth(usecaseAuth)
 
 	repositoryEventsManager := localStorageEventsManager.NewRepositoryEventLocalStorage()
@@ -60,8 +74,8 @@ func main() {
 
 	log.Info("Deploying. Port: ", port)
 
-	err := http.ListenAndServe(":"+port, r)
-	if err != nil {
-		log.Error("Main : ListenAndServe error: ", err)
+	errServer := http.ListenAndServe(":"+port, r)
+	if errServer != nil {
+		log.Error("Main : ListenAndServe error: ", errServer)
 	}
 }
