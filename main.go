@@ -4,9 +4,11 @@ import (
 	deliveryAuth "backend/auth/delivery/http"
 	localStorageAuth "backend/auth/repository/localstorage"
 	useCaseAuth "backend/auth/usecase"
+	deliveryEventsManager "backend/eventsManager/delivery/http"
+	localStorageEventsManager "backend/eventsManager/repository/localstorage"
+	useCaseEventsManager "backend/eventsManager/usecase"
 	"net/http"
 	"os"
-
 	gorilla_handlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -36,19 +38,24 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		//log.Error("$PORT must be set")
+		log.Error("Main : PORT must be set")
 		port = "8080"
 	}
 
 	r := mux.NewRouter()
 
-	repo := localStorageAuth.NewRepositoryUserLocalStorage()
-	useCase := useCaseAuth.NewUseCaseAuth(repo)
-	handler := deliveryAuth.NewHandlerAuth(useCase)
+	repositoryAuth := localStorageAuth.NewRepositoryUserLocalStorage()
+	usecaseAuth := useCaseAuth.NewUseCaseAuth(repositoryAuth)
+	handlerAuth := deliveryAuth.NewHandlerAuth(usecaseAuth)
 
-	r.HandleFunc("/signup", handler.SignUp).Methods("POST")
-	r.HandleFunc("/signin", handler.SignIn).Methods("POST")
-	r.HandleFunc("/user", handler.User).Methods("GET")
+	repositoryEventsManager := localStorageEventsManager.NewRepositoryEventLocalStorage()
+	usecaseEventsManager := useCaseEventsManager.NewUseCaseEvents(repositoryEventsManager)
+	handlerEventsManager := deliveryEventsManager.NewHandlerEventsManager(usecaseEventsManager)
+
+	r.HandleFunc("/signup", handlerAuth.SignUp).Methods("POST")
+	r.HandleFunc("/login", handlerAuth.SignIn).Methods("POST")
+	r.HandleFunc("/user", handlerAuth.User).Methods("GET")
+	r.HandleFunc("/events", handlerEventsManager.List)
 	r.Methods("OPTIONS").HandlerFunc(Preflight)
 
 	r.Use(gorilla_handlers.CORS(
@@ -64,7 +71,7 @@ func main() {
 
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
-		log.Error("main error: ", err)
+		log.Error("Main : ListenAndServe error: ", err)
 	}
 
 }
