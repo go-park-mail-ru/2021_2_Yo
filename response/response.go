@@ -1,7 +1,6 @@
 package response
 
-type Response struct {
-	Status   int    `json:"status"`
+type ResponseBody struct {
 	Message  string `json:"message,omitempty"`
 	Name     string `json:"name,omitempty"`
 	Surname  string `json:"surname,omitempty"`
@@ -10,22 +9,35 @@ type Response struct {
 	Token    string `json:"token,omitempty"`
 }
 
+type Response struct {
+	Status   int    `json:"status"`
+	Body ResponseBody `json:"body"`
+}
+
+
 func ErrorResponse(errorMessage string) *Response {
 	return &Response{
-		Status:  500,
-		Message: errorMessage,
+		Status:  404,
+		Body :ResponseBody {
+			Message: errorMessage,
+		},
 	}
 }
 
 func OkResponse() *Response {
 	return &Response{
 		Status: 200,
+		Body :ResponseBody {
+			
+		},
 	}
 }
 
 func UsernameResponse(name string) *Response {
 	return &Response{
 		Status: 200,
-		Name:   name,
+		Body :ResponseBody {
+			Name :name,
+		},
 	}
 }
