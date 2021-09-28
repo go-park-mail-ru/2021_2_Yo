@@ -48,6 +48,7 @@ func getUserFromJSON(r *http.Request) (*response.Response, error) {
 
 func sendResponse(w http.ResponseWriter, response *response.Response) {
 	w.WriteHeader(http.StatusOK)
+	log.Info("what is this ",response)
 	b, err := json.Marshal(response)
 	log.Info("what is this ",string(b))
 	if err != nil {
