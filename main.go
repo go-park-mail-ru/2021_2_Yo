@@ -17,7 +17,7 @@ import (
 //@description API Server for TodoList Application
 
 //@host https://yobmstu.herokuapp.com
-//@BasePath /swagger
+//@BasePath /
 
 //
 
