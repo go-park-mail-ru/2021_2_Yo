@@ -2,7 +2,6 @@ package http
 
 import (
 	"backend/auth"
-	"backend/models"
 	"backend/response"
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
@@ -19,24 +18,8 @@ func NewHandlerAuth(useCase auth.UseCase) *HandlerAuth {
 	}
 }
 
-type userDataResponse struct {
-	Name     string `json:"name,omitempty"`
-	Surname  string `json:"surname,omitempty"`
-	Mail     string `json:"email,omitempty"`
-	Password string `json:"password,omitempty"`
-}
-
-func makeUserDataForResponse(user *models.User) *userDataResponse {
-	return &userDataResponse{
-		Name:     user.Name,
-		Surname:  user.Surname,
-		Mail:     user.Mail,
-		Password: user.Password,
-	}
-}
-
-func getUserFromJSON(r *http.Request) (*userDataResponse, error) {
-	userInput := new(userDataResponse)
+func getUserFromJSON(r *http.Request) (*response.Response, error) {
+	userInput := new(response.Response)
 	err := json.NewDecoder(r.Body).Decode(userInput)
 	if err != nil {
 		return nil, err
@@ -188,8 +171,7 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userData := makeUserDataForResponse(foundUser)
-	sendResponse(w, response.UsernameResponse(userData.Name))
+	sendResponse(w, response.UsernameResponse(foundUser.Name))
 
 	log.Info("User : ended")
 
