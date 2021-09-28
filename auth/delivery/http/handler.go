@@ -60,9 +60,9 @@ func sendResponse(w http.ResponseWriter, responseToSend *response) {
 	w.WriteHeader(http.StatusOK)
 	b, err := json.Marshal(responseToSend)
 	if err != nil {
-		/////////
+		
 		log.Error("SignUp : Response error")
-		/////////
+		
 		return
 	}
 	w.Write(b)
@@ -83,20 +83,20 @@ func setCookie(w http.ResponseWriter, cookie *http.Cookie) {
 }
 
 func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, userMail, userPassword string) {
-	/////////
+	
 	log.Info("setCookieWithJwtToken : started")
-	/////////
+	
 	jwtToken, err := h.useCase.SignIn(userMail, userPassword)
 	if err == auth.ErrUserNotFound {
-		/////////
+		
 		log.Error("SignIn : setCookieWithJwtToken error", err)
-		/////////
+		
 		sendError(w, "User not found")
 		return
 	}
-	/////////
+	
 	log.Info("setCookieWithJwtToken : jwtToken = ", jwtToken)
-	/////////
+	
 	cookie := &http.Cookie{
 		Name:     "session_id",
 		Value:    jwtToken,
@@ -104,58 +104,51 @@ func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, userMail, use
 		Secure:   true,
 	}
 	setCookie(w, cookie)
-	/////////
+	
 	log.Info("setCookieWithJwtToken : ended")
-	/////////
+	
 }
 
 func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
-	/////////
 	log.Info("SignUp : started")
-	/////////
+
 	userFromRequest, err := getUserFromJSON(r)
+
 	if err != nil {
-		/////////
 		log.Error("SignUp : didn't get user from JSON", err)
-		/////////
 		sendError(w, "")
 		return
 	}
-	/////////
+
 	log.Info("SignUp : userFromRequest = ", userFromRequest)
-	/////////
 	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
 	if err != nil {
-		/////////
 		log.Error("SignUp : SignUp error", err)
-		/////////
 		sendError(w, "User already exists")
 		return
 	}
+
 	h.setCookieWithJwtToken(w, userFromRequest.Mail, userFromRequest.Password)
 	sendResponse(w, &response{
 		Status: http.StatusOK,
 		Msg:    "Sign Up success",
 		Name:   "",
 	})
-	/////////
 	log.Info("SignUp : ended")
-	/////////
-	return
 }
 
 func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
-	/////////
+	
 	log.Info("SignIn : started")
-	/////////
+	
 	userFromRequest, err := getUserFromJSON(r)
-	/////////
+	
 	log.Info("SignIn : userFromRequest = ", userFromRequest)
-	/////////
+	
 	if err != nil {
-		/////////
+		
 		log.Error("SignIn : getUserFromJSON error")
-		/////////
+		
 		return
 	}
 	h.setCookieWithJwtToken(w, userFromRequest.Mail, userFromRequest.Password)
@@ -164,16 +157,15 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		Msg:    "Cookie sent!",
 		Name:   "",
 	})
-	/////////
+	
 	log.Info("SignIn : ended")
-	/////////
-	return
+	
 }
 
 func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
-	/////////
+	
 	log.Info("MiddleWare : started & ended")
-	/////////
+	
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -185,46 +177,46 @@ func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
 }
 
 func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
-	/////////
+	
 	log.Info("User : started")
-	/////////
+	
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		/////////
+		
 		log.Error("User : getting cookie error", err)
-		/////////
+		
 		sendError(w, "Error with getting cookie")
 		return
 	}
-	/////////
+	
 	if cookie != nil {
 		log.Info("User : cookie.value = ", cookie.Value)
 	}
-	/////////
+	
 	//TODO: Отладить этот момент, мб если cookie пустая, то при инициализации cookie вылезет ошибка и вызовется предыдущий if
 	if cookie == nil {
-		/////////
+		
 		log.Error("User : cookie is nil")
-		/////////
+		
 		sendError(w, "No cookie sent or wrong cookie format")
 		return
 	}
 	userID, err := h.useCase.ParseToken(cookie.Value)
 	if err != nil {
-		/////////
+		
 		log.Info("User : parse error", err)
-		/////////
+		
 		sendError(w, "Error with parsing token")
 		return
 	}
-	/////////
+	
 	log.Info("User : userID = ", userID)
-	/////////
+	
 	foundUser, err := h.useCase.GetUserById(userID)
 	if err == auth.ErrUserNotFound {
-		/////////
+		
 		log.Info("User : GetUser error", err)
-		/////////
+		
 		sendError(w, "User not found")
 		return
 	}
@@ -234,7 +226,7 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 		Msg:    "sending name",
 		Name:   userData.Name,
 	})
-	/////////
+	
 	log.Info("User : ended")
-	/////////
+	
 }

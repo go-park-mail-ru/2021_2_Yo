@@ -4,11 +4,12 @@ import (
 	deliveryAuth "backend/auth/delivery/http"
 	localStorageAuth "backend/auth/repository/localstorage"
 	useCaseAuth "backend/auth/usecase"
+	"net/http"
+	"os"
+
 	gorilla_handlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"os"
 )
 
 func Preflight(w http.ResponseWriter, r *http.Request) {
@@ -21,6 +22,8 @@ func Preflight(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
+	log.SetFormatter(new(log.JSONFormatter))
 	log.Println("Hello, World!")
 
 	port := os.Getenv("PORT")
