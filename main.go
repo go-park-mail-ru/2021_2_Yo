@@ -23,7 +23,6 @@ func Preflight(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	log.SetFormatter(new(log.JSONFormatter))
 	log.Println("Hello, World!")
 
 	port := os.Getenv("PORT")
