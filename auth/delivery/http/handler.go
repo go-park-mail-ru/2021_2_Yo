@@ -33,8 +33,7 @@ func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, jwtToken stri
 		Value:    jwtToken,
 		HttpOnly: true,
 		Secure:   true,
-		//TODO: SameSite =
-		//SameSite: http.SameSiteDefaultMode,
+		SameSite: 4,
 	}
 	http.SetCookie(w, cookie)
 	cs := w.Header().Get("Set-Cookie")
