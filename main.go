@@ -25,10 +25,13 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Error("$PORT must be set")
+		//log.Error("$PORT must be set")
+		port = "8080"
 	}
 
 	r := mux.NewRouter()
+
+	
 
 	repo := localStorageAuth.NewRepositoryUserLocalStorage()
 	useCase := useCaseAuth.NewUseCaseAuth(repo)
@@ -51,7 +54,6 @@ func main() {
 	log.Info("Deploying. Port: ", port)
 
 	err := http.ListenAndServe(":"+port, r)
-	//err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		log.Error("main error: ", err)
 	}

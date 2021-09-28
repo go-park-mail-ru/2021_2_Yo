@@ -4,10 +4,7 @@ import (
 	"backend/auth"
 	"backend/models"
 	"fmt"
-
-	//"time"
 	"github.com/dgrijalva/jwt-go/v4"
-	//"crypto/sha1"
 )
 
 type UseCaseAuth struct {

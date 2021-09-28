@@ -14,11 +14,9 @@ type RepositoryUserLocalStorage struct {
 
 func NewRepositoryUserLocalStorage() *RepositoryUserLocalStorage {
 	result := &RepositoryUserLocalStorage{
-		users: make([]*User, 1),
+		users: make([]*User, 0),
 		mutex: new(sync.Mutex),
 	}
-	//TODO: Убрать костыль
-	result.users[0] = &User{0, "Dasha", "Petrova", "funnyduck@yandex.ru", "1234567890"}
 	return result
 }
 
