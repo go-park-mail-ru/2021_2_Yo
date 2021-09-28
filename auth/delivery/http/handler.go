@@ -3,7 +3,6 @@ package http
 import (
 	"backend/auth"
 	"backend/response"
-	"backend/models"
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -19,28 +18,13 @@ func NewHandlerAuth(useCase auth.UseCase) *HandlerAuth {
 	}
 }
 
-type userDataResponse struct {
-	Name     string `json:"name,omitempty"`
-	Surname  string `json:"surname,omitempty"`
-	Mail     string `json:"email,omitempty"`
-	Password string `json:"password,omitempty"`
-}
 
-func makeUserDataForResponse(user *models.User) *userDataResponse {
-	return &userDataResponse{
-		Name:     user.Name,
-		Surname:  user.Surname,
-		Mail:     user.Mail,
-		Password: user.Password,
-	}
-}
-
-func getUserFromJSON(r *http.Request) (*response.Response, error) {
-	userInput := new(response.Response)
+func getUserFromJSON(r *http.Request) (*response.ResponseBody, error) {
+	userInput := new(response.ResponseBody)
 	log.Info(r.Body)
 	err := json.NewDecoder(r.Body).Decode(userInput)
-	log.Info("UserInputBody = ", userInput.Body)
-	log.Info("UserInputBodyName = ",userInput.Body.Name)
+	log.Info("UserInputBody = ", userInput)
+	log.Info("UserInputBodyName = ",userInput.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -85,8 +69,8 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Info("SignUp : userFromRequest = ", userFromRequest)
-	err = h.useCase.SignUp(userFromRequest.Body.Name, userFromRequest.Body.Surname,
-		userFromRequest.Body.Mail, userFromRequest.Body.Password)
+	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname,
+		userFromRequest.Mail, userFromRequest.Password)
 
 	if err != nil {
 		log.Error("SignUp : SignUp error", err)
@@ -94,7 +78,7 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwtToken, err := h.useCase.SignIn(userFromRequest.Body.Mail, userFromRequest.Body.Password)
+	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
 		log.Error("SignIn : setCookieWithJwtToken error", err)
 		sendResponse(w, response.ErrorResponse("User not found"))
@@ -124,7 +108,7 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwtToken, err := h.useCase.SignIn(userFromRequest.Body.Name, userFromRequest.Body.Password)
+	jwtToken, err := h.useCase.SignIn(userFromRequest.Name, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
 		log.Error("SignIn : setCookieWithJwtToken error", err)
 		sendResponse(w, response.ErrorResponse("User not found"))
