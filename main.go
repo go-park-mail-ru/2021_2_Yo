@@ -14,15 +14,6 @@ import (
 	"os"
 )
 
-//@title BMSTUsa App API
-//@version 1.0
-//@description API Server for TodoList Application
-
-//@host https://yobmstu.herokuapp.com
-//@BasePath /
-
-//
-
 func Preflight(w http.ResponseWriter, r *http.Request) {
 	log.Info("In preflight")
 	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
