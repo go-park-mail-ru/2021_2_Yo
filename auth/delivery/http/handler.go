@@ -5,7 +5,6 @@ import (
 	"backend/response"
 	"encoding/json"
 	"net/http"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 )
