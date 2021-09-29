@@ -58,7 +58,7 @@ func (a *UseCaseAuth) SignIn(mail, password string) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
 		jwt.StandardClaims{
-			ExpiresAt: &jwt.Time{time.Now().Add(12 * time.Hour)},
+			ExpiresAt: &jwt.Time{time.Now().Add(12 * time.Second)},
 			IssuedAt:  &jwt.Time{time.Now()},
 		},
 		user.ID,
