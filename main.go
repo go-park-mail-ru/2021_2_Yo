@@ -39,8 +39,6 @@ func main() {
 		log.Fatal("Main : can't close file with secret keyword!", err)
 	}
 
-	log.Println(secret)
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Error("Main : PORT must be set")

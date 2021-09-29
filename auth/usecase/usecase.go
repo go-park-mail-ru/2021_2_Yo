@@ -62,14 +62,10 @@ func (a *UseCaseAuth) SignIn(mail, password string) (string, error) {
 	return signedString, err
 }
 
-func (a *UseCaseAuth) ParseToken(cookie string) (string, error) {
-	userID, err := parseToken(cookie, a.secretWord)
+func (a *UseCaseAuth) ParseToken(accessToken string) (*models.User, error) {
+	userID, err := parseToken(accessToken, a.secretWord)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return userID, nil
-}
-
-func (a *UseCaseAuth) GetUserById(userID string) (*models.User, error) {
 	return a.userRepo.GetUserById(userID)
 }

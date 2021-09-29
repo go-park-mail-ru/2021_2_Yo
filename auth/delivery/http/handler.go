@@ -70,11 +70,11 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignIn : started")
 	userFromRequest, err := getUserFromJSON(r)
-	log.Info("SignIn : userFromRequest = ", userFromRequest)
 	if err != nil {
 		log.Error("SignIn : getUserFromJSON error", err)
 		return
 	}
+	log.Info("SignIn : userFromRequest = ", userFromRequest)
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
 		log.Error("SignIn : useCase.SignIn error", err)
@@ -85,18 +85,6 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	h.setCookieWithJwtToken(w, jwtToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Info("SignIn : ended")
-}
-
-func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
-	log.Info("MiddleWare : started & ended")
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
-		handler.ServeHTTP(w, r)
-	})
 }
 
 func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
@@ -110,17 +98,10 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	if cookie != nil {
 		log.Info("User : cookie.value = ", cookie.Value)
 	}
-	userID, err := h.useCase.ParseToken(cookie.Value)
+	foundUser, err := h.useCase.ParseToken(cookie.Value)
 	if err != nil {
-		log.Info("User : parse error", err)
+		log.Error("User : User token parsing error", err)
 		response.SendResponse(w, response.ErrorResponse("Error with parsing token"))
-		return
-	}
-	log.Info("User : userID = ", userID)
-	foundUser, err := h.useCase.GetUserById(userID)
-	if err == auth.ErrUserNotFound {
-		log.Info("User : GetUserById error", err)
-		response.SendResponse(w, response.ErrorResponse("User not found"))
 		return
 	}
 	log.Info("User : Found User = ", foundUser)
