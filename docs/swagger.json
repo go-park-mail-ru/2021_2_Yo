@@ -1,0 +1,34 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "TP_2021_GO TEAM YO",
+        "title": "BMSTUSA API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "https://yobmstu.herokuapp.com",
+    "basePath": "/",
+    "paths": {},
+    "definitions": {
+        "response.ResponseBodyUser": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "surname": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

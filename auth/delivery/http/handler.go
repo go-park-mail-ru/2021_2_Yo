@@ -42,6 +42,12 @@ func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, jwtToken stri
 	w.Header().Set("Set-Cookie", cs)
 }
 
+//@Summmary SignUp
+//@Tags auth
+//@Description Create an account
+//@Accept json
+//@Produce json
+//@Param input body response.ResponseBodyUser true "Account Info"
 func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignUp : started")
 	userFromRequest, err := getUserFromJSON(r)

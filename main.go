@@ -13,6 +13,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
+	"github.com/swaggo/http-swagger"
+	_ "github.com/go-park-mail-ru/2021_2_Yo/docs"
 )
 
 func Preflight(w http.ResponseWriter, r *http.Request) {
@@ -23,6 +25,13 @@ func Preflight(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
 }
+
+//@title BMSTUSA API
+//@version 1.0
+//@description TP_2021_GO TEAM YO
+
+//@host https://yobmstu.herokuapp.com
+//@BasePath /
 
 func main() {
 
@@ -67,7 +76,7 @@ func main() {
 		gorilla_handlers.AllowedOrigins([]string{"https://bmstusssa.herokuapp.com"}),
 		gorilla_handlers.AllowedHeaders([]string{
 			"Accept", "Content-Type", "Content-Length",
-			"Accept-Encoding", "X-CSRF-Token", "csrf-token", "Authorization"}),
+			"Accept-Encoding", "X-CSRF-Token", "csrf-token"}),
 		gorilla_handlers.AllowCredentials(),
 		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
 	))

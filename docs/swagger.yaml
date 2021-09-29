@@ -1,0 +1,23 @@
+basePath: /
+definitions:
+  response.ResponseBodyUser:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      surname:
+        type: string
+      token:
+        type: string
+    type: object
+host: https://yobmstu.herokuapp.com
+info:
+  contact: {}
+  description: TP_2021_GO TEAM YO
+  title: BMSTUSA API
+  version: "1.0"
+paths: {}
+swagger: "2.0"
