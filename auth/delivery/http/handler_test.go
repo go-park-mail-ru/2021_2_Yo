@@ -84,8 +84,8 @@ func TestUser(t *testing.T) {
 	w := httptest.NewRecorder()
 	jwtToken := "test_token"
 	cookie := &http.Cookie{
-		Name:     "session_id",
-		Value:    jwtToken,
+		Name:  "session_id",
+		Value: jwtToken,
 	}
 
 	useCaseMock.On(
@@ -104,7 +104,7 @@ func TestUser(t *testing.T) {
 
 	require.Equal(t, 200, w.Code, "TestSignIn : expected 200, got", w.Code)
 	require.Equal(t,
-		"{\"status\":200,\"message\":\"Sending username\",\"body\":{\"name\":\"nameTest\"}}",
+		"{\"status\":200,\"body\":{\"name\":\"nameTest\"}}",
 		w.Body.String(),
 		"TestSignIn : expected jwt_token_test, got",
 		w.Body.String())
