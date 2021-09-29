@@ -45,20 +45,20 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	userFromRequest, err := getUserFromJSON(r)
 	if err != nil {
 		log.Error("SignUp : didn't get user from JSON", err)
-		response.SendResponse(w, response.ErrorResponse("SignUp : didn't get user from JSON"))
+		response.SendResponse(w, response.ErrorResponse("Не получилось получить пользователя из JSON"))
 		return
 	}
 	log.Info("SignUp : userFromRequest = ", userFromRequest)
 	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
 	if err != nil {
 		log.Error("SignUp : SignUp error", err)
-		response.SendResponse(w, response.ErrorResponse("User already exists"))
+		response.SendResponse(w, response.ErrorResponse("Пользователь уже зарегестрирован"))
 		return
 	}
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
 		log.Error("SignIn : useCase.SignIn error", err)
-		response.SendResponse(w, response.ErrorResponse("User not found"))
+		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
 		return
 	}
 	log.Info("setCookieWithJwtToken : jwtToken = ", jwtToken)
@@ -78,7 +78,7 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
 		log.Error("SignIn : useCase.SignIn error", err)
-		response.SendResponse(w, response.ErrorResponse("User not found"))
+		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
 		return
 	}
 	log.Info("SignIn : jwtToken = ", jwtToken)
@@ -92,7 +92,7 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
 		log.Error("User : cookie error", err)
-		response.SendResponse(w, response.ErrorResponse("Error with getting cookie"))
+		response.SendResponse(w, response.ErrorResponse("Ошибка с получением Cookie"))
 		return
 	}
 	if cookie != nil {
@@ -101,7 +101,7 @@ func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	foundUser, err := h.useCase.ParseToken(cookie.Value)
 	if err != nil {
 		log.Error("User : User token parsing error", err)
-		response.SendResponse(w, response.ErrorResponse("Error with parsing token"))
+		response.SendResponse(w, response.ErrorResponse("Ошибка с парсингом токена"))
 		return
 	}
 	log.Info("User : Found User = ", foundUser)

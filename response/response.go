@@ -60,7 +60,7 @@ func OkResponse() *Response {
 func UsernameResponse(name string) *Response {
 	return &Response{
 		Status:  200,
-		Message: "Sending username",
+		Message: "Отправка имени пользователя",
 		Body: ResponseBodyUser{
 			Name: name,
 		},
