@@ -4,8 +4,10 @@ import (
 	"backend/auth"
 	"backend/response"
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"net/http"
+	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type HandlerAuth struct {
@@ -33,6 +35,7 @@ func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, jwtToken stri
 		Value:    jwtToken,
 		HttpOnly: true,
 		Secure:   true,
+		Expires: time.Now().Add(12 * time.Second),
 	}
 	http.SetCookie(w, cookie)
 	cs := w.Header().Get("Set-Cookie")

@@ -5,7 +5,6 @@ import (
 	"backend/models"
 	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
-	"time"
 )
 
 type UseCaseAuth struct {
@@ -57,11 +56,7 @@ func (a *UseCaseAuth) SignIn(mail, password string) (string, error) {
 		return "", err
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
-		jwt.StandardClaims{
-			ExpiresAt: &jwt.Time{time.Now().Add(12 * time.Second)},
-			IssuedAt:  &jwt.Time{time.Now()},
-		},
-		user.ID,
+		ID: user.ID,
 	})
 	signedString, err := token.SignedString(a.secretWord)
 	return signedString, err
