@@ -7,12 +7,14 @@ import (
 	"net/http"
 )
 
+const STATUS_OK = 200
+const STATUS_ERROR = 404
+
 type ResponseBodyUser struct {
 	Name     string `json:"name,omitempty"`
 	Surname  string `json:"surname,omitempty"`
 	Mail     string `json:"email,omitempty"`
 	Password string `json:"password,omitempty"`
-	Token    string `json:"token,omitempty"`
 }
 
 type ResponseBodyEvent struct {
@@ -86,4 +88,10 @@ func SendResponse(w http.ResponseWriter, response interface{}) {
 	}
 	log.Info("sendResponse : response to send = ", string(b))
 	w.Write(b)
+}
+
+//For docs
+type BaseResponse struct {
+	Status  int         `json:"status"`
+	Message string      `json:"message,omitempty"`
 }

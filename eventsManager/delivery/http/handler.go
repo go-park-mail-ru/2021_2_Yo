@@ -17,6 +17,13 @@ func NewHandlerEventsManager(useCase eventsManager.UseCaseEventsManager) *Handle
 	}
 }
 
+//@Summmary List
+//@Tags Events
+//@Description "Список мероприятий"
+//@Produce json
+//@Success 200 {object} response.ResponseBodyEventList
+//@Failure 404 {object} response.BaseResponse
+//@Router /events [get]
 func (h *HandlerEventsManager) List(w http.ResponseWriter, r *http.Request) {
 	eventsList, err := h.useCase.List()
 	if err != nil {

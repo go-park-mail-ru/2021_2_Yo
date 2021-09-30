@@ -34,7 +34,6 @@ func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, jwtToken stri
 		Value:    jwtToken,
 		HttpOnly: true,
 		Secure:   true,
-		MaxAge: 300,
 	}
 	http.SetCookie(w, cookie)
 	cs := w.Header().Get("Set-Cookie")
@@ -44,10 +43,13 @@ func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, jwtToken stri
 
 //@Summmary SignUp
 //@Tags auth
-//@Description Create an account
+//@Description Регистрация
 //@Accept json
 //@Produce json
 //@Param input body response.ResponseBodyUser true "Account Info"
+//@Success 200 {object} response.Response{body=response.ResponseBodyUser}
+//@Failure 404 {object} response.BaseResponse
+//@Router /signup [post]
 func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignUp : started")
 	userFromRequest, err := getUserFromJSON(r)
@@ -75,6 +77,15 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignUp : ended")
 }
 
+//@Summmary SignIn
+//@Tags auth
+//@Description "Авторизация"
+//@Accept json
+//@Produce json
+//@Param input body response.ResponseBodyUser true "Account Info"
+//@Success 200 {object} response.Response{body=response.ResponseBodyUser}
+//@Failure 404 {object} response.BaseResponse 
+//@Router /signin [post]
 func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignIn : started")
 	userFromRequest, err := getUserFromJSON(r)
@@ -106,7 +117,13 @@ func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
 		handler.ServeHTTP(w, r)
 	})
 }
-
+//@Summmary User
+//@Tags auth
+//@Description "Главная страница"
+//@Produce json
+//@Success 200 {object} response.BaseResponse
+//@Failure 404 {object} response.BaseResponse
+//@Router /user [get]
 func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
 	log.Info("User : started")
 	cookie, err := r.Cookie("session_id")

@@ -14,7 +14,7 @@ import (
 	"net/http"
 	"os"
 	"github.com/swaggo/http-swagger"
-	_ "github.com/go-park-mail-ru/2021_2_Yo/docs"
+	_ "backend/docs"
 )
 
 func Preflight(w http.ResponseWriter, r *http.Request) {
@@ -29,9 +29,18 @@ func Preflight(w http.ResponseWriter, r *http.Request) {
 //@title BMSTUSA API
 //@version 1.0
 //@description TP_2021_GO TEAM YO
+// @termsOfService http://swagger.io/terms/
 
-//@host https://yobmstu.herokuapp.com
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+//@host bmstusasa.herokuapp.com
 //@BasePath /
+//@schemes https
 
 func main() {
 
@@ -71,6 +80,8 @@ func main() {
 	r.HandleFunc("/user", handlerAuth.User).Methods("GET")
 	r.HandleFunc("/events", handlerEventsManager.List)
 	r.Methods("OPTIONS").HandlerFunc(Preflight)
+
+	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
 	r.Use(gorilla_handlers.CORS(
 		gorilla_handlers.AllowedOrigins([]string{"https://bmstusssa.herokuapp.com"}),
