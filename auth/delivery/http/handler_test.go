@@ -14,6 +14,7 @@ import (
 )
 
 func TestSignUp(t *testing.T) {
+	
 	r := mux.NewRouter()
 	useCaseMock := new(usecase.UseCaseAuthMock)
 	handlerTest := NewHandlerAuth(useCaseMock)
