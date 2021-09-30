@@ -38,7 +38,7 @@ func Preflight(w http.ResponseWriter, r *http.Request) {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-//@host bmstusasa.herokuapp.com
+//@host yobmstu.herokuapp.com
 //@BasePath /
 //@schemes https
 
