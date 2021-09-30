@@ -16,9 +16,7 @@ func TestList(t *testing.T) {
 	useCaseMock := new(usecase.UseCaseEventsManagerMock)
 	handlerTest := NewHandlerEventsManager(useCaseMock)
 	r.HandleFunc("/events", handlerTest.List).Methods("GET")
-
-	//var expected []*models.Event
-	//expected = nil
+	
 	useCaseMock.On("List")
 
 	w := httptest.NewRecorder()
