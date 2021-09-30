@@ -60,7 +60,7 @@ func OkResponse() *Response {
 func UsernameResponse(name string) *Response {
 	return &Response{
 		Status:  200,
-		Message: "Отправка имени пользователя",
+		Message: "",
 		Body: ResponseBodyUser{
 			Name: name,
 		},
@@ -70,7 +70,7 @@ func UsernameResponse(name string) *Response {
 func EventsListResponse(events []*models.Event) *Response {
 	return &Response{
 		Status:  200,
-		Message: "Sending list of events",
+		Message: "",
 		Body: ResponseBodyEventList{
 			Events: MakeEventListForResponse(events),
 		},

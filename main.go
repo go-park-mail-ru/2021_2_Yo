@@ -49,16 +49,16 @@ func main() {
 
 	repositoryAuth := localStorageAuth.NewRepositoryUserLocalStorage()
 	usecaseAuth := useCaseAuth.NewUseCaseAuth(repositoryAuth, []byte(secret))
-	handlerAuth := deliveryAuth.NewHandlerAuth(usecaseAuth)
+	authManager := deliveryAuth.NewHandlerAuth(usecaseAuth)
 
 	repositoryEventsManager := localStorageEventsManager.NewRepositoryEventLocalStorage()
 	usecaseEventsManager := useCaseEventsManager.NewUseCaseEvents(repositoryEventsManager)
-	handlerEventsManager := deliveryEventsManager.NewHandlerEventsManager(usecaseEventsManager)
+	eventsManager := deliveryEventsManager.NewHandlerEventsManager(usecaseEventsManager)
 
-	r.HandleFunc("/signup", handlerAuth.SignUp).Methods("POST")
-	r.HandleFunc("/login", handlerAuth.SignIn).Methods("POST")
-	r.HandleFunc("/user", handlerAuth.User).Methods("GET")
-	r.HandleFunc("/events", handlerEventsManager.List)
+	r.HandleFunc("/signup", authManager.SignUp).Methods("POST")
+	r.HandleFunc("/login", authManager.SignIn).Methods("POST")
+	r.HandleFunc("/user", authManager.User).Methods("GET")
+	r.HandleFunc("/events", eventsManager.List)
 	r.Methods("OPTIONS").HandlerFunc(Preflight)
 
 	r.Use(gorilla_handlers.CORS(
