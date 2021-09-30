@@ -6,6 +6,7 @@ import (
 )
 
 type UseCaseAuthMock struct {
+	
 	mock.Mock
 }
 
