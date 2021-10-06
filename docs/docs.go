@@ -269,7 +269,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "bmstusasa.herokuapp.com",
+	Host:        "yobmstu.herokuapp.com",
 	BasePath:    "/",
 	Schemes:     []string{"https"},
 	Title:       "BMSTUSA API",

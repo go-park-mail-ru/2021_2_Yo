@@ -18,7 +18,7 @@
         },
         "version": "1.0"
     },
-    "host": "bmstusasa.herokuapp.com",
+    "host": "yobmstu.herokuapp.com",
     "basePath": "/",
     "paths": {
         "/events": {

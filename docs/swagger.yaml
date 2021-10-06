@@ -44,7 +44,7 @@ definitions:
       surname:
         type: string
     type: object
-host: bmstusasa.herokuapp.com
+host: yobmstu.herokuapp.com
 info:
   contact:
     email: support@swagger.io
