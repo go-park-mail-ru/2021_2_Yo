@@ -7,13 +7,13 @@ import (
 )
 
 func TestCreateUser(t *testing.T) {
-	repositotyTest := NewRepositoryUserLocalStorage()
+	repositotyTest := NewRepository()
 	err := repositotyTest.CreateUser(&models.User{})
 	require.NoError(t, err, "TestCreateUser : err = ", err)
 }
 
 func TestGetUser(t *testing.T) {
-	repositotyTest := NewRepositoryUserLocalStorage()
+	repositotyTest := NewRepository()
 	idInt := 0
 	mail := "mailTest"
 	password := "passwordTest"
@@ -30,7 +30,7 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestGetUserById(t *testing.T) {
-	repositotyTest := NewRepositoryUserLocalStorage()
+	repositotyTest := NewRepository()
 	idInt := 0
 	idString := "0"
 	userToAppend := &User{

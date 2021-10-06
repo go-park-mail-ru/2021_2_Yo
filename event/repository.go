@@ -1,9 +1,9 @@
-package eventsManager
+package event
 
 import (
 	"backend/models"
 )
 
-type RepositoryEventsManager interface {
+type Repository interface {
 	List() ([]*models.Event, error)
 }

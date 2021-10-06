@@ -5,10 +5,10 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type UseCaseEventsManagerMock struct {
+type UseCaseMock struct {
 	mock.Mock
 }
 
-func (m *UseCaseEventsManagerMock) List() ([]*models.Event, error) {
+func (m *UseCaseMock) List() ([]*models.Event, error) {
 	return nil, nil
 }

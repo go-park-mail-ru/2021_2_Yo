@@ -7,7 +7,7 @@ import (
 )
 
 func TestList(t *testing.T) {
-	repositoryTest := NewRepositoryEventLocalStorage()
+	repositoryTest := NewRepository()
 	resultEvents := make([]*models.Event, len(eventsDemo))
 	for i := 0; i < len(eventsDemo); i++ {
 		resultEvents[i] = toModelEvent(eventsDemo[i])

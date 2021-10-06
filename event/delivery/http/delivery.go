@@ -1,23 +1,23 @@
 package http
 
 import (
-	"backend/eventsManager"
+	"backend/event"
 	"backend/response"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
-type HandlerEventsManager struct {
-	useCase eventsManager.UseCaseEventsManager
+type Delivery struct {
+	useCase event.UseCase
 }
 
-func NewHandlerEventsManager(useCase eventsManager.UseCaseEventsManager) *HandlerEventsManager {
-	return &HandlerEventsManager{
+func NewDelivery(useCase event.UseCase) *Delivery {
+	return &Delivery{
 		useCase: useCase,
 	}
 }
 
-func (h *HandlerEventsManager) List(w http.ResponseWriter, r *http.Request) {
+func (h *Delivery) List(w http.ResponseWriter, r *http.Request) {
 	eventsList, err := h.useCase.List()
 	if err != nil {
 		log.Error("List : got error", err)

@@ -1,4 +1,4 @@
-package eventsManager
+package event
 
 import "errors"
 

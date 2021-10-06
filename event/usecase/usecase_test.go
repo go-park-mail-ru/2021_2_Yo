@@ -1,15 +1,15 @@
 package usecase
 
 import (
-	"backend/eventsManager/repository/localstorage"
+	"backend/event/repository/mock"
 	"backend/models"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestList(t *testing.T) {
-	repositoryMock := new(localstorage.RepositoryEventMock)
-	eventsManagerTest := NewUseCaseEvents(repositoryMock)
+	repositoryMock := new(mock.RepositoryMock)
+	eventsManagerTest := NewUseCase(repositoryMock)
 	var expected []*models.Event
 	expected = nil
 	repositoryMock.On("List")

@@ -8,12 +8,12 @@ import (
 	"net/http"
 )
 
-type HandlerAuth struct {
-	useCase auth.UseCaseAuth
+type Delivery struct {
+	useCase auth.UseCase
 }
 
-func NewHandlerAuth(useCase auth.UseCaseAuth) *HandlerAuth {
-	return &HandlerAuth{
+func NewDelivery(useCase auth.UseCase) *Delivery {
+	return &Delivery{
 		useCase: useCase,
 	}
 }
@@ -27,7 +27,7 @@ func getUserFromJSON(r *http.Request) (*response.ResponseBodyUser, error) {
 	return userInput, nil
 }
 
-func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string) {
+func (h *Delivery) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string) {
 	cookie := &http.Cookie{
 		Name:     "session_id",
 		Value:    jwtToken,
@@ -40,7 +40,7 @@ func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, jwtToken stri
 	w.Header().Set("Set-Cookie", cs)
 }
 
-func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
+func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignUp : started")
 	userFromRequest, err := getUserFromJSON(r)
 	if err != nil {
@@ -67,7 +67,7 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignUp : ended")
 }
 
-func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
+func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignIn : started")
 	userFromRequest, err := getUserFromJSON(r)
 	if err != nil {
@@ -87,7 +87,7 @@ func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignIn : ended")
 }
 
-func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
+func (h *Delivery) User(w http.ResponseWriter, r *http.Request) {
 	log.Info("User : started")
 	cookie, err := r.Cookie("session_id")
 	if err != nil {

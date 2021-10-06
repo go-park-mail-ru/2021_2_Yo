@@ -7,20 +7,20 @@ import (
 	"sync"
 )
 
-type RepositoryUserLocalStorage struct {
+type Repository struct {
 	users []*User
 	mutex *sync.Mutex
 }
 
-func NewRepositoryUserLocalStorage() *RepositoryUserLocalStorage {
-	result := &RepositoryUserLocalStorage{
+func NewRepository() *Repository {
+	result := &Repository{
 		users: make([]*User, 0),
 		mutex: new(sync.Mutex),
 	}
 	return result
 }
 
-func (s *RepositoryUserLocalStorage) CreateUser(user *models.User) error {
+func (s *Repository) CreateUser(user *models.User) error {
 	newUser := toLocalstorageUser(user)
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -38,7 +38,7 @@ func (s *RepositoryUserLocalStorage) CreateUser(user *models.User) error {
 	return nil
 }
 
-func (s *RepositoryUserLocalStorage) GetUser(mail, password string) (*models.User, error) {
+func (s *Repository) GetUser(mail, password string) (*models.User, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	for _, user := range s.users {
@@ -49,7 +49,7 @@ func (s *RepositoryUserLocalStorage) GetUser(mail, password string) (*models.Use
 	return nil, auth.ErrUserNotFound
 }
 
-func (s *RepositoryUserLocalStorage) GetUserById(userId string) (*models.User, error) {
+func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	userIdInt, _ := strconv.Atoi(userId)
 	s.mutex.Lock()
 	defer s.mutex.Unlock()

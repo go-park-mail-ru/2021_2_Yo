@@ -1,7 +1,7 @@
 package http
 
 import (
-	"backend/eventsManager/usecase"
+	"backend/event/usecase"
 	//"backend/models"
 	"bytes"
 	"github.com/gorilla/mux"
@@ -13,10 +13,10 @@ import (
 
 func TestList(t *testing.T) {
 	r := mux.NewRouter()
-	useCaseMock := new(usecase.UseCaseEventsManagerMock)
-	handlerTest := NewHandlerEventsManager(useCaseMock)
+	useCaseMock := new(usecase.UseCaseMock)
+	handlerTest := NewDelivery(useCaseMock)
 	r.HandleFunc("/events", handlerTest.List).Methods("GET")
-	
+
 	useCaseMock.On("List")
 
 	w := httptest.NewRecorder()

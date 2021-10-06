@@ -15,8 +15,8 @@ import (
 
 func TestSignUp(t *testing.T) {
 	r := mux.NewRouter()
-	useCaseMock := new(usecase.UseCaseAuthMock)
-	handlerTest := NewHandlerAuth(useCaseMock)
+	useCaseMock := new(usecase.UseCaseMock)
+	handlerTest := NewDelivery(useCaseMock)
 	r.HandleFunc("/signup", handlerTest.SignUp).Methods("POST")
 
 	bodyUserTest := &response.ResponseBodyUser{
@@ -50,8 +50,8 @@ func TestSignUp(t *testing.T) {
 
 func TestSignIn(t *testing.T) {
 	r := mux.NewRouter()
-	useCaseMock := new(usecase.UseCaseAuthMock)
-	handlerTest := NewHandlerAuth(useCaseMock)
+	useCaseMock := new(usecase.UseCaseMock)
+	handlerTest := NewDelivery(useCaseMock)
 	r.HandleFunc("/login", handlerTest.SignIn).Methods("POST")
 
 	bodyUserTest := &response.ResponseBodyUser{
@@ -77,8 +77,8 @@ func TestSignIn(t *testing.T) {
 
 func TestUser(t *testing.T) {
 	r := mux.NewRouter()
-	useCaseMock := new(usecase.UseCaseAuthMock)
-	handlerTest := NewHandlerAuth(useCaseMock)
+	useCaseMock := new(usecase.UseCaseMock)
+	handlerTest := NewDelivery(useCaseMock)
 	r.HandleFunc("/user", handlerTest.User).Methods("GET")
 
 	w := httptest.NewRecorder()

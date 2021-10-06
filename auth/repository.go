@@ -4,7 +4,7 @@ import (
 	"backend/models"
 )
 
-type RepositoryUser interface {
+type Repository interface {
 	CreateUser(user *models.User) error
 	GetUser(mail, password string) (*models.User, error)
 	GetUserById(userId string) (*models.User, error)
