@@ -1,7 +1,7 @@
-package eventsManager
+package event
 
 import "backend/models"
 
-type UseCaseEventsManager interface {
+type UseCase interface {
 	List() ([]*models.Event, error)
 }

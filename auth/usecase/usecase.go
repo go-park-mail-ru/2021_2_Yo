@@ -7,14 +7,14 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 )
 
-type UseCaseAuth struct {
-	userRepo   auth.RepositoryUser
+type UseCase struct {
+	repository auth.Repository
 	secretWord []byte
 }
 
-func NewUseCaseAuth(userRepo auth.RepositoryUser, secretWord []byte) *UseCaseAuth {
-	return &UseCaseAuth{
-		userRepo:   userRepo,
+func NewUseCase(userRepo auth.Repository, secretWord []byte) *UseCase {
+	return &UseCase{
+		repository: userRepo,
 		secretWord: secretWord,
 	}
 }
@@ -40,18 +40,18 @@ func parseToken(accessToken string, signingKey []byte) (string, error) {
 	return "", auth.ErrInvalidAccessToken
 }
 
-func (a *UseCaseAuth) SignUp(name, surname, mail, password string) error {
+func (a *UseCase) SignUp(name, surname, mail, password string) error {
 	user := &models.User{
 		Name:     name,
 		Surname:  surname,
 		Mail:     mail,
 		Password: password,
 	}
-	return a.userRepo.CreateUser(user)
+	return a.repository.CreateUser(user)
 }
 
-func (a *UseCaseAuth) SignIn(mail, password string) (string, error) {
-	user, err := a.userRepo.GetUser(mail, password)
+func (a *UseCase) SignIn(mail, password string) (string, error) {
+	user, err := a.repository.GetUser(mail, password)
 	if err == auth.ErrUserNotFound {
 		return "", err
 	}
@@ -62,14 +62,10 @@ func (a *UseCaseAuth) SignIn(mail, password string) (string, error) {
 	return signedString, err
 }
 
-func (a *UseCaseAuth) ParseToken(cookie string) (string, error) {
-	userID, err := parseToken(cookie, a.secretWord)
+func (a *UseCase) ParseToken(accessToken string) (*models.User, error) {
+	userID, err := parseToken(accessToken, a.secretWord)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return userID, nil
-}
-
-func (a *UseCaseAuth) GetUserById(userID string) (*models.User, error) {
-	return a.userRepo.GetUserById(userID)
+	return a.repository.GetUserById(userID)
 }

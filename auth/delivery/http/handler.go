@@ -9,12 +9,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type HandlerAuth struct {
-	useCase auth.UseCaseAuth
+type Delivery struct {
+	useCase auth.UseCase
 }
 
-func NewHandlerAuth(useCase auth.UseCaseAuth) *HandlerAuth {
-	return &HandlerAuth{
+func NewDelivery(useCase auth.UseCase) *Delivery {
+	return &Delivery{
 		useCase: useCase,
 	}
 }
@@ -28,7 +28,7 @@ func getUserFromJSON(r *http.Request) (*response.ResponseBodyUser, error) {
 	return userInput, nil
 }
 
-func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string) {
+func (h *Delivery) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string) {
 	cookie := &http.Cookie{
 		Name:     "session_id",
 		Value:    jwtToken,
@@ -50,25 +50,25 @@ func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, jwtToken stri
 //@Success 200 {object} response.Response{body=response.ResponseBodyUser}
 //@Failure 404 {object} response.BaseResponse
 //@Router /signup [post]
-func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
+func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignUp : started")
 	userFromRequest, err := getUserFromJSON(r)
 	if err != nil {
 		log.Error("SignUp : didn't get user from JSON", err)
-		response.SendResponse(w, response.ErrorResponse("SignUp : didn't get user from JSON"))
+		response.SendResponse(w, response.ErrorResponse("Не получилось получить пользователя из JSON"))
 		return
 	}
 	log.Info("SignUp : userFromRequest = ", userFromRequest)
 	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
 	if err != nil {
 		log.Error("SignUp : SignUp error", err)
-		response.SendResponse(w, response.ErrorResponse("User already exists"))
+		response.SendResponse(w, response.ErrorResponse("Пользователь уже зарегестрирован"))
 		return
 	}
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
 		log.Error("SignIn : useCase.SignIn error", err)
-		response.SendResponse(w, response.ErrorResponse("User not found"))
+		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
 		return
 	}
 	log.Info("setCookieWithJwtToken : jwtToken = ", jwtToken)
@@ -86,36 +86,24 @@ func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
 //@Success 200 {object} response.Response{body=response.ResponseBodyUser}
 //@Failure 404 {object} response.BaseResponse 
 //@Router /signin [post]
-func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
+func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignIn : started")
 	userFromRequest, err := getUserFromJSON(r)
-	log.Info("SignIn : userFromRequest = ", userFromRequest)
 	if err != nil {
 		log.Error("SignIn : getUserFromJSON error", err)
 		return
 	}
+	log.Info("SignIn : userFromRequest = ", userFromRequest)
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
 		log.Error("SignIn : useCase.SignIn error", err)
-		response.SendResponse(w, response.ErrorResponse("User not found"))
+		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
 		return
 	}
 	log.Info("SignIn : jwtToken = ", jwtToken)
 	h.setCookieWithJwtToken(w, jwtToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Info("SignIn : ended")
-}
-
-func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
-	log.Info("MiddleWare : started & ended")
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
-		handler.ServeHTTP(w, r)
-	})
 }
 //@Summmary User
 //@Tags auth
@@ -124,28 +112,21 @@ func (h *HandlerAuth) MiddleWare(handler http.Handler) http.Handler {
 //@Success 200 {object} response.BaseResponse
 //@Failure 404 {object} response.BaseResponse
 //@Router /user [get]
-func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
+func (h *Delivery) User(w http.ResponseWriter, r *http.Request) {
 	log.Info("User : started")
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
 		log.Error("User : cookie error", err)
-		response.SendResponse(w, response.ErrorResponse("Error with getting cookie"))
+		response.SendResponse(w, response.ErrorResponse("Ошибка с получением Cookie"))
 		return
 	}
 	if cookie != nil {
 		log.Info("User : cookie.value = ", cookie.Value)
 	}
-	userID, err := h.useCase.ParseToken(cookie.Value)
+	foundUser, err := h.useCase.ParseToken(cookie.Value)
 	if err != nil {
-		log.Info("User : parse error", err)
-		response.SendResponse(w, response.ErrorResponse("Error with parsing token"))
-		return
-	}
-	log.Info("User : userID = ", userID)
-	foundUser, err := h.useCase.GetUserById(userID)
-	if err == auth.ErrUserNotFound {
-		log.Info("User : GetUserById error", err)
-		response.SendResponse(w, response.ErrorResponse("User not found"))
+		log.Error("User : User token parsing error", err)
+		response.SendResponse(w, response.ErrorResponse("Ошибка с парсингом токена"))
 		return
 	}
 	log.Info("User : Found User = ", foundUser)

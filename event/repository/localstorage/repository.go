@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-type RepositoryEventLocalStorage struct {
+type Repository struct {
 	events []*Event
 	mutex  *sync.Mutex
 }
@@ -76,8 +76,8 @@ var eventsDemo = []*Event{
 	},
 }
 
-func NewRepositoryEventLocalStorage() *RepositoryEventLocalStorage {
-	result := &RepositoryEventLocalStorage{
+func NewRepository() *Repository {
+	result := &Repository{
 		//events: make([]*Event, 0),
 		events: eventsDemo,
 		mutex:  new(sync.Mutex),
@@ -85,7 +85,7 @@ func NewRepositoryEventLocalStorage() *RepositoryEventLocalStorage {
 	return result
 }
 
-func (s *RepositoryEventLocalStorage) List() ([]*models.Event, error) {
+func (s *Repository) List() ([]*models.Event, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	resultEvents := make([]*models.Event, len(s.events))
