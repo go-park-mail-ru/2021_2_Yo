@@ -1,11 +1,11 @@
 package main
 
 import (
-	"backend/server"
-	log "github.com/sirupsen/logrus"
 	_ "backend/docs"
-)
+	"backend/server"
 
+	log "github.com/sirupsen/logrus"
+)
 
 //@title BMSTUSA API
 //@version 1.0
@@ -25,8 +25,10 @@ import (
 
 
 func main() {
+
 	log.Info("Main : start")
 
 	app := server.NewApp()
 	app.Run()
 }
+

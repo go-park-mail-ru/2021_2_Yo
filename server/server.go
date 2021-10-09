@@ -4,15 +4,19 @@ import (
 	authDelivery "backend/auth/delivery/http"
 	authRepository "backend/auth/repository/localstorage"
 	authUseCase "backend/auth/usecase"
+	_ "backend/docs"
 	eventDelivery "backend/event/delivery/http"
 	eventRepository "backend/event/repository/localstorage"
 	eventUseCase "backend/event/usecase"
 	"bufio"
+	"net/http"
+	"os"
+
 	gorilla_handlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"os"
+	"github.com/spf13/viper"
+	"github.com/swaggo/http-swagger"
 )
 
 func preflight(w http.ResponseWriter, r *http.Request) {
@@ -56,18 +60,26 @@ func NewApp() *App {
 }
 
 func (app *App) Run() {
+	/*
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Error("Main : PORT must be set")
 		port = "8080"
+	}*/
+
+	if err := initConfig(); err != nil {
+		log.Fatalf("Ошибка при инициализации конфигов, %s", err.Error())
 	}
 
+	port := viper.GetString("port")
 	r := mux.NewRouter()
+	
 	r.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
 	r.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
 	r.HandleFunc("/events", app.eventManager.List)
 	r.Methods("OPTIONS").HandlerFunc(preflight)
+	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
 	//TODO: Проверить, нужно ли это?
 	r.Use(gorilla_handlers.CORS(
@@ -85,4 +97,10 @@ func (app *App) Run() {
 	if errServer != nil {
 		log.Error("Main : ListenAndServe error: ", errServer)
 	}
+}
+
+func initConfig() error {
+	viper.AddConfigPath("configs")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
 }
