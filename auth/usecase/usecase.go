@@ -5,6 +5,8 @@ import (
 	"backend/models"
 	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
+	"crypto/sha256"
+	log "github.com/sirupsen/logrus"
 )
 
 type UseCase struct {
@@ -41,17 +43,20 @@ func parseToken(accessToken string, signingKey []byte) (string, error) {
 }
 
 func (a *UseCase) SignUp(name, surname, mail, password string) error {
+	password_hash := a.CreatePasswordHash(password)
 	user := &models.User{
 		Name:     name,
 		Surname:  surname,
 		Mail:     mail,
-		Password: password,
+		Password: password_hash,
 	}
 	return a.repository.CreateUser(user)
 }
 
 func (a *UseCase) SignIn(mail, password string) (string, error) {
-	user, err := a.repository.GetUser(mail, password)
+	password_hash := a.CreatePasswordHash(password)
+	log.Info("password:",password,"password_hash:",password_hash)
+	user, err := a.repository.GetUser(mail, password_hash)
 	if err == auth.ErrUserNotFound {
 		return "", err
 	}
@@ -68,4 +73,10 @@ func (a *UseCase) ParseToken(accessToken string) (*models.User, error) {
 		return nil, err
 	}
 	return a.repository.GetUserById(userID)
+}
+
+func (a *UseCase) CreatePasswordHash(password string) string{
+	hash := sha256.New()
+	hash.Write([]byte(password))
+	return fmt.Sprintf("%x",hash.Sum(nil))
 }
