@@ -16,6 +16,7 @@ func NewDelivery(useCase event.UseCase) *Delivery {
 		useCase: useCase,
 	}
 }
+
 //@Summmary List
 //@Tags Events
 //@Description "Список мероприятий"

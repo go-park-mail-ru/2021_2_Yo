@@ -65,6 +65,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		response.SendResponse(w, response.ErrorResponse("Пользователь уже зарегестрирован"))
 		return
 	}
+	log.Println("Auth:Handler:Signup: mail, pass ", userFromRequest.Mail, userFromRequest.Password)
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
 		log.Error("SignIn : useCase.SignIn error", err)
@@ -84,7 +85,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 //@Produce json
 //@Param input body response.ResponseBodyUser true "Account Info"
 //@Success 200 {object} response.Response{body=response.ResponseBodyUser}
-//@Failure 404 {object} response.BaseResponse 
+//@Failure 404 {object} response.BaseResponse
 //@Router /signin [post]
 func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignIn : started")
@@ -105,6 +106,7 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	response.SendResponse(w, response.OkResponse())
 	log.Info("SignIn : ended")
 }
+
 //@Summmary User
 //@Tags auth
 //@Description "Главная страница"

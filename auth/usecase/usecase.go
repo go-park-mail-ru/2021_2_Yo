@@ -3,9 +3,9 @@ package usecase
 import (
 	"backend/auth"
 	"backend/models"
+	"crypto/sha256"
 	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
-	"crypto/sha256"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -55,7 +55,7 @@ func (a *UseCase) SignUp(name, surname, mail, password string) error {
 
 func (a *UseCase) SignIn(mail, password string) (string, error) {
 	password_hash := a.CreatePasswordHash(password)
-	log.Info("password:",password,"password_hash:",password_hash)
+	log.Info("UseCase:SignIn password:", password, " password_hash:", password_hash)
 	user, err := a.repository.GetUser(mail, password_hash)
 	if err == auth.ErrUserNotFound {
 		return "", err
@@ -75,8 +75,8 @@ func (a *UseCase) ParseToken(accessToken string) (*models.User, error) {
 	return a.repository.GetUserById(userID)
 }
 
-func (a *UseCase) CreatePasswordHash(password string) string{
+func (a *UseCase) CreatePasswordHash(password string) string {
 	hash := sha256.New()
 	hash.Write([]byte(password))
-	return fmt.Sprintf("%x",hash.Sum(nil))
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }

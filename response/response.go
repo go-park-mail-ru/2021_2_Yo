@@ -92,6 +92,6 @@ func SendResponse(w http.ResponseWriter, response interface{}) {
 
 //For docs
 type BaseResponse struct {
-	Status  int         `json:"status"`
-	Message string      `json:"message,omitempty"`
+	Status  int    `json:"status"`
+	Message string `json:"message,omitempty"`
 }
