@@ -1,2 +1,2 @@
-DROP Table users;
+DROP Table "user";
 Drop Table events;
