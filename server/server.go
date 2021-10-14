@@ -67,7 +67,15 @@ func initConfig() error {
 
 func NewApp() (*App, error) {
 	secret := getSecret("auth/secret.txt")
-	db, err := initDB("user=postgres password=password dbname=testDB sslmode=disable")
+	user := viper.GetString("db.username")
+	password := viper.GetString("db.password")
+
+	dbname := viper.GetString("db.dbname")
+	sslmode := viper.GetString("db.sslmode")
+	
+	connStr := "user="+user+" password="+password+" dbname="+dbname+" sslmode="+sslmode
+
+	db, err := initDB(connStr)
 	if err != nil {
 		log.Error("NewApp : initDB error", err)
 		return nil, err
