@@ -18,6 +18,7 @@ func NewRepository(database *sql.DB) *Repository {
 }
 
 func (s *Repository) CreateUser(user *models.User) error {
+	log.Info("Here")
 	newUser := toPostgresUser(user)
 	insertQuery :=
 		`insert into "user" (name, surname, mail, password) values($1, $2, $3, $4)`

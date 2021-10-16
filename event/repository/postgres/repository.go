@@ -3,8 +3,8 @@ package postgres
 import (
 	"backend/models"
 	//"database/sql"
-	log "github.com/sirupsen/logrus"
 	sql "github.com/jmoiron/sqlx"
+	log "github.com/sirupsen/logrus"
 )
 
 type Repository struct {

@@ -6,6 +6,7 @@ import (
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"os"
+	"github.com/spf13/viper"
 )
 
 //@title BMSTUSA API
@@ -25,6 +26,11 @@ import (
 //@schemes https
 func main() {
 	log.Info("Main : start")
+	
+	viper.AddConfigPath("configs")
+	viper.SetConfigName("config")
+	viper.ReadInConfig()
+
 	app, err := server.NewApp()
 	if err != nil {
 		log.Error("Main : NewApp error = ", err)

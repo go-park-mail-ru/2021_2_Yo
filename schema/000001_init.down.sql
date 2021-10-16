@@ -1,2 +1,2 @@
-DROP Table "user";
-Drop Table events;
+Drop Table "user";
+Drop Table "event";

@@ -7,23 +7,26 @@ import (
 	eventRepository "backend/event/repository/postgres"
 	eventUseCase "backend/event/usecase"
 	"bufio"
+	"fmt"
+	"os"
+
 	gorilla_handlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
 	httpSwagger "github.com/swaggo/http-swagger"
-	"os"
 
 	_ "backend/docs"
 	eventDelivery "backend/event/delivery/http"
+	"net/http"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"net/http"
 )
 
 type App struct {
 	authManager  *authDelivery.Delivery
 	eventManager *eventDelivery.Delivery
-	db *sql.DB
+	db           *sql.DB
 }
 
 func preflight(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +53,7 @@ func getSecret(pathToSecretFile string) string {
 }
 
 func initDB(connStr string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", connStr)
+	db, err := sql.Connect("postgres", connStr)
 	if err != nil {
 		log.Error("main : Can't open DB", err)
 		return nil, err
@@ -59,21 +62,20 @@ func initDB(connStr string) (*sql.DB, error) {
 	return db, nil
 }
 
-func initConfig() error {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
-}
+
 
 func NewApp() (*App, error) {
 	secret := getSecret("auth/secret.txt")
-	user := viper.GetString("db.username")
-	password := viper.GetString("db.password")
 
+	user := viper.GetString("db.user")
+	password := viper.GetString("db.password")
+	host := viper.GetString("db.host")
+	port := viper.GetString("db.port")
 	dbname := viper.GetString("db.dbname")
 	sslmode := viper.GetString("db.sslmode")
-	
-	connStr := "user="+user+" password="+password+" dbname="+dbname+" sslmode="+sslmode
+
+	connStr := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s", host, port, user, dbname, password, sslmode)
+	log.Info(connStr)
 
 	db, err := initDB(connStr)
 	if err != nil {
@@ -92,14 +94,11 @@ func NewApp() (*App, error) {
 	return &App{
 		authManager:  authD,
 		eventManager: eventD,
-		db: db,
+		db:           db,
 	}, nil
 }
 
 func (app *App) Run() error {
-	if err := initConfig(); err != nil {
-		log.Error("Server : Run() initConfig err", err)
-	}
 	defer app.db.Close()
 
 	port := viper.GetString("port")
