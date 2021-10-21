@@ -5,6 +5,7 @@ import (
 	log "backend/logger"
 	"backend/models"
 	"backend/response"
+	"github.com/asaskevich/govalidator"
 	"net/http"
 )
 
@@ -44,7 +45,13 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	message := "SignUp:"
 	log.Debug(message + "started")
 	userFromRequest := r.Context().Value("user").(*models.User)
-	err := h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
+
+	_, err := govalidator.ValidateStruct(userFromRequest)
+	if err != nil {
+		log.Error(message+"validation err", err)
+	}
+
+	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
 	if err != nil {
 		log.Error(message+"err = ", err)
 		response.SendResponse(w, response.ErrorResponse("Пользователь уже зарегестрирован"))
@@ -76,6 +83,12 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	message := "SignIn:"
 	log.Debug(message + "started")
 	userFromRequest := r.Context().Value("user").(*response.ResponseBodyUser)
+
+	_, err := govalidator.ValidateStruct(userFromRequest)
+	if err != nil {
+		log.Error(message+"validation err", err)
+	}
+
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
 		log.Error("SignIn : useCase.SignIn error", err)

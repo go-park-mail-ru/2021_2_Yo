@@ -11,17 +11,17 @@ const STATUS_OK = 200
 const STATUS_ERROR = 404
 
 type ResponseBodyUser struct {
-	Name     string `json:"name,omitempty"`
-	Surname  string `json:"surname,omitempty"`
-	Mail     string `json:"email,omitempty"`
-	Password string `json:"password,omitempty"`
+	Name     string `json:"name,omitempty" valid:"type(string)"`
+	Surname  string `json:"surname,omitempty" valid:"type(string)"`
+	Mail     string `json:"email,omitempty" valid:"email"`
+	Password string `json:"password,omitempty" valid:"type(string)"`
 }
 
 type ResponseBodyEvent struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Viewed      int    `json:"viewed"`
-	ImgUrl      string `json:"imgUrl"`
+	Name        string `json:"name" valid:"type(string)"`
+	Description string `json:"description" valid:"type(string)"`
+	Viewed      int    `json:"viewed" valid:"type(int)"`
+	ImgUrl      string `json:"imgUrl" valid:"type(string)"`
 }
 
 type ResponseBodyEventList struct {
