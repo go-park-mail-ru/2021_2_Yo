@@ -75,11 +75,13 @@ func NewApp() (*App, error) {
 	connStr := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s", host, port, user, dbname, password, sslmode)
 	log.Info(connStr)
 
-	db, err := initDB(connStr)
-	if err != nil {
-		log.Error("NewApp : initDB error", err)
-		return nil, err
-	}
+	/*
+		db, err := initDB(connStr)
+		if err != nil {
+			log.Error("NewApp : initDB error", err)
+			return nil, err
+		}
+	*/
 
 	authR := authRepository.NewRepository()
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
@@ -94,12 +96,12 @@ func NewApp() (*App, error) {
 	return &App{
 		authManager:  authD,
 		eventManager: eventD,
-		db:           db,
+		db:           nil,
 	}, nil
 }
 
 func (app *App) Run() error {
-	defer app.db.Close()
+	//defer app.db.Close()
 
 	log.Debug("Server:Run()")
 
