@@ -128,9 +128,6 @@ func (app *App) Run() error {
 		gorilla_handlers.AllowCredentials(),
 		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
 	))
-auth:
-usecase:
-usecase:
 	r.Use(midwar.Recovery)
 
 	port := viper.GetString("port")
