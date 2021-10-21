@@ -89,7 +89,7 @@ func NewApp() (*App, error) {
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
-	log.Init(logrus.InfoLevel)
+	log.Init(logrus.DebugLevel)
 
 	return &App{
 		authManager:  authD,
@@ -117,7 +117,7 @@ func (app *App) Run() error {
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.Methods("OPTIONS").HandlerFunc(preflight)
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
-	
+
 	//Сначала будет вызываться recovery, потом cors, а потом logging
 	r.Use(midwar.Logging)
 	r.Use(midwar.CORS)
