@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+const logMessage = "response:response:"
+
 const STATUS_OK = 200
 const STATUS_ERROR = 404
 
@@ -80,14 +82,14 @@ func EventsListResponse(events []*models.Event) *Response {
 }
 
 func SendResponse(w http.ResponseWriter, response interface{}) {
-	message := "SendResponse"
+	message := logMessage + "SendResponse:"
 	w.WriteHeader(http.StatusOK)
 	b, err := json.Marshal(response)
 	if err != nil {
-		log.Error(message+"err = ", err)
+		log.Error(message+"err =", err)
 		return
 	}
-	log.Debug(message+"response to send = ", string(b))
+	log.Debug(message+"response to send =", string(b))
 	w.Write(b)
 }
 

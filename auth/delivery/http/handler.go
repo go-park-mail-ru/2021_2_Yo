@@ -9,6 +9,8 @@ import (
 	"net/http"
 )
 
+const logMessage = "auth:delivery:http:handler:"
+
 type Delivery struct {
 	useCase auth.UseCase
 }
@@ -42,29 +44,29 @@ func (h *Delivery) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string)
 //@Failure 404 {object} response.BaseResponse
 //@Router /signup [post]
 func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
-	message := "SignUp:"
+	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
 	userFromRequest := r.Context().Value("user").(*models.User)
 
 	_, err := govalidator.ValidateStruct(userFromRequest)
 	if err != nil {
-		log.Error(message+"validation err", err)
+		log.Error(message+"err =", err)
 	}
 
 	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
 	if err != nil {
-		log.Error(message+"err = ", err)
+		log.Error(message+"err =", err)
 		response.SendResponse(w, response.ErrorResponse("Пользователь уже зарегестрирован"))
 		return
 	}
 	log.Debug(message+"mail, pass = ", userFromRequest.Mail, userFromRequest.Password)
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
-		log.Error(message+"err = ", err)
+		log.Error(message+"err =", err)
 		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
 		return
 	}
-	log.Debug(message+"setCookieWithJwtToken : jwtToken = ", jwtToken)
+	log.Debug(message+"jwtToken =", jwtToken)
 	h.setCookieWithJwtToken(w, jwtToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
@@ -80,25 +82,25 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 //@Failure 404 {object} response.BaseResponse
 //@Router /signin [post]
 func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
-	message := "SignIn:"
+	message := logMessage + "SignIn:"
 	log.Debug(message + "started")
 	userFromRequest := r.Context().Value("user").(*response.ResponseBodyUser)
 
 	_, err := govalidator.ValidateStruct(userFromRequest)
 	if err != nil {
-		log.Error(message+"validation err", err)
+		log.Error(message+"err =", err)
 	}
 
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
-		log.Error("SignIn : useCase.SignIn error", err)
+		log.Error(message+"err =", err)
 		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
 		return
 	}
-	log.Debug("SignIn : jwtToken = ", jwtToken)
+	log.Debug(message+"jwtToken =", jwtToken)
 	h.setCookieWithJwtToken(w, jwtToken)
 	response.SendResponse(w, response.OkResponse())
-	log.Debug("SignIn : ended")
+	log.Debug(message + "ended")
 }
 
 //@Summmary User
@@ -109,21 +111,21 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 //@Failure 404 {object} response.BaseResponse
 //@Router /user [get]
 func (h *Delivery) User(w http.ResponseWriter, r *http.Request) {
-	message := "User:"
+	message := logMessage + "User:"
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		log.Error(message+"cookie error", err)
+		log.Error(message+"err =", err)
 		response.SendResponse(w, response.ErrorResponse("Ошибка с получением Cookie"))
 		return
 	}
 	foundUser, err := h.useCase.ParseToken(cookie.Value)
 	if err != nil {
-		log.Error(message+"User token parsing error", err)
+		log.Error(message+"err =", err)
 		response.SendResponse(w, response.ErrorResponse("Ошибка с парсингом токена"))
 		return
 	}
-	log.Debug(message+"Found User = ", foundUser)
+	log.Debug(message+"foundUser =", foundUser)
 	response.SendResponse(w, response.UsernameResponse(foundUser.Name))
 	log.Debug(message + "ended")
 }

@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+const logMessage = "event:delivery:http:"
+
 type Delivery struct {
 	useCase event.UseCase
 }
@@ -25,11 +27,11 @@ func NewDelivery(useCase event.UseCase) *Delivery {
 //@Failure 404 {object} response.BaseResponse
 //@Router /events [get]
 func (h *Delivery) List(w http.ResponseWriter, r *http.Request) {
-	message := "List:"
+	message := logMessage + "List:"
 	log.Debug(message + "started")
 	eventsList, err := h.useCase.List()
 	if err != nil {
-		log.Error(message+"err = ", err)
+		log.Error(message+"err =", err)
 		response.SendResponse(w, response.ErrorResponse("Can't get list of events"))
 		return
 	}

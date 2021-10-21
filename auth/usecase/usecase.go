@@ -9,6 +9,8 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 )
 
+const logMessage = "auth:usecase:usecase:"
+
 type UseCase struct {
 	repository auth.Repository
 	secretWord []byte
@@ -54,17 +56,18 @@ func (a *UseCase) SignUp(name, surname, mail, password string) error {
 }
 
 func (a *UseCase) SignIn(mail, password string) (string, error) {
-	password_hash := a.CreatePasswordHash(password)
-	log.Info("UseCase:SignIn password:", password, " password_hash:", password_hash)
-	user, err := a.repository.GetUser(mail, password_hash)
+	message := logMessage + "SignIn:"
+	hashedPassword := a.CreatePasswordHash(password)
+	log.Debug(message+"hashedPassword =", hashedPassword)
+	user, err := a.repository.GetUser(mail, hashedPassword)
 	if err == auth.ErrUserNotFound {
+		log.Error(message+"err =", err)
 		return "", err
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
 		ID: user.ID,
 	})
-	signedString, err := token.SignedString(a.secretWord)
-	return signedString, err
+	return token.SignedString(a.secretWord)
 }
 
 func (a *UseCase) ParseToken(accessToken string) (*models.User, error) {

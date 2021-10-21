@@ -6,6 +6,8 @@ import (
 	sql "github.com/jmoiron/sqlx"
 )
 
+const logMessage = "event:repository:postgres:"
+
 type Repository struct {
 	db *sql.DB
 }
@@ -17,11 +19,11 @@ func NewRepository(database *sql.DB) *Repository {
 }
 
 func (s *Repository) List() ([]*models.Event, error) {
-	message := "List:"
+	message := logMessage + "List:"
 	query := `select * from "event"`
 	rows, err := s.db.Queryx(query)
 	if err != nil {
-		log.Error(message+"err = ", err)
+		log.Error(message+"err =", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -30,12 +32,12 @@ func (s *Repository) List() ([]*models.Event, error) {
 		var event Event
 		err := rows.StructScan(&event)
 		if err != nil {
-			log.Error(message+"err = ", err)
+			log.Error(message+"err =", err)
 			return nil, err
 		}
 		modelEvent := toModelEvent(&event)
 		resultEvents = append(resultEvents, modelEvent)
 	}
-	log.Debug(message+"resultEvents = ", resultEvents)
+	log.Debug(message+"resultEvents =", resultEvents)
 	return resultEvents, nil
 }

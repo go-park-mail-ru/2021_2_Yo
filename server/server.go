@@ -24,47 +24,33 @@ import (
 	"github.com/spf13/viper"
 )
 
+const logMessage = "server:"
+
 type App struct {
 	authManager  *authDelivery.Delivery
 	eventManager *eventDelivery.Delivery
 	db           *sql.DB
 }
 
-func preflight(w http.ResponseWriter, r *http.Request) {
-	log.Info("Server:preflight")
-	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
-}
-
-func getSecret(pathToSecretFile string) string {
+func getSecret(pathToSecretFile string) (string, error) {
+	message := logMessage + "getSecret:"
 	f, err := os.Open(pathToSecretFile)
 	if err != nil {
-		log.Fatal("Server : can't open file with secret keyword!", err)
+		log.Error(message+"err =", err)
+		return "", err
 	}
 	scanner := bufio.NewScanner(f)
 	scanner.Scan()
 	secret := scanner.Text()
 	if err := f.Close(); err != nil {
-		log.Fatal("Server : can't close file with secret keyword!", err)
+		log.Error(message+"err =", err)
+		return "", err
 	}
-	return secret
+	return secret, nil
 }
 
-func initDB(connStr string) (*sql.DB, error) {
-	db, err := sql.Connect("postgres", connStr)
-	if err != nil {
-		log.Error("main : Can't open DB", err)
-		return nil, err
-	}
-	log.Info("db status = ", db.Stats())
-	return db, nil
-}
-
-func NewApp() (*App, error) {
-	secret := getSecret("auth/secret.txt")
+func initDB() (*sql.DB, error) {
+	message := logMessage + "initDB:"
 
 	user := viper.GetString("db.user")
 	password := viper.GetString("db.password")
@@ -72,13 +58,30 @@ func NewApp() (*App, error) {
 	port := viper.GetString("db.port")
 	dbname := viper.GetString("db.dbname")
 	sslmode := viper.GetString("db.sslmode")
-
 	connStr := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s", host, port, user, dbname, password, sslmode)
-	log.Info(connStr)
+	log.Debug(message+"connStr = ", connStr)
 
-	db, err := initDB(connStr)
+	db, err := sql.Connect("postgres", connStr)
 	if err != nil {
-		log.Error("NewApp : initDB error", err)
+		log.Error(message+"err =", err)
+		return nil, err
+	}
+	log.Info("db status =", db.Stats())
+	return db, nil
+}
+
+func NewApp() (*App, error) {
+	message := logMessage + "NewApp:"
+	log.Init(logrus.DebugLevel)
+	secret, err := getSecret("auth/secret.txt")
+	if err != nil {
+		log.Error(message+"err =", err)
+		return nil, err
+	}
+
+	db, err := initDB()
+	if err != nil {
+		log.Error(message+"err =", err)
 		return nil, err
 	}
 
@@ -90,8 +93,6 @@ func NewApp() (*App, error) {
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
-	log.Init(logrus.DebugLevel)
-
 	return &App{
 		authManager:  authD,
 		eventManager: eventD,
@@ -102,6 +103,7 @@ func NewApp() (*App, error) {
 func (app *App) Run() error {
 	defer app.db.Close()
 
+	message := logMessage + "Run:"
 	midwar := middleware.NewMiddleware()
 
 	authMux := mux.NewRouter()
@@ -109,20 +111,15 @@ func (app *App) Run() error {
 	authMux.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
 	authMux.Use(midwar.Auth)
 
-	port := viper.GetString("port")
 	r := mux.NewRouter()
-
 	r.Handle("/signup", authMux)
 	r.Handle("/login", authMux)
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
-	//r.Methods("OPTIONS").HandlerFunc(preflight)
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
 	//Сначала будет вызываться recovery, потом cors, а потом logging
 	r.Use(midwar.Logging)
-	//r.Use(midwar.CORS)
-	r.Use(midwar.Recovery)
 	r.Use(gorilla_handlers.CORS(
 		gorilla_handlers.AllowedOrigins([]string{"https://bmstusssa.herokuapp.com"}),
 		gorilla_handlers.AllowedHeaders([]string{
@@ -131,11 +128,16 @@ func (app *App) Run() error {
 		gorilla_handlers.AllowCredentials(),
 		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
 	))
+auth:
+usecase:
+usecase:
+	r.Use(midwar.Recovery)
 
-	log.Info("Server:Run():Deploying, port = ", port)
+	port := viper.GetString("port")
+	log.Info(message+"port =", port)
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
-		log.Error("Server:Run():ListenAndServe error: ", err)
+		log.Error(message+"err =", err)
 		return err
 	}
 	return nil
