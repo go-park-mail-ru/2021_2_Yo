@@ -2,7 +2,10 @@ package middleware
 
 import (
 	log "backend/logger"
+	"backend/models"
 	"backend/response"
+	"context"
+	"encoding/json"
 	"net/http"
 	"time"
 )
@@ -62,9 +65,32 @@ func (m *Middleware) CORS(next http.Handler) http.Handler {
 	})
 }
 
+func getUserFromJSON(r *http.Request) (*models.User, error) {
+	userInput := new(response.ResponseBodyUser)
+	err := json.NewDecoder(r.Body).Decode(userInput)
+	if err != nil {
+		return nil, err
+	}
+	result := &models.User{
+		Name:     userInput.Name,
+		Surname:  userInput.Surname,
+		Mail:     userInput.Mail,
+		Password: userInput.Password,
+	}
+	return result, nil
+}
+
 func (m *Middleware) Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		
-		next.ServeHTTP(w, r)
+		message := "Middleware:Auth"
+		userFromRequest, err := getUserFromJSON(r)
+		if err != nil {
+			log.Error(message+"err = ", err)
+			response.SendResponse(w, response.ErrorResponse("Не получилось получить пользователя из JSON"))
+			return
+		}
+		log.Debug(message+"user from request = ", userFromRequest)
+		userCtx := context.WithValue(context.Background(), "user", userFromRequest)
+		next.ServeHTTP(w, r.WithContext(userCtx))
 	})
 }

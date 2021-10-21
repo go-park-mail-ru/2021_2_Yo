@@ -3,8 +3,8 @@ package http
 import (
 	"backend/auth"
 	log "backend/logger"
+	"backend/models"
 	"backend/response"
-	"encoding/json"
 	"net/http"
 )
 
@@ -16,15 +16,6 @@ func NewDelivery(useCase auth.UseCase) *Delivery {
 	return &Delivery{
 		useCase: useCase,
 	}
-}
-
-func getUserFromJSON(r *http.Request) (*response.ResponseBodyUser, error) {
-	userInput := new(response.ResponseBodyUser)
-	err := json.NewDecoder(r.Body).Decode(userInput)
-	if err != nil {
-		return nil, err
-	}
-	return userInput, nil
 }
 
 func (h *Delivery) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string) {
@@ -52,23 +43,17 @@ func (h *Delivery) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string)
 func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	message := "SignUp:"
 	log.Debug(message + "started")
-	userFromRequest, err := getUserFromJSON(r)
+	userFromRequest := r.Context().Value("user").(*models.User)
+	err := h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
 	if err != nil {
-		log.Error(message+"err:", err)
-		response.SendResponse(w, response.ErrorResponse("Не получилось получить пользователя из JSON"))
-		return
-	}
-	log.Debug(message+"user from request = ", userFromRequest)
-	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
-	if err != nil {
-		log.Error(message+"err", err)
+		log.Error(message+"err = ", err)
 		response.SendResponse(w, response.ErrorResponse("Пользователь уже зарегестрирован"))
 		return
 	}
 	log.Debug(message+"mail, pass = ", userFromRequest.Mail, userFromRequest.Password)
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
-		log.Error(message+"useCase.SignIn error", err)
+		log.Error(message+"err = ", err)
 		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
 		return
 	}
@@ -90,12 +75,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	message := "SignIn:"
 	log.Debug(message + "started")
-	userFromRequest, err := getUserFromJSON(r)
-	if err != nil {
-		log.Error(message+"getUserFromJSON error", err)
-		return
-	}
-	log.Debug(message+"userFromRequest = ", userFromRequest)
+	userFromRequest := r.Context().Value("user").(*response.ResponseBodyUser)
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
 		log.Error("SignIn : useCase.SignIn error", err)

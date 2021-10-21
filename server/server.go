@@ -101,16 +101,23 @@ func NewApp() (*App, error) {
 func (app *App) Run() error {
 	defer app.db.Close()
 
+	midwar := middleware.NewMiddleware()
+
+	authMux := mux.NewRouter()
+	authMux.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
+	authMux.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
+	authMux.Use(midwar.Auth)
+
 	port := viper.GetString("port")
 	r := mux.NewRouter()
-	r.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
-	r.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
+
+	r.Handle("/signup", authMux)
+	r.Handle("/login", authMux)
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
-	r.HandleFunc("/events", app.eventManager.List)
+	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.Methods("OPTIONS").HandlerFunc(preflight)
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
-
-	midwar := middleware.NewMiddleware()
+	
 	//Сначала будет вызываться recovery, потом cors, а потом logging
 	r.Use(midwar.Logging)
 	r.Use(midwar.CORS)
