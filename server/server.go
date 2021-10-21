@@ -3,9 +3,9 @@ package server
 import (
 	authDelivery "backend/auth/delivery/http"
 	"backend/auth/delivery/http/middleware"
-	authRepository "backend/auth/repository/postgres"
+	authRepository "backend/auth/repository/localstorage"
 	authUseCase "backend/auth/usecase"
-	eventRepository "backend/event/repository/postgres"
+	eventRepository "backend/event/repository/localstorage"
 	eventUseCase "backend/event/usecase"
 	"bufio"
 	"fmt"
@@ -81,11 +81,11 @@ func NewApp() (*App, error) {
 		return nil, err
 	}
 
-	authR := authRepository.NewRepository(db)
+	authR := authRepository.NewRepository()
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
 	authD := authDelivery.NewDelivery(authUC)
 
-	eventR := eventRepository.NewRepository(db)
+	eventR := eventRepository.NewRepository()
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
@@ -100,6 +100,8 @@ func NewApp() (*App, error) {
 
 func (app *App) Run() error {
 	defer app.db.Close()
+
+	log.Debug("Server:Run()")
 
 	midwar := middleware.NewMiddleware()
 
