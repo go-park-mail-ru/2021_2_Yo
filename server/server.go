@@ -104,7 +104,7 @@ func (app *App) Run() error {
 	r.Use(midwar.Recovery)
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Error("Main : PORT must be set")
+		log.Error("Server : PORT must be set")
 		port = "8080"
 	}
 	log.Info("Server:Run():Deploying, port = ", port)

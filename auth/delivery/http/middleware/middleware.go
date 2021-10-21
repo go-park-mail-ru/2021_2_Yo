@@ -82,7 +82,8 @@ func getUserFromJSON(r *http.Request) (*models.User, error) {
 
 func (m *Middleware) Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		message := "Middleware:Auth"
+		message := "Middleware:Auth:"
+		log.Debug(message + "started")
 		userFromRequest, err := getUserFromJSON(r)
 		if err != nil {
 			log.Error(message+"err = ", err)
