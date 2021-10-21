@@ -8,7 +8,6 @@ import (
 	eventRepository "backend/event/repository/localstorage"
 	eventUseCase "backend/event/usecase"
 	"bufio"
-	"fmt"
 	"github.com/sirupsen/logrus"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"os"
@@ -20,7 +19,6 @@ import (
 	"net/http"
 
 	log "backend/logger"
-	"github.com/spf13/viper"
 )
 
 type App struct {
@@ -65,24 +63,6 @@ func initDB(connStr string) (*sql.DB, error) {
 func NewApp() (*App, error) {
 	secret := getSecret("auth/secret.txt")
 
-	user := viper.GetString("db.user")
-	password := viper.GetString("db.password")
-	host := viper.GetString("db.host")
-	port := viper.GetString("db.port")
-	dbname := viper.GetString("db.dbname")
-	sslmode := viper.GetString("db.sslmode")
-
-	connStr := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s", host, port, user, dbname, password, sslmode)
-	log.Info(connStr)
-
-	/*
-		db, err := initDB(connStr)
-		if err != nil {
-			log.Error("NewApp : initDB error", err)
-			return nil, err
-		}
-	*/
-
 	authR := authRepository.NewRepository()
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
 	authD := authDelivery.NewDelivery(authUC)
@@ -101,10 +81,7 @@ func NewApp() (*App, error) {
 }
 
 func (app *App) Run() error {
-	//defer app.db.Close()
-
 	log.Debug("Server:Run()")
-
 	midwar := middleware.NewMiddleware()
 
 	authMux := mux.NewRouter()
@@ -112,7 +89,6 @@ func (app *App) Run() error {
 	authMux.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
 	authMux.Use(midwar.Auth)
 
-	port := viper.GetString("port")
 	r := mux.NewRouter()
 
 	r.Handle("/signup", authMux)
@@ -126,7 +102,11 @@ func (app *App) Run() error {
 	r.Use(midwar.Logging)
 	r.Use(midwar.CORS)
 	r.Use(midwar.Recovery)
-
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Error("Main : PORT must be set")
+		port = "8080"
+	}
 	log.Info("Server:Run():Deploying, port = ", port)
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
