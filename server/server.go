@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	log "backend/logger"
+	gorilla_handlers "github.com/gorilla/handlers"
 )
 
 type App struct {
@@ -95,13 +96,23 @@ func (app *App) Run() error {
 	r.Handle("/login", authMux)
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
-	r.Methods("OPTIONS").HandlerFunc(preflight)
+	//r.Methods("OPTIONS").HandlerFunc(preflight)
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
 	//Сначала будет вызываться recovery, потом cors, а потом logging
 	r.Use(midwar.Logging)
-	r.Use(midwar.CORS)
+	//r.Use(midwar.CORS)
 	r.Use(midwar.Recovery)
+
+	r.Use(gorilla_handlers.CORS(
+		gorilla_handlers.AllowedOrigins([]string{"https://bmstusssa.herokuapp.com"}),
+		gorilla_handlers.AllowedHeaders([]string{
+			"Accept", "Content-Type", "Content-Length",
+			"Accept-Encoding", "X-CSRF-Token", "csrf-token", "Authorization"}),
+		gorilla_handlers.AllowCredentials(),
+		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
+	))
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Error("Server : PORT must be set")
