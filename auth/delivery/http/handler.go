@@ -8,6 +8,8 @@ import (
 	"net/http"
 )
 
+const logMessage = "auth:delivery:http:"
+
 type Delivery struct {
 	useCase auth.UseCase
 }
@@ -41,7 +43,7 @@ func (h *Delivery) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string)
 //@Failure 404 {object} response.BaseResponse
 //@Router /signup [post]
 func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
-	message := "SignUp:"
+	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
 	userFromRequest := r.Context().Value("user").(*models.User)
 	err := h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
@@ -73,7 +75,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 //@Failure 404 {object} response.BaseResponse
 //@Router /signin [post]
 func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
-	message := "SignIn:"
+	message := logMessage + "SignIn:"
 	log.Debug(message + "started")
 	userFromRequest := r.Context().Value("user").(*response.ResponseBodyUser)
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
@@ -96,7 +98,7 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 //@Failure 404 {object} response.BaseResponse
 //@Router /user [get]
 func (h *Delivery) User(w http.ResponseWriter, r *http.Request) {
-	message := "User:"
+	message := logMessage + "User:"
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
 	if err != nil {

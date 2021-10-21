@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+const logMessage = "auth:delivery:http:middleware:"
+
 type Middleware struct {
 	//Потом может пригодиться
 	//TODO: засунуть сюда репозиторий для Auth, чтобы пользователей доставать
@@ -30,12 +32,13 @@ func (m *Middleware) MiddlewareName(next http.Handler) http.Handler {
 */
 
 func (m *Middleware) Recovery(next http.Handler) http.Handler {
-	log.Debug("Auth:Middleware:Recovery")
+	message := logMessage + "Recovery:"
+	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			err := recover()
 			if err != nil {
-				log.Error("Auth:http:middleware:recovery panic error = ", err)
+				log.Error(message+"err = ", err)
 				response.SendResponse(w, response.ErrorResponse("Internal server error"))
 				//TODO: Разобраться, нужно ли здесь отсылать 500 через w.WriteHeader(http.StatusInternalServerError)
 			}
@@ -45,7 +48,8 @@ func (m *Middleware) Recovery(next http.Handler) http.Handler {
 }
 
 func (m *Middleware) Logging(next http.Handler) http.Handler {
-	log.Debug("Middleware:Logging")
+	message := logMessage + "Logging:"
+	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		next.ServeHTTP(w, r)
@@ -54,7 +58,8 @@ func (m *Middleware) Logging(next http.Handler) http.Handler {
 }
 
 func (m *Middleware) CORS(next http.Handler) http.Handler {
-	log.Debug("Middleware:Cors")
+	message := logMessage + "CORS:"
+	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -82,7 +87,7 @@ func getUserFromJSON(r *http.Request) (*models.User, error) {
 
 func (m *Middleware) Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		message := "Middleware:Auth:"
+		message := logMessage + "Auth:"
 		log.Debug(message + "started")
 		userFromRequest, err := getUserFromJSON(r)
 		if err != nil {
