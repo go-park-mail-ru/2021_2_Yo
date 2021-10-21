@@ -1,9 +1,9 @@
 package response
 
 import (
+	log "backend/logger"
 	"backend/models"
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -80,13 +80,14 @@ func EventsListResponse(events []*models.Event) *Response {
 }
 
 func SendResponse(w http.ResponseWriter, response interface{}) {
+	message := "SendResponse"
 	w.WriteHeader(http.StatusOK)
 	b, err := json.Marshal(response)
 	if err != nil {
-		log.Error("SendResponse : error", err)
+		log.Error(message+"err = ", err)
 		return
 	}
-	log.Info("sendResponse : response to send = ", string(b))
+	log.Debug(message+"response to send = ", string(b))
 	w.Write(b)
 }
 

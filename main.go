@@ -5,8 +5,8 @@ import (
 	"backend/server"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
-	"os"
 	"github.com/spf13/viper"
+	"os"
 )
 
 //@title BMSTUSA API
@@ -26,7 +26,7 @@ import (
 //@schemes https
 func main() {
 	log.Info("Main : start")
-	
+
 	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
 	viper.ReadInConfig()

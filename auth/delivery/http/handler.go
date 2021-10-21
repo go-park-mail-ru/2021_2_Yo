@@ -2,11 +2,10 @@ package http
 
 import (
 	"backend/auth"
+	log "backend/logger"
 	"backend/response"
 	"encoding/json"
 	"net/http"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type Delivery struct {
@@ -51,31 +50,32 @@ func (h *Delivery) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string)
 //@Failure 404 {object} response.BaseResponse
 //@Router /signup [post]
 func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
-	log.Info("SignUp : started")
+	message := "SignUp:"
+	log.Debug(message + "started")
 	userFromRequest, err := getUserFromJSON(r)
 	if err != nil {
-		log.Error("SignUp : didn't get user from JSON", err)
+		log.Error(message+"err:", err)
 		response.SendResponse(w, response.ErrorResponse("Не получилось получить пользователя из JSON"))
 		return
 	}
-	log.Info("SignUp : userFromRequest = ", userFromRequest)
+	log.Debug(message+"user from request = ", userFromRequest)
 	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
 	if err != nil {
-		log.Error("SignUp : SignUp error", err)
+		log.Error(message+"err", err)
 		response.SendResponse(w, response.ErrorResponse("Пользователь уже зарегестрирован"))
 		return
 	}
-	log.Println("Auth:Handler:Signup: mail, pass ", userFromRequest.Mail, userFromRequest.Password)
+	log.Debug(message+"mail, pass = ", userFromRequest.Mail, userFromRequest.Password)
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
-		log.Error("SignIn : useCase.SignIn error", err)
+		log.Error(message+"useCase.SignIn error", err)
 		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
 		return
 	}
-	log.Info("setCookieWithJwtToken : jwtToken = ", jwtToken)
+	log.Debug(message+"setCookieWithJwtToken : jwtToken = ", jwtToken)
 	h.setCookieWithJwtToken(w, jwtToken)
 	response.SendResponse(w, response.OkResponse())
-	log.Info("SignUp : ended")
+	log.Debug(message + "ended")
 }
 
 //@Summmary SignIn
@@ -88,23 +88,24 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 //@Failure 404 {object} response.BaseResponse
 //@Router /signin [post]
 func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
-	log.Info("SignIn : started")
+	message := "SignIn:"
+	log.Debug(message + "started")
 	userFromRequest, err := getUserFromJSON(r)
 	if err != nil {
-		log.Error("SignIn : getUserFromJSON error", err)
+		log.Error(message+"getUserFromJSON error", err)
 		return
 	}
-	log.Info("SignIn : userFromRequest = ", userFromRequest)
+	log.Debug(message+"userFromRequest = ", userFromRequest)
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
 		log.Error("SignIn : useCase.SignIn error", err)
 		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
 		return
 	}
-	log.Info("SignIn : jwtToken = ", jwtToken)
+	log.Debug("SignIn : jwtToken = ", jwtToken)
 	h.setCookieWithJwtToken(w, jwtToken)
 	response.SendResponse(w, response.OkResponse())
-	log.Info("SignIn : ended")
+	log.Debug("SignIn : ended")
 }
 
 //@Summmary User
@@ -115,23 +116,21 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 //@Failure 404 {object} response.BaseResponse
 //@Router /user [get]
 func (h *Delivery) User(w http.ResponseWriter, r *http.Request) {
-	log.Info("User : started")
+	message := "User:"
+	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		log.Error("User : cookie error", err)
+		log.Error(message+"cookie error", err)
 		response.SendResponse(w, response.ErrorResponse("Ошибка с получением Cookie"))
 		return
 	}
-	if cookie != nil {
-		log.Info("User : cookie.value = ", cookie.Value)
-	}
 	foundUser, err := h.useCase.ParseToken(cookie.Value)
 	if err != nil {
-		log.Error("User : User token parsing error", err)
+		log.Error(message+"User token parsing error", err)
 		response.SendResponse(w, response.ErrorResponse("Ошибка с парсингом токена"))
 		return
 	}
-	log.Info("User : Found User = ", foundUser)
+	log.Debug(message+"Found User = ", foundUser)
 	response.SendResponse(w, response.UsernameResponse(foundUser.Name))
-	log.Info("User : ended")
+	log.Debug(message + "ended")
 }

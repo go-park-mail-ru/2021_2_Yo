@@ -1,10 +1,9 @@
 package postgres
 
 import (
+	log "backend/logger"
 	"backend/models"
-	//"database/sql"
 	sql "github.com/jmoiron/sqlx"
-	log "github.com/sirupsen/logrus"
 )
 
 type Repository struct {
@@ -18,10 +17,11 @@ func NewRepository(database *sql.DB) *Repository {
 }
 
 func (s *Repository) List() ([]*models.Event, error) {
+	message := "List:"
 	query := `select * from "event"`
 	rows, err := s.db.Queryx(query)
 	if err != nil {
-		log.Error("Event : repository : postgres : List() err = ", err)
+		log.Error(message+"err = ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -30,12 +30,12 @@ func (s *Repository) List() ([]*models.Event, error) {
 		var event Event
 		err := rows.StructScan(&event)
 		if err != nil {
-			log.Error("Event : repository : postgres : List() StructScan err = ", err)
+			log.Error(message+"err = ", err)
 			return nil, err
 		}
 		modelEvent := toModelEvent(&event)
 		resultEvents = append(resultEvents, modelEvent)
 	}
-	log.Info("Events Postgres List = ", resultEvents)
+	log.Debug(message+"resultEvents = ", resultEvents)
 	return resultEvents, nil
 }

@@ -2,11 +2,11 @@ package usecase
 
 import (
 	"backend/auth"
+	log "backend/logger"
 	"backend/models"
 	"crypto/sha256"
 	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
-	log "github.com/sirupsen/logrus"
 )
 
 type UseCase struct {

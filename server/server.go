@@ -2,24 +2,24 @@ package server
 
 import (
 	authDelivery "backend/auth/delivery/http"
+	"backend/auth/delivery/http/middleware"
 	authRepository "backend/auth/repository/postgres"
 	authUseCase "backend/auth/usecase"
 	eventRepository "backend/event/repository/postgres"
 	eventUseCase "backend/event/usecase"
 	"bufio"
 	"fmt"
-	"os"
-
-	gorilla_handlers "github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
-	sql "github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"os"
 
 	_ "backend/docs"
 	eventDelivery "backend/event/delivery/http"
+	"github.com/gorilla/mux"
+	sql "github.com/jmoiron/sqlx"
 	"net/http"
 
-	log "github.com/sirupsen/logrus"
+	log "backend/logger"
 	"github.com/spf13/viper"
 )
 
@@ -30,7 +30,7 @@ type App struct {
 }
 
 func preflight(w http.ResponseWriter, r *http.Request) {
-	log.Info("In preflight")
+	log.Info("Server:preflight")
 	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -58,11 +58,9 @@ func initDB(connStr string) (*sql.DB, error) {
 		log.Error("main : Can't open DB", err)
 		return nil, err
 	}
-	log.Println("db status = ", db.Stats())
+	log.Info("db status = ", db.Stats())
 	return db, nil
 }
-
-
 
 func NewApp() (*App, error) {
 	secret := getSecret("auth/secret.txt")
@@ -91,6 +89,8 @@ func NewApp() (*App, error) {
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
+	log.Init(logrus.InfoLevel)
+
 	return &App{
 		authManager:  authD,
 		eventManager: eventD,
@@ -103,7 +103,6 @@ func (app *App) Run() error {
 
 	port := viper.GetString("port")
 	r := mux.NewRouter()
-
 	r.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
 	r.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
@@ -111,20 +110,16 @@ func (app *App) Run() error {
 	r.Methods("OPTIONS").HandlerFunc(preflight)
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
-	//TODO: Проверить, нужно ли это? Или preflight достаточно?
-	r.Use(gorilla_handlers.CORS(
-		gorilla_handlers.AllowedOrigins([]string{"https://bmstusssa.herokuapp.com"}),
-		gorilla_handlers.AllowedHeaders([]string{
-			"Accept", "Content-Type", "Content-Length",
-			"Accept-Encoding", "X-CSRF-Token", "csrf-token", "Authorization"}),
-		gorilla_handlers.AllowCredentials(),
-		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
-	))
+	midwar := middleware.NewMiddleware()
+	//Сначала будет вызываться recovery, потом cors, а потом logging
+	r.Use(midwar.Logging)
+	r.Use(midwar.CORS)
+	r.Use(midwar.Recovery)
 
-	log.Info("Server : Run() : Deploying, port = ", port)
+	log.Info("Server:Run():Deploying, port = ", port)
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
-		log.Error("Server : Run() : ListenAndServe error: ", err)
+		log.Error("Server:Run():ListenAndServe error: ", err)
 		return err
 	}
 	return nil

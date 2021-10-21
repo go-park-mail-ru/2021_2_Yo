@@ -2,7 +2,6 @@ package http
 
 import (
 	"backend/event/usecase"
-	//"backend/models"
 	"bytes"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
