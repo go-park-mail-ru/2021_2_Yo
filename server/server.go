@@ -7,7 +7,6 @@ import (
 	authUseCase "backend/auth/usecase"
 	eventRepository "backend/event/repository/postgres"
 	eventUseCase "backend/event/usecase"
-	"bufio"
 	"fmt"
 	gorilla_handlers "github.com/gorilla/handlers"
 	"github.com/sirupsen/logrus"
@@ -31,7 +30,7 @@ type App struct {
 	eventManager *eventDelivery.Delivery
 	db           *sql.DB
 }
-
+/*
 func getSecret(pathToSecretFile string) (string, error) {
 	message := logMessage + "getSecret:"
 	f, err := os.Open(pathToSecretFile)
@@ -48,7 +47,7 @@ func getSecret(pathToSecretFile string) (string, error) {
 	}
 	return secret, nil
 }
-
+*/
 func initDB() (*sql.DB, error) {
 	message := logMessage + "initDB:"
 
@@ -73,9 +72,10 @@ func initDB() (*sql.DB, error) {
 func NewApp() (*App, error) {
 	message := logMessage + "NewApp:"
 	log.Init(logrus.DebugLevel)
-	secret, err := getSecret("auth/secret.txt")
-	if err != nil {
-		log.Error(message+"err =", err)
+	secret := os.Getenv("SECRET")
+	if secret == "" {
+		var err error
+		log.Error(message+"err =")
 		return nil, err
 	}
 
