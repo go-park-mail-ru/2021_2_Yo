@@ -103,6 +103,24 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "ended")
 }
 
+func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "Logout:"
+	log.Debug(message + "started")
+	userFromRequest := r.Context().Value("user").(*response.ResponseBodyUser)
+
+	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
+	if err == auth.ErrUserNotFound {
+		log.Error(message+"err =", err)
+		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
+		return
+	}
+	jwtToken = "Null"
+	log.Debug(message+"jwtToken =", jwtToken)
+	h.setCookieWithJwtToken(w, jwtToken)
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
+}
+
 //@Summmary User
 //@Tags auth
 //@Description "Главная страница"

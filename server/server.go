@@ -109,11 +109,13 @@ func (app *App) Run() error {
 	authMux := mux.NewRouter()
 	authMux.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
 	authMux.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
+	authMux.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
 	authMux.Use(midwar.Auth)
 
 	r := mux.NewRouter()
 	r.Handle("/signup", authMux)
 	r.Handle("/login", authMux)
+	r.Handle("/logout", authMux)
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
