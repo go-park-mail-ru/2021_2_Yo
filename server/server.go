@@ -1,26 +1,30 @@
 package server
 
 import (
+	"backend/auth"
 	authDelivery "backend/auth/delivery/http"
 	"backend/auth/delivery/http/middleware"
+	authLocalRepository "backend/auth/repository/localstorage"
 	authRepository "backend/auth/repository/postgres"
 	authUseCase "backend/auth/usecase"
+	_ "backend/docs"
+	"backend/event"
+	eventDelivery "backend/event/delivery/http"
+	eventLocalRepository "backend/event/repository/localstorage"
 	eventRepository "backend/event/repository/postgres"
 	eventUseCase "backend/event/usecase"
+	log "backend/logger"
+	"bufio"
+	"errors"
 	"fmt"
 	gorilla_handlers "github.com/gorilla/handlers"
-	"github.com/sirupsen/logrus"
-	httpSwagger "github.com/swaggo/http-swagger"
-	"os"
-
-	_ "backend/docs"
-	eventDelivery "backend/event/delivery/http"
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
-	"net/http"
-
-	log "backend/logger"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	httpSwagger "github.com/swaggo/http-swagger"
+	"net/http"
+	"os"
 )
 
 const logMessage = "server:"
@@ -30,26 +34,41 @@ type App struct {
 	eventManager *eventDelivery.Delivery
 	db           *sql.DB
 }
-/*
-func getSecret(pathToSecretFile string) (string, error) {
+
+func getSecret(isRemoteServer bool, pathToSecretFile string) (string, error) {
 	message := logMessage + "getSecret:"
-	f, err := os.Open(pathToSecretFile)
-	if err != nil {
-		log.Error(message+"err =", err)
-		return "", err
+	log.Debug(message + "started")
+	if isRemoteServer {
+		secret := os.Getenv("SECRET")
+		if secret == "" {
+			err := errors.New("Can't get secret from environment")
+			log.Error(message+"err =", err)
+			return "", err
+		}
+		return secret, nil
+	} else {
+		f, err := os.Open(pathToSecretFile)
+		if err != nil {
+			log.Error(message+"err =", err)
+			return "", err
+		}
+		scanner := bufio.NewScanner(f)
+		scanner.Scan()
+		secret := scanner.Text()
+		if err := f.Close(); err != nil {
+			log.Error(message+"err =", err)
+			return "", err
+		}
+		return secret, nil
 	}
-	scanner := bufio.NewScanner(f)
-	scanner.Scan()
-	secret := scanner.Text()
-	if err := f.Close(); err != nil {
-		log.Error(message+"err =", err)
-		return "", err
-	}
-	return secret, nil
 }
-*/
-func initDB() (*sql.DB, error) {
+
+func initDB(isRemoteServer bool) (*sql.DB, error) {
 	message := logMessage + "initDB:"
+	log.Debug(message + "started")
+	if !isRemoteServer {
+		return nil, nil
+	}
 
 	user := viper.GetString("db.user")
 	password := viper.GetString("db.password")
@@ -58,7 +77,7 @@ func initDB() (*sql.DB, error) {
 	dbname := viper.GetString("db.dbname")
 	sslmode := viper.GetString("db.sslmode")
 	connStr := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s", host, port, user, dbname, password, sslmode)
-	log.Debug(message+"connStr = ", connStr)
+	log.Debug(message+"connStr =", connStr)
 
 	db, err := sql.Connect("postgres", connStr)
 	if err != nil {
@@ -69,27 +88,31 @@ func initDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func NewApp() (*App, error) {
+func NewApp(isRemoteServer bool, logLevel logrus.Level) (*App, error) {
 	message := logMessage + "NewApp:"
-	log.Init(logrus.DebugLevel)
-	secret := os.Getenv("SECRET")
-	if secret == "" {
-		var err error
-		log.Error(message+"err =")
-		return nil, err
-	}
+	log.Init(logLevel)
+	log.Info(fmt.Sprintf(message+"started, isRemoteServer = %t, log level = %s", isRemoteServer, logLevel))
+	secret, err := getSecret(isRemoteServer, "auth/secret.txt")
 
-	db, err := initDB()
+	db, err := initDB(isRemoteServer)
 	if err != nil {
 		log.Error(message+"err =", err)
 		return nil, err
 	}
 
-	authR := authRepository.NewRepository(db)
+	var authR auth.Repository
+	var eventR event.Repository
+	if isRemoteServer {
+		authR = authRepository.NewRepository(db)
+		eventR = eventRepository.NewRepository(db)
+	} else {
+		authR = authLocalRepository.NewRepository()
+		eventR = eventLocalRepository.NewRepository()
+	}
+
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
 	authD := authDelivery.NewDelivery(authUC)
 
-	eventR := eventRepository.NewRepository(db)
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
@@ -101,7 +124,9 @@ func NewApp() (*App, error) {
 }
 
 func (app *App) Run() error {
-	defer app.db.Close()
+	if app.db != nil {
+		defer app.db.Close()
+	}
 
 	message := logMessage + "Run:"
 	midwar := middleware.NewMiddleware()

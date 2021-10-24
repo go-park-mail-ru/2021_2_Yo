@@ -3,6 +3,7 @@ package main
 import (
 	_ "backend/docs"
 	"backend/server"
+	"flag"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -31,7 +32,11 @@ func main() {
 	viper.SetConfigName("config")
 	viper.ReadInConfig()
 
-	app, err := server.NewApp()
+	var isLocalServer bool
+	flag.BoolVar(&isLocalServer, "l", false, "local storage DB and environment")
+	flag.Parse()
+	logLevel := log.DebugLevel
+	app, err := server.NewApp(!isLocalServer, logLevel)
 	if err != nil {
 		log.Error("Main : NewApp error = ", err)
 		os.Exit(1)
