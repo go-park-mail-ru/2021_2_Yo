@@ -123,12 +123,7 @@ func NewApp(isRemoteServer bool, logLevel logrus.Level) (*App, error) {
 	}, nil
 }
 
-func (app *App) Run() error {
-	if app.db != nil {
-		defer app.db.Close()
-	}
-
-	message := logMessage + "Run:"
+func newRouterWithEndpoints(app *App) *mux.Router {
 	midwar := middleware.NewMiddleware()
 
 	authMux := mux.NewRouter()
@@ -156,7 +151,16 @@ func (app *App) Run() error {
 		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
 	))
 	r.Use(midwar.Recovery)
+	return r
+}
 
+func (app *App) Run() error {
+	if app.db != nil {
+		defer app.db.Close()
+	}
+	message := logMessage + "Run:"
+	log.Info(message + "start")
+	r := newRouterWithEndpoints(app)
 	port := viper.GetString("port")
 	log.Info(message+"port =", port)
 	err := http.ListenAndServe(":"+port, r)
