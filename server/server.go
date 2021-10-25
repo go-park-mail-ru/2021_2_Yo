@@ -190,7 +190,8 @@ func (app *App) Run() error {
 	))
 	r.Use(midwar.Recovery)
 
-	port := viper.GetString("port")
+	//port := viper.GetString("port")
+	port := os.Getenv("PORT")
 	log.Info(message+"port =", port)
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
