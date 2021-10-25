@@ -7,27 +7,42 @@ import (
 
 type Event struct {
 	ID          int
-	Name        string
+	Title       string
 	Description string
-	Views       int
-	ImgUrl      string
+	Text        string
+	City        string
+	Category    string
+	Viewed      int
+	Tag         []string
+	Date        string
+	Geo         string
 }
 
 func toPostgresEvent(e *models.Event) *Event {
 	return &Event{
-		Name:        e.Name,
+		Title:       e.Title,
 		Description: e.Description,
-		Views:       e.Views,
-		ImgUrl:      e.ImgUrl,
+		Text:        e.Text,
+		City:        e.City,
+		Category:    e.Category,
+		Viewed:      e.Viewed,
+		Tag:         e.Tag,
+		Date:        e.Date,
+		Geo:         e.Geo,
 	}
 }
 
 func toModelEvent(e *Event) *models.Event {
 	return &models.Event{
 		ID:          strconv.Itoa(e.ID),
-		Name:        e.Name,
+		Title:       e.Title,
 		Description: e.Description,
-		Views:       e.Views,
-		ImgUrl:      e.ImgUrl,
+		Text:        e.Text,
+		City:        e.City,
+		Category:    e.Category,
+		Viewed:      e.Viewed,
+		Tag:         e.Tag,
+		Date:        e.Date,
+		Geo:         e.Geo,
 	}
 }

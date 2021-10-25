@@ -20,10 +20,15 @@ type ResponseBodyUser struct {
 }
 
 type ResponseBodyEvent struct {
-	Name        string `json:"name" valid:"type(string)"`
-	Description string `json:"description" valid:"type(string)"`
-	Viewed      int    `json:"viewed" valid:"type(int)"`
-	ImgUrl      string `json:"imgUrl" valid:"type(string)"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Text        string   `json:"text"`
+	City        string   `json:"city"`
+	Category    string   `json:"category"`
+	Viewed      int      `json:"viewed"`
+	Tag         []string `json:"tag"`
+	Date        string   `json:"date"`
+	Geo         string   `json:"geo"`
 }
 
 type ResponseBodyEventList struct {
@@ -32,20 +37,22 @@ type ResponseBodyEventList struct {
 
 func MakeEventForResponse(event *models.Event) ResponseBodyEvent {
 	return ResponseBodyEvent{
-		Name:        event.Name,
+		Title:       event.Title,
 		Description: event.Description,
-		Viewed:      event.Views,
-		ImgUrl:      event.ImgUrl,
+		Text:        event.Text,
+		City:        event.City,
+		Category:    event.Category,
+		Viewed:      event.Viewed,
+		Tag:         event.Tag,
+		Date:        event.Date,
+		Geo:         event.Geo,
 	}
 }
 
 func MakeEventListForResponse(events []*models.Event) []ResponseBodyEvent {
 	result := make([]ResponseBodyEvent, len(events))
 	for i := 0; i < len(events); i++ {
-		result[i].Name = events[i].Name
-		result[i].Description = events[i].Description
-		result[i].Viewed = events[i].Views
-		result[i].ImgUrl = events[i].ImgUrl
+		result[i] = MakeEventForResponse(events[i])
 	}
 	return result
 }
