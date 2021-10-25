@@ -113,3 +113,16 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 	}
 	return nil, event.ErrEventNotFound
 }
+
+func (s *Repository) CreateEvent(e *models.Event) (string, error) {
+	newEvent := toLocalstorageEvent(e)
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	if len(s.events) > 0 {
+		newEvent.ID = s.events[len(s.events)-1].ID + 1
+	} else {
+		newEvent.ID = 0
+	}
+	s.events = append(s.events, newEvent)
+	return strconv.Itoa(newEvent.ID), nil
+}

@@ -19,6 +19,10 @@ func (a *UseCase) List() ([]*models.Event, error) {
 	return a.eventRepo.List()
 }
 
-func (a *UseCase) Event(eventId string) (*models.Event, error) {
+func (a *UseCase) GetEvent(eventId string) (*models.Event, error) {
 	return a.eventRepo.GetEvent(eventId)
+}
+
+func (a *UseCase) CreateEvent(event *models.Event) (string, error) {
+	return a.eventRepo.CreateEvent(event)
 }

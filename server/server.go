@@ -138,7 +138,8 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Handle("/logout", authMux)
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
-	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.Event).Methods("GET")
+	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
+	r.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
 	//Сначала будет вызываться recovery, потом cors, а потом logging

@@ -87,6 +87,20 @@ func UsernameResponse(name string) *Response {
 	}
 }
 
+type ResponseEventID struct {
+	ID string `json:"id"`
+}
+
+func EventIdResponse(eventID string) *Response {
+	return &Response{
+		Status:  0,
+		Message: "",
+		Body: ResponseEventID{
+			ID: eventID,
+		},
+	}
+}
+
 func EventsListResponse(events []*models.Event) *Response {
 	return &Response{
 		Status:  200,
