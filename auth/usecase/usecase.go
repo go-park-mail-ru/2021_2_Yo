@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
+	"time"
 )
 
 const logMessage = "auth:usecase:usecase:"
@@ -23,9 +24,59 @@ func NewUseCase(userRepo auth.Repository, secretWord []byte) *UseCase {
 	}
 }
 
+/*
+
+type TokenMetaInfo struct {
+	AccessToken string
+	RefreshToken string
+	AccTokenExpires int64
+	RefTokenExpires int64
+}
+
+type MegaClaims struct {
+
+}
+
+func(a* UseCase) CreateToken(ID int) (*TokenMetaInfo, error){
+	var err error
+
+	TokenMeta := &TokenMetaInfo{}
+	TokenMeta.AccTokenExpires = time.Now().Add(time.Minute * 15).Unix()
+	TokenMeta.RefTokenExpires = time.Now().Add(time.Hour * 7).Unix()
+
+	//Делаю access token
+	AccTokenClaims := jwt.MapClaims{}
+	AccTokenClaims["authorized"] = true
+	AccTokenClaims["ID"] = ID
+	AccTokenClaims["exp"] = TokenMeta.RefTokenExpires
+
+	AccToken := jwt.NewWithClaims(jwt.SigningMethodHS256, AccTokenClaims)
+	TokenMeta.AccessToken, err = AccToken.SignedString(a.secretWord)
+
+	if err != nil {
+		return nil, err
+	}
+	
+	//Делаю refresh token
+	RefTokenClaims := jwt.MapClaims{}
+	RefTokenClaims["ID"] = ID
+	RefTokenClaims["exp"] = TokenMeta.RefTokenExpires
+
+	RefToken := jwt.NewWithClaims(jwt.SigningMethodHS256, RefTokenClaims)
+	TokenMeta.RefreshToken, err = RefToken.SignedString(a.secretWord)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return TokenMeta, nil
+}
+*/
+
 type claims struct {
 	jwt.StandardClaims
 	ID string `json:"user_id"`
+	ExpiresAt int64 `json:"exp"`
 }
 
 func parseToken(accessToken string, signingKey []byte) (string, error) {
@@ -66,6 +117,7 @@ func (a *UseCase) SignIn(mail, password string) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
 		ID: user.ID,
+		ExpiresAt: time.Now().Add(time.Minute * 30).Unix(),
 	})
 	return token.SignedString(a.secretWord)
 }

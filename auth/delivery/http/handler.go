@@ -7,6 +7,7 @@ import (
 	"backend/response"
 	"github.com/asaskevich/govalidator"
 	"net/http"
+	"time"
 )
 
 const logMessage = "auth:delivery:http:handler:"
@@ -27,6 +28,21 @@ func (h *Delivery) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string)
 		Value:    jwtToken,
 		HttpOnly: true,
 		Secure:   true,
+		Expires: time.Now().Add(time.Minute * 30),
+	}
+	http.SetCookie(w, cookie)
+	cs := w.Header().Get("Set-Cookie")
+	cs += "; SameSite=None"
+	w.Header().Set("Set-Cookie", cs)
+}
+
+func (h *Delivery) ExpireCookieWithJwtToken(w http.ResponseWriter, jwtToken string) {
+	cookie := &http.Cookie{
+		Name:     "session_id",
+		Value:    jwtToken,
+		HttpOnly: true,
+		Secure:   true,
+		Expires:  time.Now().Add(time.Minute * (-30)),
 	}
 	http.SetCookie(w, cookie)
 	cs := w.Header().Get("Set-Cookie")
@@ -114,9 +130,8 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
 		return
 	}
-	jwtToken = "Null"
 	log.Debug(message+"jwtToken =", jwtToken)
-	h.setCookieWithJwtToken(w, jwtToken)
+	h.ExpireCookieWithJwtToken(w, jwtToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
