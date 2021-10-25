@@ -1,6 +1,7 @@
 package mock
 
 import (
+	"backend/event"
 	"backend/models"
 	"github.com/stretchr/testify/mock"
 )
@@ -11,4 +12,8 @@ type RepositoryMock struct {
 
 func (s *RepositoryMock) List() ([]*models.Event, error) {
 	return nil, nil
+}
+
+func (s *RepositoryMock) GetEvent(eventId string) (*models.Event, error) {
+	return nil, event.ErrEventNotFound
 }

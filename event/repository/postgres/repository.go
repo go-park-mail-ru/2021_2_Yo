@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"backend/event"
 	log "backend/logger"
 	"backend/models"
 	sql "github.com/jmoiron/sqlx"
@@ -40,4 +41,8 @@ func (s *Repository) List() ([]*models.Event, error) {
 	}
 	log.Debug(message+"resultEvents =", resultEvents)
 	return resultEvents, nil
+}
+
+func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
+	return nil, event.ErrEventNotFound
 }

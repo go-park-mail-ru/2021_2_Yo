@@ -138,7 +138,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Handle("/logout", authMux)
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
-	r.HandleFunc("/event/{id:[0-9]+}", app.eventManager.Event).Methods("GET")
+	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.Event).Methods("GET")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
 	//Сначала будет вызываться recovery, потом cors, а потом logging
@@ -165,6 +165,9 @@ func (app *App) Run() error {
 
 	//port := viper.GetString("port")
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	log.Info(message+"port =", port)
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
