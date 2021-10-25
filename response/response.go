@@ -93,7 +93,7 @@ type ResponseEventID struct {
 
 func EventIdResponse(eventID string) *Response {
 	return &Response{
-		Status:  0,
+		Status:  200,
 		Message: "",
 		Body: ResponseEventID{
 			ID: eventID,
