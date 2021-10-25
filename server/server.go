@@ -160,35 +160,7 @@ func (app *App) Run() error {
 	}
 	message := logMessage + "Run:"
 	log.Info(message + "start")
-	//r := newRouterWithEndpoints(app)
-
-	midwar := middleware.NewMiddleware()
-
-	authMux := mux.NewRouter()
-	authMux.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
-	authMux.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
-	authMux.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
-	authMux.Use(midwar.Auth)
-
-	r := mux.NewRouter()
-	r.Handle("/signup", authMux)
-	r.Handle("/login", authMux)
-	r.Handle("/logout", authMux)
-	r.HandleFunc("/user", app.authManager.User).Methods("GET")
-	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
-	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
-
-	//Сначала будет вызываться recovery, потом cors, а потом logging
-	r.Use(midwar.Logging)
-	r.Use(gorilla_handlers.CORS(
-		gorilla_handlers.AllowedOrigins([]string{"https://bmstusssa.herokuapp.com"}),
-		gorilla_handlers.AllowedHeaders([]string{
-			"Accept", "Content-Type", "Content-Length",
-			"Accept-Encoding", "X-CSRF-Token", "csrf-token", "Authorization"}),
-		gorilla_handlers.AllowCredentials(),
-		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
-	))
-	r.Use(midwar.Recovery)
+	r := newRouterWithEndpoints(app)
 
 	//port := viper.GetString("port")
 	port := os.Getenv("PORT")
