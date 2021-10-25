@@ -6,4 +6,5 @@ import (
 
 type Repository interface {
 	List() ([]*models.Event, error)
+	GetEvent(eventId string) (*models.Event, error)
 }

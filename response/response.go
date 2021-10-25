@@ -30,6 +30,15 @@ type ResponseBodyEventList struct {
 	Events []ResponseBodyEvent `json:"events"`
 }
 
+func MakeEventForResponse(event *models.Event) ResponseBodyEvent {
+	return ResponseBodyEvent{
+		Name:        event.Name,
+		Description: event.Description,
+		Viewed:      event.Views,
+		ImgUrl:      event.ImgUrl,
+	}
+}
+
 func MakeEventListForResponse(events []*models.Event) []ResponseBodyEvent {
 	result := make([]ResponseBodyEvent, len(events))
 	for i := 0; i < len(events); i++ {
@@ -78,6 +87,14 @@ func EventsListResponse(events []*models.Event) *Response {
 		Body: ResponseBodyEventList{
 			Events: MakeEventListForResponse(events),
 		},
+	}
+}
+
+func EventResponse(event *models.Event) *Response {
+	return &Response{
+		Status:  200,
+		Message: "",
+		Body:    MakeEventForResponse(event),
 	}
 }
 

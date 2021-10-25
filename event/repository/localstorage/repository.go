@@ -1,7 +1,9 @@
 package localstorage
 
 import (
+	"backend/event"
 	"backend/models"
+	"strconv"
 	"sync"
 )
 
@@ -93,4 +95,16 @@ func (s *Repository) List() ([]*models.Event, error) {
 		resultEvents[i] = toModelEvent(s.events[i])
 	}
 	return resultEvents, nil
+}
+
+func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
+	eventIdInt, _ := strconv.Atoi(eventId)
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	for _, foundEvent := range s.events {
+		if foundEvent.ID == eventIdInt {
+			return toModelEvent(foundEvent), nil
+		}
+	}
+	return nil, event.ErrEventNotFound
 }

@@ -18,3 +18,7 @@ func NewUseCase(eventRepo event.Repository) *UseCase {
 func (a *UseCase) List() ([]*models.Event, error) {
 	return a.eventRepo.List()
 }
+
+func (a *UseCase) Event(eventId string) (*models.Event, error) {
+	return a.eventRepo.GetEvent(eventId)
+}
