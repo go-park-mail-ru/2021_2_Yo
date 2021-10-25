@@ -123,6 +123,17 @@ func NewApp(isRemoteServer bool, logLevel logrus.Level) (*App, error) {
 	}, nil
 }
 
+func Preflight(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "Preflight:"
+	log.Info(message + "start")
+	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
+	log.Info(message + "end")
+}
+
 func newRouterWithEndpoints(app *App) *mux.Router {
 	midwar := middleware.NewMiddleware()
 
@@ -133,6 +144,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	authMux.Use(midwar.Auth)
 
 	r := mux.NewRouter()
+	r.Methods("OPTIONS").HandlerFunc(Preflight)
 	r.Handle("/signup", authMux)
 	r.Handle("/login", authMux)
 	r.Handle("/logout", authMux)
