@@ -69,6 +69,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		log.Error(message+"err =", err)
 	}
 
+	//TODO: SignUp(*models.User)
 	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
 	if err != nil {
 		log.Error(message+"err =", err)

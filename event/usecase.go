@@ -4,5 +4,6 @@ import "backend/models"
 
 type UseCase interface {
 	List() ([]*models.Event, error)
-	Event(eventId string) (*models.Event, error)
+	GetEvent(string) (*models.Event, error)
+	CreateEvent(*models.Event) (string, error)
 }

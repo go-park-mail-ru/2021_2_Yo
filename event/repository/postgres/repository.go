@@ -46,3 +46,7 @@ func (s *Repository) List() ([]*models.Event, error) {
 func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 	return nil, event.ErrEventNotFound
 }
+
+func (s *Repository) CreateEvent(event2 *models.Event) (string, error) {
+	return "", nil
+}
