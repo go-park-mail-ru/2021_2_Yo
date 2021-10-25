@@ -84,7 +84,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignIn:"
 	log.Debug(message + "started")
-	userFromRequest := r.Context().Value("user").(*response.ResponseBodyUser)
+	userFromRequest := r.Context().Value("user").(*models.User)
 
 	_, err := govalidator.ValidateStruct(userFromRequest)
 	if err != nil {
@@ -106,7 +106,7 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Logout:"
 	log.Debug(message + "started")
-	userFromRequest := r.Context().Value("user").(*response.ResponseBodyUser)
+	userFromRequest := r.Context().Value("user").(*models.User)
 
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if err == auth.ErrUserNotFound {
