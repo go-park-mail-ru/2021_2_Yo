@@ -7,7 +7,6 @@ import (
 	"backend/response"
 	"github.com/asaskevich/govalidator"
 	"net/http"
-	"time"
 )
 
 const logMessage = "auth:delivery:http:handler:"
@@ -28,21 +27,6 @@ func (h *Delivery) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string)
 		Value:    jwtToken,
 		HttpOnly: true,
 		Secure:   true,
-		Expires: time.Now().Add(time.Minute * 30),
-	}
-	http.SetCookie(w, cookie)
-	cs := w.Header().Get("Set-Cookie")
-	cs += "; SameSite=None"
-	w.Header().Set("Set-Cookie", cs)
-}
-
-func (h *Delivery) ExpireCookieWithJwtToken(w http.ResponseWriter, jwtToken string) {
-	cookie := &http.Cookie{
-		Name:     "session_id",
-		Value:    jwtToken,
-		HttpOnly: true,
-		Secure:   true,
-		Expires:  time.Now().Add(time.Minute * (-30)),
 	}
 	http.SetCookie(w, cookie)
 	cs := w.Header().Get("Set-Cookie")
@@ -121,18 +105,17 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "Logout:"
+	message := logMessage + "User:"
 	log.Debug(message + "started")
-	userFromRequest := r.Context().Value("user").(*models.User)
-
-	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
-	if err == auth.ErrUserNotFound {
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
 		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
+		response.SendResponse(w, response.ErrorResponse("Ошибка с получением Cookie"))
 		return
 	}
-	log.Debug(message+"jwtToken =", jwtToken)
-	h.ExpireCookieWithJwtToken(w, jwtToken)
+	expiredJwtToken,err := h.useCase.Logout(cookie.Value)
+	log.Debug(message+"jwtToken =", expiredJwtToken)
+	h.setCookieWithJwtToken(w, expiredJwtToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }

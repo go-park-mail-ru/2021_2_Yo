@@ -76,7 +76,6 @@ func(a* UseCase) CreateToken(ID int) (*TokenMetaInfo, error){
 type claims struct {
 	jwt.StandardClaims
 	ID string `json:"user_id"`
-	ExpiresAt int64 `json:"exp"`
 }
 
 func parseToken(accessToken string, signingKey []byte) (string, error) {
@@ -90,6 +89,10 @@ func parseToken(accessToken string, signingKey []byte) (string, error) {
 		return "", err
 	}
 	if claims, ok := token.Claims.(*claims); ok && token.Valid {
+		if claims.ExpiresAt.Before(time.Now()) {
+			log.Debug("Expired")
+			return "", auth.ErrExpired
+		}
 		return claims.ID, nil
 	}
 	return "", auth.ErrInvalidAccessToken
@@ -116,8 +119,8 @@ func (a *UseCase) SignIn(mail, password string) (string, error) {
 		return "", err
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
-		ID: user.ID,
-		ExpiresAt: time.Now().Add(time.Minute * 30).Unix(),
+		jwt.StandardClaims{ExpiresAt: jwt.At(time.Now().Add(time.Minute * (30)))},
+		user.ID,
 	})
 	return token.SignedString(a.secretWord)
 }
@@ -134,4 +137,16 @@ func (a *UseCase) CreatePasswordHash(password string) string {
 	hash := sha256.New()
 	hash.Write([]byte(password))
 	return fmt.Sprintf("%x", hash.Sum(nil))
+}
+
+func (a *UseCase) Logout(accessToken string) (string,error){
+	UserID, err := parseToken(accessToken,a.secretWord)
+	if err != nil {
+		return "Null", err
+	}
+	expiredToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
+		jwt.StandardClaims{ExpiresAt: jwt.At(time.Now().Add(time.Minute * (-30)))},
+		UserID,
+	})
+	return expiredToken.SignedString(a.secretWord)
 }
