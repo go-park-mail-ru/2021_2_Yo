@@ -113,7 +113,7 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 		response.SendResponse(w, response.ErrorResponse("Ошибка с получением Cookie"))
 		return
 	}
-	expiredJwtToken,err := h.useCase.Logout(cookie.Value)
+	expiredJwtToken, err := h.useCase.Logout(cookie.Value)
 	log.Debug(message+"jwtToken =", expiredJwtToken)
 	h.setCookieWithJwtToken(w, expiredJwtToken)
 	response.SendResponse(w, response.OkResponse())

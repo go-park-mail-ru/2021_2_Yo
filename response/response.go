@@ -20,6 +20,7 @@ type ResponseBodyUser struct {
 }
 
 type ResponseBodyEvent struct {
+	ID          string   `json:"id,omitempty"`
 	Title       string   `json:"title"`
 	Description string   `json:"description"`
 	Text        string   `json:"text"`
@@ -37,6 +38,7 @@ type ResponseBodyEventList struct {
 
 func MakeEventForResponse(event *models.Event) ResponseBodyEvent {
 	return ResponseBodyEvent{
+		ID:          event.ID,
 		Title:       event.Title,
 		Description: event.Description,
 		Text:        event.Text,

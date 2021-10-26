@@ -56,7 +56,7 @@ func(a* UseCase) CreateToken(ID int) (*TokenMetaInfo, error){
 	if err != nil {
 		return nil, err
 	}
-	
+
 	//Делаю refresh token
 	RefTokenClaims := jwt.MapClaims{}
 	RefTokenClaims["ID"] = ID
@@ -139,8 +139,8 @@ func (a *UseCase) CreatePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
-func (a *UseCase) Logout(accessToken string) (string,error){
-	UserID, err := parseToken(accessToken,a.secretWord)
+func (a *UseCase) Logout(accessToken string) (string, error) {
+	UserID, err := parseToken(accessToken, a.secretWord)
 	if err != nil {
 		return "Null", err
 	}
