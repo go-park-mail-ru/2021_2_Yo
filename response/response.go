@@ -27,6 +27,7 @@ type ResponseBodyEvent struct {
 	City        string   `json:"city"`
 	Category    string   `json:"category"`
 	Viewed      int      `json:"viewed"`
+	ImgUrl      string   `json:"imgUrl"`
 	Tag         []string `json:"tag"`
 	Date        string   `json:"date"`
 	Geo         string   `json:"geo"`
@@ -45,6 +46,7 @@ func MakeEventForResponse(event *models.Event) ResponseBodyEvent {
 		City:        event.City,
 		Category:    event.Category,
 		Viewed:      event.Viewed,
+		ImgUrl:      event.ImgUrl,
 		Tag:         event.Tag,
 		Date:        event.Date,
 		Geo:         event.Geo,

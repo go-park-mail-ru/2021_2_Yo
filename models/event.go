@@ -8,6 +8,7 @@ type Event struct {
 	City        string
 	Category    string
 	Viewed      int
+	ImgUrl      string
 	Tag         []string
 	Date        string
 	Geo         string

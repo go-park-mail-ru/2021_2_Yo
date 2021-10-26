@@ -75,6 +75,7 @@ func getEventFromJSON(r *http.Request) (*models.Event, error) {
 		City:        eventInput.City,
 		Category:    eventInput.Category,
 		Viewed:      eventInput.Viewed,
+		ImgUrl:      eventInput.ImgUrl,
 		Tag:         eventInput.Tag,
 		Date:        eventInput.Date,
 		Geo:         eventInput.Geo,

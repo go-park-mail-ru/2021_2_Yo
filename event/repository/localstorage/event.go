@@ -13,6 +13,7 @@ type Event struct {
 	City        string
 	Category    string
 	Viewed      int
+	ImgUrl      string
 	Tag         []string
 	Date        string
 	Geo         string
@@ -26,6 +27,7 @@ func toLocalstorageEvent(e *models.Event) *Event {
 		City:        e.City,
 		Category:    e.Category,
 		Viewed:      e.Viewed,
+		ImgUrl:      e.ImgUrl,
 		Tag:         e.Tag,
 		Date:        e.Date,
 		Geo:         e.Geo,
@@ -41,6 +43,7 @@ func toModelEvent(e *Event) *models.Event {
 		City:        e.City,
 		Category:    e.Category,
 		Viewed:      e.Viewed,
+		ImgUrl:      e.ImgUrl,
 		Tag:         e.Tag,
 		Date:        e.Date,
 		Geo:         e.Geo,
