@@ -157,7 +157,8 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	//Сначала будет вызываться recovery, потом cors, а потом logging
 	r.Use(midwar.Logging)
 	r.Use(gorilla_handlers.CORS(
-		gorilla_handlers.AllowedOrigins([]string{"https://bmstusssa.herokuapp.com"}),
+		//TODO: AllowedOrigins - heroku...
+		gorilla_handlers.AllowedOrigins([]string{"*"}),
 		gorilla_handlers.AllowedHeaders([]string{
 			"Accept", "Content-Type", "Content-Length",
 			"Accept-Encoding", "X-CSRF-Token", "csrf-token", "Authorization"}),
