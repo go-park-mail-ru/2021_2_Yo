@@ -47,6 +47,10 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 	return nil, event.ErrEventNotFound
 }
 
-func (s *Repository) CreateEvent(event2 *models.Event) (string, error) {
+func (s *Repository) UpdateEvent(eventId string, e *models.Event) error {
+	return nil
+}
+
+func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	return "", nil
 }

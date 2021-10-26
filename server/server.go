@@ -140,7 +140,6 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	authMux := mux.NewRouter()
 	authMux.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
 	authMux.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
-	//authMux.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
 	authMux.Use(midwar.Auth)
 
 	r := mux.NewRouter()
@@ -151,6 +150,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
+	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
 	r.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 

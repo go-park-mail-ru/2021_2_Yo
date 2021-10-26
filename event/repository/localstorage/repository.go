@@ -114,6 +114,21 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 	return nil, event.ErrEventNotFound
 }
 
+func (s *Repository) UpdateEvent(eventId string, e *models.Event) error {
+	eventToUpdate := toLocalstorageEvent(e)
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	eventIdInt, _ := strconv.Atoi(eventId)
+	for _, event := range s.events {
+		if event.ID == eventIdInt {
+			event = eventToUpdate
+			event.ID = eventIdInt
+			return nil
+		}
+	}
+	return event.ErrEventNotFound
+}
+
 func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	newEvent := toLocalstorageEvent(e)
 	s.mutex.Lock()

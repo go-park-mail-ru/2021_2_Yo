@@ -82,10 +82,37 @@ func getEventFromJSON(r *http.Request) (*models.Event, error) {
 	return result, nil
 }
 
-func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "PostEvent:"
+func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "UpdateEvent:"
 	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	eventId := vars["id"]
+	if eventId == "" {
+		err := errors.New("eventId is null")
+		log.Error(message+"err =", err)
+		response.SendResponse(w, response.ErrorResponse("Can't get eventId out of url"))
+		return
+	}
+	eventFromRequest, err := getEventFromJSON(r)
+	if err != nil {
+		log.Error(message+"err =", err)
+		response.SendResponse(w, response.ErrorResponse("Can't get event from JSON"))
+		return
+	}
+	//TODO: Validate struct
+	err = h.useCase.UpdateEvent(eventId, eventFromRequest)
+	if err != nil {
+		log.Error(message+"err =", err)
+		response.SendResponse(w, response.ErrorResponse("Can't update such event"))
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
+}
 
+func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "SetEvent:"
+	log.Debug(message + "started")
 	eventFromRequest, err := getEventFromJSON(r)
 	if err != nil {
 		log.Error(message+"err =", err)
