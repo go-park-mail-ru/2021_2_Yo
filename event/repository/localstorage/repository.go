@@ -127,11 +127,11 @@ func (s *Repository) UpdateEvent(eventId string, e *models.Event) error {
 	for i, e := range s.events {
 		if e.ID == eventIdInt {
 			debugId = i
-			log.Debug("localstorage:UpdateEvent: event to update = ", s.events[debugId])
-			log.Debug("localstorage:UpdateEvent: event to update = ", e)
+			log.Debug("localstorage:UpdateEvent: event to update = ", *s.events[debugId])
+			log.Debug("localstorage:UpdateEvent: event to update = ", *e)
 			e = eventToUpdate
 			e.ID = eventIdInt
-			log.Debug("localstorage:UpdateEvent: updated event = ", s.events[debugId])
+			log.Debug("localstorage:UpdateEvent: updated event = ", *s.events[debugId])
 			return nil
 		}
 	}
