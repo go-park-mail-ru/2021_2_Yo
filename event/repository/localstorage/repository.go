@@ -2,7 +2,6 @@ package localstorage
 
 import (
 	"backend/event"
-	log "backend/logger"
 	"backend/models"
 	"strconv"
 	"sync"
@@ -40,6 +39,7 @@ var eventsDemo = []*Event{
 		Tag:      []string{"nil", "alco", "hey"},
 		Date:     "20.01.19",
 		Geo:      "Izmaiilfoofo",
+		AuthorID: 1,
 	},
 	&Event{
 		ID:    2,
@@ -67,6 +67,7 @@ var eventsDemo = []*Event{
 		Tag:      []string{"nil", "alco", "hey"},
 		Date:     "20.01.19",
 		Geo:      "Izmaiilfoofo",
+		AuthorID: 1,
 	},
 	&Event{
 		ID:    3,
@@ -84,6 +85,7 @@ var eventsDemo = []*Event{
 		Tag:      []string{"nil", "alco", "hey"},
 		Date:     "20.01.19",
 		Geo:      "Izmaiilfoofo",
+		AuthorID: 1,
 	},
 }
 
@@ -118,26 +120,6 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 	return nil, event.ErrEventNotFound
 }
 
-func (s *Repository) UpdateEvent(eventId string, e *models.Event) error {
-	eventFromRequest := toLocalstorageEvent(e)
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-	eventIdInt, _ := strconv.Atoi(eventId)
-	debugId := 0
-	for i, e := range s.events {
-		if e.ID == eventIdInt {
-			debugId = i
-			log.Debug("localstorage:UpdateEvent: given event = ", *eventFromRequest)
-			log.Debug("localstorage:UpdateEvent: event to update = ", *s.events[debugId])
-			*e = *eventFromRequest
-			e.ID = eventIdInt
-			log.Debug("localstorage:UpdateEvent: updated event = ", *s.events[debugId])
-			return nil
-		}
-	}
-	return event.ErrEventNotFound
-}
-
 func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	newEvent := toLocalstorageEvent(e)
 	s.mutex.Lock()
@@ -149,4 +131,34 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	}
 	s.events = append(s.events, newEvent)
 	return strconv.Itoa(newEvent.ID), nil
+}
+
+func (s *Repository) UpdateEvent(eventId string, e *models.Event) error {
+	eventFromRequest := toLocalstorageEvent(e)
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	eventIdInt, _ := strconv.Atoi(eventId)
+	for _, e := range s.events {
+		if e.ID == eventIdInt {
+			*e = *eventFromRequest
+			e.ID = eventIdInt
+			return nil
+		}
+	}
+	return event.ErrEventNotFound
+}
+
+func (s *Repository) DeleteEvent(eventId string, userId string) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	eventIdInt, _ := strconv.Atoi(eventId)
+	authorIdInt, _ := strconv.Atoi(userId)
+	for _, e := range s.events {
+		if e.ID == eventIdInt && e.AuthorID == authorIdInt {
+			//TODO: По сути, это заглушка для localstorage
+			e.ID = -1
+			return nil
+		}
+	}
+	return event.ErrEventNotFound
 }

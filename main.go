@@ -34,11 +34,10 @@ func main() {
 
 	var isLocalServer bool
 	flag.BoolVar(&isLocalServer, "l", true, "local storage DB and environment")
-	flag.BoolVar(&isLocalServer, "d", true, "local storage DB and environment")
 	flag.Parse()
 	logLevel := log.DebugLevel
 	//FOR HEROKU
-	isLocalServer = false
+	isLocalServer = true
 	app, err := server.NewApp(!isLocalServer, logLevel)
 	if err != nil {
 		log.Error("Main : NewApp error = ", err)

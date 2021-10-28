@@ -9,4 +9,5 @@ type Repository interface {
 	GetEvent(eventId string) (*models.Event, error)
 	CreateEvent(event *models.Event) (string, error)
 	UpdateEvent(eventId string, e *models.Event) error
+	DeleteEvent(eventId string, userId string) error
 }

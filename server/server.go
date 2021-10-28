@@ -15,6 +15,8 @@ import (
 	eventUseCase "backend/event/usecase"
 	log "backend/logger"
 	"bufio"
+	"errors"
+
 	//"errors"
 	"fmt"
 	gorilla_handlers "github.com/gorilla/handlers"
@@ -42,8 +44,8 @@ func getSecret(isRemoteServer bool, pathToSecretFile string) (string, error) {
 		secret := os.Getenv("SECRET")
 		if secret == "" {
 			secret = "secret1234"
-			//err := errors.New("Can't get secret from environment")
-			//log.Error(message+"err =", err)
+			err := errors.New("Can't get secret from environment")
+			log.Error(message+"err =", err)
 			//return "", err
 		}
 		return secret, nil
@@ -151,7 +153,9 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
+	//TODO: Проверка на пользователя, отправляющего запрос
 	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
+	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
 	r.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
@@ -177,10 +181,9 @@ func (app *App) Run() error {
 	log.Info(message + "start")
 	r := newRouterWithEndpoints(app)
 
-	//port := viper.GetString("port")
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "80"
+		port = "8080"
 	}
 	log.Info(message+"port =", port)
 	err := http.ListenAndServe(":"+port, r)

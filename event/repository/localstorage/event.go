@@ -17,6 +17,7 @@ type Event struct {
 	Tag         []string
 	Date        string
 	Geo         string
+	AuthorID    int
 }
 
 func toLocalstorageEvent(e *models.Event) *Event {
