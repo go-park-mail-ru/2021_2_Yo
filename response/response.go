@@ -131,7 +131,6 @@ func SendResponse(w http.ResponseWriter, response interface{}) {
 		log.Error(message+"err =", err)
 		return
 	}
-	log.Debug(message+"response to send =", string(b))
 	w.Write(b)
 }
 

@@ -167,7 +167,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 			"Accept", "Content-Type", "Content-Length",
 			"Accept-Encoding", "X-CSRF-Token", "csrf-token", "Authorization"}),
 		gorilla_handlers.AllowCredentials(),
-		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
+		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "DELETE", "POST", "PUT", "OPTIONS"}),
 	))
 	r.Use(midwar.Recovery)
 	return r
