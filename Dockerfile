@@ -1,11 +1,22 @@
+# syntax=docker/dockerfile:1
+
 FROM golang:latest
 
-RUN go version
-ENV GOPATH=/
+LABEL maintainer="Artyom <artyomsh01@yandex.ru>"
 
-COPY ./ ./
+WORKDIR /app
+
+COPY go.mod .
+COPY go.sum .
 
 RUN go mod download
-RUN go build -o main .
 
-CMD ["./main"]
+COPY . .
+
+RUN apt-get install ca-certificates -y
+
+RUN go build 
+
+EXPOSE 8080
+
+CMD ["./backend"]

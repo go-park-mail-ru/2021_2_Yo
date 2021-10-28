@@ -33,11 +33,12 @@ func main() {
 	viper.ReadInConfig()
 
 	var isLocalServer bool
-	flag.BoolVar(&isLocalServer, "l", false, "local storage DB and environment")
+	flag.BoolVar(&isLocalServer, "l", true, "local storage DB and environment")
+	flag.BoolVar(&isLocalServer, "d", true, "local storage DB and environment")
 	flag.Parse()
 	logLevel := log.DebugLevel
 	//FOR HEROKU
-	isLocalServer = true
+	isLocalServer = false
 	app, err := server.NewApp(!isLocalServer, logLevel)
 	if err != nil {
 		log.Error("Main : NewApp error = ", err)

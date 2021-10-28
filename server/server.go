@@ -15,7 +15,7 @@ import (
 	eventUseCase "backend/event/usecase"
 	log "backend/logger"
 	"bufio"
-	"errors"
+	//"errors"
 	"fmt"
 	gorilla_handlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -41,9 +41,10 @@ func getSecret(isRemoteServer bool, pathToSecretFile string) (string, error) {
 	if isRemoteServer {
 		secret := os.Getenv("SECRET")
 		if secret == "" {
-			err := errors.New("Can't get secret from environment")
-			log.Error(message+"err =", err)
-			return "", err
+			secret = "secret1234"
+			//err := errors.New("Can't get secret from environment")
+			//log.Error(message+"err =", err)
+			//return "", err
 		}
 		return secret, nil
 	} else {
@@ -179,7 +180,7 @@ func (app *App) Run() error {
 	//port := viper.GetString("port")
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "80"
 	}
 	log.Info(message+"port =", port)
 	err := http.ListenAndServe(":"+port, r)

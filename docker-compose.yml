@@ -1,23 +1,12 @@
-version: '3.8'
-
+version: "3.6"
 services:
-  kudago:
-    build: ./
-    command: ./kudago
+  backend:
+    build: "."
     ports:
-      - 8000:8000
+      - "8080"
+  nginx:
+    build: "./nginx"
+    ports:
+      - "80:80"
     depends_on:
-      - db
-    environment:
-      - DB_PASSWORD=qwerty
-
-
-  db:
-    restart: always
-    image: postgres:latest
-    volumes:
-    - ./.database/postgres/data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=qwerty
-    ports:
-      - 5432:5432
+      - "backend"
