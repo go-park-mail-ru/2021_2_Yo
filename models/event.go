@@ -12,4 +12,5 @@ type Event struct {
 	Tag         []string
 	Date        string
 	Geo         string
+	AuthorId    string
 }

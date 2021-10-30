@@ -83,6 +83,26 @@ func getEventFromJSON(r *http.Request) (*models.Event, error) {
 	return result, nil
 }
 
+func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "SetEvent:"
+	log.Debug(message + "started")
+	eventFromRequest, err := getEventFromJSON(r)
+	if err != nil {
+		log.Error(message+"err =", err)
+		response.SendResponse(w, response.ErrorResponse("Can't get event from JSON"))
+		return
+	}
+	//TODO: Validate struct
+	eventID, err := h.useCase.CreateEvent(eventFromRequest)
+	if err != nil {
+		log.Error(message+"err =", err)
+		response.SendResponse(w, response.ErrorResponse("Can't create such event"))
+		return
+	}
+	response.SendResponse(w, response.EventIdResponse(eventID))
+	log.Debug(message + "ended")
+}
+
 func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateEvent:"
 	log.Debug(message + "started")
@@ -111,22 +131,28 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "ended")
 }
 
-func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "SetEvent:"
+func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "DeleteEvent:"
 	log.Debug(message + "started")
-	eventFromRequest, err := getEventFromJSON(r)
-	if err != nil {
+	vars := mux.Vars(r)
+	eventId := vars["id"]
+	if eventId == "" {
+		err := errors.New("eventId is null")
 		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Can't get event from JSON"))
+		response.SendResponse(w, response.ErrorResponse("Can't get eventId out of url"))
 		return
 	}
-	//TODO: Validate struct
-	eventID, err := h.useCase.CreateEvent(eventFromRequest)
+	//TODO: через middleware всунуть пользователя, определённого по session_id
+	//userFromRequest := r.Context().Value("user").(*models.User)
+	userFromRequest := models.User{
+		ID: "1",
+	}
+	err := h.useCase.DeleteEvent(eventId, &userFromRequest)
 	if err != nil {
 		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Can't create such event"))
+		response.SendResponse(w, response.ErrorResponse("Can't delete such event"))
 		return
 	}
-	response.SendResponse(w, response.EventIdResponse(eventID))
+	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }

@@ -7,6 +7,13 @@ import (
 	sql "github.com/jmoiron/sqlx"
 )
 
+const (
+	createUserQuery  = `insert into "user" (name, surname, mail, password, about) values($1, $2, $3, $4, $5) returning id`
+	updateUserQuery  = ``
+	getUserQuery     = `select * from "user" where mail = $1 and password = $2`
+	getUserByIdQuery = `select * from "user" where id = $1`
+)
+
 type Repository struct {
 	db *sql.DB
 }
@@ -20,9 +27,21 @@ func NewRepository(database *sql.DB) *Repository {
 func (s *Repository) CreateUser(user *models.User) error {
 	message := "CreateUser"
 	newUser := toPostgresUser(user)
-	insertQuery :=
-		`insert into "user" (name, surname, mail, password) values($1, $2, $3, $4)`
-	_, err := s.db.Exec(insertQuery, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password)
+	insertQuery := createUserQuery
+	//TODO: Выяснить, нужен ли фронту user.id
+	_, err := s.db.Exec(insertQuery, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About)
+	if err != nil {
+		log.Debug(message+"err = ", err)
+		return err
+	}
+	return nil
+}
+
+func (s *Repository) UpdateUser(user *models.User) error {
+	message := "UpdateUser"
+	newUser := toPostgresUser(user)
+	insertQuery := `update "user" set name = $1, surname = $2, mail = $3, password = $4, about = $5 where id = $6`
+	_, err := s.db.Exec(insertQuery, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About, newUser.ID)
 	if err != nil {
 		log.Debug(message+"err = ", err)
 		return err
@@ -32,9 +51,9 @@ func (s *Repository) CreateUser(user *models.User) error {
 
 func (s *Repository) GetUser(mail, password string) (*models.User, error) {
 	message := "GetUser"
-	query := `select * from "user" where mail = $1 and password = $2`
+	query := getUserQuery
 	user := User{}
-	err := s.db.QueryRow(query, mail, password).Scan(&user.ID, &user.Name, &user.Surname, &user.Mail, &user.Password)
+	err := s.db.QueryRow(query, mail, password).Scan(&user.ID, &user.Name, &user.Surname, &user.Mail, &user.Password, &user.About)
 	if err != nil {
 		log.Error(message+"err =", err)
 		return nil, auth.ErrUserNotFound
@@ -44,9 +63,9 @@ func (s *Repository) GetUser(mail, password string) (*models.User, error) {
 
 func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	message := "GetUserById"
-	query := `select * from "user" where id = $1`
+	query := getUserByIdQuery
 	user := User{}
-	err := s.db.QueryRow(query, userId).Scan(&user.ID, &user.Name, &user.Surname, &user.Mail, &user.Password)
+	err := s.db.QueryRow(query, userId).Scan(&user.ID, &user.Name, &user.Surname, &user.Mail, &user.Password, &user.About)
 	if err != nil {
 		log.Error(message+"err =", err)
 		return nil, auth.ErrUserNotFound

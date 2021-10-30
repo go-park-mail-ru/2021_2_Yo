@@ -6,7 +6,7 @@ go 1.13
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
-	github.com/gorilla/handlers v1.5.1
+	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/gorilla/mux v1.8.0
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/lib/pq v1.10.3

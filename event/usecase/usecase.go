@@ -30,3 +30,8 @@ func (a *UseCase) UpdateEvent(eventID string, event *models.Event) error {
 func (a *UseCase) CreateEvent(event *models.Event) (string, error) {
 	return a.eventRepo.CreateEvent(event)
 }
+
+func (a *UseCase) DeleteEvent(eventID string, user *models.User) error {
+	userId := user.ID
+	return a.eventRepo.DeleteEvent(eventID, userId)
+}
