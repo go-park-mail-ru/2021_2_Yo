@@ -5,6 +5,9 @@ import (
 	log "backend/logger"
 	"backend/models"
 	"backend/response"
+	"backend/response/utils"
+	"backend/session"
+	"encoding/json"
 	"github.com/asaskevich/govalidator"
 	"net/http"
 )
@@ -12,16 +15,18 @@ import (
 const logMessage = "auth:delivery:http:handler:"
 
 type Delivery struct {
-	useCase auth.UseCase
+	useCase        auth.UseCase
+	sessionManager session.Manager
 }
 
-func NewDelivery(useCase auth.UseCase) *Delivery {
+func NewDelivery(useCase auth.UseCase, manager session.Manager) *Delivery {
 	return &Delivery{
-		useCase: useCase,
+		useCase:        useCase,
+		sessionManager: manager,
 	}
 }
 
-func (h *Delivery) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string) {
+func (h *Delivery) setJwtToken(w http.ResponseWriter, jwtToken string) {
 	cookie := &http.Cookie{
 		Name:     "session_id",
 		Value:    jwtToken,
@@ -33,6 +38,30 @@ func (h *Delivery) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string)
 	cs += "; SameSite=None"
 	w.Header().Set("Set-Cookie", cs)
 }
+
+func getUserFromRequest(r *http.Request) (*models.User, error) {
+	userInput := new(response.ResponseBodyUser)
+	err := json.NewDecoder(r.Body).Decode(userInput)
+	if err != nil {
+		return nil, err
+	}
+	result := &models.User{
+		Name:     userInput.Name,
+		Surname:  userInput.Surname,
+		Mail:     userInput.Mail,
+		Password: userInput.Password,
+		About:    userInput.About,
+	}
+	_, err = govalidator.ValidateStruct(result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+//TODO!!!!
+//TODO: Работа с sessionManager:
+//TODO:		Ставить куки с session_id, создавать session_id и т.п.
 
 //@Summmary SignUp
 //@Tags auth
@@ -46,29 +75,19 @@ func (h *Delivery) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string)
 func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
-	userFromRequest := r.Context().Value("user").(*models.User)
-
-	_, err := govalidator.ValidateStruct(userFromRequest)
-	if err != nil {
-		log.Error(message+"err =", err)
-	}
-
-	//TODO: SignUp(*models.User)
-	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
-	if err != nil {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Пользователь уже зарегестрирован"))
+	userFromRequest, err := getUserFromRequest(r)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	log.Debug(message+"mail, pass = ", userFromRequest.Mail, userFromRequest.Password)
+	err = h.useCase.SignUp(userFromRequest)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusConflict) {
+		return
+	}
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
-	if err == auth.ErrUserNotFound {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
+	if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 		return
 	}
-	log.Debug(message+"jwtToken =", jwtToken)
-	h.setCookieWithJwtToken(w, jwtToken)
+	h.setJwtToken(w, jwtToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -85,21 +104,16 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignIn:"
 	log.Debug(message + "started")
-	userFromRequest := r.Context().Value("user").(*models.User)
-
-	_, err := govalidator.ValidateStruct(userFromRequest)
-	if err != nil {
-		log.Error(message+"err =", err)
+	userFromRequest, err := getUserFromRequest(r)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
 	}
-
 	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
-	if err == auth.ErrUserNotFound {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
+	if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 		return
 	}
 	log.Debug(message+"jwtToken =", jwtToken)
-	h.setCookieWithJwtToken(w, jwtToken)
+	h.setJwtToken(w, jwtToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -108,14 +122,11 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "User:"
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
-	if err != nil {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Ошибка с получением Cookie"))
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
 	expiredJwtToken, err := h.useCase.Logout(cookie.Value)
-	log.Debug(message+"jwtToken =", expiredJwtToken)
-	h.setCookieWithJwtToken(w, expiredJwtToken)
+	h.setJwtToken(w, expiredJwtToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -131,18 +142,14 @@ func (h *Delivery) User(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "User:"
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
-	if err != nil {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Ошибка с получением Cookie"))
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
 	foundUser, err := h.useCase.ParseToken(cookie.Value)
-	if err != nil {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Ошибка с парсингом токена"))
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
 	log.Debug(message+"foundUser =", foundUser)
-	response.SendResponse(w, response.UsernameResponse(foundUser.Name))
+	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }

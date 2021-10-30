@@ -3,7 +3,6 @@ package main
 import (
 	_ "backend/docs"
 	"backend/server"
-	"flag"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -32,13 +31,8 @@ func main() {
 	viper.SetConfigName("config")
 	viper.ReadInConfig()
 
-	var isLocalServer bool
-	flag.BoolVar(&isLocalServer, "l", true, "local storage DB and environment")
-	flag.Parse()
 	logLevel := log.DebugLevel
-	//FOR HEROKU
-	isLocalServer = true
-	app, err := server.NewApp(!isLocalServer, logLevel)
+	app, err := server.NewApp(logLevel)
 	if err != nil {
 		log.Error("Main : NewApp error = ", err)
 		os.Exit(1)

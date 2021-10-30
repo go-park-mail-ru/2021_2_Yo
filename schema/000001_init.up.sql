@@ -1,34 +1,33 @@
 CREATE TABLE "user" (
-  ID serial not null unique,
-  user_id int not null,
-  Name varchar(255) not null,
-  Surname varchar(255) not null,
-  Mail varchar(255) not null unique,
-  Password varchar(255) not null
+                        id serial not null unique,
+                        name varchar(50) not null,
+                        surname varchar(50) not null,
+                        mail varchar(150) not null unique,
+                        password varchar(50) not null,
+                        about varchar(150)
 );
 
 CREATE TABLE "event" (
-  ID serial not null unique,
-  event_id int not null,
-  Title varchar(255) not null,
-  Description varchar(255),
-  Text varchar(1000),
-  City varchar(255) not null,
-  Category varchar(255),
-  Viewed BIGINT not null,
-  ImgUrl varchar(500) not null,
-  Date varchar(255) not null,
-  GEO varchar(255) not null,
-  Author_id int references "user" (ID) on delete cascade not null
+                         id serial not null unique,
+                         title varchar(255) not null,
+                         description varchar(500),
+                         text varchar(1000),
+                         city varchar(255) not null,
+                         category varchar(255),
+                         viewed BIGINT not null,
+                         img_url varchar(500) not null,
+                         date varchar(10) not null,
+                         geo varchar(255) not null,
+                         author_id int references "user" (id) on delete cascade not null
 );
 
 CREATE TABLE "tag" (
-  ID serial not null unique,
-  Name varchar(255) not null
+                       id serial not null unique,
+                       Name varchar(30) not null
 );
 
 CREATE TABLE "tag_event" (
-  ID serial not null unique,
-  tag_id int references "tag" (ID) on delete cascade not null,
-  event_id int references "event" (ID) on delete cascade not null
+                             ID serial not null unique,
+                             tag_id int references "tag" (id) on delete cascade not null,
+                             event_id int references "event" (id) on delete cascade not null
 );

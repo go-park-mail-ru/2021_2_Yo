@@ -11,6 +11,7 @@ type User struct {
 	Surname  string
 	Mail     string
 	Password string
+	About    string
 }
 
 func toPostgresUser(u *models.User) *User {
@@ -19,6 +20,7 @@ func toPostgresUser(u *models.User) *User {
 		Surname:  u.Surname,
 		Mail:     u.Mail,
 		Password: u.Password,
+		About:    u.About,
 	}
 }
 
@@ -29,5 +31,6 @@ func toModelUser(u *User) *models.User {
 		Surname:  u.Surname,
 		Mail:     u.Mail,
 		Password: u.Password,
+		About:    u.About,
 	}
 }

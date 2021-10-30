@@ -24,55 +24,6 @@ func NewUseCase(userRepo auth.Repository, secretWord []byte) *UseCase {
 	}
 }
 
-/*
-
-type TokenMetaInfo struct {
-	AccessToken string
-	RefreshToken string
-	AccTokenExpires int64
-	RefTokenExpires int64
-}
-
-type MegaClaims struct {
-
-}
-
-func(a* UseCase) CreateToken(ID int) (*TokenMetaInfo, error){
-	var err error
-
-	TokenMeta := &TokenMetaInfo{}
-	TokenMeta.AccTokenExpires = time.Now().Add(time.Minute * 15).Unix()
-	TokenMeta.RefTokenExpires = time.Now().Add(time.Hour * 7).Unix()
-
-	//Делаю access token
-	AccTokenClaims := jwt.MapClaims{}
-	AccTokenClaims["authorized"] = true
-	AccTokenClaims["ID"] = ID
-	AccTokenClaims["exp"] = TokenMeta.RefTokenExpires
-
-	AccToken := jwt.NewWithClaims(jwt.SigningMethodHS256, AccTokenClaims)
-	TokenMeta.AccessToken, err = AccToken.SignedString(a.secretWord)
-
-	if err != nil {
-		return nil, err
-	}
-
-	//Делаю refresh token
-	RefTokenClaims := jwt.MapClaims{}
-	RefTokenClaims["ID"] = ID
-	RefTokenClaims["exp"] = TokenMeta.RefTokenExpires
-
-	RefToken := jwt.NewWithClaims(jwt.SigningMethodHS256, RefTokenClaims)
-	TokenMeta.RefreshToken, err = RefToken.SignedString(a.secretWord)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return TokenMeta, nil
-}
-*/
-
 type claims struct {
 	jwt.StandardClaims
 	ID string `json:"user_id"`
@@ -98,14 +49,9 @@ func parseToken(accessToken string, signingKey []byte) (string, error) {
 	return "", auth.ErrInvalidAccessToken
 }
 
-func (a *UseCase) SignUp(name, surname, mail, password string) error {
-	password_hash := a.CreatePasswordHash(password)
-	user := &models.User{
-		Name:     name,
-		Surname:  surname,
-		Mail:     mail,
-		Password: password_hash,
-	}
+func (a *UseCase) SignUp(user *models.User) error {
+	password_hash := a.CreatePasswordHash(user.Password)
+	user.Password = password_hash
 	return a.repository.CreateUser(user)
 }
 
@@ -142,7 +88,7 @@ func (a *UseCase) CreatePasswordHash(password string) string {
 func (a *UseCase) Logout(accessToken string) (string, error) {
 	UserID, err := parseToken(accessToken, a.secretWord)
 	if err != nil {
-		return "Null", err
+		return "", err
 	}
 	expiredToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
 		jwt.StandardClaims{ExpiresAt: jwt.At(time.Now().Add(time.Minute * (-30)))},

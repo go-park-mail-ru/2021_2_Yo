@@ -9,12 +9,15 @@ import (
 
 const logMessage = "response:response:"
 
+type HttpStatus int
+
 const STATUS_OK = 200
 const STATUS_ERROR = 404
 
 type ResponseBodyUser struct {
 	Name     string `json:"name,omitempty" valid:"type(string)"`
 	Surname  string `json:"surname,omitempty" valid:"type(string)"`
+	About    string `json:"about,omitempty" valid:"type(string)"`
 	Mail     string `json:"email,omitempty" valid:"email"`
 	Password string `json:"password,omitempty" valid:"type(string)"`
 }
@@ -31,6 +34,7 @@ type ResponseBodyEvent struct {
 	Tag         []string `json:"tag"`
 	Date        string   `json:"date"`
 	Geo         string   `json:"geo"`
+	AuthorID    string   `json:"authorID"`
 }
 
 type ResponseBodyEventList struct {
@@ -50,6 +54,7 @@ func MakeEventForResponse(event *models.Event) ResponseBodyEvent {
 		Tag:         event.Tag,
 		Date:        event.Date,
 		Geo:         event.Geo,
+		AuthorID:    event.AuthorId,
 	}
 }
 
@@ -74,6 +79,13 @@ func ErrorResponse(errorMessage string) *Response {
 	}
 }
 
+func StatusResponse(status HttpStatus) *Response {
+	return &Response{
+		Status: 200,
+		Body:   status,
+	}
+}
+
 func OkResponse() *Response {
 	return &Response{
 		Status:  200,
@@ -81,12 +93,15 @@ func OkResponse() *Response {
 	}
 }
 
-func UsernameResponse(name string) *Response {
+func UserResponse(user *models.User) *Response {
 	return &Response{
 		Status:  200,
 		Message: "",
 		Body: ResponseBodyUser{
-			Name: name,
+			Name:    user.Name,
+			Surname: user.Surname,
+			About:   user.About,
+			Mail:    user.Mail,
 		},
 	}
 }
