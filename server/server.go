@@ -155,6 +155,11 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
+	//For test
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, "Hello World")
+    })
+
 	//Сначала будет вызываться recovery, потом cors, а потом logging
 	r.Use(midwar.Logging)
 	r.Use(gorilla_handlers.CORS(
@@ -180,7 +185,7 @@ func (app *App) Run() error {
 	//port := viper.GetString("port")
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "80"
+		port = "8080"
 	}
 	log.Info(message+"port =", port)
 	err := http.ListenAndServe(":"+port, r)
