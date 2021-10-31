@@ -70,20 +70,12 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	}, nil
 }
 
-func options(w http.ResponseWriter, r *http.Request) {
-	log.Info("In preflight")
-	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,HEAD")
-}
+func options(w http.ResponseWriter, r *http.Request) {}
 
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddleware()
 	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
 	authRouter := mux.NewRouter()
-	authRouter.Methods("OPTIONS").HandlerFunc(options)
 	authRouter.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
 	authRouter.HandleFunc("/user", app.authManager.GetUser).Methods("GET")
 	authRouter.HandleFunc("/user/info", app.authManager.UpdateUserInfo).Methods("POST")
@@ -91,7 +83,6 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
 	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
 	authRouter.Use(sessionMW.Auth)
-	authRouter.Use(mw.CORS)
 
 	r := mux.NewRouter()
 	r.Methods("OPTIONS").HandlerFunc(options)
