@@ -81,6 +81,7 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	fmt.Printf("Req: %s %s\n", r.Host, r.URL.Path)
 	vars := mux.Vars(r)
+	log.Debug(message+"vars =", vars)
 	eventId := vars["id"]
 	log.Debug(message+"eventId =", eventId)
 	userId := r.Context().Value("userId").(string)
