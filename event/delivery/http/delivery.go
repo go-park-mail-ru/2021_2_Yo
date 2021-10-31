@@ -77,6 +77,9 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateEvent:"
 	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	eventId := vars["id"]
+	log.Debug(message+"eventId =", eventId)
 	userId := r.Context().Value("userId").(string)
 	eventFromRequest, err := response.GetEventFromJSON(r)
 	if err != nil {
@@ -84,9 +87,6 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		response.SendResponse(w, response.ErrorResponse("Can't get event from JSON"))
 		return
 	}
-	vars := mux.Vars(r)
-	eventId := vars["id"]
-	log.Debug(message+"eventId =", eventId)
 	eventFromRequest.ID = eventId
 	err = h.useCase.UpdateEvent(eventFromRequest, userId)
 	if err != nil {
