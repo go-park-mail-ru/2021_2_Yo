@@ -37,8 +37,8 @@ const (
 
 func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
 	query := checkAuthorQuery
-	log.Debug("checkAuthor userId = ", userId)
 	rows, err := s.db.Queryx(query, userId)
+	log.Debug("checkAuthor HERE")
 	if err != nil {
 		log.Debug("checkAuthor err1 = ", err)
 		return false, err
