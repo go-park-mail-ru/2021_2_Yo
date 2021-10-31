@@ -4,16 +4,16 @@ CREATE TABLE "user" (
                         surname varchar(50) not null,
                         mail varchar(150) not null unique,
                         password varchar(50) not null,
-                        about varchar(150)
+                        about varchar(150) not null
 );
 
 CREATE TABLE "event" (
                          id serial not null unique,
                          title varchar(255) not null,
-                         description varchar(500),
-                         text varchar(1000),
+                         description varchar(500) not null,
+                         text varchar(1000) not null,
                          city varchar(255) not null,
-                         category varchar(255),
+                         category varchar(255) not null,
                          viewed BIGINT not null,
                          img_url varchar(500) not null,
                          date varchar(10) not null,

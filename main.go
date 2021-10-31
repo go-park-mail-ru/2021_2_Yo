@@ -29,17 +29,21 @@ func main() {
 
 	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
-	viper.ReadInConfig()
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Error("main:err = ", err)
+		os.Exit(1)
+	}
 
 	logLevel := log.DebugLevel
 	app, err := server.NewApp(logLevel)
 	if err != nil {
-		log.Error("Main : NewApp error = ", err)
+		log.Error("main:err = ", err)
 		os.Exit(1)
 	}
 	err = app.Run()
 	if err != nil {
-		log.Error("Main : Run error = ", err)
+		log.Error("main:err = ", err)
 		os.Exit(1)
 	}
 }

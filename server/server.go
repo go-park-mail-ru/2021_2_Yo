@@ -14,9 +14,7 @@ import (
 	sessionMiddleware "backend/session/middleware"
 	sessionRepository "backend/session/repository"
 	"backend/utils"
-	"flag"
 	"fmt"
-	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
@@ -40,14 +38,16 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	log.Info(fmt.Sprintf(message+"started, log level = %s", logLevel))
 
 	secret, err := utils.GetSecret()
+	if err != nil {
+		log.Error(message+"err =", err)
+		return nil, err
+	}
 	db, err := utils.InitPostgresDB()
 	if err != nil {
 		log.Error(message+"err =", err)
 		return nil, err
 	}
-	//TODO: Параметры поменять для НЕ локал хоста
-	redisAddr := flag.String("addr", "redis://user:@localhost:6379/0", "redis addr")
-	redisConn, err := redis.DialURL(*redisAddr)
+	redisConn, err := utils.InitRedisDB()
 	if err != nil {
 		log.Error(message+"err =", err)
 		return nil, err
@@ -56,9 +56,9 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	sessionR := sessionRepository.NewRepository(redisConn)
 	sessionM := session.NewManager(*sessionR)
 	authR := authRepository.NewRepository(db)
-	eventR := eventRepository.NewRepository(db)
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
 	authD := authDelivery.NewDelivery(authUC, *sessionM)
+	eventR := eventRepository.NewRepository(db)
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
