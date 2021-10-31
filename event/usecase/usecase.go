@@ -44,11 +44,7 @@ func (a *UseCase) UpdateEvent(event *models.Event, userId string) error {
 		err := errors.New("event or userId is nil")
 		return err
 	}
-	if userId != event.AuthorId {
-		err := errors.New("userId != event.AuthorId")
-		return err
-	}
-	return a.eventRepo.UpdateEvent(event)
+	return a.eventRepo.UpdateEvent(event, userId)
 }
 
 func (a *UseCase) DeleteEvent(userId string, eventID string) error {

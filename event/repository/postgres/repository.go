@@ -147,10 +147,25 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	return strconv.Itoa(eventId), nil
 }
 
-func (s *Repository) UpdateEvent(updatedEvent *models.Event) error {
+func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) error {
 	message := logMessage + "UpdateEvent:"
 	e, err := toPostgresEvent(updatedEvent)
 	if err != nil {
+		return err
+	}
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		log.Error(message+"err =", err)
+		return err
+	}
+	canUpdate, err := s.checkAuthor(e.ID, userIdInt)
+	if err != nil {
+		log.Error(message+"err =", err)
+		return err
+	}
+	if !canUpdate {
+		err = errors.New("user can't update event")
+		log.Error(message+"err =", err)
 		return err
 	}
 	query := updateEventQuery
