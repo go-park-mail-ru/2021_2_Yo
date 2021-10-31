@@ -36,29 +36,19 @@ const (
 )
 
 func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
+	var authorId int
 	query := checkAuthorQuery
-	rows, err := s.db.Queryx(query, userId)
-	log.Debug("checkAuthor HERE")
+	err := s.db.QueryRow(query, userId).Scan(&authorId)
 	if err != nil {
 		log.Debug("checkAuthor err1 = ", err)
 		return false, err
 	}
-	defer rows.Close()
-	if rows.Next() {
-		var authorId int
-		err := rows.StructScan(&authorId)
-		if err != nil {
-			log.Debug("checkAuthor err2 = ", err)
-			return false, err
-		}
-		if authorId == userId {
-			return true, nil
-		} else {
-			return false, nil
-		}
+	log.Debug("checkAuthor HERE")
+	if authorId == userId {
+		return true, nil
+	} else {
+		return false, nil
 	}
-	err = errors.New("Unexpected error")
-	return false, err
 }
 
 /*
