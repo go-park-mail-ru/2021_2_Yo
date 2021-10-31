@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	log "backend/logger"
 	"backend/models"
 	"strconv"
 )
@@ -24,10 +23,8 @@ type Event struct {
 func toPostgresEvent(e *models.Event) (*Event, error) {
 	authorIdInt, err := strconv.Atoi(e.AuthorId)
 	if err != nil {
-		log.Debug("toPostgresEvent 1")
 		return nil, err
 	}
-	log.Debug("toPostgresEvent 2")
 	return &Event{
 		Title:       e.Title,
 		Description: e.Description,

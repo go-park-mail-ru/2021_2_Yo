@@ -56,13 +56,15 @@ func (h *Delivery) GetEvent(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "CreateEvent:"
 	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	log.Debug(message+"userId =", userId)
 	eventFromRequest, err := response.GetEventFromJSON(r)
 	if err != nil {
 		log.Error(message+"err =", err)
 		response.SendResponse(w, response.ErrorResponse("Can't get event from JSON"))
 		return
 	}
-	eventID, err := h.useCase.CreateEvent(eventFromRequest)
+	eventID, err := h.useCase.CreateEvent(eventFromRequest, userId)
 	if err != nil {
 		log.Error(message+"err =", err)
 		response.SendResponse(w, response.ErrorResponse("Can't create such event"))

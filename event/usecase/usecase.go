@@ -29,11 +29,12 @@ func (a *UseCase) GetEvent(eventId string) (*models.Event, error) {
 	return a.eventRepo.GetEvent(eventId)
 }
 
-func (a *UseCase) CreateEvent(event *models.Event) (string, error) {
-	if event == nil {
-		err := errors.New("UseCase:CreateEvent error")
+func (a *UseCase) CreateEvent(event *models.Event, userId string) (string, error) {
+	if event == nil || userId == "" {
+		err := errors.New("UseCase:CreateEvent event or userId is empty")
 		return "", err
 	}
+	event.AuthorId = userId
 	log.Debug("UseCase CreateEvent: HERE")
 	return a.eventRepo.CreateEvent(event)
 }

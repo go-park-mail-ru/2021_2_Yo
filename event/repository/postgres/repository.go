@@ -103,15 +103,17 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 
 func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	message := logMessage + "CreateEvent:"
-	newEvent, _ := toPostgresEvent(e)
-	log.Debug(message+"newEvent = ", newEvent)
+	newEvent, err := toPostgresEvent(e)
+	if err != nil {
+		return "", err
+	}
 	var eventId int
 	query :=
 		`insert into "event" 
 		(title, description, text, city, category, viewed, img_url, date, geo, author_id) 
 		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
 		returning id`
-	err := s.db.QueryRow(query,
+	err = s.db.QueryRow(query,
 		newEvent.Title,
 		newEvent.Description,
 		newEvent.Text,
@@ -130,12 +132,15 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 
 func (s *Repository) UpdateEvent(updatedEvent *models.Event) error {
 	message := logMessage + "UpdateEvent:"
-	e, _ := toPostgresEvent(updatedEvent)
+	e, err := toPostgresEvent(updatedEvent)
+	if err != nil {
+		return err
+	}
 	query :=
 		`update "event" set
 		title = $1, description = $2, text = $3, city = $4, category = $5, viewed = $6, img_url = $7, date = $8, geo = $9 
 		where event.id = $10`
-	_, err := s.db.Exec(query, e.Title, e.Description, e.Text, e.City, e.Category, e.Viewed, e.Img_Url, e.Date, e.Geo, e.ID)
+	_, err = s.db.Exec(query, e.Title, e.Description, e.Text, e.City, e.Category, e.Viewed, e.Img_Url, e.Date, e.Geo, e.ID)
 	if err != nil {
 		log.Debug(message+"err = ", err)
 		return err
