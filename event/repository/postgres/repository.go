@@ -58,6 +58,13 @@ func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
 	return false, err
 }
 
+/*
+func (s *Repository) getTagsIds(eventId int) ([]int, error) {
+	message := logMessage + "getTagsIds:"
+	query :=
+}
+*/
+
 //TODO: Увеличить количество кастомных ошибок
 //TODO: sql.ErrNoRows
 
@@ -106,6 +113,10 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 		}
 		resultEvent = toModelEvent(&e)
 		return resultEvent, nil
+	}
+	err = rows.Close()
+	if err != nil {
+		return nil, err
 	}
 	return nil, event.ErrEventNotFound
 }
