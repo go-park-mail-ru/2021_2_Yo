@@ -15,6 +15,7 @@ const STATUS_OK = 200
 const STATUS_ERROR = 404
 
 type ResponseBodyUser struct {
+	ID       string `json:"id,omitempty"`
 	Name     string `json:"name,omitempty" valid:"type(string)"`
 	Surname  string `json:"surname,omitempty" valid:"type(string)"`
 	About    string `json:"description,omitempty" valid:"type(string)"`
@@ -98,6 +99,7 @@ func UserResponse(user *models.User) *Response {
 		Status:  200,
 		Message: "",
 		Body: ResponseBodyUser{
+			ID:      user.ID,
 			Name:    user.Name,
 			Surname: user.Surname,
 			Mail:    user.Mail,
