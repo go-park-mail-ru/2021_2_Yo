@@ -77,6 +77,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateEvent:"
 	log.Debug(message + "started")
+	log.Debug(message+"vars =", r.Context().Value("vars"))
 	vars := r.Context().Value("vars").(map[string]string)
 	eventId := vars["id"]
 	log.Debug(message+"eventId =", eventId)

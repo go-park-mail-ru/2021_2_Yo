@@ -65,7 +65,7 @@ func (m *Middleware) GetVars(next http.Handler) http.Handler {
 	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		log.Debug(message+"vars =", vars["id"])
+		log.Debug(message+"vars =", vars)
 		if vars != nil {
 			varsCtx := context.WithValue(context.Background(), "vars", vars)
 			next.ServeHTTP(w, r.WithContext(varsCtx))
