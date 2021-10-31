@@ -129,15 +129,17 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		log.Debug(message+"err1 =", err)
 		return
 	}
 	err = h.sessionManager.Delete(cookie.Value)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		log.Debug(message+"err2 =", err)
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
 	cookie.Expires = time.Now().AddDate(0, 0, -1)
 	http.SetCookie(w, cookie)
+	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
 
