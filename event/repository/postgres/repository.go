@@ -104,7 +104,8 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	message := logMessage + "CreateEvent:"
 	newEvent, _ := toPostgresEvent(e)
-	var eventId string
+	log.Debug(message+"newEvent = ", newEvent)
+	var eventId int
 	query :=
 		`insert into "event" 
 		(title, description, text, city, category, viewed, img_url, date, geo, author_id) 
@@ -124,7 +125,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		log.Debug(message+"err = ", err)
 		return "", err
 	}
-	return eventId, nil
+	return strconv.Itoa(eventId), nil
 }
 
 func (s *Repository) UpdateEvent(updatedEvent *models.Event) error {
