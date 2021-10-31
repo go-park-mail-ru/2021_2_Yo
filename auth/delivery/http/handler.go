@@ -112,7 +112,6 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 		return
 	}
-	log.Debug(message+"userId =", userId)
 	sessionId, err := h.sessionManager.Create(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
@@ -146,10 +145,12 @@ func (h *Delivery) User(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "User:"
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
+	sessionId := cookie.Value
+	userId, err := h.sessionManager.Check(sessionId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	foundUser, err := h.useCase.ParseToken(cookie.Value)
+	foundUser, err := h.useCase.GetUser(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

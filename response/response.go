@@ -17,7 +17,7 @@ const STATUS_ERROR = 404
 type ResponseBodyUser struct {
 	Name     string `json:"name,omitempty" valid:"type(string)"`
 	Surname  string `json:"surname,omitempty" valid:"type(string)"`
-	About    string `json:"about,omitempty" valid:"type(string)"`
+	About    string `json:"description,omitempty" valid:"type(string)"`
 	Mail     string `json:"email,omitempty" valid:"email"`
 	Password string `json:"password,omitempty" valid:"type(string)"`
 }
@@ -100,8 +100,8 @@ func UserResponse(user *models.User) *Response {
 		Body: ResponseBodyUser{
 			Name:    user.Name,
 			Surname: user.Surname,
-			About:   user.About,
 			Mail:    user.Mail,
+			About:   user.About,
 		},
 	}
 }
