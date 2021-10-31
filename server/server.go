@@ -76,6 +76,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddleware()
 	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
 	authRouter := mux.NewRouter()
+	authRouter.Methods("OPTIONS").HandlerFunc(options)
 	authRouter.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
 	authRouter.HandleFunc("/user", app.authManager.GetUser).Methods("GET")
 	authRouter.HandleFunc("/user/info", app.authManager.UpdateUserInfo).Methods("POST")
