@@ -43,7 +43,7 @@ func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
 		log.Debug("checkAuthor err1 = ", err)
 		return false, err
 	}
-	log.Debug("checkAuthor HERE")
+	log.Debug("eventId =", eventId, "userId =", userId)
 	if authorId == userId {
 		return true, nil
 	} else {
