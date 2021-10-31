@@ -44,6 +44,10 @@ func (a *UseCase) UpdateEvent(event *models.Event, userId string) error {
 		err := errors.New("event or userId is nil")
 		return err
 	}
+	if event.ID == "" {
+		err := errors.New("event.ID is null")
+		return err
+	}
 	return a.eventRepo.UpdateEvent(event, userId)
 }
 
