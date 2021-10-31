@@ -49,7 +49,7 @@ func parseToken(accessToken string, signingKey []byte) (string, error) {
 	return "", auth.ErrInvalidAccessToken
 }
 
-func (a *UseCase) SignUp(user *models.User) error {
+func (a *UseCase) SignUp(user *models.User) (string, error) {
 	password_hash := a.CreatePasswordHash(user.Password)
 	user.Password = password_hash
 	return a.repository.CreateUser(user)

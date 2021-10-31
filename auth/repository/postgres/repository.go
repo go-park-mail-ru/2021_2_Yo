@@ -4,7 +4,9 @@ import (
 	"backend/auth"
 	log "backend/logger"
 	"backend/models"
+	"errors"
 	sql "github.com/jmoiron/sqlx"
+	"strconv"
 )
 
 const (
@@ -25,18 +27,27 @@ func NewRepository(database *sql.DB) *Repository {
 	}
 }
 
-func (s *Repository) CreateUser(user *models.User) error {
+func (s *Repository) CreateUser(user *models.User) (string, error) {
 	message := logMessage + "CreateUser:"
 	newUser := toPostgresUser(user)
 	insertQuery := createUserQuery
 	//TODO: Выяснить, нужен ли фронту user.id
 	log.Debug(message+"password =", user.Password)
-	_, err := s.db.Exec(insertQuery, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About)
+	rows, err := s.db.Queryx(insertQuery, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About)
+	defer rows.Close()
 	if err != nil {
-		log.Debug(message+"err = ", err)
-		return err
+		return "", err
 	}
-	return nil
+	if rows.Next() {
+		var userId int
+		err := rows.Scan(rows, &userId)
+		if err != nil {
+			return "", err
+		}
+		return strconv.Itoa(userId), nil
+	}
+	err = errors.New(message + "unknown err")
+	return "", err
 }
 
 func (s *Repository) UpdateUser(user *models.User) error {
