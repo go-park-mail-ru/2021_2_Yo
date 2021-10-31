@@ -88,6 +88,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	h.setSessionIdCookie(w, sessionId)
+	log.Debug(message+"userId =", userId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -154,7 +155,7 @@ func (h *Delivery) User(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	log.Debug(message+"foundUser =", foundUser)
+	log.Debug(message+"foundUser =", *foundUser)
 	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }

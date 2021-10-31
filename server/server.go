@@ -81,6 +81,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
 	r.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
+	//r.HandleFunc("/users/{id:[0-9]+}", app.authManager.User).Methods("GET")
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
 	//TODO: Проверка на пользователя, отправляющего запрос
