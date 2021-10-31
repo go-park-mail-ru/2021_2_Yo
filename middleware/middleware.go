@@ -42,7 +42,6 @@ func (m *Middleware) CORS(next http.Handler) http.Handler {
 			"Accept,Content-Type,Content-Length,Accept-Encoding,X-CSRF-Token,csrf-token,Authorization")
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT,OPTIONS,HEAD")
-		//TODO: Попросить фронт не присылать options
 		if r.Method == http.MethodOptions {
 			return
 		}

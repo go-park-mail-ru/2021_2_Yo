@@ -70,31 +70,18 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	}, nil
 }
 
-func Preflight(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "Preflight:"
-	log.Info(message + "start")
-	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT,OPTIONS,HEAD")
-	log.Info(message + "end")
-}
-
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddleware()
 	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
 
 	authRouter := mux.NewRouter()
-	authRouter.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
+	//authRouter.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
 	authRouter.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
 	authRouter.Use(sessionMW.Auth)
 
 	r := mux.NewRouter()
-	//TODO: Попросить фронт не отправлять options
-	//r.Methods("OPTIONS").HandlerFunc(Preflight)
-	r.Handle("/signup", authRouter)
 	r.Handle("/login", authRouter)
+	r.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
 	r.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
