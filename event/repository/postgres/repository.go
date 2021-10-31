@@ -32,7 +32,7 @@ const (
 	updateEventQuery = `update "event" set
 		title = $1, description = $2, text = $3, city = $4, category = $5, viewed = $6, img_url = $7, date = $8, geo = $9 
 		where event.id = $10`
-	deleteEventQuery = `delete from "event" where event.author_id = $1`
+	deleteEventQuery = `delete from "event" where id = $1`
 )
 
 func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
@@ -209,7 +209,7 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 		return err
 	}
 	query := deleteEventQuery
-	_, err = s.db.Exec(query, userIdInt)
+	_, err = s.db.Exec(query, eventIdInt)
 	if err != nil {
 		log.Debug(message+"err = ", err)
 		return err

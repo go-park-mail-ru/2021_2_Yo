@@ -79,7 +79,6 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	vars := r.Context().Value("vars").(map[string]string)
 	eventId := vars["id"]
-	log.Debug(message+"eventId =", eventId)
 	userId := r.Context().Value("userId").(string)
 	eventFromRequest, err := response.GetEventFromJSON(r)
 	if err != nil {
@@ -101,7 +100,7 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "DeleteEvent:"
 	log.Debug(message + "started")
-	vars := mux.Vars(r)
+	vars := r.Context().Value("vars").(map[string]string)
 	eventId := vars["id"]
 	userId := r.Context().Value("userId").(string)
 	err := h.useCase.DeleteEvent(eventId, userId)
