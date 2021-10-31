@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
 	"time"
+	"backend/csrf"
 )
 
 const logMessage = "auth:usecase:usecase:"
@@ -95,4 +96,8 @@ func (a *UseCase) Logout(accessToken string) (string, error) {
 		UserID,
 	})
 	return expiredToken.SignedString(a.secretWord)
+}
+
+func (a *UseCase) GetCSRFToken(cookie string, expirationTime int64) (string, error) {
+	return csrf.Token.Create(cookie,expirationTime)
 }

@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"github.com/asaskevich/govalidator"
 	"net/http"
+	"time"
 )
 
 const logMessage = "auth:delivery:http:handler:"
@@ -152,4 +153,16 @@ func (h *Delivery) User(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message+"foundUser =", foundUser)
 	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")
+}
+
+func (h *Delivery) GetCSRF(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetCSRF:"
+	log.Debug(message + "started")
+	var err error
+	cookie, _ := r.Cookie("session_id")
+	CSRFToken, err := h.useCase.GetCSRFToken(cookie.Value, time.Now().Add(24 * time.Hour).Unix())
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	w.Header().Set("X-CSRF-Token", CSRFToken)
 }

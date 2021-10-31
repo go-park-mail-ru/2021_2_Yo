@@ -46,7 +46,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		return nil, err
 	}
 	//TODO: Параметры поменять для НЕ локал хоста
-	redisAddr := flag.String("addr", "redis://user:@localhost:6379/0", "redis addr")
+	redisAddr := flag.String("addr", "redis://user:@redis_db:6379/0", "redis addr")
 	redisConn, err := redis.DialURL(*redisAddr)
 	if err != nil {
 		log.Error(message+"err =", err)
