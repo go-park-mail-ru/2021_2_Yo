@@ -86,6 +86,7 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	eventId := vars["id"]
+	log.Debug(message+"eventId =", eventId)
 	eventFromRequest.ID = eventId
 	err = h.useCase.UpdateEvent(eventFromRequest, userId)
 	if err != nil {
