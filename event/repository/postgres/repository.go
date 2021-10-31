@@ -165,6 +165,7 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 	if err != nil {
 		return err
 	}
+	e.ID = userIdInt
 	log.Debug(message + "HERE")
 	query := updateEventQuery
 	_, err = s.db.Exec(query, e.Title, e.Description, e.Text, e.City, e.Category, e.Viewed, e.Img_Url, e.Date, e.Geo, e.ID)
