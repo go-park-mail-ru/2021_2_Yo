@@ -23,6 +23,8 @@ const logMessage = "session:middleware:"
 func (m *Middleware) Auth(next http.Handler) http.Handler {
 	message := logMessage + "Auth:"
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := r.Context().Value("vars").(map[string]string)
+		log.Debug(message+"vars =", vars)
 		cookie, err := r.Cookie("session_id")
 		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 			log.Error(message + "err1")

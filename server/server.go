@@ -83,8 +83,8 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
 	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
 	authRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
-	authRouter.Use(mw.GetVars)
 	authRouter.Use(sessionMW.Auth)
+	authRouter.Use(mw.GetVars)
 
 	r := mux.NewRouter()
 	r.Methods("OPTIONS").HandlerFunc(options)
