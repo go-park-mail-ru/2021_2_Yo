@@ -37,8 +37,10 @@ const (
 
 func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
 	query := checkAuthorQuery
+	log.Debug("checkAuthor userId = ", userId)
 	rows, err := s.db.Queryx(query, userId)
 	if err != nil {
+		log.Debug("checkAuthor err1 = ", err)
 		return false, err
 	}
 	defer rows.Close()
@@ -46,6 +48,7 @@ func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
 		var authorId int
 		err := rows.StructScan(&authorId)
 		if err != nil {
+			log.Debug("checkAuthor err2 = ", err)
 			return false, err
 		}
 		if authorId == userId {
@@ -168,6 +171,7 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 		log.Error(message+"err =", err)
 		return err
 	}
+	log.Debug(message + "HERE")
 	query := updateEventQuery
 	_, err = s.db.Exec(query, e.Title, e.Description, e.Text, e.City, e.Category, e.Viewed, e.Img_Url, e.Date, e.Geo, e.ID)
 	if err != nil {
