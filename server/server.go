@@ -11,7 +11,6 @@ import (
 	log "backend/logger"
 	"backend/middleware"
 	"backend/session"
-	sessionMiddleware "backend/session/middleware"
 	sessionRepository "backend/session/repository"
 	"backend/utils"
 	"fmt"
@@ -70,18 +69,16 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	}, nil
 }
 
+func options(w http.ResponseWriter, r *http.Request) {}
+
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddleware()
-	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
-
-	authRouter := mux.NewRouter()
-	//authRouter.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
-	authRouter.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
-	authRouter.Use(sessionMW.Auth)
+	//sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
 
 	r := mux.NewRouter()
-	r.Handle("/login", authRouter)
 	r.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
+	r.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
+	r.Methods("OPTIONS").HandlerFunc(options)
 	r.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
 	r.HandleFunc("/user", app.authManager.User).Methods("GET")
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
