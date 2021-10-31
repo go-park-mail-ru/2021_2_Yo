@@ -4,10 +4,8 @@ import (
 	"backend/event"
 	log "backend/logger"
 	"backend/response"
-	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
-	"net/url"
 )
 
 const logMessage = "event:delivery:http:"
@@ -46,7 +44,6 @@ func (h *Delivery) GetEvent(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	vars := mux.Vars(r)
 	eventId := vars["id"]
-	log.Debug(message+"eventId =", eventId)
 	resultEvent, err := h.useCase.GetEvent(eventId)
 	if err != nil {
 		log.Error(message+"err =", err)
@@ -80,17 +77,6 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateEvent:"
 	log.Debug(message + "started")
-	log.Debug(message+"r =", r)
-	u, err := url.Parse(r.RequestURI)
-	if err != nil {
-		panic(err)
-	}
-	fragments, _ := url.ParseQuery(u.Fragment)
-	fmt.Println("Fragments:", fragments)
-	log.Debug(fragments["id"])
-	eventId := ""
-
-	log.Debug(message+"eventId =", eventId)
 	userId := r.Context().Value("userId").(string)
 	eventFromRequest, err := response.GetEventFromJSON(r)
 	if err != nil {
@@ -98,6 +84,9 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		response.SendResponse(w, response.ErrorResponse("Can't get event from JSON"))
 		return
 	}
+	vars := mux.Vars(r)
+	eventId := vars["id"]
+	log.Debug(message+"eventId =", eventId)
 	eventFromRequest.ID = eventId
 	err = h.useCase.UpdateEvent(eventFromRequest, userId)
 	if err != nil {
