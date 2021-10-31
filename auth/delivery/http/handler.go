@@ -27,12 +27,25 @@ func NewDelivery(useCase auth.UseCase, manager session.Manager) *Delivery {
 	}
 }
 
-func (h *Delivery) setSessionIdCookie(w http.ResponseWriter, sessionId string) {
+func setSessionIdCookie(w http.ResponseWriter, sessionId string) {
 	cookie := &http.Cookie{
 		Name:     "session_id",
 		Value:    sessionId,
 		HttpOnly: true,
 		Secure:   true,
+	}
+	http.SetCookie(w, cookie)
+	cs := w.Header().Get("Set-Cookie")
+	cs += "; SameSite=None"
+	w.Header().Set("Set-Cookie", cs)
+}
+
+func setExpiredCookie(w http.ResponseWriter) {
+	cookie := &http.Cookie{
+		Name:     "session_id",
+		HttpOnly: true,
+		Secure:   true,
+		MaxAge:   -1,
 	}
 	http.SetCookie(w, cookie)
 	cs := w.Header().Get("Set-Cookie")
@@ -84,7 +97,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	h.setSessionIdCookie(w, sessionId)
+	setSessionIdCookie(w, sessionId)
 	log.Debug(message+"userId =", userId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
@@ -114,7 +127,7 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	h.setSessionIdCookie(w, sessionId)
+	setSessionIdCookie(w, sessionId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -123,13 +136,7 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Logout:"
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
-	cookie.MaxAge = -1
-	log.Debug(message+"cookie.expires = ", cookie.Expires.String())
-	http.SetCookie(w, cookie)
-	cs := w.Header().Get("Set-Cookie")
-	cs += "; SameSite=None"
-	w.Header().Set("Set-Cookie", cs)
-
+	setExpiredCookie(w)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		log.Debug(message+"err1 =", err)
 		return
