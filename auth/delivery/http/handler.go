@@ -11,7 +11,6 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
 	"net/http"
-	"time"
 )
 
 const logMessage = "auth:delivery:http:handler:"
@@ -124,11 +123,6 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Logout:"
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
-	cookie.MaxAge = -1
-	log.Debug(message+"cookie.expires = ", cookie.MaxAge)
-	http.SetCookie(w, cookie)
-	response.SendResponse(w, response.OkResponse())
-	return
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		log.Debug(message+"err1 =", err)
 		return
@@ -138,7 +132,7 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 		log.Debug(message+"err2 =", err)
 		return
 	}
-	cookie.Expires = time.Now().AddDate(0, 0, -1)
+	cookie.MaxAge = -1
 	log.Debug(message+"cookie.expires = ", cookie.Expires.String())
 	http.SetCookie(w, cookie)
 	response.SendResponse(w, response.OkResponse())
