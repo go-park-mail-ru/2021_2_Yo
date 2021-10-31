@@ -126,6 +126,10 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	cookie.MaxAge = -1
 	log.Debug(message+"cookie.expires = ", cookie.Expires.String())
 	http.SetCookie(w, cookie)
+	cs := w.Header().Get("Set-Cookie")
+	cs += "; SameSite=None"
+	w.Header().Set("Set-Cookie", cs)
+
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		log.Debug(message+"err1 =", err)
 		return
