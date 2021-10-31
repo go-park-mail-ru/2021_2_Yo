@@ -84,7 +84,6 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		response.SendResponse(w, response.ErrorResponse("Can't get event from JSON"))
 		return
 	}
-	log.Debug(message+"userId =", userId, "authorId =", eventFromRequest.AuthorId)
 	err = h.useCase.UpdateEvent(eventFromRequest, userId)
 	if err != nil {
 		log.Error(message+"err =", err)

@@ -153,6 +153,7 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 	if err != nil {
 		return err
 	}
+	log.Debug("userId = ", userId)
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
 		log.Error(message+"err =", err)
