@@ -60,7 +60,7 @@ func (a *UseCase) GetUser(userId string) (*models.User, error) {
 }
 
 func (a *UseCase) UpdateUserInfo(userId string, name string, surname string, about string) error {
-	if userId == "" || name == "" || surname == "" || about == "" {
+	if userId == "" {
 		err := errors.New("UpdateUserInfo data in empty")
 		return err
 	}

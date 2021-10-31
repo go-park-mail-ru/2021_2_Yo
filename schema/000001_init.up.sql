@@ -4,7 +4,7 @@ CREATE TABLE "user" (
                         surname varchar(50) not null,
                         mail varchar(150) not null unique,
                         password varchar(255) not null,
-                        about varchar(150) not null
+                        about varchar(150)
 );
 
 CREATE TABLE "event" (
