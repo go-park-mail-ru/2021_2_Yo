@@ -111,7 +111,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	query :=
 		`insert into "event" 
 		(title, description, text, city, category, viewed, img_url, date, geo, author_id) 
-		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
 		returning id`
 	err = s.db.QueryRow(query,
 		newEvent.Title,
@@ -121,6 +121,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		newEvent.Category,
 		newEvent.Viewed,
 		newEvent.Img_Url,
+		newEvent.Date,
 		newEvent.Geo,
 		newEvent.Author_ID).Scan(&eventId)
 	if err != nil {
