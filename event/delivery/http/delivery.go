@@ -4,6 +4,7 @@ import (
 	"backend/event"
 	log "backend/logger"
 	"backend/response"
+	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -78,6 +79,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateEvent:"
 	log.Debug(message + "started")
+	fmt.Printf("Req: %s %s\n", r.Host, r.URL.Path)
 	vars := mux.Vars(r)
 	eventId := vars["id"]
 	log.Debug(message+"eventId =", eventId)
