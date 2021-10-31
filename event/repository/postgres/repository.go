@@ -153,7 +153,6 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 	if err != nil {
 		return err
 	}
-	log.Debug("userId = ", userId)
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
 		log.Error(message+"err =", err)
@@ -169,6 +168,7 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 		log.Error(message+"err =", err)
 		return err
 	}
+	log.Debug(message+"e = ", e)
 	query := updateEventQuery
 	_, err = s.db.Exec(query, e.Title, e.Description, e.Text, e.City, e.Category, e.Viewed, e.Img_Url, e.Date, e.Geo, e.ID)
 	if err != nil {
