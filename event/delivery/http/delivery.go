@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
+	"net/url"
 )
 
 const logMessage = "event:delivery:http:"
@@ -79,10 +80,16 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateEvent:"
 	log.Debug(message + "started")
-	fmt.Printf("Req: %s %s\n", r.Host, r.URL.Path)
-	vars := mux.Vars(r)
-	log.Debug(message+"vars =", vars)
-	eventId := vars["id"]
+	log.Debug(message+"r =", r)
+	u, err := url.Parse(r.RequestURI)
+	if err != nil {
+		panic(err)
+	}
+	fragments, _ := url.ParseQuery(u.Fragment)
+	fmt.Println("Fragments:", fragments)
+	log.Debug(fragments["id"])
+	eventId := ""
+
 	log.Debug(message+"eventId =", eventId)
 	userId := r.Context().Value("userId").(string)
 	eventFromRequest, err := response.GetEventFromJSON(r)
