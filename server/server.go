@@ -96,7 +96,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Handle("/user/password", authRouter)
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
-	r.Handle("/events/{id:[0-9]+}", authRouter)
+	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
 	r.Handle("/events", authRouter)
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
