@@ -188,15 +188,12 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserInfo:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	log.Debug(message+"userId =", userId)
 	u, err := getUserFromRequest(r)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		log.Error(message+"err 1 =", err)
 		return
 	}
 	err = h.useCase.UpdateUserInfo(userId, u.Name, u.Surname, u.About)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
-		log.Error(message+"err 2 =", err)
 		return
 	}
 	response.SendResponse(w, response.OkResponse())
