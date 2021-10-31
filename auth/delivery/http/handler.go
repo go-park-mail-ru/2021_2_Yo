@@ -148,12 +148,7 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetUser:"
 	log.Debug(message + "started")
-	cookie, err := r.Cookie("session_id")
-	sessionId := cookie.Value
-	userId, err := h.sessionManager.Check(sessionId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		return
-	}
+	userId := r.Context().Value("userId").(string)
 	foundUser, err := h.useCase.GetUser(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return

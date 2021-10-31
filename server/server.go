@@ -11,6 +11,7 @@ import (
 	log "backend/logger"
 	"backend/middleware"
 	"backend/session"
+	sessionMiddleware "backend/session/middleware"
 	sessionRepository "backend/session/repository"
 	"backend/utils"
 	"fmt"
@@ -73,22 +74,29 @@ func options(w http.ResponseWriter, r *http.Request) {}
 
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddleware()
-	//sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
+	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
+	authRouter := mux.NewRouter()
+	authRouter.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
+	authRouter.HandleFunc("/user", app.authManager.GetUser).Methods("GET")
+	authRouter.HandleFunc("/user/info", app.authManager.UpdateUserInfo).Methods("POST")
+	authRouter.HandleFunc("/user/password", app.authManager.UpdateUserPassword).Methods("POST")
+	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
+	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
+	authRouter.Use(sessionMW.Auth)
 
 	r := mux.NewRouter()
 	r.Methods("OPTIONS").HandlerFunc(options)
 	r.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
 	r.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
-	r.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
-	r.HandleFunc("/user", app.authManager.GetUser).Methods("GET")
+	r.Handle("/logout", authRouter)
+	r.Handle("/user", authRouter)
 	r.HandleFunc("/user/{id:[0-9]+}", app.authManager.GetUserById).Methods("GET")
-	r.HandleFunc("/user/info", app.authManager.UpdateUserInfo).Methods("POST")
-	r.HandleFunc("/user/password", app.authManager.UpdateUserPassword).Methods("POST")
+	r.Handle("/user/info", authRouter)
+	r.Handle("/user/password", authRouter)
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
-	//TODO: Проверка на пользователя, отправляющего запрос
-	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
-	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
+	r.Handle("/events/{id:[0-9]+}", authRouter)
+	r.Handle("/events/{id:[0-9]+}", authRouter)
 	r.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
