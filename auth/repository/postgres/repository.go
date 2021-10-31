@@ -31,20 +31,21 @@ func (s *Repository) CreateUser(user *models.User) (string, error) {
 	message := logMessage + "CreateUser:"
 	newUser := toPostgresUser(user)
 	insertQuery := createUserQuery
-	//TODO: Выяснить, нужен ли фронту user.id
-	log.Debug(message+"password =", user.Password)
 	rows, err := s.db.Queryx(insertQuery, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About)
-	defer rows.Close()
 	if err != nil {
 		return "", err
 	}
 	if rows.Next() {
 		var userId int
-		err := rows.Scan(rows, &userId)
+		err := rows.Scan(&userId)
 		if err != nil {
 			return "", err
 		}
 		return strconv.Itoa(userId), nil
+	}
+	err = rows.Close()
+	if err != nil {
+		return "", nil
 	}
 	err = errors.New(message + "unknown err")
 	return "", err

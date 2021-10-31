@@ -26,7 +26,7 @@ func NewDelivery(useCase auth.UseCase, manager session.Manager) *Delivery {
 	}
 }
 
-func (h *Delivery) setSessionId(w http.ResponseWriter, sessionId string) {
+func (h *Delivery) setSessionIdCookie(w http.ResponseWriter, sessionId string) {
 	cookie := &http.Cookie{
 		Name:     "session_id",
 		Value:    sessionId,
@@ -87,7 +87,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	h.setSessionId(w, sessionId)
+	h.setSessionIdCookie(w, sessionId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -108,12 +108,16 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
+	userId, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 		return
 	}
-	log.Debug(message+"jwtToken =", jwtToken)
-	h.setSessionId(w, jwtToken)
+	log.Debug(message+"userId =", userId)
+	sessionId, err := h.sessionManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	h.setSessionIdCookie(w, sessionId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -126,7 +130,7 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	expiredJwtToken, err := h.useCase.Logout(cookie.Value)
-	h.setSessionId(w, expiredJwtToken)
+	h.setSessionIdCookie(w, expiredJwtToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }

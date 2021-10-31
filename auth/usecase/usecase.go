@@ -50,25 +50,20 @@ func parseToken(accessToken string, signingKey []byte) (string, error) {
 }
 
 func (a *UseCase) SignUp(user *models.User) (string, error) {
-	password_hash := a.CreatePasswordHash(user.Password)
-	user.Password = password_hash
+	hashedPassword := a.CreatePasswordHash(user.Password)
+	user.Password = hashedPassword
 	return a.repository.CreateUser(user)
 }
 
 func (a *UseCase) SignIn(mail, password string) (string, error) {
 	message := logMessage + "SignIn:"
 	hashedPassword := a.CreatePasswordHash(password)
-	log.Debug(message+"hashedPassword =", hashedPassword)
 	user, err := a.repository.GetUser(mail, hashedPassword)
 	if err == auth.ErrUserNotFound {
 		log.Error(message+"err =", err)
 		return "", err
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
-		jwt.StandardClaims{ExpiresAt: jwt.At(time.Now().Add(time.Minute * (30)))},
-		user.ID,
-	})
-	return token.SignedString(a.secretWord)
+	return user.ID, nil
 }
 
 func (a *UseCase) ParseToken(accessToken string) (*models.User, error) {
