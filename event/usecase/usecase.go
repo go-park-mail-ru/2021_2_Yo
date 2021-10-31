@@ -29,6 +29,10 @@ func (a *UseCase) GetEvent(eventId string) (*models.Event, error) {
 }
 
 func (a *UseCase) CreateEvent(event *models.Event) (string, error) {
+	if event == nil {
+		err := errors.New("UseCase:CreateEvent error")
+		return "", err
+	}
 	return a.eventRepo.CreateEvent(event)
 }
 

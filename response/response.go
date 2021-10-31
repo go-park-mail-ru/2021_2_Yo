@@ -17,6 +17,7 @@ const STATUS_ERROR = 404
 func GetEventFromJSON(r *http.Request) (*models.Event, error) {
 	eventInput := new(models.ResponseBodyEvent)
 	err := json.NewDecoder(r.Body).Decode(eventInput)
+	log.Debug(logMessage + "GetEventFromJSON start")
 	if err != nil {
 		return nil, err
 	}
@@ -32,6 +33,7 @@ func GetEventFromJSON(r *http.Request) (*models.Event, error) {
 		Date:        eventInput.Date,
 		Geo:         eventInput.Geo,
 	}
+	log.Debug(logMessage + "GetEventFromJSON end")
 	return result, nil
 }
 

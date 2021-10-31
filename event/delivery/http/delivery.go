@@ -54,7 +54,7 @@ func (h *Delivery) GetEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "SetEvent:"
+	message := logMessage + "CreateEvent:"
 	log.Debug(message + "started")
 	eventFromRequest, err := response.GetEventFromJSON(r)
 	if err != nil {
