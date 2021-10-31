@@ -92,7 +92,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 
 	r := mux.NewRouter()
 	//TODO: Попросить фронт не отправлять options
-	r.Methods("OPTIONS").HandlerFunc(Preflight)
+	//r.Methods("OPTIONS").HandlerFunc(Preflight)
 	r.Handle("/signup", authRouter)
 	r.Handle("/login", authRouter)
 	r.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
@@ -108,16 +108,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	//Сначала будет вызываться recovery, потом cors, а потом logging
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
-	//TODO: Убедиться, что достаточно верхней строчки
-	/*r.Use(gorilla_handlers.CORS(
-		gorilla_handlers.AllowedOrigins([]string{"https://bmstusssa.herokuapp.com"}),
-		gorilla_handlers.AllowedHeaders([]string{
-			"Accept", "Content-Type", "Content-Length",
-			"Accept-Encoding", "X-CSRF-Token", "csrf-token", "Authorization"}),
-		gorilla_handlers.AllowCredentials(),
-		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "DELETE", "POST", "PUT", "OPTIONS"}),
-	))
-	*/
+	y
 	r.Use(mw.Recovery)
 	return r
 }

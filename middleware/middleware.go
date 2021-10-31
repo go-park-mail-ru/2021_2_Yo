@@ -36,7 +36,7 @@ func (m *Middleware) CORS(next http.Handler) http.Handler {
 	message := logMessage + "CORS:"
 	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+		w.Header().Set("Access-Control-Allow-Origin", "https://bmstusssa.herokuapp.com")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Headers",
 			"Accept,Content-Type,Content-Length,Accept-Encoding,X-CSRF-Token,csrf-token,Authorization")
