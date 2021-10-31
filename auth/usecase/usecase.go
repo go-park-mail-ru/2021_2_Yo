@@ -2,16 +2,20 @@ package usecase
 
 import (
 	"backend/auth"
-	log "backend/logger"
 	"backend/models"
 	"crypto/sha256"
+	"errors"
 	"fmt"
-	"github.com/dgrijalva/jwt-go/v4"
-	"time"
 	"backend/csrf"
 )
 
 const logMessage = "auth:usecase:usecase:"
+
+func createPasswordHash(password string) string {
+	hash := sha256.New()
+	hash.Write([]byte(password))
+	return fmt.Sprintf("%x", hash.Sum(nil))
+}
 
 type UseCase struct {
 	repository auth.Repository
@@ -25,77 +29,52 @@ func NewUseCase(userRepo auth.Repository, secretWord []byte) *UseCase {
 	}
 }
 
-type claims struct {
-	jwt.StandardClaims
-	ID string `json:"user_id"`
-}
-
-func parseToken(accessToken string, signingKey []byte) (string, error) {
-	token, err := jwt.ParseWithClaims(accessToken, &claims{}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return signingKey, nil
-	})
-	if err != nil {
+func (a *UseCase) SignUp(user *models.User) (string, error) {
+	if user == nil {
+		err := errors.New("user is nil")
 		return "", err
 	}
-	if claims, ok := token.Claims.(*claims); ok && token.Valid {
-		if claims.ExpiresAt.Before(time.Now()) {
-			log.Debug("Expired")
-			return "", auth.ErrExpired
-		}
-		return claims.ID, nil
-	}
-	return "", auth.ErrInvalidAccessToken
-}
-
-func (a *UseCase) SignUp(user *models.User) error {
-	password_hash := a.CreatePasswordHash(user.Password)
-	user.Password = password_hash
+	hashedPassword := createPasswordHash(user.Password)
+	user.Password = hashedPassword
 	return a.repository.CreateUser(user)
 }
 
-func (a *UseCase) SignIn(mail, password string) (string, error) {
-	message := logMessage + "SignIn:"
-	hashedPassword := a.CreatePasswordHash(password)
-	log.Debug(message+"hashedPassword =", hashedPassword)
-	user, err := a.repository.GetUser(mail, hashedPassword)
-	if err == auth.ErrUserNotFound {
-		log.Error(message+"err =", err)
+func (a *UseCase) SignIn(mail string, password string) (string, error) {
+	if mail == "" || password == "" {
+		err := errors.New("mail or password is nil")
 		return "", err
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
-		jwt.StandardClaims{ExpiresAt: jwt.At(time.Now().Add(time.Minute * (30)))},
-		user.ID,
-	})
-	return token.SignedString(a.secretWord)
+	hashedPassword := createPasswordHash(password)
+	user, err := a.repository.GetUser(mail, hashedPassword)
+	if err != nil {
+		return "", err
+	}
+	return user.ID, nil
 }
 
-func (a *UseCase) ParseToken(accessToken string) (*models.User, error) {
-	userID, err := parseToken(accessToken, a.secretWord)
-	if err != nil {
+func (a *UseCase) GetUser(userId string) (*models.User, error) {
+	if userId == "" {
+		err := errors.New("userId is empty")
 		return nil, err
 	}
-	return a.repository.GetUserById(userID)
+	return a.repository.GetUserById(userId)
 }
 
-func (a *UseCase) CreatePasswordHash(password string) string {
-	hash := sha256.New()
-	hash.Write([]byte(password))
-	return fmt.Sprintf("%x", hash.Sum(nil))
-}
-
-func (a *UseCase) Logout(accessToken string) (string, error) {
-	UserID, err := parseToken(accessToken, a.secretWord)
-	if err != nil {
-		return "", err
+func (a *UseCase) UpdateUserInfo(userId string, name string, surname string, about string) error {
+	if userId == "" {
+		err := errors.New("UpdateUserInfo data in empty")
+		return err
 	}
-	expiredToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
-		jwt.StandardClaims{ExpiresAt: jwt.At(time.Now().Add(time.Minute * (-30)))},
-		UserID,
-	})
-	return expiredToken.SignedString(a.secretWord)
+	return a.repository.UpdateUserInfo(userId, name, surname, about)
+}
+
+func (a *UseCase) UpdateUserPassword(userId string, password string) error {
+	if userId == "" || password == "" {
+		err := errors.New("UpdateUserPassword data in empty")
+		return err
+	}
+	hashedPassword := createPasswordHash(password)
+	return a.repository.UpdateUserPassword(userId, hashedPassword)
 }
 
 func (a *UseCase) GetCSRFToken(cookie string, expirationTime int64) (string, error) {

@@ -9,6 +9,7 @@ import (
 	"backend/session"
 	"encoding/json"
 	"github.com/asaskevich/govalidator"
+	"github.com/gorilla/mux"
 	"net/http"
 	"time"
 )
@@ -27,10 +28,10 @@ func NewDelivery(useCase auth.UseCase, manager session.Manager) *Delivery {
 	}
 }
 
-func (h *Delivery) setJwtToken(w http.ResponseWriter, jwtToken string) {
+func setSessionIdCookie(w http.ResponseWriter, sessionId string) {
 	cookie := &http.Cookie{
 		Name:     "session_id",
-		Value:    jwtToken,
+		Value:    sessionId,
 		HttpOnly: true,
 		Secure:   true,
 	}
@@ -40,8 +41,21 @@ func (h *Delivery) setJwtToken(w http.ResponseWriter, jwtToken string) {
 	w.Header().Set("Set-Cookie", cs)
 }
 
+func setExpiredCookie(w http.ResponseWriter) {
+	cookie := &http.Cookie{
+		Name:     "session_id",
+		HttpOnly: true,
+		Secure:   true,
+		MaxAge:   -1,
+	}
+	http.SetCookie(w, cookie)
+	cs := w.Header().Get("Set-Cookie")
+	cs += "; SameSite=None"
+	w.Header().Set("Set-Cookie", cs)
+}
+
 func getUserFromRequest(r *http.Request) (*models.User, error) {
-	userInput := new(response.ResponseBodyUser)
+	userInput := new(models.ResponseBodyUser)
 	err := json.NewDecoder(r.Body).Decode(userInput)
 	if err != nil {
 		return nil, err
@@ -60,10 +74,6 @@ func getUserFromRequest(r *http.Request) (*models.User, error) {
 	return result, nil
 }
 
-//TODO!!!!
-//TODO: Работа с sessionManager:
-//TODO:		Ставить куки с session_id, создавать session_id и т.п.
-
 //@Summmary SignUp
 //@Tags auth
 //@Description Регистрация
@@ -80,15 +90,16 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	err = h.useCase.SignUp(userFromRequest)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusConflict) {
+	userId, err := h.useCase.SignUp(userFromRequest)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
+	sessionId, err := h.sessionManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	h.setJwtToken(w, jwtToken)
+	setSessionIdCookie(w, sessionId)
+	log.Debug(message+"userId =", userId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -109,25 +120,33 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
+	userId, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 		return
 	}
-	log.Debug(message+"jwtToken =", jwtToken)
-	h.setJwtToken(w, jwtToken)
+	sessionId, err := h.sessionManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	setSessionIdCookie(w, sessionId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
 
 func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "User:"
+	message := logMessage + "Logout:"
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
+	setExpiredCookie(w)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		log.Debug(message+"err1 =", err)
 		return
 	}
-	expiredJwtToken, err := h.useCase.Logout(cookie.Value)
-	h.setJwtToken(w, expiredJwtToken)
+	err = h.sessionManager.Delete(cookie.Value)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		log.Debug(message+"err2 =", err)
+		return
+	}
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -139,18 +158,29 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 //@Success 200 {object} response.BaseResponse
 //@Failure 404 {object} response.BaseResponse
 //@Router /user [get]
-func (h *Delivery) User(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "User:"
+func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetUser:"
 	log.Debug(message + "started")
-	cookie, err := r.Cookie("session_id")
+	userId := r.Context().Value("userId").(string)
+	foundUser, err := h.useCase.GetUser(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	foundUser, err := h.useCase.ParseToken(cookie.Value)
+	log.Debug(message+"foundUser =", *foundUser)
+	response.SendResponse(w, response.UserResponse(foundUser))
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetUserWithId:"
+	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	userId := vars["id"]
+	foundUser, err := h.useCase.GetUser(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	log.Debug(message+"foundUser =", foundUser)
+	log.Debug(message+"foundUser =", *foundUser)
 	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }
@@ -165,4 +195,38 @@ func (h *Delivery) GetCSRF(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("X-CSRF-Token", CSRFToken)
+}
+func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "UpdateUserInfo:"
+	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	log.Debug(message+"userId =", userId)
+	u, err := getUserFromRequest(r)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		log.Error(message+"err 1 =", err)
+		return
+	}
+	err = h.useCase.UpdateUserInfo(userId, u.Name, u.Surname, u.About)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		log.Error(message+"err 2 =", err)
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "UpdateUserInfo:"
+	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	u, err := getUserFromRequest(r)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	err = h.useCase.UpdateUserPassword(userId, u.Password)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
 }

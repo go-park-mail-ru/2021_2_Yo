@@ -1,6 +1,7 @@
 package repository
 
 import (
+	log "backend/logger"
 	"backend/session/models"
 	"errors"
 	"fmt"
@@ -39,6 +40,7 @@ func (s *Repository) Check(sessionId string) (string, error) {
 
 func (s *Repository) Delete(sessionId string) error {
 	result, err := redis.String(s.db.Do("DEL", sessionId))
+	log.Debug("REDIS result =", result, "err =", err)
 	if err != nil {
 		return err
 	}

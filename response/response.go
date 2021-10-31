@@ -14,35 +14,35 @@ type HttpStatus int
 const STATUS_OK = 200
 const STATUS_ERROR = 404
 
-type ResponseBodyUser struct {
-	Name     string `json:"name,omitempty" valid:"type(string)"`
-	Surname  string `json:"surname,omitempty" valid:"type(string)"`
-	About    string `json:"about,omitempty" valid:"type(string)"`
-	Mail     string `json:"email,omitempty" valid:"email"`
-	Password string `json:"password,omitempty" valid:"type(string)"`
-}
-
-type ResponseBodyEvent struct {
-	ID          string   `json:"id,omitempty"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Text        string   `json:"text"`
-	City        string   `json:"city"`
-	Category    string   `json:"category"`
-	Viewed      int      `json:"viewed"`
-	ImgUrl      string   `json:"imgUrl"`
-	Tag         []string `json:"tag"`
-	Date        string   `json:"date"`
-	Geo         string   `json:"geo"`
-	AuthorID    string   `json:"authorID"`
+func GetEventFromJSON(r *http.Request) (*models.Event, error) {
+	eventInput := new(models.ResponseBodyEvent)
+	err := json.NewDecoder(r.Body).Decode(eventInput)
+	log.Debug(logMessage + "GetEventFromJSON start")
+	if err != nil {
+		return nil, err
+	}
+	result := &models.Event{
+		Title:       eventInput.Title,
+		Description: eventInput.Description,
+		Text:        eventInput.Text,
+		City:        eventInput.City,
+		Category:    eventInput.Category,
+		Viewed:      eventInput.Viewed,
+		ImgUrl:      eventInput.ImgUrl,
+		Tag:         eventInput.Tag,
+		Date:        eventInput.Date,
+		Geo:         eventInput.Geo,
+	}
+	log.Debug(logMessage + "GetEventFromJSON end")
+	return result, nil
 }
 
 type ResponseBodyEventList struct {
-	Events []ResponseBodyEvent `json:"events"`
+	Events []models.ResponseBodyEvent `json:"events"`
 }
 
-func MakeEventForResponse(event *models.Event) ResponseBodyEvent {
-	return ResponseBodyEvent{
+func MakeEventForResponse(event *models.Event) models.ResponseBodyEvent {
+	return models.ResponseBodyEvent{
 		ID:          event.ID,
 		Title:       event.Title,
 		Description: event.Description,
@@ -58,8 +58,8 @@ func MakeEventForResponse(event *models.Event) ResponseBodyEvent {
 	}
 }
 
-func MakeEventListForResponse(events []*models.Event) []ResponseBodyEvent {
-	result := make([]ResponseBodyEvent, len(events))
+func MakeEventListForResponse(events []*models.Event) []models.ResponseBodyEvent {
+	result := make([]models.ResponseBodyEvent, len(events))
 	for i := 0; i < len(events); i++ {
 		result[i] = MakeEventForResponse(events[i])
 	}
@@ -97,11 +97,12 @@ func UserResponse(user *models.User) *Response {
 	return &Response{
 		Status:  200,
 		Message: "",
-		Body: ResponseBodyUser{
+		Body: models.ResponseBodyUser{
+			ID:      user.ID,
 			Name:    user.Name,
 			Surname: user.Surname,
-			About:   user.About,
 			Mail:    user.Mail,
+			About:   user.About,
 		},
 	}
 }
@@ -149,7 +150,6 @@ func SendResponse(w http.ResponseWriter, response interface{}) {
 	w.Write(b)
 }
 
-//For docs
 type BaseResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`

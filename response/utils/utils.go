@@ -9,7 +9,8 @@ import (
 func CheckIfNoError(w *http.ResponseWriter, err error, msg string, status response.HttpStatus) bool {
 	if err != nil {
 		log.Error(msg+"err =", err)
-		response.SendResponse(*w, response.StatusResponse(status))
+		response.ErrorResponse(msg)
+		//response.SendResponse(*w, response.StatusResponse(status))
 		return false
 	}
 	return true

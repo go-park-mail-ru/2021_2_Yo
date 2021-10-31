@@ -14,9 +14,7 @@ import (
 	sessionMiddleware "backend/session/middleware"
 	sessionRepository "backend/session/repository"
 	"backend/utils"
-	"flag"
 	"fmt"
-	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
@@ -40,14 +38,16 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	log.Info(fmt.Sprintf(message+"started, log level = %s", logLevel))
 
 	secret, err := utils.GetSecret()
+	if err != nil {
+		log.Error(message+"err =", err)
+		return nil, err
+	}
 	db, err := utils.InitPostgresDB()
 	if err != nil {
 		log.Error(message+"err =", err)
 		return nil, err
 	}
-	//TODO: Параметры поменять для НЕ локал хоста
-	redisAddr := flag.String("addr", "redis://user:@redis_db:6379/0", "redis addr")
-	redisConn, err := redis.DialURL(*redisAddr)
+	redisConn, err := utils.InitRedisDB()
 	if err != nil {
 		log.Error(message+"err =", err)
 		return nil, err
@@ -56,9 +56,9 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	sessionR := sessionRepository.NewRepository(redisConn)
 	sessionM := session.NewManager(*sessionR)
 	authR := authRepository.NewRepository(db)
-	eventR := eventRepository.NewRepository(db)
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
 	authD := authDelivery.NewDelivery(authUC, *sessionM)
+	eventR := eventRepository.NewRepository(db)
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
@@ -70,39 +70,35 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	}, nil
 }
 
-func Preflight(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "Preflight:"
-	log.Info(message + "start")
-	w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT,OPTIONS,HEAD")
-	log.Info(message + "end")
-}
+func options(w http.ResponseWriter, r *http.Request) {}
 
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddleware()
 	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
-
 	authRouter := mux.NewRouter()
-	authRouter.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
-	authRouter.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
+	authRouter.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
+	authRouter.HandleFunc("/user", app.authManager.GetUser).Methods("GET")
+	authRouter.HandleFunc("/user/info", app.authManager.UpdateUserInfo).Methods("POST")
+	authRouter.HandleFunc("/user/password", app.authManager.UpdateUserPassword).Methods("POST")
+	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
+	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
+	authRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
 	authRouter.Use(sessionMW.Auth)
 
 	r := mux.NewRouter()
-	//TODO: Попросить фронт не отправлять options
-	r.Methods("OPTIONS").HandlerFunc(Preflight)
-	r.Handle("/signup", authRouter)
-	r.Handle("/login", authRouter)
-	r.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
-	r.HandleFunc("/user", app.authManager.User).Methods("GET")
+	r.Methods("OPTIONS").HandlerFunc(options)
+	r.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
+	r.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
+	r.Handle("/logout", authRouter)
+	r.Handle("/user", authRouter)
+	r.HandleFunc("/user/{id:[0-9]+}", app.authManager.GetUserById).Methods("GET")
+	r.Handle("/user/info", authRouter)
+	r.Handle("/user/password", authRouter)
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
-	//TODO: Проверка на пользователя, отправляющего запрос
-	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
-	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
-	r.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
+	r.Handle("/events/{id:[0-9]+}", authRouter)
+	r.Handle("/events/{id:[0-9]+}", authRouter)
+	r.Handle("/events", authRouter)
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
 	//For test
@@ -113,16 +109,6 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	//Сначала будет вызываться recovery, потом cors, а потом logging
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
-	//TODO: Убедиться, что достаточно верхней строчки
-	/*r.Use(gorilla_handlers.CORS(
-		gorilla_handlers.AllowedOrigins([]string{"https://bmstusssa.herokuapp.com"}),
-		gorilla_handlers.AllowedHeaders([]string{
-			"Accept", "Content-Type", "Content-Length",
-			"Accept-Encoding", "X-CSRF-Token", "csrf-token", "Authorization"}),
-		gorilla_handlers.AllowCredentials(),
-		gorilla_handlers.AllowedMethods([]string{"GET", "HEAD", "DELETE", "POST", "PUT", "OPTIONS"}),
-	))
-	*/
 	r.Use(mw.Recovery)
 	return r
 }
