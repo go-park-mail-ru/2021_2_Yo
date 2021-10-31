@@ -41,7 +41,7 @@ func (h *Delivery) setSessionIdCookie(w http.ResponseWriter, sessionId string) {
 }
 
 func getUserFromRequest(r *http.Request) (*models.User, error) {
-	userInput := new(response.ResponseBodyUser)
+	userInput := new(models.ResponseBodyUser)
 	err := json.NewDecoder(r.Body).Decode(userInput)
 	if err != nil {
 		return nil, err
