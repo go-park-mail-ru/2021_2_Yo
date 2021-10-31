@@ -44,6 +44,7 @@ func (h *Delivery) GetEvent(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	vars := mux.Vars(r)
 	eventId := vars["id"]
+	log.Debug(message+"eventId =", eventId)
 	resultEvent, err := h.useCase.GetEvent(eventId)
 	if err != nil {
 		log.Error(message+"err =", err)
