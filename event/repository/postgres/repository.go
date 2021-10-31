@@ -38,12 +38,12 @@ const (
 func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
 	var authorId int
 	query := checkAuthorQuery
-	err := s.db.QueryRow(query, userId).Scan(&authorId)
+	err := s.db.QueryRow(query, eventId).Scan(&authorId)
 	if err != nil {
 		log.Debug("checkAuthor err1 = ", err)
 		return false, err
 	}
-	log.Debug("eventId =", eventId, "userId =", userId)
+	log.Debug("eventId =", eventId, "userId =", userId, "authorId =", authorId)
 	if authorId == userId {
 		return true, nil
 	} else {
@@ -142,8 +142,9 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 
 func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) error {
 	message := logMessage + "UpdateEvent:"
-	e, err := toPostgresEvent(updatedEvent)
+	eventIdInt, err := strconv.Atoi(updatedEvent.ID)
 	if err != nil {
+		log.Error(message+"err =", err)
 		return err
 	}
 	userIdInt, err := strconv.Atoi(userId)
@@ -151,7 +152,7 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 		log.Error(message+"err =", err)
 		return err
 	}
-	canUpdate, err := s.checkAuthor(e.ID, userIdInt)
+	canUpdate, err := s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
 		log.Error(message+"err =", err)
 		return err
@@ -161,7 +162,10 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 		log.Error(message+"err =", err)
 		return err
 	}
-	log.Debug(message + "HERE")
+	e, err := toPostgresEvent(updatedEvent)
+	if err != nil {
+		return err
+	}
 	query := updateEventQuery
 	_, err = s.db.Exec(query, e.Title, e.Description, e.Text, e.City, e.Category, e.Viewed, e.Img_Url, e.Date, e.Geo, e.ID)
 	if err != nil {

@@ -22,6 +22,7 @@ func GetEventFromJSON(r *http.Request) (*models.Event, error) {
 		return nil, err
 	}
 	result := &models.Event{
+		ID:          eventInput.ID,
 		Title:       eventInput.Title,
 		Description: eventInput.Description,
 		Text:        eventInput.Text,
