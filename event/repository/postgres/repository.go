@@ -22,12 +22,21 @@ func NewRepository(database *sql.DB) *Repository {
 }
 
 const (
-	listQuery     = `select * from "event"`
-	getEventQuery = `select * from "event" where id = $1`
+	checkAuthorQuery = `select author_id from "event" where id = $1`
+	listQuery        = `select * from "event"`
+	getEventQuery    = `select * from "event" where id = $1`
+	createEventQuery = `insert into "event" 
+		(title, description, text, city, category, viewed, img_url, date, geo, author_id) 
+		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+		returning id`
+	updateEventQuery = `update "event" set
+		title = $1, description = $2, text = $3, city = $4, category = $5, viewed = $6, img_url = $7, date = $8, geo = $9 
+		where event.id = $10`
+	deleteEventQuery = `delete from "event" where event.author_id = $1`
 )
 
 func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
-	query := `select author_id from "event" where id = $1`
+	query := checkAuthorQuery
 	rows, err := s.db.Queryx(query)
 	if err != nil {
 		return false, err
@@ -108,11 +117,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		return "", err
 	}
 	var eventId int
-	query :=
-		`insert into "event" 
-		(title, description, text, city, category, viewed, img_url, date, geo, author_id) 
-		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
-		returning id`
+	query := createEventQuery
 	err = s.db.QueryRow(query,
 		newEvent.Title,
 		newEvent.Description,
@@ -137,10 +142,7 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event) error {
 	if err != nil {
 		return err
 	}
-	query :=
-		`update "event" set
-		title = $1, description = $2, text = $3, city = $4, category = $5, viewed = $6, img_url = $7, date = $8, geo = $9 
-		where event.id = $10`
+	query := updateEventQuery
 	_, err = s.db.Exec(query, e.Title, e.Description, e.Text, e.City, e.Category, e.Viewed, e.Img_Url, e.Date, e.Geo, e.ID)
 	if err != nil {
 		log.Debug(message+"err = ", err)
@@ -171,7 +173,7 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 		log.Error(message+"err =", err)
 		return err
 	}
-	query := `delete from "event" where event.author_id = $1`
+	query := deleteEventQuery
 	_, err = s.db.Exec(query, userIdInt)
 	if err != nil {
 		log.Debug(message+"err = ", err)
