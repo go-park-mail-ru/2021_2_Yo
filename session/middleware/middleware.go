@@ -33,7 +33,7 @@ func (m *Middleware) Auth(next http.Handler) http.Handler {
 			log.Error(message + "err2")
 			return
 		}
-		userCtx := context.WithValue(context.Background(), "userId", userId)
+		userCtx := context.WithValue(r.Context(), "userId", userId)
 		next.ServeHTTP(w, r.WithContext(userCtx))
 	})
 }
