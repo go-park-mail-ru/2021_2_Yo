@@ -61,10 +61,6 @@ func getUserFromRequest(r *http.Request) (*models.User, error) {
 	return result, nil
 }
 
-//TODO!!!!
-//TODO: Работа с sessionManager:
-//TODO:		Ставить куки с session_id, создавать session_id и т.п.
-
 //@Summmary SignUp
 //@Tags auth
 //@Description Регистрация
@@ -138,6 +134,7 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cookie.Expires = time.Now().AddDate(0, 0, -1)
+	log.Debug(message+"cookie.expires = ", cookie.Expires.String())
 	http.SetCookie(w, cookie)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
