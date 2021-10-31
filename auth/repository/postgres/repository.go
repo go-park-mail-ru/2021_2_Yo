@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	logMessage       = "auth:repository:postgres:"
 	createUserQuery  = `insert into "user" (name, surname, mail, password, about) values($1, $2, $3, $4, $5) returning id`
 	updateUserQuery  = ``
 	getUserQuery     = `select * from "user" where mail = $1 and password = $2`
@@ -25,10 +26,11 @@ func NewRepository(database *sql.DB) *Repository {
 }
 
 func (s *Repository) CreateUser(user *models.User) error {
-	message := "CreateUser"
+	message := logMessage + "CreateUser:"
 	newUser := toPostgresUser(user)
 	insertQuery := createUserQuery
 	//TODO: Выяснить, нужен ли фронту user.id
+	log.Debug(message+"password =", user.Password)
 	_, err := s.db.Exec(insertQuery, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About)
 	if err != nil {
 		log.Debug(message+"err = ", err)
