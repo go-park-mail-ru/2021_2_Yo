@@ -3,6 +3,8 @@ package middleware
 import (
 	log "backend/logger"
 	"backend/response"
+	"context"
+	"github.com/gorilla/mux"
 	"net/http"
 	"time"
 )
@@ -25,7 +27,6 @@ func (m *Middleware) Recovery(next http.Handler) http.Handler {
 			if err != nil {
 				log.Error(message+"err =", err)
 				response.SendResponse(w, response.ErrorResponse("Internal server error"))
-				//TODO: Разобраться, нужно ли здесь отсылать 500 через w.WriteHeader(http.StatusInternalServerError)
 			}
 		}()
 		next.ServeHTTP(w, r)
@@ -56,5 +57,19 @@ func (m *Middleware) Logging(next http.Handler) http.Handler {
 		start := time.Now()
 		next.ServeHTTP(w, r)
 		log.Info(r.Method, r.RequestURI, time.Since(start))
+	})
+}
+
+func (m *Middleware) GetVars(next http.Handler) http.Handler {
+	message := logMessage + "GetVars:"
+	log.Debug(message + "started")
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		if vars != nil {
+			varsCtx := context.WithValue(context.Background(), "vars", vars)
+			next.ServeHTTP(w, r.WithContext(varsCtx))
+			return
+		}
+		next.ServeHTTP(w, r)
 	})
 }
