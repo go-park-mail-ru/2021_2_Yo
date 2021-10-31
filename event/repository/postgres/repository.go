@@ -37,7 +37,7 @@ const (
 
 func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
 	query := checkAuthorQuery
-	rows, err := s.db.Queryx(query)
+	rows, err := s.db.Queryx(query, userId)
 	if err != nil {
 		return false, err
 	}
@@ -168,7 +168,6 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 		log.Error(message+"err =", err)
 		return err
 	}
-	log.Debug(message+"e = ", e)
 	query := updateEventQuery
 	_, err = s.db.Exec(query, e.Title, e.Description, e.Text, e.City, e.Category, e.Viewed, e.Img_Url, e.Date, e.Geo, e.ID)
 	if err != nil {
