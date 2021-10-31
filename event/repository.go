@@ -8,6 +8,6 @@ type Repository interface {
 	List() ([]*models.Event, error)
 	GetEvent(eventId string) (*models.Event, error)
 	CreateEvent(event *models.Event) (string, error)
-	UpdateEvent(eventId string, e *models.Event) error
-	DeleteEvent(eventId string, userId string) error
+	UpdateEvent(e *models.Event) error
+	DeleteEvent(userId, eventId string) error
 }

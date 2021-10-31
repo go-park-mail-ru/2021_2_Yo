@@ -30,8 +30,8 @@ func NewRepository(database *sql.DB) *Repository {
 func (s *Repository) CreateUser(user *models.User) (string, error) {
 	message := logMessage + "CreateUser:"
 	newUser := toPostgresUser(user)
-	insertQuery := createUserQuery
-	rows, err := s.db.Queryx(insertQuery, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About)
+	query := createUserQuery
+	rows, err := s.db.Queryx(query, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About)
 	if err != nil {
 		return "", err
 	}
@@ -51,11 +51,31 @@ func (s *Repository) CreateUser(user *models.User) (string, error) {
 	return "", err
 }
 
-func (s *Repository) UpdateUser(user *models.User) error {
-	message := "UpdateUser"
-	newUser := toPostgresUser(user)
-	insertQuery := `update "user" set name = $1, surname = $2, mail = $3, password = $4, about = $5 where id = $6`
-	_, err := s.db.Exec(insertQuery, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About, newUser.ID)
+func (s *Repository) UpdateUserInfo(userId, name, surname, about string) error {
+	message := logMessage + "UpdateUserInfo"
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		log.Error(message+"err =", err)
+		return err
+	}
+	query := `update "user" set name = $1, surname = $2, about = $3 where id = $4`
+	_, err = s.db.Exec(query, name, surname, about, userIdInt)
+	if err != nil {
+		log.Debug(message+"err = ", err)
+		return err
+	}
+	return nil
+}
+
+func (s *Repository) UpdateUserPassword(userId, password string) error {
+	message := logMessage + "UpdateUserInfo"
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		log.Error(message+"err =", err)
+		return err
+	}
+	query := `update "user" set password = $1 where id = $2`
+	_, err = s.db.Exec(query, password, userIdInt)
 	if err != nil {
 		log.Debug(message+"err = ", err)
 		return err

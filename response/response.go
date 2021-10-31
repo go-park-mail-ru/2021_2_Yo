@@ -38,6 +38,27 @@ type ResponseBodyEvent struct {
 	AuthorID    string   `json:"authorID"`
 }
 
+func GetEventFromJSON(r *http.Request) (*models.Event, error) {
+	eventInput := new(ResponseBodyEvent)
+	err := json.NewDecoder(r.Body).Decode(eventInput)
+	if err != nil {
+		return nil, err
+	}
+	result := &models.Event{
+		Title:       eventInput.Title,
+		Description: eventInput.Description,
+		Text:        eventInput.Text,
+		City:        eventInput.City,
+		Category:    eventInput.Category,
+		Viewed:      eventInput.Viewed,
+		ImgUrl:      eventInput.ImgUrl,
+		Tag:         eventInput.Tag,
+		Date:        eventInput.Date,
+		Geo:         eventInput.Geo,
+	}
+	return result, nil
+}
+
 type ResponseBodyEventList struct {
 	Events []ResponseBodyEvent `json:"events"`
 }
@@ -151,7 +172,6 @@ func SendResponse(w http.ResponseWriter, response interface{}) {
 	w.Write(b)
 }
 
-//For docs
 type BaseResponse struct {
 	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`

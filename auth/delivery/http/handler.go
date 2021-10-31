@@ -9,6 +9,7 @@ import (
 	"backend/session"
 	"encoding/json"
 	"github.com/asaskevich/govalidator"
+	"github.com/gorilla/mux"
 	"net/http"
 )
 
@@ -123,14 +124,16 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "User:"
+	message := logMessage + "Logout:"
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	expiredJwtToken, err := h.useCase.Logout(cookie.Value)
-	h.setSessionIdCookie(w, expiredJwtToken)
+	err = h.sessionManager.Delete(cookie.Value)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -142,8 +145,8 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 //@Success 200 {object} response.BaseResponse
 //@Failure 404 {object} response.BaseResponse
 //@Router /user [get]
-func (h *Delivery) User(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "User:"
+func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetUser:"
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
 	sessionId := cookie.Value
@@ -157,5 +160,51 @@ func (h *Delivery) User(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Debug(message+"foundUser =", *foundUser)
 	response.SendResponse(w, response.UserResponse(foundUser))
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetUserWithId:"
+	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	userId := vars["id"]
+	foundUser, err := h.useCase.GetUser(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	log.Debug(message+"foundUser =", *foundUser)
+	response.SendResponse(w, response.UserResponse(foundUser))
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "UpdateUserInfo:"
+	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	u, err := getUserFromRequest(r)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	err = h.useCase.UpdateUserInfo(userId, u.Name, u.Surname, u.About)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "UpdateUserInfo:"
+	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	u, err := getUserFromRequest(r)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	err = h.useCase.UpdateUserPassword(userId, u.Password)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }

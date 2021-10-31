@@ -6,6 +6,6 @@ type UseCase interface {
 	List() ([]*models.Event, error)
 	GetEvent(string) (*models.Event, error)
 	CreateEvent(*models.Event) (string, error)
-	UpdateEvent(string, *models.Event) error
-	DeleteEvent(string, *models.User) error
+	UpdateEvent(e *models.Event, userId string) error
+	DeleteEvent(eventId string, userId string) error
 }

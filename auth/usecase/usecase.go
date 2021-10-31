@@ -2,14 +2,19 @@ package usecase
 
 import (
 	"backend/auth"
-	log "backend/logger"
 	"backend/models"
 	"crypto/sha256"
+	"errors"
 	"fmt"
-	"github.com/dgrijalva/jwt-go/v4"
 )
 
 const logMessage = "auth:usecase:usecase:"
+
+func createPasswordHash(password string) string {
+	hash := sha256.New()
+	hash.Write([]byte(password))
+	return fmt.Sprintf("%x", hash.Sum(nil))
+}
 
 type UseCase struct {
 	repository auth.Repository
@@ -23,49 +28,50 @@ func NewUseCase(userRepo auth.Repository, secretWord []byte) *UseCase {
 	}
 }
 
-type claims struct {
-	jwt.StandardClaims
-	ID string `json:"user_id"`
-}
-
 func (a *UseCase) SignUp(user *models.User) (string, error) {
-	hashedPassword := a.CreatePasswordHash(user.Password)
+	if user == nil {
+		err := errors.New("user is nil")
+		return "", err
+	}
+	hashedPassword := createPasswordHash(user.Password)
 	user.Password = hashedPassword
 	return a.repository.CreateUser(user)
 }
 
-func (a *UseCase) SignIn(mail, password string) (string, error) {
-	message := logMessage + "SignIn:"
-	hashedPassword := a.CreatePasswordHash(password)
+func (a *UseCase) SignIn(mail string, password string) (string, error) {
+	if mail == "" || password == "" {
+		err := errors.New("mail or password is nil")
+		return "", err
+	}
+	hashedPassword := createPasswordHash(password)
 	user, err := a.repository.GetUser(mail, hashedPassword)
-	if err == auth.ErrUserNotFound {
-		log.Error(message+"err =", err)
+	if err != nil {
 		return "", err
 	}
 	return user.ID, nil
 }
 
 func (a *UseCase) GetUser(userId string) (*models.User, error) {
+	if userId == "" {
+		err := errors.New("userId is empty")
+		return nil, err
+	}
 	return a.repository.GetUserById(userId)
 }
 
-func (a *UseCase) CreatePasswordHash(password string) string {
-	hash := sha256.New()
-	hash.Write([]byte(password))
-	return fmt.Sprintf("%x", hash.Sum(nil))
+func (a *UseCase) UpdateUserInfo(userId string, name string, surname string, about string) error {
+	if userId == "" || name == "" || surname == "" || about == "" {
+		err := errors.New("UpdateUserInfo data in empty")
+		return err
+	}
+	return a.repository.UpdateUserInfo(userId, name, surname, about)
 }
 
-func (a *UseCase) Logout(accessToken string) (string, error) {
-	/*
-		UserID, err := parseToken(accessToken, a.secretWord)
-		if err != nil {
-			return "", err
-		}
-		expiredToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
-			jwt.StandardClaims{ExpiresAt: jwt.At(time.Now().Add(time.Minute * (-30)))},
-			UserID,
-		})
-		return expiredToken.SignedString(a.secretWord)
-	*/
-	return "", nil
+func (a *UseCase) UpdateUserPassword(userId string, password string) error {
+	if userId == "" || password == "" {
+		err := errors.New("UpdateUserPassword data in empty")
+		return err
+	}
+	hashedPassword := createPasswordHash(password)
+	return a.repository.UpdateUserPassword(userId, hashedPassword)
 }

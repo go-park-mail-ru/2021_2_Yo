@@ -4,6 +4,7 @@ import (
 	"backend/event"
 	log "backend/logger"
 	"backend/models"
+	"errors"
 	sql "github.com/jmoiron/sqlx"
 	"strconv"
 )
@@ -24,6 +25,29 @@ const (
 	listQuery     = `select * from "event"`
 	getEventQuery = `select * from "event" where id = $1`
 )
+
+func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
+	query := `select author_id from "event" where id = $1`
+	rows, err := s.db.Queryx(query)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+	if rows.Next() {
+		var authorId int
+		err := rows.StructScan(&authorId)
+		if err != nil {
+			return false, err
+		}
+		if authorId == userId {
+			return true, nil
+		} else {
+			return false, nil
+		}
+	}
+	err = errors.New("Unexpected error")
+	return false, err
+}
 
 //TODO: Увеличить количество кастомных ошибок
 //TODO: sql.ErrNoRows
@@ -78,7 +102,7 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 }
 
 func (s *Repository) CreateEvent(e *models.Event) (string, error) {
-	message := "CreateEvent"
+	message := logMessage + "CreateEvent:"
 	newEvent, _ := toPostgresEvent(e)
 	var eventId string
 	query :=
@@ -103,12 +127,48 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	return eventId, nil
 }
 
-func (s *Repository) UpdateEvent(eventId string, e *models.Event) error {
+func (s *Repository) UpdateEvent(updatedEvent *models.Event) error {
+	message := logMessage + "UpdateEvent:"
+	e, _ := toPostgresEvent(updatedEvent)
+	query :=
+		`update "event" set
+		title = $1, description = $2, text = $3, city = $4, category = $5, viewed = $6, img_url = $7, date = $8, geo = $9 
+		where event.id = $10`
+	_, err := s.db.Exec(query, e.Title, e.Description, e.Text, e.City, e.Category, e.Viewed, e.Img_Url, e.Date, e.Geo, e.ID)
+	if err != nil {
+		log.Debug(message+"err = ", err)
+		return err
+	}
 	return nil
 }
 
-//TODO: userId должен проверяться в useCase
-
 func (s *Repository) DeleteEvent(eventId string, userId string) error {
+	message := logMessage + "DeleteEvent:"
+	eventIdInt, err := strconv.Atoi(eventId)
+	if err != nil {
+		log.Error(message+"err =", err)
+		return err
+	}
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		log.Error(message+"err =", err)
+		return err
+	}
+	canDelete, err := s.checkAuthor(eventIdInt, userIdInt)
+	if err != nil {
+		log.Error(message+"err =", err)
+		return err
+	}
+	if !canDelete {
+		err = errors.New("user can't delete event")
+		log.Error(message+"err =", err)
+		return err
+	}
+	query := `delete from "event" where event.author_id = $1`
+	_, err = s.db.Exec(query, userIdInt)
+	if err != nil {
+		log.Debug(message+"err = ", err)
+		return err
+	}
 	return nil
 }
