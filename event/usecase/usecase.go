@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"backend/event"
+	log "backend/logger"
 	"backend/models"
 	"errors"
 )
@@ -33,6 +34,7 @@ func (a *UseCase) CreateEvent(event *models.Event) (string, error) {
 		err := errors.New("UseCase:CreateEvent error")
 		return "", err
 	}
+	log.Debug("UseCase CreateEvent: HERE")
 	return a.eventRepo.CreateEvent(event)
 }
 
