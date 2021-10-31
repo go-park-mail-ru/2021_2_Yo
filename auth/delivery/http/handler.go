@@ -123,6 +123,9 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Logout:"
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
+	cookie.MaxAge = -1
+	log.Debug(message+"cookie.expires = ", cookie.Expires.String())
+	http.SetCookie(w, cookie)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		log.Debug(message+"err1 =", err)
 		return
@@ -132,9 +135,6 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 		log.Debug(message+"err2 =", err)
 		return
 	}
-	cookie.MaxAge = -1
-	log.Debug(message+"cookie.expires = ", cookie.Expires.String())
-	http.SetCookie(w, cookie)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
