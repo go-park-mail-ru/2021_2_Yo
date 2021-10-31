@@ -20,7 +20,7 @@ func NewMiddleware(manager session.Manager) *Middleware {
 const logMessage = "session:middleware:"
 
 func (m *Middleware) Auth(next http.Handler) http.Handler {
-	message := logMessage + "Auth"
+	message := logMessage + "Auth:"
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_id")
 		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
