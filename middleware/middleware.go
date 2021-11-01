@@ -21,7 +21,6 @@ func NewMiddleware() *Middleware {
 
 func (m *Middleware) Recovery(next http.Handler) http.Handler {
 	message := logMessage + "Recovery:"
-	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			err := recover()
@@ -35,8 +34,6 @@ func (m *Middleware) Recovery(next http.Handler) http.Handler {
 }
 
 func (m *Middleware) CORS(next http.Handler) http.Handler {
-	message := logMessage + "CORS:"
-	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "https://bmstusssa.herokuapp.com")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -52,8 +49,6 @@ func (m *Middleware) CORS(next http.Handler) http.Handler {
 }
 
 func (m *Middleware) Logging(next http.Handler) http.Handler {
-	message := logMessage + "Logging:"
-	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		next.ServeHTTP(w, r)

@@ -105,7 +105,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 
 	//Сначала будет вызываться recovery, потом cors, а потом logging
 	//TODO: Проверить, не лишняя ли тут мидла
-	r.Use(mw.GetVars)
+	//r.Use(mw.GetVars)
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
