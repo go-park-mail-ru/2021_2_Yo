@@ -90,7 +90,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 	setSessionIdCookie(w, sessionId)
 	setCSRFCokkie(w,CSRFToken)
-
+	log.Info(CSRFToken)
 	//w.Header().Set("X-CSRF-Token", CSRFToken)
 
 	log.Debug(message+"userId =", userId)
@@ -128,6 +128,7 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	setSessionIdCookie(w, sessionId)
 	setCSRFCokkie(w,CSRFToken)
+	log.Info(CSRFToken)
 	//w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
