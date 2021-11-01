@@ -2,9 +2,7 @@ package postgres
 
 import (
 	"backend/event"
-	log "backend/logger"
 	"backend/models"
-	"errors"
 	sql "github.com/jmoiron/sqlx"
 	"strconv"
 )
@@ -40,8 +38,7 @@ func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
 	query := checkAuthorQuery
 	err := s.db.QueryRow(query, eventId).Scan(&authorId)
 	if err != nil {
-		log.Debug("checkAuthor err1 = ", err)
-		return false, err
+		return false, event.ErrPostgres
 	}
 	if authorId == userId {
 		return true, nil
@@ -50,23 +47,14 @@ func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
 	}
 }
 
-/*
-func (s *Repository) getTagsIds(eventId int) ([]int, error) {
-	message := logMessage + "getTagsIds:"
-	query :=
-}
-*/
-
 //TODO: Увеличить количество кастомных ошибок
 //TODO: sql.ErrNoRows
 
 func (s *Repository) List() ([]*models.Event, error) {
-	message := logMessage + "List:"
 	query := listQuery
 	rows, err := s.db.Queryx(query)
 	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, err
+		return nil, event.ErrPostgres
 	}
 	defer rows.Close()
 	var resultEvents []*models.Event
@@ -74,47 +62,31 @@ func (s *Repository) List() ([]*models.Event, error) {
 		var e Event
 		err := rows.StructScan(&e)
 		if err != nil {
-			log.Error(message+"err =", err)
-			return nil, err
+			return nil, event.ErrPostgres
 		}
 		modelEvent := toModelEvent(&e)
 		resultEvents = append(resultEvents, modelEvent)
 	}
-	log.Debug(message+"resultEvents =", resultEvents)
 	return resultEvents, nil
 }
 
 func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
-	message := logMessage + "GetEvent:"
-	log.Debug(message + "started")
 	eventIdInt, err := strconv.Atoi(eventId)
 	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, err
+		return nil, event.ErrAtoi
 	}
 	query := getEventQuery
-	rows, err := s.db.Queryx(query, eventIdInt)
-	defer rows.Close()
-	var resultEvent *models.Event
-	if rows.Next() {
-		var e Event
-		err := rows.StructScan(&e)
-		if err != nil {
-			log.Error(message+"err =", err)
-			return nil, err
-		}
-		resultEvent = toModelEvent(&e)
-		return resultEvent, nil
-	}
-	err = rows.Close()
+	var e Event
+	err = s.db.QueryRow(query, eventIdInt).Scan(&e)
 	if err != nil {
-		return nil, err
+		return nil, event.ErrPostgres
 	}
-	return nil, event.ErrEventNotFound
+	var resultEvent *models.Event
+	resultEvent = toModelEvent(&e)
+	return resultEvent, nil
 }
 
 func (s *Repository) CreateEvent(e *models.Event) (string, error) {
-	message := logMessage + "CreateEvent:"
 	newEvent, err := toPostgresEvent(e)
 	if err != nil {
 		return "", err
@@ -133,33 +105,26 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		newEvent.Geo,
 		newEvent.Author_ID).Scan(&eventId)
 	if err != nil {
-		log.Debug(message+"err = ", err)
-		return "", err
+		return "", event.ErrPostgres
 	}
 	return strconv.Itoa(eventId), nil
 }
 
 func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) error {
-	message := logMessage + "UpdateEvent:"
 	eventIdInt, err := strconv.Atoi(updatedEvent.ID)
 	if err != nil {
-		log.Error(message+"err =", err)
-		return err
+		return event.ErrAtoi
 	}
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		log.Error(message+"err =", err)
-		return err
+		return event.ErrAtoi
 	}
 	canUpdate, err := s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
-		log.Error(message+"err =", err)
 		return err
 	}
 	if !canUpdate {
-		err = errors.New("user can't update event")
-		log.Error(message+"err =", err)
-		return err
+		return event.ErrNotAllowed
 	}
 	e, err := toPostgresEvent(updatedEvent)
 	if err != nil {
@@ -179,40 +144,31 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 		e.Geo,
 		e.ID)
 	if err != nil {
-		log.Debug(message+"err = ", err)
-		return err
+		return event.ErrPostgres
 	}
-	log.Debug(message + "HERE")
 	return nil
 }
 
 func (s *Repository) DeleteEvent(eventId string, userId string) error {
-	message := logMessage + "DeleteEvent:"
 	eventIdInt, err := strconv.Atoi(eventId)
 	if err != nil {
-		log.Error(message+"err =", err)
-		return err
+		return event.ErrAtoi
 	}
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		log.Error(message+"err =", err)
-		return err
+		return event.ErrAtoi
 	}
 	canDelete, err := s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
-		log.Error(message+"err =", err)
 		return err
 	}
 	if !canDelete {
-		err = errors.New("user can't delete event")
-		log.Error(message+"err =", err)
-		return err
+		return event.ErrNotAllowed
 	}
 	query := deleteEventQuery
 	_, err = s.db.Exec(query, eventIdInt)
 	if err != nil {
-		log.Debug(message+"err = ", err)
-		return err
+		return event.ErrPostgres
 	}
 	return nil
 }

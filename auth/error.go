@@ -3,9 +3,9 @@ package auth
 import "errors"
 
 var (
-	ErrUserNotFound       = errors.New("user not found")
-	ErrInvalidAccessToken = errors.New("invalid access token")
-	ErrInvalidUserData    = errors.New("invalid user data")
-	ErrUserExists         = errors.New("user with the same mail already exists")
-	ErrExpired            = errors.New("need to refresh token")
+	ErrUserNotFound = errors.New("user not found")
+	ErrCookie       = errors.New("error with cookie")
+	ErrEmptyData    = errors.New("required data is empty")
+	ErrPostgres     = errors.New("internal DB server error")
+	ErrAtoi         = errors.New("cant cast string to int")
 )

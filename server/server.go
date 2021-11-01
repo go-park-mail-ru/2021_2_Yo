@@ -98,12 +98,11 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
 	r.Handle("/events/{id:[0-9]+}", authRouter)
-	//r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
-	//r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
 	r.Handle("/events", authRouter)
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
 	//Сначала будет вызываться recovery, потом cors, а потом logging
+	//TODO: Проверить, не лишняя ли тут мидла
 	r.Use(mw.GetVars)
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
