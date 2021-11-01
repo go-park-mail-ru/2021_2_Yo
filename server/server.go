@@ -5,7 +5,7 @@ import (
 	authRepository "backend/auth/repository/postgres"
 	authUseCase "backend/auth/usecase"
 	"backend/csrf"
-	csrfMiddleware "backend/csrf/middleware"
+	//csrfMiddleware "backend/csrf/middleware"
 	csrfRepository "backend/csrf/repository"
 	_ "backend/docs"
 	eventDelivery "backend/event/delivery/http"
@@ -89,9 +89,8 @@ func options(w http.ResponseWriter, r *http.Request) {}
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddleware()
 	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
-	csrfMW := csrfMiddleware.NewMiddleware(*app.csrfManager)
+	//csrfMW := csrfMiddleware.NewMiddleware(*app.csrfManager)
 	authRouter := mux.NewRouter()
-	authRouter.Methods("POST").Subrouter().Use(csrfMW.CSRF)
 	authRouter.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
 	authRouter.HandleFunc("/user", app.authManager.GetUser).Methods("GET")
 	authRouter.HandleFunc("/user/info", app.authManager.UpdateUserInfo).Methods("POST")
