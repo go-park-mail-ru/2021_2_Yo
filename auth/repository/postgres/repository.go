@@ -1,10 +1,9 @@
 package postgres
 
 import (
-	"backend/auth"
-	log "backend/logger"
+	error2 "backend/auth/error"
 	"backend/models"
-	"errors"
+	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
 	"strconv"
 )
@@ -28,81 +27,64 @@ func NewRepository(database *sql.DB) *Repository {
 }
 
 func (s *Repository) CreateUser(user *models.User) (string, error) {
-	message := logMessage + "CreateUser:"
 	newUser := toPostgresUser(user)
 	query := createUserQuery
-	rows, err := s.db.Queryx(query, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About)
+	var userId int
+	err := s.db.QueryRow(query, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About).Scan(&userId)
 	if err != nil {
-		return "", err
+		return "", error2.ErrPostgres
 	}
-	if rows.Next() {
-		var userId int
-		err := rows.Scan(&userId)
-		if err != nil {
-			return "", err
-		}
-		return strconv.Itoa(userId), nil
-	}
-	err = rows.Close()
-	if err != nil {
-		return "", nil
-	}
-	err = errors.New(message + "unknown err")
-	return "", err
+	return strconv.Itoa(userId), nil
 }
 
 func (s *Repository) UpdateUserInfo(userId, name, surname, about string) error {
-	message := logMessage + "UpdateUserInfo"
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		log.Error(message+"err =", err)
-		return err
+		return error2.ErrAtoi
 	}
 	query := `update "user" set name = $1, surname = $2, about = $3 where id = $4`
 	_, err = s.db.Exec(query, name, surname, about, userIdInt)
 	if err != nil {
-		log.Debug(message+"err = ", err)
-		return err
+		return error2.ErrPostgres
 	}
 	return nil
 }
 
 func (s *Repository) UpdateUserPassword(userId, password string) error {
-	message := logMessage + "UpdateUserInfo"
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		log.Error(message+"err =", err)
-		return err
+		return error2.ErrAtoi
 	}
 	query := `update "user" set password = $1 where id = $2`
 	_, err = s.db.Exec(query, password, userIdInt)
 	if err != nil {
-		log.Debug(message+"err = ", err)
-		return err
+		return error2.ErrPostgres
 	}
 	return nil
 }
 
 func (s *Repository) GetUser(mail, password string) (*models.User, error) {
-	message := "GetUser"
 	query := getUserQuery
 	user := User{}
 	err := s.db.QueryRow(query, mail, password).Scan(&user.ID, &user.Name, &user.Surname, &user.Mail, &user.Password, &user.About)
+	if err == sql2.ErrNoRows {
+		return nil, error2.ErrUserNotFound
+	}
 	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, auth.ErrUserNotFound
+		return nil, error2.ErrPostgres
 	}
 	return toModelUser(&user), nil
 }
 
 func (s *Repository) GetUserById(userId string) (*models.User, error) {
-	message := "GetUserById"
 	query := getUserByIdQuery
 	user := User{}
 	err := s.db.QueryRow(query, userId).Scan(&user.ID, &user.Name, &user.Surname, &user.Mail, &user.Password, &user.About)
+	if err == sql2.ErrNoRows {
+		return nil, error2.ErrUserNotFound
+	}
 	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, auth.ErrUserNotFound
+		return nil, error2.ErrPostgres
 	}
 	return toModelUser(&user), nil
 }

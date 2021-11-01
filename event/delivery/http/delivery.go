@@ -4,6 +4,7 @@ import (
 	"backend/event"
 	log "backend/logger"
 	"backend/response"
+	"backend/response/utils"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -31,9 +32,7 @@ func (h *Delivery) List(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "List:"
 	log.Debug(message + "started")
 	eventsList, err := h.useCase.List()
-	if err != nil {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Can't get list of events"))
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
 	response.SendResponse(w, response.EventsListResponse(eventsList))
@@ -45,9 +44,7 @@ func (h *Delivery) GetEvent(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	eventId := vars["id"]
 	resultEvent, err := h.useCase.GetEvent(eventId)
-	if err != nil {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Can't get event with ID"))
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
 	response.SendResponse(w, response.EventResponse(resultEvent))
@@ -57,17 +54,12 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "CreateEvent:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	log.Debug(message+"userId =", userId)
 	eventFromRequest, err := response.GetEventFromJSON(r)
-	if err != nil {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Can't get event from JSON"))
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
 	eventID, err := h.useCase.CreateEvent(eventFromRequest, userId)
-	if err != nil {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Can't create such event"))
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
 	response.SendResponse(w, response.EventIdResponse(eventID))
@@ -77,17 +69,16 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateEvent:"
 	log.Debug(message + "started")
+	vars := r.Context().Value("vars").(map[string]string)
+	eventId := vars["id"]
 	userId := r.Context().Value("userId").(string)
 	eventFromRequest, err := response.GetEventFromJSON(r)
-	if err != nil {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Can't get event from JSON"))
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
+	eventFromRequest.ID = eventId
 	err = h.useCase.UpdateEvent(eventFromRequest, userId)
-	if err != nil {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Can't update such event"))
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
 	response.SendResponse(w, response.OkResponse())
@@ -97,13 +88,11 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "DeleteEvent:"
 	log.Debug(message + "started")
-	vars := mux.Vars(r)
+	vars := r.Context().Value("vars").(map[string]string)
 	eventId := vars["id"]
 	userId := r.Context().Value("userId").(string)
 	err := h.useCase.DeleteEvent(eventId, userId)
-	if err != nil {
-		log.Error(message+"err =", err)
-		response.SendResponse(w, response.ErrorResponse("Can't delete such event"))
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
 	response.SendResponse(w, response.OkResponse())

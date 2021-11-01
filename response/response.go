@@ -4,6 +4,8 @@ import (
 	log "backend/logger"
 	"backend/models"
 	"encoding/json"
+	"errors"
+	"github.com/asaskevich/govalidator"
 	"net/http"
 )
 
@@ -14,6 +16,11 @@ type HttpStatus int
 const STATUS_OK = 200
 const STATUS_ERROR = 404
 
+var (
+	ErrJSONDecoding = errors.New("can't decode a model from json")
+	ErrValidation   = errors.New("validation error")
+)
+
 func GetEventFromJSON(r *http.Request) (*models.Event, error) {
 	eventInput := new(models.ResponseBodyEvent)
 	err := json.NewDecoder(r.Body).Decode(eventInput)
@@ -22,6 +29,7 @@ func GetEventFromJSON(r *http.Request) (*models.Event, error) {
 		return nil, err
 	}
 	result := &models.Event{
+		ID:          eventInput.ID,
 		Title:       eventInput.Title,
 		Description: eventInput.Description,
 		Text:        eventInput.Text,
@@ -34,6 +42,26 @@ func GetEventFromJSON(r *http.Request) (*models.Event, error) {
 		Geo:         eventInput.Geo,
 	}
 	log.Debug(logMessage + "GetEventFromJSON end")
+	return result, nil
+}
+
+func GetUserFromRequest(r *http.Request) (*models.User, error) {
+	userInput := new(models.ResponseBodyUser)
+	err := json.NewDecoder(r.Body).Decode(userInput)
+	if err != nil {
+		return nil, ErrJSONDecoding
+	}
+	result := &models.User{
+		Name:     userInput.Name,
+		Surname:  userInput.Surname,
+		Mail:     userInput.Mail,
+		Password: userInput.Password,
+		About:    userInput.About,
+	}
+	_, err = govalidator.ValidateStruct(result)
+	if err != nil {
+		return nil, ErrValidation
+	}
 	return result, nil
 }
 

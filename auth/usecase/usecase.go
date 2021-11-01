@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"backend/auth"
+	error2 "backend/auth/error"
 	"backend/models"
 	"crypto/sha256"
-	"errors"
 	"fmt"
 	"backend/csrf"
 )
@@ -31,8 +31,7 @@ func NewUseCase(userRepo auth.Repository, secretWord []byte) *UseCase {
 
 func (a *UseCase) SignUp(user *models.User) (string, error) {
 	if user == nil {
-		err := errors.New("user is nil")
-		return "", err
+		return "", error2.ErrEmptyData
 	}
 	hashedPassword := createPasswordHash(user.Password)
 	user.Password = hashedPassword
@@ -41,8 +40,7 @@ func (a *UseCase) SignUp(user *models.User) (string, error) {
 
 func (a *UseCase) SignIn(mail string, password string) (string, error) {
 	if mail == "" || password == "" {
-		err := errors.New("mail or password is nil")
-		return "", err
+		return "", error2.ErrEmptyData
 	}
 	hashedPassword := createPasswordHash(password)
 	user, err := a.repository.GetUser(mail, hashedPassword)
@@ -54,24 +52,21 @@ func (a *UseCase) SignIn(mail string, password string) (string, error) {
 
 func (a *UseCase) GetUser(userId string) (*models.User, error) {
 	if userId == "" {
-		err := errors.New("userId is empty")
-		return nil, err
+		return nil, error2.ErrEmptyData
 	}
 	return a.repository.GetUserById(userId)
 }
 
 func (a *UseCase) UpdateUserInfo(userId string, name string, surname string, about string) error {
 	if userId == "" {
-		err := errors.New("UpdateUserInfo data in empty")
-		return err
+		return error2.ErrEmptyData
 	}
 	return a.repository.UpdateUserInfo(userId, name, surname, about)
 }
 
 func (a *UseCase) UpdateUserPassword(userId string, password string) error {
 	if userId == "" || password == "" {
-		err := errors.New("UpdateUserPassword data in empty")
-		return err
+		return error2.ErrEmptyData
 	}
 	hashedPassword := createPasswordHash(password)
 	return a.repository.UpdateUserPassword(userId, hashedPassword)

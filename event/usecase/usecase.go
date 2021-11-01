@@ -2,9 +2,8 @@ package usecase
 
 import (
 	"backend/event"
-	log "backend/logger"
+	error2 "backend/event/error"
 	"backend/models"
-	"errors"
 )
 
 type UseCase struct {
@@ -23,38 +22,32 @@ func (a *UseCase) List() ([]*models.Event, error) {
 
 func (a *UseCase) GetEvent(eventId string) (*models.Event, error) {
 	if eventId == "" {
-		err := errors.New("eventId is null")
-		return nil, err
+		return nil, error2.ErrEmptyData
 	}
 	return a.eventRepo.GetEvent(eventId)
 }
 
-func (a *UseCase) CreateEvent(event *models.Event, userId string) (string, error) {
-	if event == nil || userId == "" {
-		err := errors.New("UseCase:CreateEvent event or userId is empty")
-		return "", err
+func (a *UseCase) CreateEvent(e *models.Event, userId string) (string, error) {
+	if e == nil || userId == "" {
+		return "", error2.ErrEmptyData
 	}
-	event.AuthorId = userId
-	log.Debug("UseCase CreateEvent: HERE")
-	return a.eventRepo.CreateEvent(event)
+	e.AuthorId = userId
+	return a.eventRepo.CreateEvent(e)
 }
 
-func (a *UseCase) UpdateEvent(event *models.Event, userId string) error {
-	if event == nil || userId == "" {
-		err := errors.New("event or userId is nil")
-		return err
+func (a *UseCase) UpdateEvent(e *models.Event, userId string) error {
+	if e == nil || userId == "" {
+		return error2.ErrEmptyData
 	}
-	if userId != event.AuthorId {
-		err := errors.New("userId != event.AuthorId")
-		return err
+	if e.ID == "" {
+		return error2.ErrEmptyData
 	}
-	return a.eventRepo.UpdateEvent(event)
+	return a.eventRepo.UpdateEvent(e, userId)
 }
 
 func (a *UseCase) DeleteEvent(userId string, eventID string) error {
 	if userId == "" || eventID == "" {
-		err := errors.New("eventId is empty")
-		return err
+		return error2.ErrEmptyData
 	}
 	return a.eventRepo.DeleteEvent(userId, eventID)
 }

@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	error2 "backend/event/error"
 	"backend/models"
 	"strconv"
 )
@@ -21,9 +22,15 @@ type Event struct {
 }
 
 func toPostgresEvent(e *models.Event) (*Event, error) {
-	authorIdInt, err := strconv.Atoi(e.AuthorId)
-	if err != nil {
-		return nil, err
+	authorIdInt := 0
+	if e.AuthorId == "" {
+		authorIdInt = 0
+	} else {
+		authorIdInt, err := strconv.Atoi(e.AuthorId)
+		if err != nil {
+			return nil, error2.ErrAtoi
+		}
+		_ = authorIdInt
 	}
 	return &Event{
 		Title:       e.Title,

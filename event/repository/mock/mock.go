@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"backend/event"
+	error2 "backend/event/error"
 	"backend/models"
 	"github.com/stretchr/testify/mock"
 )
@@ -15,5 +15,5 @@ func (s *RepositoryMock) List() ([]*models.Event, error) {
 }
 
 func (s *RepositoryMock) GetEvent(eventId string) (*models.Event, error) {
-	return nil, event.ErrEventNotFound
+	return nil, error2.ErrEventNotFound
 }

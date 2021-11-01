@@ -2,14 +2,11 @@ package http
 
 import (
 	"backend/auth"
+	error2 "backend/auth/error"
 	log "backend/logger"
-	"backend/models"
 	"backend/response"
 	"backend/response/utils"
 	"backend/session"
-	"encoding/json"
-	"github.com/asaskevich/govalidator"
-	"github.com/gorilla/mux"
 	"net/http"
 	"time"
 )
@@ -54,26 +51,6 @@ func setExpiredCookie(w http.ResponseWriter) {
 	w.Header().Set("Set-Cookie", cs)
 }
 
-func getUserFromRequest(r *http.Request) (*models.User, error) {
-	userInput := new(models.ResponseBodyUser)
-	err := json.NewDecoder(r.Body).Decode(userInput)
-	if err != nil {
-		return nil, err
-	}
-	result := &models.User{
-		Name:     userInput.Name,
-		Surname:  userInput.Surname,
-		Mail:     userInput.Mail,
-		Password: userInput.Password,
-		About:    userInput.About,
-	}
-	_, err = govalidator.ValidateStruct(result)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
 //@Summmary SignUp
 //@Tags auth
 //@Description Регистрация
@@ -86,11 +63,11 @@ func getUserFromRequest(r *http.Request) (*models.User, error) {
 func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
-	userFromRequest, err := getUserFromRequest(r)
+	u, err := response.GetUserFromRequest(r)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	userId, err := h.useCase.SignUp(userFromRequest)
+	userId, err := h.useCase.SignUp(u)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
@@ -116,11 +93,11 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignIn:"
 	log.Debug(message + "started")
-	userFromRequest, err := getUserFromRequest(r)
+	u, err := response.GetUserFromRequest(r)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	userId, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
+	userId, err := h.useCase.SignIn(u.Mail, u.Password)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 		return
 	}
@@ -137,16 +114,17 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Logout:"
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
-	setExpiredCookie(w)
+	if err != nil {
+		err = error2.ErrCookie
+	}
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		log.Debug(message+"err1 =", err)
 		return
 	}
 	err = h.sessionManager.Delete(cookie.Value)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		log.Debug(message+"err2 =", err)
 		return
 	}
+	setExpiredCookie(w)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -166,7 +144,6 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	log.Debug(message+"foundUser =", *foundUser)
 	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }
@@ -174,13 +151,12 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetUserWithId:"
 	log.Debug(message + "started")
-	vars := mux.Vars(r)
+	vars := r.Context().Value("vars").(map[string]string)
 	userId := vars["id"]
 	foundUser, err := h.useCase.GetUser(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	log.Debug(message+"foundUser =", *foundUser)
 	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }
@@ -200,15 +176,12 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserInfo:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	log.Debug(message+"userId =", userId)
-	u, err := getUserFromRequest(r)
+	u, err := response.GetUserFromRequest(r)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		log.Error(message+"err 1 =", err)
 		return
 	}
 	err = h.useCase.UpdateUserInfo(userId, u.Name, u.Surname, u.About)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
-		log.Error(message+"err 2 =", err)
 		return
 	}
 	response.SendResponse(w, response.OkResponse())
@@ -219,7 +192,7 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserInfo:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	u, err := getUserFromRequest(r)
+	u, err := response.GetUserFromRequest(r)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

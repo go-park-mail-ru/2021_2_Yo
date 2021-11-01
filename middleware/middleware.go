@@ -4,6 +4,8 @@ import (
 	"backend/csrf"
 	log "backend/logger"
 	"backend/response"
+	"context"
+	"github.com/gorilla/mux"
 	"net/http"
 	"time"
 )
@@ -26,7 +28,6 @@ func (m *Middleware) Recovery(next http.Handler) http.Handler {
 			if err != nil {
 				log.Error(message+"err =", err)
 				response.SendResponse(w, response.ErrorResponse("Internal server error"))
-				//TODO: Разобраться, нужно ли здесь отсылать 500 через w.WriteHeader(http.StatusInternalServerError)
 			}
 		}()
 		next.ServeHTTP(w, r)
@@ -70,6 +71,20 @@ func (m *Middleware) CSRF(next http.Handler) http.Handler {
 		isValidCSRFToken, _ := csrf.Token.Check(cookie.Value, CSRFToken)
 		if !isValidCSRFToken {
 			return 
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+func (m *Middleware) GetVars(next http.Handler) http.Handler {
+	message := logMessage + "GetVars:"
+	log.Debug(message + "started")
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		log.Debug(message+"vars =", vars)
+		if vars != nil {
+			varsCtx := context.WithValue(r.Context(), "vars", vars)
+			next.ServeHTTP(w, r.WithContext(varsCtx))
+			return
 		}
 		next.ServeHTTP(w, r)
 	})
