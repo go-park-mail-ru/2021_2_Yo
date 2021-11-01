@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"backend/csrf"
 	log "backend/logger"
 	"backend/response"
 	"context"
@@ -60,7 +59,7 @@ func (m *Middleware) Logging(next http.Handler) http.Handler {
 		log.Info(r.Method, r.RequestURI, time.Since(start))
 	})
 }
-
+/*
 func (m *Middleware) CSRF(next http.Handler) http.Handler {
 	message := logMessage + "CSRF:"
 	log.Debug(message + "started")
@@ -68,13 +67,14 @@ func (m *Middleware) CSRF(next http.Handler) http.Handler {
 		CSRFToken := w.Header().Get("X-CSRF-Token")
 		log.Debug(message+"CSRFToken =", CSRFToken)
 		cookie, _ := r.Cookie("session_id")
-		isValidCSRFToken, _ := csrf.Token.Check(cookie.Value, CSRFToken)
+		isValidCSRFToken, _ := csrf.Check(cookie.Value, CSRFToken)
 		if !isValidCSRFToken {
 			return
 		}
 		next.ServeHTTP(w, r)
 	})
 }
+*/
 func (m *Middleware) GetVars(next http.Handler) http.Handler {
 	message := logMessage + "GetVars:"
 	log.Debug(message + "started")

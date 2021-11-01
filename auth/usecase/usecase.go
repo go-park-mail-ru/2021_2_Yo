@@ -6,7 +6,6 @@ import (
 	"backend/models"
 	"crypto/sha256"
 	"fmt"
-	"backend/csrf"
 )
 
 const logMessage = "auth:usecase:usecase:"
@@ -70,8 +69,4 @@ func (a *UseCase) UpdateUserPassword(userId string, password string) error {
 	}
 	hashedPassword := createPasswordHash(password)
 	return a.repository.UpdateUserPassword(userId, hashedPassword)
-}
-
-func (a *UseCase) GetCSRFToken(cookie string, expirationTime int64) (string, error) {
-	return csrf.Token.Create(cookie,expirationTime)
 }

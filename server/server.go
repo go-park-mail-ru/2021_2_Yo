@@ -4,6 +4,9 @@ import (
 	authDelivery "backend/auth/delivery/http"
 	authRepository "backend/auth/repository/postgres"
 	authUseCase "backend/auth/usecase"
+	"backend/csrf"
+	csrfRepository "backend/csrf/repository"
+	csrfMiddleware "backend/csrf/middleware"
 	_ "backend/docs"
 	eventDelivery "backend/event/delivery/http"
 	eventRepository "backend/event/repository/postgres"
@@ -15,12 +18,13 @@ import (
 	sessionRepository "backend/session/repository"
 	"backend/utils"
 	"fmt"
+	"net/http"
+	"os"
+
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	httpSwagger "github.com/swaggo/http-swagger"
-	"net/http"
-	"os"
 )
 
 const logMessage = "server:"
@@ -29,6 +33,7 @@ type App struct {
 	authManager    *authDelivery.Delivery
 	eventManager   *eventDelivery.Delivery
 	sessionManager *session.Manager
+	csrfManager    *csrf.Manager
 	db             *sql.DB
 }
 
@@ -47,25 +52,35 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		log.Error(message+"err =", err)
 		return nil, err
 	}
-	redisConn, err := utils.InitRedisDB()
+	redisConnSessions, err := utils.InitRedisDB("redis_db_session")
 	if err != nil {
 		log.Error(message+"err =", err)
 		return nil, err
 	}
 
-	sessionR := sessionRepository.NewRepository(redisConn)
+	redisConnCSRFTokens, err := utils.InitRedisDB("redis_db_csrf")
+	if err != nil {
+		log.Error(message+"err =", err)
+		return nil, err
+	}
+
+	sessionR := sessionRepository.NewRepository(redisConnSessions)
 	sessionM := session.NewManager(*sessionR)
+	csrfR := csrfRepository.NewRepository(redisConnCSRFTokens) 
+	csrfM := csrf.NewManager(*csrfR)
 	authR := authRepository.NewRepository(db)
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
-	authD := authDelivery.NewDelivery(authUC, *sessionM)
+	authD := authDelivery.NewDelivery(authUC, *sessionM, *csrfM)
 	eventR := eventRepository.NewRepository(db)
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
+	
 
 	return &App{
 		authManager:    authD,
 		eventManager:   eventD,
 		sessionManager: sessionM,
+		csrfManager:    csrfM,
 		db:             db,
 	}, nil
 }
@@ -75,6 +90,7 @@ func options(w http.ResponseWriter, r *http.Request) {}
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddleware()
 	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
+	csrfMW := csrfMiddleware.NewMiddleware(*app.csrfManager)
 	authRouter := mux.NewRouter()
 	authRouter.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
 	authRouter.HandleFunc("/user", app.authManager.GetUser).Methods("GET")
@@ -83,9 +99,9 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
 	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
 	authRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
-	authRouter.HandleFunc("/csrf", app.authManager.GetCSRF).Methods("GET")
 	authRouter.Use(sessionMW.Auth)
 	authRouter.Use(mw.GetVars)
+	authRouter.Use(csrfMW.CSRF)
 
 	r := mux.NewRouter()
 	r.Methods("OPTIONS").HandlerFunc(options)
@@ -114,7 +130,6 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
-	r.Use(mw.CSRF)
 	return r
 }
 
