@@ -87,9 +87,9 @@ func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 type getEventsVars struct {
-	title    string `valid:"type(string),length(0|50)" san:"xss"`
-	category string `valid:"type(string),length(0|50)" san:"xss"`
-	//tags     []string `valid:"type(string),length(0|50)" san:"xss"`
+	title    string   `valid:"type(string),length(0|50)" san:"xss"`
+	category string   `valid:"type(string),length(0|50)" san:"xss"`
+	tags     []string `valid:"type(string),length(0|50)" san:"xss"`
 }
 
 func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
@@ -100,11 +100,7 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	category := vars["category"]
 	tag := vars["tags"]
 	tags := strings.Split(tag, "|")
-	err := response.ValidateAndSanitize(getEventsVars{
-		title:    title,
-		category: category,
-		//tags:     tags,
-	})
+	err := response.ValidateAndSanitize(title)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
