@@ -4,10 +4,10 @@ import (
 	my_error "backend/csrf/error"
 	"backend/csrf/models"
 	"backend/csrf/repository"
-	"time"
-
 	"github.com/satori/go.uuid"
+	"time"
 )
+
 type Manager struct {
 	repository repository.Repository
 }
@@ -31,7 +31,6 @@ func (m *Manager) Create(userID string) (string, error) {
 		UserId:     userID,
 		Expiration: int(sessionLifeTime),
 	}
-
 	err := m.repository.Create(CSRFData)
 	if err != nil {
 		return "", err

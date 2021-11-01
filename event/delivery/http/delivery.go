@@ -101,3 +101,13 @@ func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
+
+func (h *Delivery) SearchEvents(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "SearchEvents:"
+	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	category := vars["id"]
+	tags := vars["tag"]
+	log.Debug(message+"category, tags = ", category, tags)
+	log.Debug(message + "ended")
+}
