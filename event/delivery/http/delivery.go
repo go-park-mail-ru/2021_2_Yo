@@ -56,6 +56,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
 	eventFromRequest, err := response.GetEventFromJSON(r)
+	log.Debug(message+"eventFromRequest = ", *eventFromRequest)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

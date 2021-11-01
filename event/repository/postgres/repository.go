@@ -111,6 +111,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	log.Debug("event:repo:CreateEvent:"+"newEvent = ", *newEvent)
 	var eventId int
 	query := createEventQuery
 	err = s.db.QueryRow(query,
@@ -124,6 +125,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		newEvent.Date,
 		newEvent.Geo,
 		newEvent.Author_ID).Scan(&eventId)
+	log.Debug("event:repo:CreateEvent:"+"err = ", err)
 	if err != nil {
 		if err == sql2.ErrNoRows {
 			return "", error2.ErrNoRows
