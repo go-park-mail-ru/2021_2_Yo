@@ -46,7 +46,7 @@ func (s *Repository) GetUser(mail, password string) (*models.User, error) {
 		return nil, error2.ErrUserNotFound
 	}
 	if err != nil {
-		return nil, error2.ErrPostgres
+		return nil, err
 	}
 	return toModelUser(&user), nil
 }
