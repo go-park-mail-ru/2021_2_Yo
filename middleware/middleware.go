@@ -37,7 +37,7 @@ func (m *Middleware) CORS(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", "https://bmstusssa.herokuapp.com")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Headers",
-			"Accept,Content-Type,Content-Length,Accept-Encoding,X-CSRF-Token,csrf-token,Authorization")
+			"Accept,Content-Type,Content-Length,Accept-Encoding,X-CSRF-Token,Authorization")
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT,OPTIONS,HEAD")
 		if r.Method == http.MethodOptions {

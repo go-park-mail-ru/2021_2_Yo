@@ -100,7 +100,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	authRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
 	authRouter.Use(sessionMW.Auth)
 	authRouter.Use(mw.GetVars)
-	authRouter.Use(csrfMW.CSRF)
+	authRouter.Methods("POST").Subrouter().Use(csrfMW.CSRF)
 
 	r := mux.NewRouter()
 	r.Methods("OPTIONS").HandlerFunc(options)

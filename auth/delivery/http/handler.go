@@ -33,11 +33,9 @@ func setSessionIdCookie(w http.ResponseWriter, sessionId string) {
 		Value:    sessionId,
 		HttpOnly: true,
 		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	}
 	http.SetCookie(w, cookie)
-	cs := w.Header().Get("Set-Cookie")
-	cs += "; SameSite=None"
-	w.Header().Set("Set-Cookie", cs)
 }
 
 func setExpiredCookie(w http.ResponseWriter) {
@@ -46,11 +44,20 @@ func setExpiredCookie(w http.ResponseWriter) {
 		HttpOnly: true,
 		Secure:   true,
 		MaxAge:   -1,
+		SameSite: http.SameSiteNoneMode,
 	}
 	http.SetCookie(w, cookie)
-	cs := w.Header().Get("Set-Cookie")
-	cs += "; SameSite=None"
-	w.Header().Set("Set-Cookie", cs)
+}
+
+func setCSRFCokkie(w http.ResponseWriter, csrfToken string) {
+	cookie := &http.Cookie{
+		Name:     "csrf-token",
+		Value:    csrfToken,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
+	}
+	http.SetCookie(w, cookie)
 }
 
 //@Summmary SignUp
@@ -82,7 +89,10 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
-	w.Header().Set("X-CSRF-Token", CSRFToken)
+	setCSRFCokkie(w,CSRFToken)
+	log.Info(CSRFToken)
+	//w.Header().Set("X-CSRF-Token", CSRFToken)
+
 	log.Debug(message+"userId =", userId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
@@ -117,7 +127,9 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
-	w.Header().Set("X-CSRF-Token", CSRFToken)
+	setCSRFCokkie(w,CSRFToken)
+	log.Info(CSRFToken)
+	//w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
