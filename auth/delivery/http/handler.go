@@ -2,6 +2,7 @@ package http
 
 import (
 	"backend/auth"
+	error2 "backend/auth/error"
 	log "backend/logger"
 	"backend/response"
 	"backend/response/utils"
@@ -113,7 +114,7 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		err = auth.ErrCookie
+		err = error2.ErrCookie
 	}
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return

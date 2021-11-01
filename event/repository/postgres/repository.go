@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"backend/event"
+	error2 "backend/event/error"
 	"backend/models"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
@@ -40,14 +40,14 @@ func (s *Repository) checkAuthor(eventId int, userId int) error {
 	err := s.db.QueryRow(query, eventId).Scan(&authorId)
 	if err != nil {
 		if err == sql2.ErrNoRows {
-			return event.ErrNoRows
+			return error2.ErrNoRows
 		}
-		return event.ErrPostgres
+		return error2.ErrPostgres
 	}
 	if authorId == userId {
 		return nil
 	} else {
-		return event.ErrNotAllowed
+		return error2.ErrNotAllowed
 	}
 }
 
@@ -56,9 +56,9 @@ func (s *Repository) List() ([]*models.Event, error) {
 	rows, err := s.db.Queryx(query)
 	if err != nil {
 		if err == sql2.ErrNoRows {
-			return nil, event.ErrNoRows
+			return nil, error2.ErrNoRows
 		}
-		return nil, event.ErrPostgres
+		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
 	var resultEvents []*models.Event
@@ -66,7 +66,7 @@ func (s *Repository) List() ([]*models.Event, error) {
 		var e Event
 		err := rows.StructScan(&e)
 		if err != nil {
-			return nil, event.ErrPostgres
+			return nil, error2.ErrPostgres
 		}
 		modelEvent := toModelEvent(&e)
 		resultEvents = append(resultEvents, modelEvent)
@@ -77,16 +77,16 @@ func (s *Repository) List() ([]*models.Event, error) {
 func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 	eventIdInt, err := strconv.Atoi(eventId)
 	if err != nil {
-		return nil, event.ErrAtoi
+		return nil, error2.ErrAtoi
 	}
 	query := getEventQuery
 	var e Event
 	err = s.db.QueryRow(query, eventIdInt).Scan(&e)
 	if err != nil {
 		if err == sql2.ErrNoRows {
-			return nil, event.ErrNoRows
+			return nil, error2.ErrNoRows
 		}
-		return nil, event.ErrPostgres
+		return nil, error2.ErrPostgres
 	}
 	var resultEvent *models.Event
 	resultEvent = toModelEvent(&e)
@@ -113,9 +113,9 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		newEvent.Author_ID).Scan(&eventId)
 	if err != nil {
 		if err == sql2.ErrNoRows {
-			return "", event.ErrNoRows
+			return "", error2.ErrNoRows
 		}
-		return "", event.ErrPostgres
+		return "", error2.ErrPostgres
 	}
 	return strconv.Itoa(eventId), nil
 }
@@ -123,11 +123,11 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) error {
 	eventIdInt, err := strconv.Atoi(updatedEvent.ID)
 	if err != nil {
-		return event.ErrAtoi
+		return error2.ErrAtoi
 	}
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return event.ErrAtoi
+		return error2.ErrAtoi
 	}
 	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
@@ -151,7 +151,7 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 		e.Geo,
 		e.ID)
 	if err != nil {
-		return event.ErrPostgres
+		return error2.ErrPostgres
 	}
 	return nil
 }
@@ -159,11 +159,11 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 func (s *Repository) DeleteEvent(eventId string, userId string) error {
 	eventIdInt, err := strconv.Atoi(eventId)
 	if err != nil {
-		return event.ErrAtoi
+		return error2.ErrAtoi
 	}
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return event.ErrAtoi
+		return error2.ErrAtoi
 	}
 	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
@@ -172,7 +172,7 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 	query := deleteEventQuery
 	_, err = s.db.Exec(query, eventIdInt)
 	if err != nil {
-		return event.ErrPostgres
+		return error2.ErrPostgres
 	}
 	return nil
 }

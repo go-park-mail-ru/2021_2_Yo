@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"backend/auth"
+	error2 "backend/auth/error"
 	"backend/models"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
@@ -32,7 +32,7 @@ func (s *Repository) CreateUser(user *models.User) (string, error) {
 	var userId int
 	err := s.db.QueryRow(query, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About).Scan(&userId)
 	if err != nil {
-		return "", auth.ErrPostgres
+		return "", error2.ErrPostgres
 	}
 	return strconv.Itoa(userId), nil
 }
@@ -40,12 +40,12 @@ func (s *Repository) CreateUser(user *models.User) (string, error) {
 func (s *Repository) UpdateUserInfo(userId, name, surname, about string) error {
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return auth.ErrAtoi
+		return error2.ErrAtoi
 	}
 	query := `update "user" set name = $1, surname = $2, about = $3 where id = $4`
 	_, err = s.db.Exec(query, name, surname, about, userIdInt)
 	if err != nil {
-		return auth.ErrPostgres
+		return error2.ErrPostgres
 	}
 	return nil
 }
@@ -53,12 +53,12 @@ func (s *Repository) UpdateUserInfo(userId, name, surname, about string) error {
 func (s *Repository) UpdateUserPassword(userId, password string) error {
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return auth.ErrAtoi
+		return error2.ErrAtoi
 	}
 	query := `update "user" set password = $1 where id = $2`
 	_, err = s.db.Exec(query, password, userIdInt)
 	if err != nil {
-		return auth.ErrPostgres
+		return error2.ErrPostgres
 	}
 	return nil
 }
@@ -68,10 +68,10 @@ func (s *Repository) GetUser(mail, password string) (*models.User, error) {
 	user := User{}
 	err := s.db.QueryRow(query, mail, password).Scan(&user.ID, &user.Name, &user.Surname, &user.Mail, &user.Password, &user.About)
 	if err == sql2.ErrNoRows {
-		return nil, auth.ErrUserNotFound
+		return nil, error2.ErrUserNotFound
 	}
 	if err != nil {
-		return nil, auth.ErrPostgres
+		return nil, error2.ErrPostgres
 	}
 	return toModelUser(&user), nil
 }
@@ -81,10 +81,10 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	user := User{}
 	err := s.db.QueryRow(query, userId).Scan(&user.ID, &user.Name, &user.Surname, &user.Mail, &user.Password, &user.About)
 	if err == sql2.ErrNoRows {
-		return nil, auth.ErrUserNotFound
+		return nil, error2.ErrUserNotFound
 	}
 	if err != nil {
-		return nil, auth.ErrPostgres
+		return nil, error2.ErrPostgres
 	}
 	return toModelUser(&user), nil
 }
