@@ -5,9 +5,9 @@ import (
 )
 
 type Repository interface {
-	List() ([]*models.Event, error)
 	GetEvent(eventId string) (*models.Event, error)
-	CreateEvent(event *models.Event) (string, error)
+	GetEvents(title string, category string, tags []string) ([]*models.Event, error)
+	CreateEvent(e *models.Event) (string, error)
 	UpdateEvent(e *models.Event, userId string) error
 	DeleteEvent(eventId string, userId string) error
 }

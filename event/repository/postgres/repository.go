@@ -2,9 +2,11 @@ package postgres
 
 import (
 	error2 "backend/event/error"
+	log "backend/logger"
 	"backend/models"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"strconv"
 )
 
@@ -51,13 +53,32 @@ func (s *Repository) checkAuthor(eventId int, userId int) error {
 
 //TODO: Посмотреть, что делает sliceScan
 
-func (s *Repository) List() ([]*models.Event, error) {
-	query := listQuery
-	rows, err := s.db.Queryx(query)
+func (s *Repository) GetEvents(title string, category string, tags []string) ([]*models.Event, error) {
+	postgresTags := make(pq.StringArray, len(tags))
+	for i := range tags {
+		postgresTags[i] = tags[i]
+	}
+	query := listQuery + " "
+	if title != "" {
+		query += `where lower(title) ~ lower($1) and `
+	} else {
+		query += `where $1 = $1 and `
+	}
+	if category != "" {
+		query += `lower(category) = lower($2) and `
+	} else {
+		query += `$2 = $2 and `
+	}
+	if len(postgresTags) != 0 {
+		query += `tag && $3::varchar[]`
+	} else {
+		query += `$3 = $3`
+	}
+	log.Debug(logMessage+"GetEvents:query =", query)
+	log.Debug("title =", title, ",category=", category, ", tags =", postgresTags)
+	rows, err := s.db.Queryx(query, title, category, postgresTags)
 	if err != nil {
-		if err == sql2.ErrNoRows {
-			return nil, error2.ErrNoRows
-		}
+		log.Error(logMessage+"GetEvents:err =", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()

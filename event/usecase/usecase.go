@@ -16,15 +16,18 @@ func NewUseCase(eventRepo event.Repository) *UseCase {
 	}
 }
 
-func (a *UseCase) List() ([]*models.Event, error) {
-	return a.eventRepo.List()
-}
-
 func (a *UseCase) GetEvent(eventId string) (*models.Event, error) {
 	if eventId == "" {
 		return nil, error2.ErrEmptyData
 	}
 	return a.eventRepo.GetEvent(eventId)
+}
+
+func (a *UseCase) GetEvents(title string, category string, tags []string) ([]*models.Event, error) {
+	if tags[0] == "" {
+		tags = nil
+	}
+	return a.eventRepo.GetEvents(title, category, tags)
 }
 
 func (a *UseCase) CreateEvent(e *models.Event, userId string) (string, error) {
