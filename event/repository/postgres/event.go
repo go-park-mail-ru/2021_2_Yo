@@ -3,22 +3,23 @@ package postgres
 import (
 	error2 "backend/event/error"
 	"backend/models"
+	"github.com/lib/pq"
 	"strconv"
 )
 
 type Event struct {
-	ID          int
-	Title       string
-	Description string
-	Text        string
-	City        string
-	Category    string
-	Viewed      int
-	Img_Url     string
-	Tag         []string
-	Date        string
-	Geo         string
-	Author_ID   int
+	ID          int            `db:"id"`
+	Title       string         `db:"title"`
+	Description string         `db:"description"`
+	Text        string         `db:"text"`
+	City        string         `db:"city"`
+	Category    string         `db:"category"`
+	Viewed      int            `db:"viewed"`
+	ImgUrl      string         `db:"img_url"`
+	Tag         pq.StringArray `db:"tag"`
+	Date        string         `db:"date"`
+	Geo         string         `db:"geo"`
+	AuthorID    int            `db:"author_id"`
 }
 
 func toPostgresEvent(e *models.Event) (*Event, error) {
@@ -39,11 +40,11 @@ func toPostgresEvent(e *models.Event) (*Event, error) {
 		City:        e.City,
 		Category:    e.Category,
 		Viewed:      e.Viewed,
-		Img_Url:     e.ImgUrl,
+		ImgUrl:      e.ImgUrl,
 		Tag:         e.Tag,
 		Date:        e.Date,
 		Geo:         e.Geo,
-		Author_ID:   authorIdInt,
+		AuthorID:    authorIdInt,
 	}, nil
 }
 
@@ -56,10 +57,10 @@ func toModelEvent(e *Event) *models.Event {
 		City:        e.City,
 		Category:    e.Category,
 		Viewed:      e.Viewed,
-		ImgUrl:      e.Img_Url,
+		ImgUrl:      e.ImgUrl,
 		Tag:         e.Tag,
 		Date:        e.Date,
 		Geo:         e.Geo,
-		AuthorId:    strconv.Itoa(e.Author_ID),
+		AuthorId:    strconv.Itoa(e.AuthorID),
 	}
 }

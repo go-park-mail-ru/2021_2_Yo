@@ -20,7 +20,6 @@ func NewMiddleware() *Middleware {
 
 func (m *Middleware) Recovery(next http.Handler) http.Handler {
 	message := logMessage + "Recovery:"
-	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			err := recover()
@@ -34,8 +33,6 @@ func (m *Middleware) Recovery(next http.Handler) http.Handler {
 }
 
 func (m *Middleware) CORS(next http.Handler) http.Handler {
-	message := logMessage + "CORS:"
-	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "https://bmstusssa.herokuapp.com")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -51,35 +48,19 @@ func (m *Middleware) CORS(next http.Handler) http.Handler {
 }
 
 func (m *Middleware) Logging(next http.Handler) http.Handler {
-	message := logMessage + "Logging:"
-	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		next.ServeHTTP(w, r)
 		log.Info(r.Method, r.RequestURI, time.Since(start))
 	})
 }
-/*
-func (m *Middleware) CSRF(next http.Handler) http.Handler {
-	message := logMessage + "CSRF:"
-	log.Debug(message + "started")
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		CSRFToken := w.Header().Get("X-CSRF-Token")
-		log.Debug(message+"CSRFToken =", CSRFToken)
-		cookie, _ := r.Cookie("session_id")
-		isValidCSRFToken, _ := csrf.Check(cookie.Value, CSRFToken)
-		if !isValidCSRFToken {
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
-}
-*/
+
 func (m *Middleware) GetVars(next http.Handler) http.Handler {
 	message := logMessage + "GetVars:"
 	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
+		log.Debug(message+"vars =", vars)
 		if vars != nil {
 			varsCtx := context.WithValue(r.Context(), "vars", vars)
 			next.ServeHTTP(w, r.WithContext(varsCtx))

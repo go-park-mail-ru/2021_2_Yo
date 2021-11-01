@@ -1,6 +1,7 @@
 package repository
 
 import (
+	log "backend/logger"
 	error2 "backend/session/error"
 	"backend/session/models"
 	"github.com/gomodule/redigo/redis"
@@ -36,7 +37,8 @@ func (s *Repository) Check(sessionId string) (string, error) {
 }
 
 func (s *Repository) Delete(sessionId string) error {
-	_, err := redis.String(s.db.Do("DEL", sessionId))
+	result, err := redis.String(s.db.Do("DEL", sessionId))
+	log.Debug("Redis delete result = ", result)
 	if err != nil {
 		return error2.ErrDeleteSession
 	}

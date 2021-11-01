@@ -8,6 +8,7 @@ postgres_db:
     dbname: "postgres"
     sslmode: "disable"
 
+
 redis_db_session:
     name: "addr"
     value: "redis://user:@localhost:6379/0"
