@@ -40,9 +40,6 @@ func (s *Repository) checkAuthor(eventId int, userId int) error {
 	query := checkAuthorQuery
 	err := s.db.QueryRow(query, eventId).Scan(&authorId)
 	if err != nil {
-		if err == sql2.ErrNoRows {
-			return error2.ErrNoRows
-		}
 		return error2.ErrPostgres
 	}
 	if authorId == userId {
@@ -82,13 +79,16 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 	}
 	query := getEventQuery
 	var e Event
-	log.Debug("repo:getEvent:HERE, eventId = ", eventId)
 	rows, err := s.db.Queryx(query, eventIdInt)
 	if err != nil {
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrNoRows
 		}
 		return nil, error2.ErrPostgres
+	}
+	log.Debug("event:repo:getevent:rows = ", rows)
+	if rows == nil {
+		return nil, error2.ErrNoRows
 	}
 	if rows.Next() {
 		err := rows.StructScan(&e)
@@ -102,17 +102,14 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 	}
 	var resultEvent *models.Event
 	resultEvent = toModelEvent(&e)
-	log.Debug("repo:getEvent:resultEvent.authorId = ", resultEvent.AuthorId)
 	return resultEvent, nil
 }
 
 func (s *Repository) CreateEvent(e *models.Event) (string, error) {
-	log.Debug("event:repo:CreateEvent:"+"e.AuthorId = ", e.AuthorId)
 	newEvent, err := toPostgresEvent(e)
 	if err != nil {
 		return "", err
 	}
-	log.Debug("event:repo:CreateEvent:"+"newEvent.AuthorId = ", newEvent.Author_ID)
 	var eventId int
 	query := createEventQuery
 	err = s.db.QueryRow(query,
@@ -126,7 +123,6 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		newEvent.Date,
 		newEvent.Geo,
 		newEvent.Author_ID).Scan(&eventId)
-	log.Debug("event:repo:CreateEvent:"+"err = ", err)
 	if err != nil {
 		if err == sql2.ErrNoRows {
 			return "", error2.ErrNoRows
