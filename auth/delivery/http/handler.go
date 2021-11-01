@@ -55,7 +55,7 @@ func setExpiredCookie(w http.ResponseWriter) {
 
 func setCSRFCokkie(w http.ResponseWriter, csrfToken string) {
 	cookie := &http.Cookie{
-		Name:     "session_id",
+		Name:     "csrf-token",
 		Value:    csrfToken,
 		HttpOnly: true,
 		Secure:   true,
