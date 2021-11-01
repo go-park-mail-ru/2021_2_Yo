@@ -83,7 +83,9 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
+
 	w.Header().Set("X-CSRF-Token", CSRFToken)
+	
 	log.Debug(message+"userId =", userId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
