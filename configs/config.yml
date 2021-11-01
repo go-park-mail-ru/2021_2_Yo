@@ -8,7 +8,14 @@ postgres_db:
     dbname: "postgres"
     sslmode: "disable"
 
-redis_db:
-    name:  "addr"
+
+redis_db_session:
+    name: "addr"
     value: "redis://user:@localhost:6379/0"
     usage: "redis addr"
+
+redis_db_csrf:
+    name: "addr_csrf"
+    value: "redis://user:@localhost:6379/1"
+    usage: "redis csrf"
+

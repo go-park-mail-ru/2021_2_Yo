@@ -48,13 +48,13 @@ func InitPostgresDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func InitRedisDB() (redis.Conn, error) {
+func InitRedisDB(dbConfName string) (redis.Conn, error) {
 	message := logMessage + "InitRedisDB:"
 	log.Debug(message + "started")
 
-	name := viper.GetString("redis_db.name")
-	value := viper.GetString("redis_db.value")
-	usage := viper.GetString("redis_db.usage")
+	name := viper.GetString(dbConfName + ".name")
+	value := viper.GetString(dbConfName + ".value")
+	usage := viper.GetString(dbConfName + ".usage")
 	log.Debug(message+"name,value,usage =", name, value, usage)
 
 	redisAddr := flag.String(name, value, usage)

@@ -8,7 +8,7 @@ import (
 	"backend/response/utils"
 	"backend/session"
 	"net/http"
-	"time"
+	"backend/csrf"
 )
 
 const logMessage = "auth:delivery:http:handler:"
@@ -16,12 +16,14 @@ const logMessage = "auth:delivery:http:handler:"
 type Delivery struct {
 	useCase        auth.UseCase
 	sessionManager session.Manager
+	csrfManager    csrf.Manager
 }
 
-func NewDelivery(useCase auth.UseCase, manager session.Manager) *Delivery {
+func NewDelivery(useCase auth.UseCase, manager session.Manager, csrfManager csrf.Manager) *Delivery {
 	return &Delivery{
 		useCase:        useCase,
 		sessionManager: manager,
+		csrfManager:    csrfManager,
 	}
 }
 
@@ -75,7 +77,13 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
+
+	CSRFToken, err := h.csrfManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
 	setSessionIdCookie(w, sessionId)
+	w.Header().Set("X-CSRF-Token", CSRFToken)
 	log.Debug(message+"userId =", userId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
@@ -105,7 +113,12 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
+	CSRFToken, err := h.csrfManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
 	setSessionIdCookie(w, sessionId)
+	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -125,6 +138,12 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
+	CSRFToken := w.Header().Get("X-CSRF-Token")
+	err = h.csrfManager.Delete(CSRFToken)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	setExpiredCookie(w)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -159,18 +178,6 @@ func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 	}
 	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")
-}
-
-func (h *Delivery) GetCSRF(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "GetCSRF:"
-	log.Debug(message + "started")
-	var err error
-	cookie, _ := r.Cookie("session_id")
-	CSRFToken, err := h.useCase.GetCSRFToken(cookie.Value, time.Now().Add(24*time.Hour).Unix())
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		return
-	}
-	w.Header().Set("X-CSRF-Token", CSRFToken)
 }
 
 func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
