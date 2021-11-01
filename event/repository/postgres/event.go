@@ -22,15 +22,15 @@ type Event struct {
 }
 
 func toPostgresEvent(e *models.Event) (*Event, error) {
-	authorIdInt := 0
+	var authorIdInt int
 	if e.AuthorId == "" {
 		authorIdInt = 0
 	} else {
-		authorIdInt, err := strconv.Atoi(e.AuthorId)
+		tempAuthorId, err := strconv.Atoi(e.AuthorId)
 		if err != nil {
 			return nil, error2.ErrAtoi
 		}
-		_ = authorIdInt
+		authorIdInt = tempAuthorId
 	}
 	return &Event{
 		Title:       e.Title,

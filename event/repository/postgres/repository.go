@@ -107,6 +107,7 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 }
 
 func (s *Repository) CreateEvent(e *models.Event) (string, error) {
+	log.Debug("event:repo:CreateEvent:"+"e.AuthorId = ", e.AuthorId)
 	newEvent, err := toPostgresEvent(e)
 	if err != nil {
 		return "", err
