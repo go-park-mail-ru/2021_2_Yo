@@ -91,6 +91,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
 	csrfMW := csrfMiddleware.NewMiddleware(*app.csrfManager)
 	authRouter := mux.NewRouter()
+	authRouter.Methods("POST").Subrouter().Use(csrfMW.CSRF)
 	authRouter.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
 	authRouter.HandleFunc("/user", app.authManager.GetUser).Methods("GET")
 	authRouter.HandleFunc("/user/info", app.authManager.UpdateUserInfo).Methods("POST")
@@ -100,7 +101,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	authRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
 	authRouter.Use(sessionMW.Auth)
 	authRouter.Use(mw.GetVars)
-	authRouter.Methods("POST").Subrouter().Use(csrfMW.CSRF)
+	
 
 	r := mux.NewRouter()
 	r.Methods("OPTIONS").HandlerFunc(options)
