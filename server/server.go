@@ -5,8 +5,8 @@ import (
 	authRepository "backend/auth/repository/postgres"
 	authUseCase "backend/auth/usecase"
 	"backend/csrf"
-	csrfRepository "backend/csrf/repository"
 	csrfMiddleware "backend/csrf/middleware"
+	csrfRepository "backend/csrf/repository"
 	_ "backend/docs"
 	eventDelivery "backend/event/delivery/http"
 	eventRepository "backend/event/repository/postgres"
@@ -66,7 +66,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 
 	sessionR := sessionRepository.NewRepository(redisConnSessions)
 	sessionM := session.NewManager(*sessionR)
-	csrfR := csrfRepository.NewRepository(redisConnCSRFTokens) 
+	csrfR := csrfRepository.NewRepository(redisConnCSRFTokens)
 	csrfM := csrf.NewManager(*csrfR)
 	authR := authRepository.NewRepository(db)
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
@@ -74,7 +74,6 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	eventR := eventRepository.NewRepository(db)
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
-	
 
 	return &App{
 		authManager:    authD,
@@ -115,7 +114,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
 	r.Handle("/events/{id:[0-9]+}", authRouter)
-	//r.Handle("/csrf",authRouter)
+	r.HandleFunc("/events/", app.eventManager.SearchEvents).Queries("category", "{category}", "tag", "{tag+}").Methods("GET")
 	r.Handle("/events", authRouter).Methods("POST")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 

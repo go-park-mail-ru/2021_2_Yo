@@ -3,12 +3,12 @@ package http
 import (
 	"backend/auth"
 	error2 "backend/auth/error"
+	"backend/csrf"
 	log "backend/logger"
 	"backend/response"
 	"backend/response/utils"
 	"backend/session"
 	"net/http"
-	"backend/csrf"
 )
 
 const logMessage = "auth:delivery:http:handler:"
@@ -77,7 +77,6 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-
 	CSRFToken, err := h.csrfManager.Create(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
