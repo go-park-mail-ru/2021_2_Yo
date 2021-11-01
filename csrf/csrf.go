@@ -27,23 +27,23 @@ func (token *HashToken) Create(cookie string, expirationTime int64) (string, err
 	if err != nil {
 		return "", err
 	}
-	CSRFToken := hex.EncodeToString(hash.Sum(nil)) + ":" + strconv.FormatInt(expirationTime,10)
+	CSRFToken := hex.EncodeToString(hash.Sum(nil)) + ":" + strconv.FormatInt(expirationTime, 10)
 	return CSRFToken, nil
 }
 
 func (token *HashToken) Check(cookie string, CSRFToken string) (bool, error) {
 	tokenData := strings.Split(CSRFToken, ":")
 	if len(tokenData) != 2 {
-		return false, fmt.Errorf("bad token")
+		return false, ErrBadToken
 	}
 
-	tokenExpiration, err := strconv.ParseInt(tokenData[1],10,64)
+	tokenExpiration, err := strconv.ParseInt(tokenData[1], 10, 64)
 	if err != nil {
-		return false, fmt.Errorf("no expiration")
-	} 
+		return false, ErrTokenNoExp
+	}
 
 	if tokenExpiration < time.Now().Unix() {
-		return false, fmt.Errorf("session expired")
+		return false, ErrTokenExp
 	}
 
 	hash := hmac.New(sha256.New, token.CSRFSecretWord)

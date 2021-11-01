@@ -83,6 +83,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
 	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
 	authRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
+	authRouter.HandleFunc("/csrf", app.authManager.GetCSRF).Methods("GET")
 	authRouter.Use(sessionMW.Auth)
 	authRouter.Use(mw.GetVars)
 
@@ -98,6 +99,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
 	r.Handle("/events/{id:[0-9]+}", authRouter)
+	r.Handle("/csrf",authRouter)
 	r.Handle("/events", authRouter)
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 
@@ -112,6 +114,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
+	r.Use(mw.CSRF)
 	return r
 }
 
