@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"backend/response/utils"
 	"backend/csrf"
+	"backend/response/utils"
 	"context"
 	"net/http"
 )

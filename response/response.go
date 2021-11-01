@@ -5,11 +5,10 @@ import (
 	"backend/models"
 	"encoding/json"
 	"errors"
-	"fmt"
+	"github.com/go-sanitize/sanitize"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/go-sanitize/sanitize"
 )
 
 const logMessage = "response:response:"
@@ -20,19 +19,35 @@ const STATUS_OK = 200
 const STATUS_ERROR = 404
 
 var (
-	ErrJSONDecoding = errors.New("can't decode a model from json")
-	ErrValidation   = errors.New("validation error")
+	ErrJSONDecoding   = errors.New("data decoding error")
+	ErrValidation     = errors.New("data validation error")
+	ErrSanitizing     = errors.New("data sanitizing error")
+	ErrSanitizerError = errors.New("internal sanitizing package error")
 )
+
+func ValidateAndSanitize(object interface{}) error {
+	s, err := sanitize.New()
+	if err != nil {
+		return ErrSanitizerError
+	}
+	err = s.Sanitize(object)
+	if err != nil {
+		return ErrSanitizing
+	}
+	valid, err := govalidator.ValidateStruct(object)
+	if err != nil || !valid {
+		return ErrValidation
+	}
+	return nil
+}
 
 func GetEventFromJSON(r *http.Request) (*models.Event, error) {
 	eventInput := new(models.ResponseBodyEvent)
-	s,err := sanitize.New()
+	err := json.NewDecoder(r.Body).Decode(eventInput)
 	if err != nil {
-		return nil ,fmt.Errorf("sanitizer problems")
+		return nil, ErrJSONDecoding
 	}
-	s.Sanitize(eventInput)
-	err = json.NewDecoder(r.Body).Decode(eventInput)
-	log.Debug(logMessage + "GetEventFromJSON start")
+	err = ValidateAndSanitize(eventInput)
 	if err != nil {
 		return nil, err
 	}
@@ -49,20 +64,18 @@ func GetEventFromJSON(r *http.Request) (*models.Event, error) {
 		Date:        eventInput.Date,
 		Geo:         eventInput.Geo,
 	}
-	log.Debug(logMessage + "GetEventFromJSON end")
 	return result, nil
 }
 
 func GetUserFromRequest(r *http.Request) (*models.User, error) {
 	userInput := new(models.ResponseBodyUser)
-	s,err := sanitize.New()
-	if err != nil {
-		return nil ,fmt.Errorf("sanitizer problems")
-	}
-	s.Sanitize(userInput)
-	err = json.NewDecoder(r.Body).Decode(userInput)
+	err := json.NewDecoder(r.Body).Decode(userInput)
 	if err != nil {
 		return nil, ErrJSONDecoding
+	}
+	err = ValidateAndSanitize(userInput)
+	if err != nil {
+		return nil, err
 	}
 	result := &models.User{
 		Name:     userInput.Name,
@@ -71,8 +84,8 @@ func GetUserFromRequest(r *http.Request) (*models.User, error) {
 		Password: userInput.Password,
 		About:    userInput.About,
 	}
-	_, err = govalidator.ValidateStruct(result)
-	if err != nil {
+	valid, err := govalidator.ValidateStruct(result)
+	if err != nil || !valid {
 		return nil, ErrValidation
 	}
 	return result, nil

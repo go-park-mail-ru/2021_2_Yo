@@ -89,7 +89,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
-	setCSRFCokkie(w,CSRFToken)
+	setCSRFCokkie(w, CSRFToken)
 	log.Info(CSRFToken)
 	//w.Header().Set("X-CSRF-Token", CSRFToken)
 
@@ -127,7 +127,7 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
-	setCSRFCokkie(w,CSRFToken)
+	setCSRFCokkie(w, CSRFToken)
 	log.Info(CSRFToken)
 	//w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
@@ -179,7 +179,7 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "GetUserWithId:"
+	message := logMessage + "GetUserById:"
 	log.Debug(message + "started")
 	vars := r.Context().Value("vars").(map[string]string)
 	userId := vars["id"]

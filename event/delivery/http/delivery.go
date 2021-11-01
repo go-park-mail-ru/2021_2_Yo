@@ -86,6 +86,12 @@ func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "ended")
 }
 
+type getEventsVars struct {
+	title    string   `valid:"type(string),length(0|50)" san:"xss"`
+	category string   `valid:"type(string),length(0|50)" san:"xss"`
+	tags     []string `valid:"type(string),length(0|50)" san:"xss"`
+}
+
 func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetEvents:"
 	log.Debug(message + "started")
@@ -95,9 +101,14 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	category := vars["category"]
 	tag := vars["tags"]
 	tags := strings.Split(tag, "|")
-	log.Debug("title =", title, ",category=", category, ", tags =", tags)
-	log.Debug(message+"category =", category)
-	log.Debug(message+"tags =", tags)
+	err := response.ValidateAndSanitize(getEventsVars{
+		title:    title,
+		category: category,
+		tags:     tags,
+	})
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
 	eventsList, err := h.useCase.GetEvents(title, category, tags)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
