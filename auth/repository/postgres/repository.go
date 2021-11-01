@@ -17,36 +17,6 @@ const (
 	getUserByIdQuery        = `select * from "user" where id = $1`
 )
 
-/*
-type Event struct {
-	ID          int
-	Title       string
-	Description string
-	Text        string
-	City        string
-	Category    string
-	Viewed      int
-	ImgUrl      string `db:"img_url""`
-	Tag         pq.StringArray
-	Date        string
-	Geo         string
-	Author_ID   int
-}
-
-func main() {
-	db, _ := InitPostgresDB()
-	getEventQuery := `select * from "event" where id = $1`
-	query := getEventQuery
-	var e Event
-	err := db.Get(&e, query, 1)
-	if err != nil {
-		log.Error(err)
-	}
-	log.Info(e.Tag)
-	return
-}
-*/
-
 type Repository struct {
 	db *sql.DB
 }
@@ -66,32 +36,6 @@ func (s *Repository) CreateUser(user *models.User) (string, error) {
 		return "", error2.ErrPostgres
 	}
 	return strconv.Itoa(userId), nil
-}
-
-func (s *Repository) UpdateUserInfo(userId, name, surname, about string) error {
-	userIdInt, err := strconv.Atoi(userId)
-	if err != nil {
-		return error2.ErrAtoi
-	}
-	query := updateUserInfoQuery
-	_, err = s.db.Exec(query, name, surname, about, userIdInt)
-	if err != nil {
-		return error2.ErrPostgres
-	}
-	return nil
-}
-
-func (s *Repository) UpdateUserPassword(userId, password string) error {
-	userIdInt, err := strconv.Atoi(userId)
-	if err != nil {
-		return error2.ErrAtoi
-	}
-	query := updateUserPasswordQuery
-	_, err = s.db.Exec(query, password, userIdInt)
-	if err != nil {
-		return error2.ErrPostgres
-	}
-	return nil
 }
 
 func (s *Repository) GetUser(mail, password string) (*models.User, error) {
@@ -118,4 +62,30 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 		return nil, error2.ErrPostgres
 	}
 	return toModelUser(&user), nil
+}
+
+func (s *Repository) UpdateUserInfo(userId, name, surname, about string) error {
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		return error2.ErrAtoi
+	}
+	query := updateUserInfoQuery
+	_, err = s.db.Exec(query, name, surname, about, userIdInt)
+	if err != nil {
+		return error2.ErrPostgres
+	}
+	return nil
+}
+
+func (s *Repository) UpdateUserPassword(userId, password string) error {
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		return error2.ErrAtoi
+	}
+	query := updateUserPasswordQuery
+	_, err = s.db.Exec(query, password, userIdInt)
+	if err != nil {
+		return error2.ErrPostgres
+	}
+	return nil
 }

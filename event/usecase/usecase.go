@@ -16,17 +16,6 @@ func NewUseCase(eventRepo event.Repository) *UseCase {
 	}
 }
 
-func (a *UseCase) List() ([]*models.Event, error) {
-	return a.eventRepo.List()
-}
-
-func (a *UseCase) GetEvent(eventId string) (*models.Event, error) {
-	if eventId == "" {
-		return nil, error2.ErrEmptyData
-	}
-	return a.eventRepo.GetEvent(eventId)
-}
-
 func (a *UseCase) CreateEvent(e *models.Event, userId string) (string, error) {
 	if e == nil || userId == "" {
 		return "", error2.ErrEmptyData
@@ -50,4 +39,25 @@ func (a *UseCase) DeleteEvent(userId string, eventID string) error {
 		return error2.ErrEmptyData
 	}
 	return a.eventRepo.DeleteEvent(userId, eventID)
+}
+
+func (a *UseCase) GetEvent(eventId string) (*models.Event, error) {
+	if eventId == "" {
+		return nil, error2.ErrEmptyData
+	}
+	return a.eventRepo.GetEvent(eventId)
+}
+
+func (a *UseCase) GetEvents(title string, category string, tags []string) ([]*models.Event, error) {
+	if tags[0] == "" {
+		tags = nil
+	}
+	return a.eventRepo.GetEvents(title, category, tags)
+}
+
+func (a *UseCase) GetEventsFromAuthor(authorId string) ([]*models.Event, error) {
+	if authorId == "" {
+		return nil, error2.ErrEmptyData
+	}
+	return a.eventRepo.GetEventsFromAuthor(authorId)
 }

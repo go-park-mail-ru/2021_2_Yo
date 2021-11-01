@@ -2,9 +2,11 @@ package postgres
 
 import (
 	error2 "backend/event/error"
+	log "backend/logger"
 	"backend/models"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"strconv"
 )
 
@@ -21,10 +23,11 @@ func NewRepository(database *sql.DB) *Repository {
 }
 
 const (
-	checkAuthorQuery = `select author_id from "event" where id = $1`
-	listQuery        = `select * from "event"`
-	getEventQuery    = `select * from "event" where id = $1`
-	createEventQuery = `insert into "event" 
+	checkAuthorQuery         = `select author_id from "event" where id = $1`
+	listQuery                = `select * from "event"`
+	getEventQuery            = `select * from "event" where id = $1`
+	getEventsFromAuthorQuery = `select * from "event" where author_id = $1`
+	createEventQuery         = `insert into "event" 
 		(title, description, text, city, category, viewed, img_url, date, geo, tag, author_id) 
 		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::varchar[], $11) 
 		returning id`
@@ -47,50 +50,6 @@ func (s *Repository) checkAuthor(eventId int, userId int) error {
 	} else {
 		return error2.ErrNotAllowed
 	}
-}
-
-//TODO: Посмотреть, что делает sliceScan
-
-func (s *Repository) List() ([]*models.Event, error) {
-	query := listQuery
-	rows, err := s.db.Queryx(query)
-	if err != nil {
-		if err == sql2.ErrNoRows {
-			return nil, error2.ErrNoRows
-		}
-		return nil, error2.ErrPostgres
-	}
-	defer rows.Close()
-	var resultEvents []*models.Event
-	for rows.Next() {
-		var e Event
-		err := rows.StructScan(&e)
-		if err != nil {
-			return nil, error2.ErrPostgres
-		}
-		modelEvent := toModelEvent(&e)
-		resultEvents = append(resultEvents, modelEvent)
-	}
-	return resultEvents, nil
-}
-
-func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
-	eventIdInt, err := strconv.Atoi(eventId)
-	if err != nil {
-		return nil, error2.ErrAtoi
-	}
-	query := getEventQuery
-	var e Event
-	err = s.db.Get(&e, query, eventIdInt)
-	if err != nil {
-		if err == sql2.ErrNoRows {
-			return nil, error2.ErrNoRows
-		}
-		return nil, error2.ErrPostgres
-	}
-	var resultEvent *models.Event
-	resultEvent = toModelEvent(&e)
-	return resultEvent, nil
 }
 
 func (s *Repository) CreateEvent(e *models.Event) (string, error) {
@@ -177,4 +136,90 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 		return error2.ErrPostgres
 	}
 	return nil
+}
+
+func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
+	eventIdInt, err := strconv.Atoi(eventId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+	query := getEventQuery
+	var e Event
+	err = s.db.Get(&e, query, eventIdInt)
+	if err != nil {
+		if err == sql2.ErrNoRows {
+			return nil, error2.ErrNoRows
+		}
+		return nil, error2.ErrPostgres
+	}
+	var resultEvent *models.Event
+	resultEvent = toModelEvent(&e)
+	return resultEvent, nil
+}
+
+func (s *Repository) GetEvents(title string, category string, tags []string) ([]*models.Event, error) {
+	postgresTags := make(pq.StringArray, len(tags))
+	for i := range tags {
+		postgresTags[i] = tags[i]
+	}
+	query := listQuery + " "
+	if title != "" {
+		query += `where lower(title) ~ lower($1) and `
+	} else {
+		query += `where $1 = $1 and `
+	}
+	if category != "" {
+		query += `lower(category) = lower($2) and `
+	} else {
+		query += `$2 = $2 and `
+	}
+	if len(postgresTags) != 0 {
+		query += `tag && $3::varchar[]`
+	} else {
+		query += `$3 = $3`
+	}
+	log.Debug(logMessage+"GetEvents:query =", query)
+	log.Debug("title =", title, ",category=", category, ", tags =", postgresTags)
+	rows, err := s.db.Queryx(query, title, category, postgresTags)
+	if err != nil {
+		log.Error(logMessage+"GetEvents:err =", err)
+		return nil, error2.ErrPostgres
+	}
+	defer rows.Close()
+	var resultEvents []*models.Event
+	for rows.Next() {
+		var e Event
+		err := rows.StructScan(&e)
+		if err != nil {
+			return nil, error2.ErrPostgres
+		}
+		modelEvent := toModelEvent(&e)
+		resultEvents = append(resultEvents, modelEvent)
+	}
+	return resultEvents, nil
+}
+
+func (s *Repository) GetEventsFromAuthor(authorId string) ([]*models.Event, error) {
+	authorIdInt, err := strconv.Atoi(authorId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+	query := getEventsFromAuthorQuery
+	rows, err := s.db.Queryx(query, authorIdInt)
+	if err != nil {
+		log.Error(logMessage+"GetEvents:err =", err)
+		return nil, error2.ErrPostgres
+	}
+	defer rows.Close()
+	var resultEvents []*models.Event
+	for rows.Next() {
+		var e Event
+		err := rows.StructScan(&e)
+		if err != nil {
+			return nil, error2.ErrPostgres
+		}
+		modelEvent := toModelEvent(&e)
+		resultEvents = append(resultEvents, modelEvent)
+	}
+	return resultEvents, nil
 }

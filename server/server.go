@@ -111,19 +111,23 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.HandleFunc("/user/{id:[0-9]+}", app.authManager.GetUserById).Methods("GET")
 	r.Handle("/user/info", authRouter)
 	r.Handle("/user/password", authRouter)
-	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEventsFromAuthor).Queries("authorid", "{authorid:[0-9]+}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "category", "{category}", "tags", "{tags}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "category", "{category}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "tags", "{tags}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("category", "{category}", "tags", "{tags}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("category", "{category}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("tags", "{tags}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Methods("GET")
 	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
 	r.Handle("/events/{id:[0-9]+}", authRouter)
-	r.HandleFunc("/events/", app.eventManager.SearchEvents).Queries("category", "{category}", "tag", "{tag+}").Methods("GET")
 	r.Handle("/events", authRouter).Methods("POST")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
-
-	//Сначала будет вызываться recovery, потом cors, а потом logging
-	//TODO: Проверить, не лишняя ли тут мидла
-	//r.Use(mw.GetVars)
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
+
 	return r
 }
 

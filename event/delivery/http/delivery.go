@@ -7,6 +7,7 @@ import (
 	"backend/response/utils"
 	"github.com/gorilla/mux"
 	"net/http"
+	"strings"
 )
 
 const logMessage = "event:delivery:http:"
@@ -19,36 +20,6 @@ func NewDelivery(useCase event.UseCase) *Delivery {
 	return &Delivery{
 		useCase: useCase,
 	}
-}
-
-//@Summmary List
-//@Tags Events
-//@Description "Список мероприятий"
-//@Produce json
-//@Success 200 {object} response.ResponseBodyEventList
-//@Failure 404 {object} response.BaseResponse
-//@Router /events [get]
-func (h *Delivery) List(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "List:"
-	log.Debug(message + "started")
-	eventsList, err := h.useCase.List()
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		return
-	}
-	response.SendResponse(w, response.EventsListResponse(eventsList))
-}
-
-func (h *Delivery) GetEvent(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "GetEvent:"
-	log.Debug(message + "started")
-	vars := mux.Vars(r)
-	eventId := vars["id"]
-	resultEvent, err := h.useCase.GetEvent(eventId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		return
-	}
-	log.Debug("delivery:getEvent:resultEvent.authorId = ", resultEvent.AuthorId)
-	response.SendResponse(w, response.EventResponse(resultEvent))
 }
 
 func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
@@ -102,12 +73,53 @@ func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "ended")
 }
 
-func (h *Delivery) SearchEvents(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "SearchEvents:"
+func (h *Delivery) GetEvent(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetEvent:"
 	log.Debug(message + "started")
 	vars := mux.Vars(r)
-	category := vars["id"]
-	tags := vars["tag"]
-	log.Debug(message+"category, tags = ", category, tags)
-	log.Debug(message + "ended")
+	eventId := vars["id"]
+	resultEvent, err := h.useCase.GetEvent(eventId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	log.Debug("delivery:getEvent:resultEvent.authorId = ", resultEvent.AuthorId)
+	response.SendResponse(w, response.EventResponse(resultEvent))
+}
+
+type getEventsVars struct {
+	title    string   `valid:"type(string),length(0|50)" san:"xss"`
+	category string   `valid:"type(string),length(0|50)" san:"xss"`
+	tags     []string `valid:"type(string),length(0|50)" san:"xss"`
+}
+
+func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetEvents:"
+	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	title := vars["query"]
+	category := vars["category"]
+	tag := vars["tags"]
+	tags := strings.Split(tag, "|")
+	log.Debug("vars =", vars)
+	//err := response.ValidateAndSanitize(title)
+	//if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	//	return
+	//}
+	eventsList, err := h.useCase.GetEvents(title, category, tags)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	response.SendResponse(w, response.EventsListResponse(eventsList))
+}
+
+func (h *Delivery) GetEventsFromAuthor(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetEventsFromAuthor:"
+	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	authorId := vars["authorid"]
+	eventsList, err := h.useCase.GetEventsFromAuthor(authorId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	response.SendResponse(w, response.EventsListResponse(eventsList))
 }

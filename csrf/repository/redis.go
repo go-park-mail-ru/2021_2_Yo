@@ -1,9 +1,9 @@
 package repository
 
 import (
+	my_error "backend/csrf/error"
 	"backend/csrf/models"
 	"github.com/gomodule/redigo/redis"
-	my_error "backend/csrf/error"
 )
 
 type Repository struct {
