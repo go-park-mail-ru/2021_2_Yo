@@ -40,6 +40,8 @@ func (m *Middleware) CORS(next http.Handler) http.Handler {
 			"Accept,Content-Type,Content-Length,Accept-Encoding,X-CSRF-Token,Authorization")
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT,OPTIONS,HEAD")
+		w.Header().Set("Access-Control-Expose-Headers", 
+		"Accept,Accept-Encoding,X-CSRF-Token,Authorization")
 		if r.Method == http.MethodOptions {
 			return
 		}

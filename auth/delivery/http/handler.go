@@ -48,7 +48,7 @@ func setExpiredCookie(w http.ResponseWriter) {
 	}
 	http.SetCookie(w, cookie)
 }
-
+/*
 func setCSRFCokkie(w http.ResponseWriter, csrfToken string) {
 	cookie := &http.Cookie{
 		Name:     "csrf-token",
@@ -59,7 +59,7 @@ func setCSRFCokkie(w http.ResponseWriter, csrfToken string) {
 	}
 	http.SetCookie(w, cookie)
 }
-
+*/
 //@Summmary SignUp
 //@Tags auth
 //@Description Регистрация
@@ -89,9 +89,9 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
-	setCSRFCokkie(w,CSRFToken)
+	//setCSRFCokkie(w,CSRFToken)
 	log.Info(CSRFToken)
-	//w.Header().Set("X-CSRF-Token", CSRFToken)
+	w.Header().Set("X-CSRF-Token", CSRFToken)
 
 	log.Debug(message+"userId =", userId)
 	response.SendResponse(w, response.OkResponse())
@@ -127,9 +127,9 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
-	setCSRFCokkie(w,CSRFToken)
+	//setCSRFCokkie(w,CSRFToken)
 	log.Info(CSRFToken)
-	//w.Header().Set("X-CSRF-Token", CSRFToken)
+	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
