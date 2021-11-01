@@ -2,6 +2,7 @@ package postgres
 
 import (
 	error2 "backend/event/error"
+	log "backend/logger"
 	"backend/models"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
@@ -26,7 +27,7 @@ const (
 	getEventQuery    = `select * from "event" where id = $1`
 	createEventQuery = `insert into "event" 
 		(title, description, text, city, category, viewed, img_url, date, geo, tag, author_id) 
-		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::varchar[], $11) 
 		returning id`
 	updateEventQuery = `update "event" set
 		title = $1, description = $2, text = $3, city = $4, category = $5, 
@@ -95,6 +96,7 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 
 func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	newEvent, err := toPostgresEvent(e)
+	log.Debug("newEvent tags = ", newEvent.Tag)
 	if err != nil {
 		return "", err
 	}
@@ -113,6 +115,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		newEvent.Tag,
 		newEvent.AuthorID).Scan(&eventId)
 	if err != nil {
+		log.Debug("Postgres:CreateEvent err =", err)
 		if err == sql2.ErrNoRows {
 			return "", error2.ErrNoRows
 		}
