@@ -2,7 +2,6 @@ package postgres
 
 import (
 	error2 "backend/event/error"
-	log "backend/logger"
 	"backend/models"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
@@ -96,7 +95,6 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 
 func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	newEvent, err := toPostgresEvent(e)
-	log.Debug("newEvent authorId, tags = ", newEvent.AuthorID, newEvent.Tag)
 	if err != nil {
 		return "", err
 	}
@@ -115,7 +113,6 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		newEvent.Tag,
 		newEvent.AuthorID).Scan(&eventId)
 	if err != nil {
-		log.Debug("Postgres:CreateEvent err =", err)
 		if err == sql2.ErrNoRows {
 			return "", error2.ErrNoRows
 		}

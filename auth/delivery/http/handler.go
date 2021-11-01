@@ -113,6 +113,7 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Logout:"
 	log.Debug(message + "started")
+	defer setExpiredCookie(w)
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
 		err = error2.ErrCookie
@@ -124,7 +125,6 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	setExpiredCookie(w)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -166,12 +166,13 @@ func (h *Delivery) GetCSRF(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	var err error
 	cookie, _ := r.Cookie("session_id")
-	CSRFToken, err := h.useCase.GetCSRFToken(cookie.Value, time.Now().Add(24 * time.Hour).Unix())
+	CSRFToken, err := h.useCase.GetCSRFToken(cookie.Value, time.Now().Add(24*time.Hour).Unix())
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 }
+
 func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserInfo:"
 	log.Debug(message + "started")

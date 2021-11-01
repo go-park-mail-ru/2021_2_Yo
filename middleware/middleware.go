@@ -75,6 +75,7 @@ func (m *Middleware) CSRF(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
 func (m *Middleware) GetVars(next http.Handler) http.Handler {
 	message := logMessage + "GetVars:"
 	log.Debug(message + "started")
