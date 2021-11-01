@@ -83,7 +83,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
 	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
 	authRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
-	authRouter.HandleFunc("/csrf", app.authManager.GetCSRF).Methods("GET")
+	//authRouter.HandleFunc("/csrf", app.authManager.GetCSRF).Methods("GET")
 	authRouter.Use(sessionMW.Auth)
 	authRouter.Use(mw.GetVars)
 
@@ -99,14 +99,9 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.HandleFunc("/events", app.eventManager.List).Methods("GET")
 	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
 	r.Handle("/events/{id:[0-9]+}", authRouter)
-	r.Handle("/csrf",authRouter)
-	r.Handle("/events", authRouter)
+	//r.Handle("/csrf",authRouter)
+	r.Handle("/events", authRouter).Methods("POST")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
-
-	//For test
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintf(w, "Hello World")
-    })
 
 	//Сначала будет вызываться recovery, потом cors, а потом logging
 	//TODO: Проверить, не лишняя ли тут мидла

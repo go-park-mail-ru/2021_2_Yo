@@ -9,6 +9,6 @@ postgres_db:
     sslmode: "disable"
 
 redis_db:
-    name: "addr"
+    name:  "addr"
     value: "redis://user:@localhost:6379/0"
     usage: "redis addr"
