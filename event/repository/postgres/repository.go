@@ -2,6 +2,7 @@ package postgres
 
 import (
 	error2 "backend/event/error"
+	log "backend/logger"
 	"backend/models"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
@@ -90,6 +91,7 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 	}
 	var resultEvent *models.Event
 	resultEvent = toModelEvent(&e)
+	log.Debug("repo:getEvent:resultEvent.authorId = ", resultEvent.AuthorId)
 	return resultEvent, nil
 }
 

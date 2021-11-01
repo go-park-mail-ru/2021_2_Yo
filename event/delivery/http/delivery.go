@@ -47,6 +47,7 @@ func (h *Delivery) GetEvent(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
+	log.Debug("delivery:getEvent:resultEvent.authorId = ", resultEvent.AuthorId)
 	response.SendResponse(w, response.EventResponse(resultEvent))
 }
 

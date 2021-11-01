@@ -21,5 +21,5 @@ type ResponseBodyEvent struct {
 	Tag         []string `json:"tag" san:"xss"`
 	Date        string   `json:"date" san:"xss"`
 	Geo         string   `json:"geo" san:"xss"`
-	AuthorID    string   `json:"authorID" san:"xss"`
+	AuthorID    string   `json:"authorid" san:"xss"`
 }
