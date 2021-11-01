@@ -5,8 +5,11 @@ import (
 	"backend/models"
 	"encoding/json"
 	"errors"
-	"github.com/asaskevich/govalidator"
+	"fmt"
 	"net/http"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/go-sanitize/sanitize"
 )
 
 const logMessage = "response:response:"
@@ -23,7 +26,12 @@ var (
 
 func GetEventFromJSON(r *http.Request) (*models.Event, error) {
 	eventInput := new(models.ResponseBodyEvent)
-	err := json.NewDecoder(r.Body).Decode(eventInput)
+	s,err := sanitize.New()
+	if err != nil {
+		return nil ,fmt.Errorf("sanitizer problems")
+	}
+	s.Sanitize(eventInput)
+	err = json.NewDecoder(r.Body).Decode(eventInput)
 	log.Debug(logMessage + "GetEventFromJSON start")
 	if err != nil {
 		return nil, err
@@ -47,7 +55,12 @@ func GetEventFromJSON(r *http.Request) (*models.Event, error) {
 
 func GetUserFromRequest(r *http.Request) (*models.User, error) {
 	userInput := new(models.ResponseBodyUser)
-	err := json.NewDecoder(r.Body).Decode(userInput)
+	s,err := sanitize.New()
+	if err != nil {
+		return nil ,fmt.Errorf("sanitizer problems")
+	}
+	s.Sanitize(userInput)
+	err = json.NewDecoder(r.Body).Decode(userInput)
 	if err != nil {
 		return nil, ErrJSONDecoding
 	}
