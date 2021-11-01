@@ -25,12 +25,13 @@ const (
 	listQuery        = `select * from "event"`
 	getEventQuery    = `select * from "event" where id = $1`
 	createEventQuery = `insert into "event" 
-		(title, description, text, city, category, viewed, img_url, date, geo, author_id) 
-		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+		(title, description, text, city, category, viewed, img_url, date, geo, tag, author_id) 
+		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
 		returning id`
 	updateEventQuery = `update "event" set
-		title = $1, description = $2, text = $3, city = $4, category = $5, viewed = $6, img_url = $7, date = $8, geo = $9 
-		where event.id = $10`
+		title = $1, description = $2, text = $3, city = $4, category = $5, 
+		viewed = $6, img_url = $7, date = $8, geo = $9, tag = $10 
+		where event.id = $11`
 	deleteEventQuery = `delete from "event" where id = $1`
 )
 
@@ -47,6 +48,8 @@ func (s *Repository) checkAuthor(eventId int, userId int) error {
 		return error2.ErrNotAllowed
 	}
 }
+
+//TODO: Посмотреть, что делает sliceScan
 
 func (s *Repository) List() ([]*models.Event, error) {
 	query := listQuery
@@ -104,10 +107,11 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		newEvent.City,
 		newEvent.Category,
 		newEvent.Viewed,
-		newEvent.Img_Url,
+		newEvent.ImgUrl,
 		newEvent.Date,
 		newEvent.Geo,
-		newEvent.Author_ID).Scan(&eventId)
+		newEvent.Tag,
+		newEvent.AuthorID).Scan(&eventId)
 	if err != nil {
 		if err == sql2.ErrNoRows {
 			return "", error2.ErrNoRows
@@ -143,9 +147,10 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 		e.City,
 		e.Category,
 		e.Viewed,
-		e.Img_Url,
+		e.ImgUrl,
 		e.Date,
 		e.Geo,
+		e.Tag,
 		e.ID)
 	if err != nil {
 		return error2.ErrPostgres

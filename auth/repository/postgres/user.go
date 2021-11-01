@@ -6,12 +6,12 @@ import (
 )
 
 type User struct {
-	ID       int
-	Name     string
-	Surname  string
-	Mail     string
-	Password string
-	About    string
+	ID       int    `db:"id"`
+	Name     string `db:"name"`
+	Surname  string `db:"surname"`
+	Mail     string `db:"mail"`
+	Password string `db:"password"`
+	About    string `db:"about"`
 }
 
 func toPostgresUser(u *models.User) *User {

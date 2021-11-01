@@ -66,7 +66,7 @@ func (m *Middleware) CSRF(next http.Handler) http.Handler {
 	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		CSRFToken := w.Header().Get("X-CSRF-Token")
-		log.Debug(message+"CSRFToken =", CSRFToken)
+		log.Info(CSRFToken)
 		cookie, _ := r.Cookie("session_id")
 		isValidCSRFToken, _ := csrf.Token.Check(cookie.Value, CSRFToken)
 		if !isValidCSRFToken {
@@ -80,6 +80,7 @@ func (m *Middleware) GetVars(next http.Handler) http.Handler {
 	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
+		log.Debug(message+"vars =", vars)
 		if vars != nil {
 			varsCtx := context.WithValue(r.Context(), "vars", vars)
 			next.ServeHTTP(w, r.WithContext(varsCtx))
