@@ -109,7 +109,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
-	r.Use(mw.CSRF)
+	//r.Use(mw.CSRF)
 	return r
 }
 
