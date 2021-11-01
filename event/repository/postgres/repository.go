@@ -83,11 +83,21 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 	query := getEventQuery
 	var e Event
 	log.Debug("repo:getEvent:HERE, eventId = ", eventId)
-	err = s.db.QueryRow(query, eventIdInt).Scan(&e)
+	rows, err := s.db.Queryx(query, eventIdInt)
 	if err != nil {
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrNoRows
 		}
+		return nil, error2.ErrPostgres
+	}
+	if rows.Next() {
+		err := rows.StructScan(&e)
+		if err != nil {
+			return nil, error2.ErrPostgres
+		}
+	}
+	err = rows.Close()
+	if err != nil {
 		return nil, error2.ErrPostgres
 	}
 	var resultEvent *models.Event
