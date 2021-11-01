@@ -3,6 +3,7 @@ package postgres
 import (
 	"backend/event"
 	"backend/models"
+	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
 	"strconv"
 )
@@ -33,27 +34,30 @@ const (
 	deleteEventQuery = `delete from "event" where id = $1`
 )
 
-func (s *Repository) checkAuthor(eventId int, userId int) (bool, error) {
+func (s *Repository) checkAuthor(eventId int, userId int) error {
 	var authorId int
 	query := checkAuthorQuery
 	err := s.db.QueryRow(query, eventId).Scan(&authorId)
 	if err != nil {
-		return false, event.ErrPostgres
+		if err == sql2.ErrNoRows {
+			return event.ErrNoRows
+		}
+		return event.ErrPostgres
 	}
 	if authorId == userId {
-		return true, nil
+		return nil
 	} else {
-		return false, nil
+		return event.ErrNotAllowed
 	}
 }
-
-//TODO: Увеличить количество кастомных ошибок
-//TODO: sql.ErrNoRows
 
 func (s *Repository) List() ([]*models.Event, error) {
 	query := listQuery
 	rows, err := s.db.Queryx(query)
 	if err != nil {
+		if err == sql2.ErrNoRows {
+			return nil, event.ErrNoRows
+		}
 		return nil, event.ErrPostgres
 	}
 	defer rows.Close()
@@ -79,6 +83,9 @@ func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
 	var e Event
 	err = s.db.QueryRow(query, eventIdInt).Scan(&e)
 	if err != nil {
+		if err == sql2.ErrNoRows {
+			return nil, event.ErrNoRows
+		}
 		return nil, event.ErrPostgres
 	}
 	var resultEvent *models.Event
@@ -105,6 +112,9 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		newEvent.Geo,
 		newEvent.Author_ID).Scan(&eventId)
 	if err != nil {
+		if err == sql2.ErrNoRows {
+			return "", event.ErrNoRows
+		}
 		return "", event.ErrPostgres
 	}
 	return strconv.Itoa(eventId), nil
@@ -119,12 +129,9 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 	if err != nil {
 		return event.ErrAtoi
 	}
-	canUpdate, err := s.checkAuthor(eventIdInt, userIdInt)
+	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
 		return err
-	}
-	if !canUpdate {
-		return event.ErrNotAllowed
 	}
 	e, err := toPostgresEvent(updatedEvent)
 	if err != nil {
@@ -158,12 +165,9 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 	if err != nil {
 		return event.ErrAtoi
 	}
-	canDelete, err := s.checkAuthor(eventIdInt, userIdInt)
+	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
 		return err
-	}
-	if !canDelete {
-		return event.ErrNotAllowed
 	}
 	query := deleteEventQuery
 	_, err = s.db.Exec(query, eventIdInt)
