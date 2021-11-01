@@ -22,19 +22,6 @@ func NewDelivery(useCase event.UseCase) *Delivery {
 	}
 }
 
-func (h *Delivery) GetEvent(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "GetEvent:"
-	log.Debug(message + "started")
-	vars := mux.Vars(r)
-	eventId := vars["id"]
-	resultEvent, err := h.useCase.GetEvent(eventId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		return
-	}
-	log.Debug("delivery:getEvent:resultEvent.authorId = ", resultEvent.AuthorId)
-	response.SendResponse(w, response.EventResponse(resultEvent))
-}
-
 func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "CreateEvent:"
 	log.Debug(message + "started")
@@ -86,6 +73,19 @@ func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "ended")
 }
 
+func (h *Delivery) GetEvent(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetEvent:"
+	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	eventId := vars["id"]
+	resultEvent, err := h.useCase.GetEvent(eventId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	log.Debug("delivery:getEvent:resultEvent.authorId = ", resultEvent.AuthorId)
+	response.SendResponse(w, response.EventResponse(resultEvent))
+}
+
 type getEventsVars struct {
 	title    string   `valid:"type(string),length(0|50)" san:"xss"`
 	category string   `valid:"type(string),length(0|50)" san:"xss"`
@@ -100,11 +100,24 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	category := vars["category"]
 	tag := vars["tags"]
 	tags := strings.Split(tag, "|")
+	log.Debug("vars =", vars)
 	//err := response.ValidateAndSanitize(title)
 	//if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 	//	return
 	//}
 	eventsList, err := h.useCase.GetEvents(title, category, tags)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	response.SendResponse(w, response.EventsListResponse(eventsList))
+}
+
+func (h *Delivery) GetEventsFromAuthor(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetEventsFromAuthor:"
+	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	authorId := vars["authorid"]
+	eventsList, err := h.useCase.GetEventsFromAuthor(authorId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

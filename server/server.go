@@ -111,6 +111,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.HandleFunc("/user/{id:[0-9]+}", app.authManager.GetUserById).Methods("GET")
 	r.Handle("/user/info", authRouter)
 	r.Handle("/user/password", authRouter)
+	r.HandleFunc("/events", app.eventManager.GetEventsFromAuthor).Queries("authorid", "{authorid:[0-9]+}").Methods("GET")
 	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "category", "{category}", "tags", "{tags}").Methods("GET")
 	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "category", "{category}").Methods("GET")
 	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "tags", "{tags}").Methods("GET")
