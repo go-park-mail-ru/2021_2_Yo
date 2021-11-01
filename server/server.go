@@ -123,7 +123,6 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Handle("/events/{id:[0-9]+}", authRouter)
 	r.Handle("/events", authRouter).Methods("POST")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
-	r.Use(mw.GetVars)
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)

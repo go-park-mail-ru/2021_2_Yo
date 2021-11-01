@@ -96,7 +96,6 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetEvents:"
 	log.Debug(message + "started")
 	vars := mux.Vars(r)
-	log.Debug(message+"var = ", vars)
 	title := vars["query"]
 	category := vars["category"]
 	tag := vars["tags"]
