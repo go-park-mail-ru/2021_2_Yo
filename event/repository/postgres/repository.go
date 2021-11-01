@@ -111,7 +111,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	log.Debug("event:repo:CreateEvent:"+"newEvent = ", *newEvent)
+	log.Debug("event:repo:CreateEvent:"+"newEvent.AuthorId = ", newEvent.Author_ID)
 	var eventId int
 	query := createEventQuery
 	err = s.db.QueryRow(query,
