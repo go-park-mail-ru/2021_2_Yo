@@ -33,11 +33,9 @@ func setSessionIdCookie(w http.ResponseWriter, sessionId string) {
 		Value:    sessionId,
 		HttpOnly: true,
 		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	}
 	http.SetCookie(w, cookie)
-	cs := w.Header().Get("Set-Cookie")
-	cs += "; SameSite=None"
-	w.Header().Set("Set-Cookie", cs)
 }
 
 func setExpiredCookie(w http.ResponseWriter) {
@@ -46,11 +44,9 @@ func setExpiredCookie(w http.ResponseWriter) {
 		HttpOnly: true,
 		Secure:   true,
 		MaxAge:   -1,
+		SameSite: http.SameSiteNoneMode,
 	}
 	http.SetCookie(w, cookie)
-	cs := w.Header().Get("Set-Cookie")
-	cs += "; SameSite=None"
-	w.Header().Set("Set-Cookie", cs)
 }
 
 func setCSRFCokkie(w http.ResponseWriter, csrfToken string) {
@@ -59,11 +55,9 @@ func setCSRFCokkie(w http.ResponseWriter, csrfToken string) {
 		Value:    csrfToken,
 		HttpOnly: true,
 		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	}
 	http.SetCookie(w, cookie)
-	cs := w.Header().Get("Set-Cookie")
-	cs += "; SameSite=None"
-	w.Header().Set("Set-Cookie", cs)
 }
 
 //@Summmary SignUp
