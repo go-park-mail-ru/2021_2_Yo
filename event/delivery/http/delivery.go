@@ -93,7 +93,7 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message+"var = ", vars)
 	title := vars["query"]
 	category := vars["category"]
-	tag := vars["tag"]
+	tag := vars["tags"]
 	tags := strings.Split(tag, "|")
 	log.Debug("title =", title, ",category=", category, ", tags =", tags)
 	log.Debug(message+"category =", category)
