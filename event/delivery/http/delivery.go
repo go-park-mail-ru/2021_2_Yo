@@ -100,7 +100,7 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	category := vars["category"]
 	tag := vars["tags"]
 	tags := strings.Split(tag, "|")
-	err := response.ValidateAndSanitize(title)
+	//err := response.ValidateAndSanitize(title)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
