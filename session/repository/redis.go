@@ -1,10 +1,8 @@
 package repository
 
 import (
-	log "backend/logger"
+	error2 "backend/session/error"
 	"backend/session/models"
-	"errors"
-	"fmt"
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -21,11 +19,10 @@ func NewRepository(database redis.Conn) *Repository {
 func (s *Repository) Create(data *models.SessionData) error {
 	result, err := redis.String(s.db.Do("SET", data.SessionId, data.UserId, "EX", data.Expiration))
 	if err != nil {
-		return err
+		return error2.ErrRedis
 	}
 	if result != "OK" {
-		err := errors.New("Creating session ID error")
-		return err
+		return error2.ErrCreateSession
 	}
 	return nil
 }
@@ -33,17 +30,15 @@ func (s *Repository) Create(data *models.SessionData) error {
 func (s *Repository) Check(sessionId string) (string, error) {
 	result, err := redis.String(s.db.Do("GET", sessionId))
 	if err != nil {
-		return "", err
+		return "", error2.ErrCheckSession
 	}
 	return result, nil
 }
 
 func (s *Repository) Delete(sessionId string) error {
-	result, err := redis.String(s.db.Do("DEL", sessionId))
-	log.Debug("REDIS result =", result, "err =", err)
+	_, err := redis.String(s.db.Do("DEL", sessionId))
 	if err != nil {
-		return err
+		return error2.ErrDeleteSession
 	}
-	fmt.Println("DEBUG!!! Session result = ", result)
 	return nil
 }

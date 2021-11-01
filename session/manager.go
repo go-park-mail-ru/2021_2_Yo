@@ -1,6 +1,7 @@
 package session
 
 import (
+	error2 "backend/session/error"
 	"backend/session/models"
 	"backend/session/repository"
 	"math/rand"
@@ -46,6 +47,9 @@ func (m *Manager) Create(userId string) (string, error) {
 }
 
 func (m *Manager) Check(sessionId string) (string, error) {
+	if sessionId == "" {
+		return "", error2.ErrEmptySessionId
+	}
 	userId, err := m.repository.Check(sessionId)
 	if err != nil {
 		return "", err
