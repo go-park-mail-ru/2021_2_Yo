@@ -5,7 +5,7 @@ import (
 	authRepository "backend/auth/repository/postgres"
 	authUseCase "backend/auth/usecase"
 	"backend/csrf"
-	//csrfMiddleware "backend/csrf/middleware"
+	csrfMiddleware "backend/csrf/middleware"
 	csrfRepository "backend/csrf/repository"
 	imgRepository "backend/images/repository"
 	"backend/images"
@@ -95,7 +95,7 @@ func options(w http.ResponseWriter, r *http.Request) {}
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddleware()
 	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
-	//csrfMW := csrfMiddleware.NewMiddleware(*app.csrfManager)
+	csrfMW := csrfMiddleware.NewMiddleware(*app.csrfManager)
 	authRouter := mux.NewRouter()
 	CSRFRouter := authRouter.Methods("POST").Subrouter()
 	authRouter.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
@@ -113,7 +113,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	CSRFRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
 	authRouter.Use(sessionMW.Auth)
 	authRouter.Use(mw.GetVars)
-	//CSRFRouter.Use(csrfMW.CSRF)
+	CSRFRouter.Use(csrfMW.CSRF)
 
 	r := mux.NewRouter()
 	r.Methods("OPTIONS").HandlerFunc(options)
