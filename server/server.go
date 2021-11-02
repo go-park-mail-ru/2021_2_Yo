@@ -13,11 +13,11 @@ import (
 	eventRepository "backend/service/event/repository/postgres"
 	eventUseCase "backend/service/event/usecase"
 
-	"backend/service/csrf"
+	csrf "backend/service/csrf/manager"
 	csrfRepository "backend/service/csrf/repository"
 	"backend/service/image"
 	imgRepository "backend/service/image/repository"
-	"backend/service/session"
+	session "backend/service/session/manager"
 	sessionRepository "backend/service/session/repository"
 
 	"backend/register"
@@ -83,7 +83,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 
 	authR := authRepository.NewRepository(db)
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
-	authD := authDelivery.NewDelivery(authUC, *sessionM, *csrfM)
+	authD := authDelivery.NewDelivery(authUC, sessionM, csrfM)
 
 	userR := userRepository.NewRepository(db)
 	userUC := userUseCase.NewUseCase(userR)
@@ -107,7 +107,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 func options(w http.ResponseWriter, r *http.Request) {}
 
 func newRouterWithEndpoints(app *App) *mux.Router {
-	mw := middleware.NewMiddlewares(*app.SessionManager)
+	mw := middleware.NewMiddlewares(app.SessionManager)
 
 	r := mux.NewRouter()
 	r.Use(mw.Logging)
