@@ -2,109 +2,265 @@ package http
 
 import (
 	"backend/auth"
+	error2 "backend/auth/error"
+	"backend/csrf"
+	log "backend/logger"
 	"backend/response"
-	"encoding/json"
-	log "github.com/sirupsen/logrus"
+	"backend/response/utils"
+	"backend/session"
+	"github.com/gorilla/mux"
 	"net/http"
+	"backend/images"
 )
 
-type HandlerAuth struct {
-	useCase auth.UseCaseAuth
+const logMessage = "auth:delivery:http:handler:"
+
+type Delivery struct {
+	useCase        auth.UseCase
+	sessionManager session.Manager
+	csrfManager    csrf.Manager
+	imgManager     images.Manager
 }
 
-func NewHandlerAuth(useCase auth.UseCaseAuth) *HandlerAuth {
-	return &HandlerAuth{
-		useCase: useCase,
+func NewDelivery(useCase auth.UseCase, manager session.Manager, csrfManager csrf.Manager, imgManaher images.Manager) *Delivery {
+	return &Delivery{
+		useCase:        useCase,
+		sessionManager: manager,
+		csrfManager:    csrfManager,
+		imgManager: 	imgManaher,
 	}
 }
 
-func getUserFromJSON(r *http.Request) (*response.ResponseBodyUser, error) {
-	userInput := new(response.ResponseBodyUser)
-	err := json.NewDecoder(r.Body).Decode(userInput)
-	if err != nil {
-		return nil, err
-	}
-	return userInput, nil
-}
-
-func (h *HandlerAuth) setCookieWithJwtToken(w http.ResponseWriter, jwtToken string) {
+func setSessionIdCookie(w http.ResponseWriter, sessionId string) {
 	cookie := &http.Cookie{
 		Name:     "session_id",
-		Value:    jwtToken,
+		Value:    sessionId,
 		HttpOnly: true,
 		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	}
 	http.SetCookie(w, cookie)
-	cs := w.Header().Get("Set-Cookie")
-	cs += "; SameSite=None"
-	w.Header().Set("Set-Cookie", cs)
 }
 
-func (h *HandlerAuth) SignUp(w http.ResponseWriter, r *http.Request) {
-	log.Info("SignUp : started")
-	userFromRequest, err := getUserFromJSON(r)
-	if err != nil {
-		log.Error("SignUp : didn't get user from JSON", err)
-		response.SendResponse(w, response.ErrorResponse("Не получилось получить пользователя из JSON"))
+func setExpiredCookie(w http.ResponseWriter) {
+	cookie := &http.Cookie{
+		Name:     "session_id",
+		HttpOnly: true,
+		Secure:   true,
+		MaxAge:   -1,
+		SameSite: http.SameSiteNoneMode,
+	}
+	http.SetCookie(w, cookie)
+}
+/*
+func setCSRFCokkie(w http.ResponseWriter, csrfToken string) {
+	cookie := &http.Cookie{
+		Name:     "csrf-token",
+		Value:    csrfToken,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
+	}
+	http.SetCookie(w, cookie)
+}
+*/
+//@Summmary SignUp
+//@Tags auth
+//@Description Регистрация
+//@Accept json
+//@Produce json
+//@Param input body response.ResponseBodyUser true "Account Info"
+//@Success 200 {object} response.Response{body=response.ResponseBodyUser}
+//@Failure 404 {object} response.BaseResponse
+//@Router /signup [post]
+func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "SignUp:"
+	log.Debug(message + "started")
+	u, err := response.GetUserFromRequest(r)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	log.Info("SignUp : userFromRequest = ", userFromRequest)
-	err = h.useCase.SignUp(userFromRequest.Name, userFromRequest.Surname, userFromRequest.Mail, userFromRequest.Password)
-	if err != nil {
-		log.Error("SignUp : SignUp error", err)
-		response.SendResponse(w, response.ErrorResponse("Пользователь уже зарегестрирован"))
+	userId, err := h.useCase.SignUp(u)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
-	if err == auth.ErrUserNotFound {
-		log.Error("SignIn : useCase.SignIn error", err)
-		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
+	sessionId, err := h.sessionManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	log.Info("setCookieWithJwtToken : jwtToken = ", jwtToken)
-	h.setCookieWithJwtToken(w, jwtToken)
+	CSRFToken, err := h.csrfManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	setSessionIdCookie(w, sessionId)
+	log.Info(sessionId)
+	//setCSRFCokkie(w,CSRFToken)
+	log.Info(CSRFToken)
+	w.Header().Set("X-CSRF-Token", CSRFToken)
+
+	log.Debug(message+"userId =", userId)
 	response.SendResponse(w, response.OkResponse())
-	log.Info("SignUp : ended")
+	log.Debug(message + "ended")
 }
 
-func (h *HandlerAuth) SignIn(w http.ResponseWriter, r *http.Request) {
-	log.Info("SignIn : started")
-	userFromRequest, err := getUserFromJSON(r)
-	if err != nil {
-		log.Error("SignIn : getUserFromJSON error", err)
+//@Summmary SignIn
+//@Tags auth
+//@Description "Авторизация"
+//@Accept json
+//@Produce json
+//@Param input body response.ResponseBodyUser true "Account Info"
+//@Success 200 {object} response.Response{body=response.ResponseBodyUser}
+//@Failure 404 {object} response.BaseResponse
+//@Router /signin [post]
+func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "SignIn:"
+	log.Debug(message + "started")
+	u, err := response.GetUserFromRequest(r)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	log.Info("SignIn : userFromRequest = ", userFromRequest)
-	jwtToken, err := h.useCase.SignIn(userFromRequest.Mail, userFromRequest.Password)
-	if err == auth.ErrUserNotFound {
-		log.Error("SignIn : useCase.SignIn error", err)
-		response.SendResponse(w, response.ErrorResponse("Пользователь не найден"))
+	userId, err := h.useCase.SignIn(u.Mail, u.Password)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 		return
 	}
-	log.Info("SignIn : jwtToken = ", jwtToken)
-	h.setCookieWithJwtToken(w, jwtToken)
+	sessionId, err := h.sessionManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	CSRFToken, err := h.csrfManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	setSessionIdCookie(w, sessionId)
+	log.Info(sessionId)
+	//setCSRFCokkie(w,CSRFToken)
+	log.Info(CSRFToken)
+	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
-	log.Info("SignIn : ended")
+	log.Debug(message + "ended")
 }
 
-func (h *HandlerAuth) User(w http.ResponseWriter, r *http.Request) {
-	log.Info("User : started")
+func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "Logout:"
+	log.Debug(message + "started")
+	defer setExpiredCookie(w)
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
-		log.Error("User : cookie error", err)
-		response.SendResponse(w, response.ErrorResponse("Ошибка с получением Cookie"))
+		err = error2.ErrCookie
+	}
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	if cookie != nil {
-		log.Info("User : cookie.value = ", cookie.Value)
+	err = h.sessionManager.Delete(cookie.Value)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
 	}
-	foundUser, err := h.useCase.ParseToken(cookie.Value)
+	CSRFToken := w.Header().Get("X-CSRF-Token")
+	err = h.csrfManager.Delete(CSRFToken)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	setExpiredCookie(w)
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
+}
+
+//@Summmary User
+//@Tags auth
+//@Description "Главная страница"
+//@Produce json
+//@Success 200 {object} response.BaseResponse
+//@Failure 404 {object} response.BaseResponse
+//@Router /user [get]
+func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetUser:"
+	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	foundUser, err := h.useCase.GetUser(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	CSRFToken, err := h.csrfManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	log.Info(CSRFToken)
+	w.Header().Set("X-CSRF-Token", CSRFToken)
+	response.SendResponse(w, response.UserResponse(foundUser))
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetUserById:"
+	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	userId := vars["id"]
+	foundUser, err := h.useCase.GetUser(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	response.SendResponse(w, response.UserResponse(foundUser))
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "UpdateUserInfo:"
+	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	u, err := response.GetUserFromRequest(r)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	err = h.useCase.UpdateUserInfo(userId, u.Name, u.Surname, u.About)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "UpdateUserInfo:"
+	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	u, err := response.GetUserFromRequest(r)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	err = h.useCase.UpdateUserPassword(userId, u.Password)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) UpdateUserPhoto(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "UpdateUserPhoto:"
+	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	r.ParseMultipartForm(128 << 20)
+	// Get handler for filename, size and headers
+	file, handler, err := r.FormFile("avatar")
 	if err != nil {
-		log.Error("User : User token parsing error", err)
-		response.SendResponse(w, response.ErrorResponse("Ошибка с парсингом токена"))
+		log.Error("error Retrieving the File")
 		return
 	}
-	log.Info("User : Found User = ", foundUser)
-	response.SendResponse(w, response.UsernameResponse(foundUser.Name))
-	log.Info("User : ended")
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	defer file.Close()
+
+	log.Info("Uploaded File: %+v\n", handler.Filename)
+	log.Info("File Size: %+v\n", handler.Size)
+	log.Info("MIME Header: %+v\n", handler.Header)
+
+	filename, err := h.imgManager.SaveFile(userId, handler.Filename, file)
+	if err !=nil {
+		log.Error(err)
+	}
+	FileUrl := "https://bmstusa.ru/images/" +filename
+	response.SendResponse(w, response.OkPhotoResponse(FileUrl))
+	log.Info(w, "Successfully Uploaded File\n"+"")
+	
 }

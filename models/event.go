@@ -2,8 +2,15 @@ package models
 
 type Event struct {
 	ID          string
-	Name        string
+	Title       string
 	Description string
-	Views       int
+	Text        string
+	City        string
+	Category    string
+	Viewed      int
 	ImgUrl      string
+	Tag         []string
+	Date        string
+	Geo         string
+	AuthorId    string
 }

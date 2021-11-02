@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"backend/auth/repository/localstorage"
+	"backend/auth/repository/mock"
 	"backend/models"
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/stretchr/testify/require"
@@ -10,8 +10,8 @@ import (
 
 func TestSignUp(t *testing.T) {
 	secretWord := []byte("secret")
-	repositoryMock := new(localstorage.RepositoryUserMock)
-	useCaseTest := NewUseCaseAuth(repositoryMock, secretWord)
+	repositoryMock := new(mock.RepositoryMock)
+	useCaseTest := NewUseCase(repositoryMock, secretWord)
 
 	userTest := &models.User{
 		Name:     "nameTest",
@@ -27,8 +27,8 @@ func TestSignUp(t *testing.T) {
 
 func TestSignIn(t *testing.T) {
 	secretWord := []byte("secret")
-	repositoryMock := new(localstorage.RepositoryUserMock)
-	useCaseTest := NewUseCaseAuth(repositoryMock, secretWord)
+	repositoryMock := new(mock.RepositoryMock)
+	useCaseTest := NewUseCase(repositoryMock, secretWord)
 
 	testId := "0"
 
@@ -52,8 +52,8 @@ func TestSignIn(t *testing.T) {
 
 func TestParseToken(t *testing.T) {
 	secretWord := []byte("secret")
-	repositoryMock := new(localstorage.RepositoryUserMock)
-	useCaseTest := NewUseCaseAuth(repositoryMock, secretWord)
+	repositoryMock := new(mock.RepositoryMock)
+	useCaseTest := NewUseCase(repositoryMock, secretWord)
 
 	userIdTest := "0"
 	repositoryMock.On("GetUserById", userIdTest).Return(&models.User{

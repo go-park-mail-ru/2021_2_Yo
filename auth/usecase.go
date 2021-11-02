@@ -2,8 +2,10 @@ package auth
 
 import "backend/models"
 
-type UseCaseAuth interface {
-	SignUp(name, surname, mail, password string) error
+type UseCase interface {
+	SignUp(user *models.User) (string, error)
 	SignIn(mail, password string) (string, error)
-	ParseToken(accessToken string) (*models.User, error)
+	GetUser(userId string) (*models.User, error)
+	UpdateUserInfo(userId string, name string, surname string, about string) error
+	UpdateUserPassword(userId string, password string) error
 }

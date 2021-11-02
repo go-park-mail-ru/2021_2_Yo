@@ -1,0 +1,21 @@
+port: "8080"
+
+postgres_db:
+    user: "postgres"
+    host: "localhost"
+    port: "5432"
+    password: password
+    dbname: "postgres"
+    sslmode: "disable"
+
+
+redis_db_session:
+    name: "addr"
+    value: "redis://user:@localhost:6379/0"
+    usage: "redis addr"
+
+redis_db_csrf:
+    name: "addr_csrf"
+    value: "redis://user:@localhost:6379/1"
+    usage: "redis csrf"
+
