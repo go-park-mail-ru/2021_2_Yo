@@ -147,6 +147,13 @@ func OkResponse() *Response {
 	}
 }
 
+func OkPhotoResponse(avatarUrl string) *Response {
+	return &Response{
+		Status:  200,
+		Message: avatarUrl,
+	}
+}
+
 func UserResponse(user *models.User) *Response {
 	return &Response{
 		Status:  200,

@@ -255,10 +255,11 @@ func (h *Delivery) UpdateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	log.Info("File Size: %+v\n", handler.Size)
 	log.Info("MIME Header: %+v\n", handler.Header)
 
-	err = h.imgManager.SaveFile(userId, handler.Filename, file)
+	filename, err := h.imgManager.SaveFile(userId, handler.Filename, file)
 	if err !=nil {
 		log.Error(err)
 	}
+	response.SendResponse(w, response.OkPhotoResponse(filename))
 	log.Info(w, "Successfully Uploaded File\n"+"")
 	
 }

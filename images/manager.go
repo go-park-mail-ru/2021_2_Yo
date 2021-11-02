@@ -22,23 +22,23 @@ func NewManager(imagesRepo repository.Repository) *Manager {
 	}
 }
 
-func (img *Manager) SaveFile (userId string, fileName string,file multipart.File) error {
+func (img *Manager) SaveFile (userId string, fileName string,file multipart.File) (string,error) {
 	imgU := uuid.NewV4()
 	s := strings.Split(fileName, ".")
 	s[0] += imgU.String()
 	newFileName := s[0] + "." + s[1]
 	dst, err := os.Create(filepath.Join("/home/ubuntu/go/2021_2_Yo/static/images", filepath.Base(newFileName)))
 	if err != nil {
-		return err
+		return fileName,err
 	}
 	defer dst.Close()
 	if _, err = io.Copy(dst, file); err != nil {
 		fmt.Println(err)
-		return err
+		return fileName,err
 	}
-	err = img.imagesRepo.StoreImage(userId,fileName)
+	err = img.imagesRepo.StoreImage(userId,newFileName)
 	if err != nil {
-		return err
+		return fileName, err
 	}
-	return nil
+	return newFileName, nil
 }
