@@ -1,7 +1,7 @@
 package http
 
 import (
-	"backend/event"
+	"backend/service/event"
 	log "backend/logger"
 	"backend/response"
 	"backend/response/utils"

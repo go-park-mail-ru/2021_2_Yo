@@ -1,4 +1,4 @@
-package auth
+package register
 
 import (
 	"backend/service/auth/delivery/http"

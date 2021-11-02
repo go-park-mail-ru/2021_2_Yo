@@ -4,6 +4,7 @@ import (
 	log "backend/logger"
 	"backend/response"
 	"backend/response/utils"
+	"backend/service/image"
 	"backend/service/user"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -12,11 +13,11 @@ import (
 const logMessage = "service:user:delivery:http:"
 
 type Delivery struct {
-	useCase    auth.UseCase
+	useCase    user.UseCase
 	imgManager image.Manager
 }
 
-func NewDelivery(useCase auth.UseCase, imgManager image.Manager) *Delivery {
+func NewDelivery(useCase user.UseCase, imgManager image.Manager) *Delivery {
 	return &Delivery{
 		useCase:    useCase,
 		imgManager: imgManager,

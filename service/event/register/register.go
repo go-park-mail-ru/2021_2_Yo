@@ -1,4 +1,4 @@
-package event
+package register
 
 import (
 	"backend/server"

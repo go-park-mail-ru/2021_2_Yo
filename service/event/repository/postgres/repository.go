@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	error2 "backend/event/error"
+	error2 "backend/service/event/error"
 	log "backend/logger"
 	"backend/models"
 	sql2 "database/sql"

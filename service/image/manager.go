@@ -1,7 +1,7 @@
 package image
 
 import (
-	"backend/service/images/repository"
+	"backend/service/image/repository"
 	"fmt"
 	"io"
 	"mime/multipart"

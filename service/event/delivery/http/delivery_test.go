@@ -1,7 +1,7 @@
 package http
 
 import (
-	"backend/event/usecase"
+	"backend/service/event/usecase"
 	"bytes"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"backend/service/auth"
 	authDelivery "backend/service/auth/delivery/http"
 	authRepository "backend/service/auth/repository/postgres"
 	authUseCase "backend/service/auth/usecase"
@@ -21,7 +20,8 @@ import (
 	"backend/service/session"
 	sessionRepository "backend/service/session/repository"
 
-	_ "backend/docs"
+	"backend/register"
+
 	log "backend/logger"
 	"backend/middleware"
 	"backend/utils"
@@ -134,22 +134,11 @@ func options(w http.ResponseWriter, r *http.Request) {}
 	r.HandleFunc("/user/{id:[0-9]+}", app.authManager.GetUserById).Methods("GET")
 	r.Handle("/user/info", authRouter)
 	r.Handle("/user/password", authRouter)
-
-	r.HandleFunc("/events", app.eventManager.GetEventsFromAuthor).Queries("authorid", "{authorid:[0-9]+}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "category", "{category}", "tags", "{tags}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "category", "{category}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "tags", "{tags}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("category", "{category}", "tags", "{tags}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("category", "{category}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("tags", "{tags}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Methods("GET")
-	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
+	r.Handle("/user/avatar", authRouter)
 
 	r.Handle("/events/{id:[0-9]+}", authRouter)
 	r.Handle("/events", authRouter).Methods("POST")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
-	r.Handle("/user/avatar", authRouter)
 
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
@@ -159,9 +148,7 @@ func options(w http.ResponseWriter, r *http.Request) {}
 */
 
 func newRouterWithEndpoints(app *App) *mux.Router {
-	mw := middleware.NewMiddleware()
-	//sessionMW := sessionMiddleware.NewMiddleware(*app.SessionManager)
-	//csrfMW := csrfMiddleware.NewMiddleware(*app.CsrfManager)
+	mw := middleware.NewMiddlewares(*app.SessionManager)
 
 	r := mux.NewRouter()
 	r.Use(mw.Logging)
@@ -170,25 +157,13 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Methods("OPTIONS").HandlerFunc(options)
 
 	authRouter := r.PathPrefix("/auth").Subrouter()
-	auth.RegisterHTTPEndpoints(authRouter, app.AuthManager)
+	register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)
 
-	/*
-		r.Path("/auth/signup").HandlerFunc(app.AuthManager.SignUp).Methods("POST")
-		r.Path("/auth/login").HandlerFunc(app.AuthManager.SignIn).Methods("POST")
-		authRouter := r.PathPrefix("/auth").Subrouter()
-		authRouter.Use(sessionMW.Auth)
-		authRouter.Path("/logout").HandlerFunc(app.AuthManager.Logout).Methods("GET")
+	eventRouter := r.PathPrefix("/events").Subrouter()
+	register.EventHTTPEndpoints(eventRouter, app.EventManager, mw)
 
-		r.Path("/user/{id:[0-9]+}").HandlerFunc(app.UserManager.GetUserById).Methods("GET")
-		userRouter := r.PathPrefix("/user").Subrouter()
-		userRouter.Use(sessionMW.Auth)
-		userRouter.Use(mw.GetVars)
-		userRouter.Path("").HandlerFunc(app.UserManager.GetUser).Methods("GET")
-		userRouter.Path("info").HandlerFunc(app.UserManager.UpdateUserInfo).Methods("POST")
-		userRouter.Path("password").HandlerFunc(app.UserManager.UpdateUserPassword).Methods("POST")
-		userRouter.Path("avatar").HandlerFunc(app.UserManager.UpdateUserPhoto).Methods("POST")
-
-	*/
+	userRouter := r.PathPrefix("/user").Subrouter()
+	register.UserHTTPEndpoints(userRouter, app.UserManager, mw)
 
 	return r
 }
@@ -200,7 +175,6 @@ func (app *App) Run() error {
 	message := logMessage + "Run:"
 	log.Info(message + "start")
 	r := newRouterWithEndpoints(app)
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"

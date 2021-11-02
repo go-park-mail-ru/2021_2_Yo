@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"backend/event"
-	error2 "backend/event/error"
+	"backend/service/event"
+	error2 "backend/service/event/error"
 	"backend/models"
 )
 
