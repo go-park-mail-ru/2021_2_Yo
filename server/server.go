@@ -1,27 +1,29 @@
 package server
 
 import (
+	"backend/service/auth"
 	authDelivery "backend/service/auth/delivery/http"
 	authRepository "backend/service/auth/repository/postgres"
 	authUseCase "backend/service/auth/usecase"
+
 	userDelivery "backend/service/user/delivery/http"
 	userRepository "backend/service/user/repository/postgres"
 	userUseCase "backend/service/user/usecase"
 
-	"backend/csrf"
-	csrfMiddleware "backend/csrf/middleware"
-	csrfRepository "backend/csrf/repository"
+	eventDelivery "backend/service/event/delivery/http"
+	eventRepository "backend/service/event/repository/postgres"
+	eventUseCase "backend/service/event/usecase"
+
+	"backend/service/csrf"
+	csrfRepository "backend/service/csrf/repository"
+	"backend/service/image"
+	imgRepository "backend/service/image/repository"
+	"backend/service/session"
+	sessionRepository "backend/service/session/repository"
+
 	_ "backend/docs"
-	eventDelivery "backend/event/delivery/http"
-	eventRepository "backend/event/repository/postgres"
-	eventUseCase "backend/event/usecase"
-	"backend/images"
-	imgRepository "backend/images/repository"
 	log "backend/logger"
 	"backend/middleware"
-	"backend/session"
-	sessionMiddleware "backend/session/middleware"
-	sessionRepository "backend/session/repository"
 	"backend/utils"
 	"fmt"
 	"net/http"
@@ -40,7 +42,7 @@ type App struct {
 	EventManager   *eventDelivery.Delivery
 	SessionManager *session.Manager
 	CsrfManager    *csrf.Manager
-	ImgManager     *images.Manager
+	ImgManager     *image.Manager
 	db             *sql.DB
 }
 
@@ -64,7 +66,6 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		log.Error(message+"err =", err)
 		return nil, err
 	}
-
 	redisConnCSRFTokens, err := utils.InitRedisDB("redis_db_csrf")
 	if err != nil {
 		log.Error(message+"err =", err)
@@ -78,7 +79,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	csrfM := csrf.NewManager(*csrfR)
 
 	imgR := imgRepository.NewRepository(db)
-	imgM := images.NewManager(*imgR)
+	imgM := image.NewManager(*imgR)
 
 	authR := authRepository.NewRepository(db)
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
@@ -159,28 +160,35 @@ func options(w http.ResponseWriter, r *http.Request) {}
 
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddleware()
-	sessionMW := sessionMiddleware.NewMiddleware(*app.SessionManager)
-	csrfMW := csrfMiddleware.NewMiddleware(*app.CsrfManager)
+	//sessionMW := sessionMiddleware.NewMiddleware(*app.SessionManager)
+	//csrfMW := csrfMiddleware.NewMiddleware(*app.CsrfManager)
+
 	r := mux.NewRouter()
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
 	r.Methods("OPTIONS").HandlerFunc(options)
 
-	r.Path("/auth/signup").HandlerFunc(app.AuthManager.SignUp).Methods("POST")
-	r.Path("/auth/login").HandlerFunc(app.AuthManager.SignIn).Methods("POST")
 	authRouter := r.PathPrefix("/auth").Subrouter()
-	authRouter.Use(sessionMW.Auth)
-	authRouter.Path("/logout").HandlerFunc(app.AuthManager.Logout).Methods("GET")
+	auth.RegisterHTTPEndpoints(authRouter, app.AuthManager)
 
-	r.Path("/user/{id:[0-9]+}").HandlerFunc(app.UserManager.GetUserById).Methods("GET")
-	userRouter := r.PathPrefix("/user").Subrouter()
-	userRouter.Use(sessionMW.Auth)
-	userRouter.Use(mw.GetVars)
-	userRouter.Path("").HandlerFunc(app.UserManager.GetUser).Methods("GET")
-	userRouter.Path("info").HandlerFunc(app.UserManager.UpdateUserInfo).Methods("POST")
-	userRouter.Path("password").HandlerFunc(app.UserManager.UpdateUserPassword).Methods("POST")
-	userRouter.Path("avatar").HandlerFunc(app.UserManager.UpdateUserPhoto).Methods("POST")
+	/*
+		r.Path("/auth/signup").HandlerFunc(app.AuthManager.SignUp).Methods("POST")
+		r.Path("/auth/login").HandlerFunc(app.AuthManager.SignIn).Methods("POST")
+		authRouter := r.PathPrefix("/auth").Subrouter()
+		authRouter.Use(sessionMW.Auth)
+		authRouter.Path("/logout").HandlerFunc(app.AuthManager.Logout).Methods("GET")
+
+		r.Path("/user/{id:[0-9]+}").HandlerFunc(app.UserManager.GetUserById).Methods("GET")
+		userRouter := r.PathPrefix("/user").Subrouter()
+		userRouter.Use(sessionMW.Auth)
+		userRouter.Use(mw.GetVars)
+		userRouter.Path("").HandlerFunc(app.UserManager.GetUser).Methods("GET")
+		userRouter.Path("info").HandlerFunc(app.UserManager.UpdateUserInfo).Methods("POST")
+		userRouter.Path("password").HandlerFunc(app.UserManager.UpdateUserPassword).Methods("POST")
+		userRouter.Path("avatar").HandlerFunc(app.UserManager.UpdateUserPhoto).Methods("POST")
+
+	*/
 
 	return r
 }

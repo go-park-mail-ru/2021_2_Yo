@@ -1,7 +1,6 @@
 package http
 
 import (
-	"backend/images"
 	log "backend/logger"
 	"backend/response"
 	"backend/response/utils"
@@ -14,23 +13,16 @@ const logMessage = "service:user:delivery:http:"
 
 type Delivery struct {
 	useCase    auth.UseCase
-	imgManager images.Manager
+	imgManager image.Manager
 }
 
-func NewDelivery(useCase auth.UseCase, imgManager images.Manager) *Delivery {
+func NewDelivery(useCase auth.UseCase, imgManager image.Manager) *Delivery {
 	return &Delivery{
 		useCase:    useCase,
 		imgManager: imgManager,
 	}
 }
 
-//@Summmary User
-//@Tags auth
-//@Description "Главная страница"
-//@Produce json
-//@Success 200 {object} response.BaseResponse
-//@Failure 404 {object} response.BaseResponse
-//@Router /user [get]
 func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetUser:"
 	log.Debug(message + "started")
@@ -113,5 +105,4 @@ func (h *Delivery) UpdateUserPhoto(w http.ResponseWriter, r *http.Request) {
 		log.Error(err)
 	}
 	log.Info(w, "Successfully Uploaded File\n"+"")
-
 }

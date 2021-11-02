@@ -1,13 +1,13 @@
 package http
 
 import (
-	"backend/csrf"
 	log "backend/logger"
 	"backend/response"
 	"backend/response/utils"
 	"backend/service/auth"
 	error2 "backend/service/auth/error"
-	"backend/session"
+	"backend/service/csrf"
+	"backend/service/session"
 	"net/http"
 )
 
@@ -49,15 +49,6 @@ func setExpiredCookie(w http.ResponseWriter) {
 	http.SetCookie(w, cookie)
 }
 
-//@Summmary SignUp
-//@Tags auth
-//@Description Регистрация
-//@Accept json
-//@Produce json
-//@Param input body response.ResponseBodyUser true "Account Info"
-//@Success 200 {object} response.Response{body=response.ResponseBodyUser}
-//@Failure 404 {object} response.BaseResponse
-//@Router /signup [post]
 func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
@@ -78,22 +69,12 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
-	//setCSRFCokkie(w,CSRFToken)
 	log.Info(CSRFToken)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
 
-//@Summmary SignIn
-//@Tags auth
-//@Description "Авторизация"
-//@Accept json
-//@Produce json
-//@Param input body response.ResponseBodyUser true "Account Info"
-//@Success 200 {object} response.Response{body=response.ResponseBodyUser}
-//@Failure 404 {object} response.BaseResponse
-//@Router /signin [post]
 func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignIn:"
 	log.Debug(message + "started")
@@ -114,7 +95,6 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
-	//setCSRFCokkie(w,CSRFToken)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
