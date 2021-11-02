@@ -33,7 +33,7 @@ func (s *Repository) CreateUser(user *models.User) (string, error) {
 	var userId int
 	err := s.db.Get(&userId, query, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About)
 	if err != nil {
-		return "", error2.ErrPostgres
+		return "", err
 	}
 	return strconv.Itoa(userId), nil
 }
