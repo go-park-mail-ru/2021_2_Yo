@@ -259,7 +259,8 @@ func (h *Delivery) UpdateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	if err !=nil {
 		log.Error(err)
 	}
-	response.SendResponse(w, response.OkPhotoResponse(filename))
+	FileUrl := "https://bmstusa.ru/images/" +filename
+	response.SendResponse(w, response.OkPhotoResponse(FileUrl))
 	log.Info(w, "Successfully Uploaded File\n"+"")
 	
 }
