@@ -180,6 +180,12 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
+	CSRFToken, err := h.csrfManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	log.Info(CSRFToken)
+	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }
