@@ -66,7 +66,6 @@ func (m *Middlewares) GetVars(next http.Handler) http.Handler {
 	message := logMessage + "GetVars:"
 	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Debug(message + "YOOOOO")
 		vars := mux.Vars(r)
 		log.Debug(message+"vars =", vars)
 		if vars != nil {
@@ -82,7 +81,6 @@ func (m *Middlewares) Auth(next http.Handler) http.Handler {
 	message := logMessage + "Auth:"
 	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Debug(message + "HAAAAY")
 		cookie, err := r.Cookie("session_id")
 		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 			return
