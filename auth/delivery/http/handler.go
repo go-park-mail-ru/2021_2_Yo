@@ -10,6 +10,7 @@ import (
 	"backend/session"
 	"github.com/gorilla/mux"
 	"net/http"
+	"backend/images"
 )
 
 const logMessage = "auth:delivery:http:handler:"
@@ -18,13 +19,15 @@ type Delivery struct {
 	useCase        auth.UseCase
 	sessionManager session.Manager
 	csrfManager    csrf.Manager
+	imgManager     images.Manager
 }
 
-func NewDelivery(useCase auth.UseCase, manager session.Manager, csrfManager csrf.Manager) *Delivery {
+func NewDelivery(useCase auth.UseCase, manager session.Manager, csrfManager csrf.Manager, imgManaher images.Manager) *Delivery {
 	return &Delivery{
 		useCase:        useCase,
 		sessionManager: manager,
 		csrfManager:    csrfManager,
+		imgManager: 	imgManaher,
 	}
 }
 
@@ -222,4 +225,32 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
+}
+
+func (h *Delivery) UpdateUserPhoto(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "UpdateUserPhoto:"
+	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	r.ParseMultipartForm(1 << 2)
+	// Get handler for filename, size and headers
+	file, handler, err := r.FormFile("myFile")
+	if err != nil {
+		log.Error("error Retrieving the File")
+		return
+	}
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	defer file.Close()
+
+	log.Info("Uploaded File: %+v\n", handler.Filename)
+	log.Info("File Size: %+v\n", handler.Size)
+	log.Info("MIME Header: %+v\n", handler.Header)
+
+	err = h.imgManager.SaveFile(userId, handler.Filename, file)
+	if err !=nil {
+		log.Error(err)
+	}
+	log.Info(w, "Successfully Uploaded File\n"+"")
+	
 }

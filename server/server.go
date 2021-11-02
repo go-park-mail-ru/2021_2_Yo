@@ -7,6 +7,8 @@ import (
 	"backend/csrf"
 	csrfMiddleware "backend/csrf/middleware"
 	csrfRepository "backend/csrf/repository"
+	imgRepository "backend/images/repository"
+	"backend/images"
 	_ "backend/docs"
 	eventDelivery "backend/event/delivery/http"
 	eventRepository "backend/event/repository/postgres"
@@ -34,6 +36,7 @@ type App struct {
 	eventManager   *eventDelivery.Delivery
 	sessionManager *session.Manager
 	csrfManager    *csrf.Manager
+	imgManager     *images.Manager
 	db             *sql.DB
 }
 
@@ -68,9 +71,11 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	sessionM := session.NewManager(*sessionR)
 	csrfR := csrfRepository.NewRepository(redisConnCSRFTokens)
 	csrfM := csrf.NewManager(*csrfR)
+	imgR := imgRepository.NewRepository(db)
+	imgM := images.NewManager(*imgR)
 	authR := authRepository.NewRepository(db)
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
-	authD := authDelivery.NewDelivery(authUC, *sessionM, *csrfM)
+	authD := authDelivery.NewDelivery(authUC, *sessionM, *csrfM, *imgM)
 	eventR := eventRepository.NewRepository(db)
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
@@ -80,6 +85,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		eventManager:   eventD,
 		sessionManager: sessionM,
 		csrfManager:    csrfM,
+		imgManager:     imgM,
 		db:             db,
 	}, nil
 }
@@ -96,6 +102,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	authRouter.HandleFunc("/user", app.authManager.GetUser).Methods("GET")
 	authRouter.HandleFunc("/user/info", app.authManager.UpdateUserInfo).Methods("POST")
 	authRouter.HandleFunc("/user/password", app.authManager.UpdateUserPassword).Methods("POST")
+	authRouter.HandleFunc("/user/avatar",app.authManager.UpdateUserPhoto).Methods("POST")
 	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
 	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
 	authRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
@@ -130,6 +137,8 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Handle("/events/{id:[0-9]+}", authRouter)
 	r.Handle("/events", authRouter).Methods("POST")
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
+	r.Handle("/user/avatar", authRouter)
+
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
