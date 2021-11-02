@@ -239,7 +239,7 @@ func (h *Delivery) UpdateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserPhoto:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	r.ParseMultipartForm(1 << 2)
+	r.ParseMultipartForm(128 << 20)
 	// Get handler for filename, size and headers
 	file, handler, err := r.FormFile("avatar")
 	if err != nil {
