@@ -27,7 +27,7 @@ func (img *Manager) SaveFile (userId string, fileName string,file multipart.File
 	s := strings.Split(fileName, ".")
 	s[0] += imgU.String()
 	newFileName := s[0] +s[1]
-	dst, err := os.Create(filepath.Join("~/go/2021_2_Yo/static/images", filepath.Base(newFileName)))
+	dst, err := os.Create(filepath.Join("/home/ubuntu/go/2021_2_Yo/static/images", filepath.Base(newFileName)))
 	if err != nil {
 		return err
 	}
