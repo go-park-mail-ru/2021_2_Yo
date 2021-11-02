@@ -2,6 +2,7 @@ package utils
 
 import (
 	log "backend/logger"
+	"crypto/sha256"
 	"errors"
 	"flag"
 	"fmt"
@@ -24,6 +25,12 @@ func GetSecret() (string, error) {
 		return secret, nil
 	}
 	return secret, nil
+}
+
+func CreatePasswordHash(password string) string {
+	hash := sha256.New()
+	hash.Write([]byte(password))
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
 func InitPostgresDB() (*sql.DB, error) {
