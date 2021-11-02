@@ -106,47 +106,6 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 
 func options(w http.ResponseWriter, r *http.Request) {}
 
-/*
-	mw := middleware.NewMiddleware()
-	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
-	csrfMW := csrfMiddleware.NewMiddleware(*app.csrfManager)
-	authRouter := mux.NewRouter()
-	CSRFRouter := authRouter.Methods("POST").Subrouter()
-
-	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
-	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
-	authRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
-
-	CSRFRouter.HandleFunc("/user/info", app.authManager.UpdateUserInfo).Methods("POST")
-	CSRFRouter.HandleFunc("/user/password", app.authManager.UpdateUserPassword).Methods("POST")
-
-	CSRFRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
-	CSRFRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
-	CSRFRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
-
-	authRouter.Use(sessionMW.Auth)
-	authRouter.Use(mw.GetVars)
-	CSRFRouter.Use(csrfMW.CSRF)
-
-	r := mux.NewRouter()
-	r.Methods("OPTIONS").HandlerFunc(options)
-	r.Handle("/user", authRouter)
-	r.HandleFunc("/user/{id:[0-9]+}", app.authManager.GetUserById).Methods("GET")
-	r.Handle("/user/info", authRouter)
-	r.Handle("/user/password", authRouter)
-	r.Handle("/user/avatar", authRouter)
-
-	r.Handle("/events/{id:[0-9]+}", authRouter)
-	r.Handle("/events", authRouter).Methods("POST")
-	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
-
-	r.Use(mw.Logging)
-	r.Use(mw.CORS)
-	r.Use(mw.Recovery)
-
-	return r
-*/
-
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddlewares(*app.SessionManager)
 
