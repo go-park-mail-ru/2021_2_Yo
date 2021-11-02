@@ -241,7 +241,7 @@ func (h *Delivery) UpdateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value("userId").(string)
 	r.ParseMultipartForm(1 << 2)
 	// Get handler for filename, size and headers
-	file, handler, err := r.FormFile("myFile")
+	file, handler, err := r.FormFile("avatar")
 	if err != nil {
 		log.Error("error Retrieving the File")
 		return
