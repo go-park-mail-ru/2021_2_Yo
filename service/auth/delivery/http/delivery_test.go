@@ -1,111 +1,301 @@
 package http
 
 import (
-	"backend/auth/usecase"
 	"backend/models"
 	"backend/response"
+	error3 "backend/service/auth/error"
+	"backend/service/auth/usecase"
+	error4 "backend/service/csrf/error"
+	csrf "backend/service/csrf/manager"
+	error2 "backend/service/session/error"
+	session "backend/service/session/manager"
 	"bytes"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 )
 
+const logTestMessage = "auth:delivery:test"
+
+var signUpTests = []struct {
+	id                int
+	input             *models.ResponseBodyUser
+	useCaseErr        error
+	sessionManagerErr error
+	csrfManagerErr    error
+	output            *response.Response
+}{
+	{1,
+		&models.ResponseBodyUser{
+			Name:     "testName",
+			Surname:  "testSurname",
+			About:    "testAbout",
+			Mail:     "testMail@mail.ru",
+			Password: "testPassword",
+		},
+		nil,
+		nil,
+		nil,
+		response.OkResponse()},
+	{2,
+		&models.ResponseBodyUser{
+			Name:     "testName",
+			Surname:  "testSurname",
+			About:    "testAbout",
+			Mail:     "testMail",
+			Password: "testPassword",
+		},
+		nil,
+		nil,
+		nil,
+		response.ErrorResponse(response.ErrValidation.Error())},
+	{3,
+		&models.ResponseBodyUser{
+			Name:     "testName",
+			Surname:  "testSurname",
+			About:    "testAbout",
+			Mail:     "testMail@mail.ru",
+			Password: "testPassword",
+		},
+		error3.ErrUserNotFound,
+		nil,
+		nil,
+		response.ErrorResponse(error3.ErrUserNotFound.Error())},
+	{4,
+		&models.ResponseBodyUser{
+			Name:     "testName",
+			Surname:  "testSurname",
+			About:    "testAbout",
+			Mail:     "testMail@mail.ru",
+			Password: "testPassword",
+		},
+		nil,
+		error2.ErrEmptySessionId,
+		nil,
+		response.ErrorResponse(error2.ErrEmptySessionId.Error())},
+	{5,
+		&models.ResponseBodyUser{
+			Name:     "testName",
+			Surname:  "testSurname",
+			About:    "testAbout",
+			Mail:     "testMail@mail.ru",
+			Password: "testPassword",
+		},
+		nil,
+		nil,
+		error4.ErrEmptyToken,
+		response.ErrorResponse(error4.ErrEmptyToken.Error())},
+}
+
 func TestSignUp(t *testing.T) {
-	r := mux.NewRouter()
-	useCaseMock := new(usecase.UseCaseMock)
-	handlerTest := NewDelivery(useCaseMock)
-	r.HandleFunc("/signup", handlerTest.SignUp).Methods("POST")
 
-	bodyUserTest := &response.ResponseBodyUser{
-		Name:     "nameTest",
-		Surname:  "surnameTest",
-		Mail:     "mailTest",
-		Password: "passwordTest",
+	for _, test := range signUpTests {
+
+		bodyUserJSON, err := json.Marshal(test.input)
+		require.NoError(t, err, logTestMessage+"err =", err)
+
+		userModel := new(models.User)
+		userModel.Name = test.input.Name
+		userModel.Surname = test.input.Surname
+		userModel.About = test.input.About
+		userModel.Mail = test.input.Mail
+		userModel.Password = test.input.Password
+
+		useCaseMock := new(usecase.UseCaseMock)
+		sessionManagerMock := new(session.ManagerMock)
+		csrfManagerMock := new(csrf.ManagerMock)
+		handlerTest := NewDelivery(useCaseMock, sessionManagerMock, csrfManagerMock)
+
+		useCaseMock.On("SignUp", userModel).Return(test.useCaseErr)
+		sessionManagerMock.On("Create", "").Return("", test.sessionManagerErr)
+		csrfManagerMock.On("Create", "").Return("", test.csrfManagerErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/signup", handlerTest.SignUp).Methods("POST")
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("POST", "/signup", bytes.NewBuffer(bodyUserJSON))
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+		r.ServeHTTP(w, req)
+
+		wTest := httptest.NewRecorder()
+		response.SendResponse(wTest, test.output)
+		expected := wTest.Body
+		actual := w.Body
+
+		t.Log("exptected = ", expected)
+		t.Log("actual = ", actual)
+		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
+}
 
-	bodyUserJSON, err := json.Marshal(bodyUserTest)
-	require.NoError(t, err, "TestSignUp : jsonMarshal error = ", err)
-
-	useCaseMock.On(
-		"SignUp",
-		bodyUserTest.Name,
-		bodyUserTest.Surname,
-		bodyUserTest.Mail,
-		bodyUserTest.Password).Return(nil)
-
-	useCaseMock.On(
-		"SignIn",
-		bodyUserTest.Mail,
-		bodyUserTest.Password).Return("", nil)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/signup", bytes.NewBuffer(bodyUserJSON))
-	r.ServeHTTP(w, req)
-
-	require.Equal(t, 200, w.Code, "TestSignUp : expected 200, got", w.Code)
+var signInTests = []struct {
+	id                int
+	input             *models.ResponseBodyUser
+	useCaseErr        error
+	sessionManagerErr error
+	csrfManagerErr    error
+	output            *response.Response
+}{
+	{1,
+		&models.ResponseBodyUser{
+			Mail:     "testMail@mail.ru",
+			Password: "testPassword",
+		},
+		nil,
+		nil,
+		nil,
+		response.OkResponse()},
+	{2,
+		&models.ResponseBodyUser{
+			Mail:     "testMail",
+			Password: "testPassword",
+		},
+		nil,
+		nil,
+		nil,
+		response.ErrorResponse(response.ErrValidation.Error())},
+	{3,
+		&models.ResponseBodyUser{
+			Mail:     "testMail@mail.ru",
+			Password: "testPassword",
+		},
+		error3.ErrUserNotFound,
+		nil,
+		nil,
+		response.ErrorResponse(error3.ErrUserNotFound.Error())},
+	{4,
+		&models.ResponseBodyUser{
+			Mail:     "testMail@mail.ru",
+			Password: "testPassword",
+		},
+		nil,
+		error2.ErrEmptySessionId,
+		nil,
+		response.ErrorResponse(error2.ErrEmptySessionId.Error())},
+	{5,
+		&models.ResponseBodyUser{
+			Mail:     "testMail@mail.ru",
+			Password: "testPassword",
+		},
+		nil,
+		nil,
+		error4.ErrEmptyToken,
+		response.ErrorResponse(error4.ErrEmptyToken.Error())},
 }
 
 func TestSignIn(t *testing.T) {
-	r := mux.NewRouter()
-	useCaseMock := new(usecase.UseCaseMock)
-	handlerTest := NewDelivery(useCaseMock)
-	r.HandleFunc("/login", handlerTest.SignIn).Methods("POST")
+	for _, test := range signInTests {
 
-	bodyUserTest := &response.ResponseBodyUser{
-		Mail:     "mailTest",
-		Password: "passwordTest",
+		bodyUserJSON, err := json.Marshal(test.input)
+		require.NoError(t, err, logTestMessage+"err =", err)
+
+		userMail := test.input.Mail
+		userPassword := test.input.Password
+
+		useCaseMock := new(usecase.UseCaseMock)
+		sessionManagerMock := new(session.ManagerMock)
+		csrfManagerMock := new(csrf.ManagerMock)
+		handlerTest := NewDelivery(useCaseMock, sessionManagerMock, csrfManagerMock)
+
+		useCaseMock.On("SignIn", userMail, userPassword).Return("", test.useCaseErr)
+		sessionManagerMock.On("Create", "").Return("", test.sessionManagerErr)
+		csrfManagerMock.On("Create", "").Return("", test.csrfManagerErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/login", handlerTest.SignIn).Methods("POST")
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("POST", "/login", bytes.NewBuffer(bodyUserJSON))
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+		r.ServeHTTP(w, req)
+
+		//expected := test.output
+		//actual, err := response.GetBodyFromResponseRecorder(w)
+		require.NoError(t, err, logTestMessage+"err =", err)
+
+		t.Log(w.Body)
+
+		//require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
-
-	bodyUserJSON, err := json.Marshal(bodyUserTest)
-	require.NoError(t, err, "TestSignIn : jsonMarshal error = ", err)
-
-	useCaseMock.On(
-		"SignIn",
-		bodyUserTest.Mail,
-		bodyUserTest.Password).Return("jwt_token_test", nil)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(bodyUserJSON))
-	r.ServeHTTP(w, req)
-
-	require.Equal(t, 200, w.Code, "TestSignIn : expected 200, got", w.Code)
-	require.Equal(t, "jwt_token_test", w.Result().Cookies()[0].Value, "TestSignIn : expected jwt_token_test, got", w.Result().Cookies()[0].Value)
 }
 
-func TestUser(t *testing.T) {
-	r := mux.NewRouter()
-	useCaseMock := new(usecase.UseCaseMock)
-	handlerTest := NewDelivery(useCaseMock)
-	r.HandleFunc("/user", handlerTest.User).Methods("GET")
+var logoutTests = []struct {
+	id                int
+	input             *http.Cookie
+	csrfToken         string
+	sessionManagerErr error
+	csrfManagerErr    error
+	output            *response.Response
+}{
+	{1,
+		&http.Cookie{
+			Name:  "session_id",
+			Value: "123",
+		},
+		"token",
+		nil,
+		nil,
+		response.OkResponse()},
+	{2,
+		&http.Cookie{
+			Name:  "",
+			Value: "",
+		},
+		"token",
+		nil,
+		nil,
+		response.ErrorResponse(error3.ErrCookie.Error())},
+	{3,
+		&http.Cookie{
+			Name:  "session_id",
+			Value: "",
+		},
+		"token",
+		error2.ErrDeleteSession,
+		nil,
+		response.ErrorResponse(error2.ErrDeleteSession.Error())},
+	{4,
+		&http.Cookie{
+			Name:  "session_id",
+			Value: "",
+		},
+		"token",
+		nil,
+		error4.ErrRedis,
+		response.ErrorResponse(error4.ErrRedis.Error())},
+}
 
-	w := httptest.NewRecorder()
-	jwtToken := "test_token"
-	cookie := &http.Cookie{
-		Name:  "session_id",
-		Value: jwtToken,
+func TestLogout(t *testing.T) {
+	for _, test := range logoutTests {
+
+		useCaseMock := new(usecase.UseCaseMock)
+		sessionManagerMock := new(session.ManagerMock)
+		csrfManagerMock := new(csrf.ManagerMock)
+		handlerTest := NewDelivery(useCaseMock, sessionManagerMock, csrfManagerMock)
+
+		cookie := test.input
+		csrfToken := test.csrfToken
+
+		sessionManagerMock.On("Delete", cookie.Value).Return(test.sessionManagerErr)
+		csrfManagerMock.On("Delete", csrfToken).Return(test.csrfManagerErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/logout", handlerTest.Logout).Methods("GET")
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/logout", bytes.NewBuffer([]byte(csrfToken)))
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+		if cookie.Name != "" {
+			req.AddCookie(cookie)
+		}
+		w.Header().Set("X-CSRF-Token", csrfToken)
+		r.ServeHTTP(w, req)
+
+		//expected := test.output
+		//actual, err := response.GetBodyFromResponseRecorder(w)
+		require.NoError(t, err, logTestMessage+"err =", err)
+		//require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
-
-	useCaseMock.On(
-		"ParseToken",
-		cookie.Value).Return(&models.User{
-		ID:       "1",
-		Name:     "nameTest",
-		Surname:  "surnameTest",
-		Mail:     "mailTest",
-		Password: "passwordTest",
-	}, nil)
-
-	req, _ := http.NewRequest("GET", "/user", bytes.NewBuffer([]byte("")))
-	req.AddCookie(cookie)
-	r.ServeHTTP(w, req)
-
-	require.Equal(t, 200, w.Code, "TestSignIn : expected 200, got", w.Code)
-	require.Equal(t,
-		"{\"status\":200,\"body\":{\"name\":\"nameTest\"}}",
-		w.Body.String(),
-		"TestSignIn : expected jwt_token_test, got",
-		w.Body.String())
 }
