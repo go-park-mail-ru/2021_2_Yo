@@ -2,11 +2,8 @@ package server
 
 import (
 	authDelivery "backend/service/auth/delivery/http"
-	"backend/service/auth/register"
 	authRepository "backend/service/auth/repository/postgres"
 	authUseCase "backend/service/auth/usecase"
-	register2 "backend/service/user/register"
-
 	userDelivery "backend/service/user/delivery/http"
 	userRepository "backend/service/user/repository/postgres"
 	userUseCase "backend/service/user/usecase"
@@ -33,7 +30,6 @@ import (
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
-	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 const logMessage = "server:"
@@ -109,60 +105,82 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 
 func options(w http.ResponseWriter, r *http.Request) {}
 
-func newRouterWithEndpoints(app *App) *mux.Router {
+/*
 	mw := middleware.NewMiddleware()
-	sessionMW := sessionMiddleware.NewMiddleware(*app.SessionManager)
-	csrfMW := csrfMiddleware.NewMiddleware(*app.CsrfManager)
-
+	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
+	csrfMW := csrfMiddleware.NewMiddleware(*app.csrfManager)
 	authRouter := mux.NewRouter()
-
 	CSRFRouter := authRouter.Methods("POST").Subrouter()
 
-	authRouter.HandleFunc("/events/{id:[0-9]+}", app.EventManager.UpdateEvent).Methods("POST")
-	authRouter.HandleFunc("/events/{id:[0-9]+}", app.EventManager.DeleteEvent).Methods("DELETE")
-	authRouter.HandleFunc("/events", app.EventManager.CreateEvent).Methods("POST")
+	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
+	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
+	authRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
 
-	CSRFRouter.HandleFunc("/events/{id:[0-9]+}", app.EventManager.UpdateEvent).Methods("POST")
-	CSRFRouter.HandleFunc("/events/{id:[0-9]+}", app.EventManager.DeleteEvent).Methods("DELETE")
-	CSRFRouter.HandleFunc("/events", app.EventManager.CreateEvent).Methods("POST")
+	CSRFRouter.HandleFunc("/user/info", app.authManager.UpdateUserInfo).Methods("POST")
+	CSRFRouter.HandleFunc("/user/password", app.authManager.UpdateUserPassword).Methods("POST")
+
+	CSRFRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
+	CSRFRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
+	CSRFRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
+
 	authRouter.Use(sessionMW.Auth)
 	authRouter.Use(mw.GetVars)
 	CSRFRouter.Use(csrfMW.CSRF)
 
 	r := mux.NewRouter()
 	r.Methods("OPTIONS").HandlerFunc(options)
-
-	authSubRouter := r.PathPrefix("/auth").Subrouter()
-	register.RegisterHTTPEndpoints(authSubRouter, app, sessionMW)
-	userSubRouter := r.PathPrefix("/user").Subrouter()
-	register2.RegisterHTTPEndpoints(userSubRouter, app)
-
 	r.Handle("/user", authRouter)
-
-	r.HandleFunc("/user/{id:[0-9]+}", app.UserManager.GetUserById).Methods("GET")
-
+	r.HandleFunc("/user/{id:[0-9]+}", app.authManager.GetUserById).Methods("GET")
 	r.Handle("/user/info", authRouter)
 	r.Handle("/user/password", authRouter)
 
-	r.HandleFunc("/events", app.EventManager.GetEventsFromAuthor).Queries("authorid", "{authorid:[0-9]+}").Methods("GET")
-	r.HandleFunc("/events", app.EventManager.GetEvents).Queries("query", "{query}", "category", "{category}", "tags", "{tags}").Methods("GET")
-	r.HandleFunc("/events", app.EventManager.GetEvents).Queries("query", "{query}", "category", "{category}").Methods("GET")
-	r.HandleFunc("/events", app.EventManager.GetEvents).Queries("query", "{query}", "tags", "{tags}").Methods("GET")
-	r.HandleFunc("/events", app.EventManager.GetEvents).Queries("query", "{query}").Methods("GET")
-	r.HandleFunc("/events", app.EventManager.GetEvents).Queries("category", "{category}", "tags", "{tags}").Methods("GET")
-	r.HandleFunc("/events", app.EventManager.GetEvents).Queries("category", "{category}").Methods("GET")
-	r.HandleFunc("/events", app.EventManager.GetEvents).Queries("tags", "{tags}").Methods("GET")
-	r.HandleFunc("/events", app.EventManager.GetEvents).Methods("GET")
-	r.HandleFunc("/events/{id:[0-9]+}", app.EventManager.GetEvent).Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEventsFromAuthor).Queries("authorid", "{authorid:[0-9]+}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "category", "{category}", "tags", "{tags}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "category", "{category}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "tags", "{tags}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("category", "{category}", "tags", "{tags}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("category", "{category}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("tags", "{tags}").Methods("GET")
+	r.HandleFunc("/events", app.eventManager.GetEvents).Methods("GET")
+	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
+
 	r.Handle("/events/{id:[0-9]+}", authRouter)
 	r.Handle("/events", authRouter).Methods("POST")
-
 	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
 	r.Handle("/user/avatar", authRouter)
 
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
+
+	return r
+*/
+
+func newRouterWithEndpoints(app *App) *mux.Router {
+	mw := middleware.NewMiddleware()
+	sessionMW := sessionMiddleware.NewMiddleware(*app.SessionManager)
+	csrfMW := csrfMiddleware.NewMiddleware(*app.CsrfManager)
+	r := mux.NewRouter()
+	r.Use(mw.Logging)
+	r.Use(mw.CORS)
+	r.Use(mw.Recovery)
+	r.Methods("OPTIONS").HandlerFunc(options)
+
+	r.Path("/auth/signup").HandlerFunc(app.AuthManager.SignUp).Methods("POST")
+	r.Path("/auth/login").HandlerFunc(app.AuthManager.SignIn).Methods("POST")
+	authRouter := r.PathPrefix("/auth").Subrouter()
+	authRouter.Use(sessionMW.Auth)
+	authRouter.Path("/logout").HandlerFunc(app.AuthManager.Logout).Methods("GET")
+
+	r.Path("/user/{id:[0-9]+}").HandlerFunc(app.UserManager.GetUserById).Methods("GET")
+	userRouter := r.PathPrefix("/user").Subrouter()
+	userRouter.Use(sessionMW.Auth)
+	userRouter.Use(mw.GetVars)
+	userRouter.Path("").HandlerFunc(app.UserManager.GetUser).Methods("GET")
+	userRouter.Path("info").HandlerFunc(app.UserManager.UpdateUserInfo).Methods("POST")
+	userRouter.Path("password").HandlerFunc(app.UserManager.UpdateUserPassword).Methods("POST")
+	userRouter.Path("avatar").HandlerFunc(app.UserManager.UpdateUserPhoto).Methods("POST")
 
 	return r
 }
