@@ -6,7 +6,6 @@ import (
 	"backend/response/utils"
 	"backend/service/image"
 	"backend/service/user"
-	"github.com/gorilla/mux"
 	"net/http"
 )
 
@@ -39,8 +38,7 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetUserById:"
 	log.Debug(message + "started")
-	vars := mux.Vars(r)
-	userId := vars["id"]
+	userId := r.Context().Value("userId").(string)
 	foundUser, err := h.useCase.GetUser(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return

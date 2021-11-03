@@ -125,9 +125,6 @@ func TestSignUp(t *testing.T) {
 		response.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
-
-		t.Log("exptected = ", expected)
-		t.Log("actual = ", actual)
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
@@ -212,13 +209,11 @@ func TestSignIn(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 		r.ServeHTTP(w, req)
 
-		//expected := test.output
-		//actual, err := response.GetBodyFromResponseRecorder(w)
-		require.NoError(t, err, logTestMessage+"err =", err)
-
-		t.Log(w.Body)
-
-		//require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+		wTest := httptest.NewRecorder()
+		response.SendResponse(wTest, test.output)
+		expected := wTest.Body
+		actual := w.Body
+		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
 
@@ -293,9 +288,10 @@ func TestLogout(t *testing.T) {
 		w.Header().Set("X-CSRF-Token", csrfToken)
 		r.ServeHTTP(w, req)
 
-		//expected := test.output
-		//actual, err := response.GetBodyFromResponseRecorder(w)
-		require.NoError(t, err, logTestMessage+"err =", err)
-		//require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+		wTest := httptest.NewRecorder()
+		response.SendResponse(wTest, test.output)
+		expected := wTest.Body
+		actual := w.Body
+		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }

@@ -15,7 +15,7 @@ import (
 
 	csrf "backend/service/csrf/manager"
 	csrfRepository "backend/service/csrf/repository"
-	"backend/service/image"
+	imgManager "backend/service/image/manager"
 	imgRepository "backend/service/image/repository"
 	session "backend/service/session/manager"
 	sessionRepository "backend/service/session/repository"
@@ -42,7 +42,7 @@ type App struct {
 	EventManager   *eventDelivery.Delivery
 	SessionManager *session.Manager
 	CsrfManager    *csrf.Manager
-	ImgManager     *image.Manager
+	ImgManager     *imgManager.Manager
 	db             *sql.DB
 }
 
@@ -79,7 +79,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	csrfM := csrf.NewManager(*csrfR)
 
 	imgR := imgRepository.NewRepository(db)
-	imgM := image.NewManager(*imgR)
+	imgM := imgManager.NewManager(*imgR)
 
 	authR := authRepository.NewRepository(db)
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
@@ -87,7 +87,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 
 	userR := userRepository.NewRepository(db)
 	userUC := userUseCase.NewUseCase(userR)
-	userD := userDelivery.NewDelivery(userUC, *imgM)
+	userD := userDelivery.NewDelivery(userUC, imgM)
 
 	eventR := eventRepository.NewRepository(db)
 	eventUC := eventUseCase.NewUseCase(eventR)

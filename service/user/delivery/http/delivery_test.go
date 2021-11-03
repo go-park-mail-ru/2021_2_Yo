@@ -1,111 +1,112 @@
 package http
 
 import (
-	"backend/auth/usecase"
 	"backend/models"
 	"backend/response"
+	image "backend/service/image/manager"
+	error3 "backend/service/user/error"
+	"backend/service/user/usecase"
 	"bytes"
-	"encoding/json"
+	"context"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 )
 
-func TestSignUp(t *testing.T) {
-	r := mux.NewRouter()
-	useCaseMock := new(usecase.UseCaseMock)
-	handlerTest := NewDelivery(useCaseMock)
-	r.HandleFunc("/signup", handlerTest.SignUp).Methods("POST")
+const logTestMessage = "auth:delivery:test"
 
-	bodyUserTest := &response.ResponseBodyUser{
-		Name:     "nameTest",
-		Surname:  "surnameTest",
-		Mail:     "mailTest",
-		Password: "passwordTest",
-	}
-
-	bodyUserJSON, err := json.Marshal(bodyUserTest)
-	require.NoError(t, err, "TestSignUp : jsonMarshal error = ", err)
-
-	useCaseMock.On(
-		"SignUp",
-		bodyUserTest.Name,
-		bodyUserTest.Surname,
-		bodyUserTest.Mail,
-		bodyUserTest.Password).Return(nil)
-
-	useCaseMock.On(
-		"SignIn",
-		bodyUserTest.Mail,
-		bodyUserTest.Password).Return("", nil)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/signup", bytes.NewBuffer(bodyUserJSON))
-	r.ServeHTTP(w, req)
-
-	require.Equal(t, 200, w.Code, "TestSignUp : expected 200, got", w.Code)
+var getUserTests = []struct {
+	id         int
+	input      string
+	user       *models.User
+	useCaseErr error
+	output     *response.Response
+}{
+	{1,
+		"1",
+		&models.User{
+			ID: "1",
+		},
+		nil,
+		response.UserResponse(&models.User{ID: "1"})},
+	{2,
+		"1",
+		nil,
+		error3.ErrUserNotFound,
+		response.ErrorResponse(error3.ErrUserNotFound.Error())},
 }
 
-func TestSignIn(t *testing.T) {
-	r := mux.NewRouter()
-	useCaseMock := new(usecase.UseCaseMock)
-	handlerTest := NewDelivery(useCaseMock)
-	r.HandleFunc("/login", handlerTest.SignIn).Methods("POST")
+func TestGetUser(t *testing.T) {
+	for _, test := range getUserTests {
+		userId := test.input
+		useCaseMock := new(usecase.UseCaseMock)
+		imageManagerMock := new(image.ManagerMock)
+		handlerTest := NewDelivery(useCaseMock, imageManagerMock)
+		useCaseMock.On("GetUser", userId).Return(test.user, test.useCaseErr)
 
-	bodyUserTest := &response.ResponseBodyUser{
-		Mail:     "mailTest",
-		Password: "passwordTest",
+		r := mux.NewRouter()
+		r.HandleFunc("/user", handlerTest.GetUser).Methods("GET")
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/user", bytes.NewBuffer(nil))
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+		userIdContext := context.WithValue(context.Background(), "userId", userId)
+		r.ServeHTTP(w, req.WithContext(userIdContext))
+
+		wTest := httptest.NewRecorder()
+		response.SendResponse(wTest, test.output)
+		expected := wTest.Body
+		actual := w.Body
+		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
-
-	bodyUserJSON, err := json.Marshal(bodyUserTest)
-	require.NoError(t, err, "TestSignIn : jsonMarshal error = ", err)
-
-	useCaseMock.On(
-		"SignIn",
-		bodyUserTest.Mail,
-		bodyUserTest.Password).Return("jwt_token_test", nil)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(bodyUserJSON))
-	r.ServeHTTP(w, req)
-
-	require.Equal(t, 200, w.Code, "TestSignIn : expected 200, got", w.Code)
-	require.Equal(t, "jwt_token_test", w.Result().Cookies()[0].Value, "TestSignIn : expected jwt_token_test, got", w.Result().Cookies()[0].Value)
 }
 
-func TestUser(t *testing.T) {
-	r := mux.NewRouter()
-	useCaseMock := new(usecase.UseCaseMock)
-	handlerTest := NewDelivery(useCaseMock)
-	r.HandleFunc("/user", handlerTest.User).Methods("GET")
+var getUserByIdTests = []struct {
+	id         int
+	input      string
+	user       *models.User
+	useCaseErr error
+	output     *response.Response
+}{
+	{1,
+		"1",
+		&models.User{
+			ID: "1",
+		},
+		nil,
+		response.UserResponse(&models.User{
+			ID: "1",
+		})},
+	{2,
+		"1",
+		nil,
+		error3.ErrUserNotFound,
+		response.ErrorResponse(error3.ErrUserNotFound.Error())},
+}
 
-	w := httptest.NewRecorder()
-	jwtToken := "test_token"
-	cookie := &http.Cookie{
-		Name:  "session_id",
-		Value: jwtToken,
+func TestGetUserById(t *testing.T) {
+	for _, test := range getUserByIdTests {
+		userId := test.input
+		useCaseMock := new(usecase.UseCaseMock)
+		imageManagerMock := new(image.ManagerMock)
+		handlerTest := NewDelivery(useCaseMock, imageManagerMock)
+		useCaseMock.On("GetUser", userId).Return(test.user, test.useCaseErr)
+		r := mux.NewRouter()
+
+		r.HandleFunc("/user", handlerTest.GetUserById).Methods("GET")
+		req, err := http.NewRequest("GET", "/user", nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+
+		w := httptest.NewRecorder()
+		userIdContext := context.WithValue(context.Background(), "userId", userId)
+		r.ServeHTTP(w, req.WithContext(userIdContext))
+
+		wTest := httptest.NewRecorder()
+		response.SendResponse(wTest, test.output)
+		expected := wTest.Body
+		actual := w.Body
+		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
-
-	useCaseMock.On(
-		"ParseToken",
-		cookie.Value).Return(&models.User{
-		ID:       "1",
-		Name:     "nameTest",
-		Surname:  "surnameTest",
-		Mail:     "mailTest",
-		Password: "passwordTest",
-	}, nil)
-
-	req, _ := http.NewRequest("GET", "/user", bytes.NewBuffer([]byte("")))
-	req.AddCookie(cookie)
-	r.ServeHTTP(w, req)
-
-	require.Equal(t, 200, w.Code, "TestSignIn : expected 200, got", w.Code)
-	require.Equal(t,
-		"{\"status\":200,\"body\":{\"name\":\"nameTest\"}}",
-		w.Body.String(),
-		"TestSignIn : expected jwt_token_test, got",
-		w.Body.String())
 }
