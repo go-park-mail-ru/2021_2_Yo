@@ -92,8 +92,11 @@ var signUpTests = []struct {
 }
 
 func TestSignUp(t *testing.T) {
-
 	for _, test := range signUpTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		sessionManagerMock := new(session.ManagerMock)
+		csrfManagerMock := new(csrf.ManagerMock)
+		handlerTest := NewDelivery(useCaseMock, sessionManagerMock, csrfManagerMock)
 
 		bodyUserJSON, err := json.Marshal(test.input)
 		require.NoError(t, err, logTestMessage+"err =", err)
@@ -105,20 +108,16 @@ func TestSignUp(t *testing.T) {
 		userModel.Mail = test.input.Mail
 		userModel.Password = test.input.Password
 
-		useCaseMock := new(usecase.UseCaseMock)
-		sessionManagerMock := new(session.ManagerMock)
-		csrfManagerMock := new(csrf.ManagerMock)
-		handlerTest := NewDelivery(useCaseMock, sessionManagerMock, csrfManagerMock)
-
 		useCaseMock.On("SignUp", userModel).Return(test.useCaseErr)
 		sessionManagerMock.On("Create", "").Return("", test.sessionManagerErr)
 		csrfManagerMock.On("Create", "").Return("", test.csrfManagerErr)
 
 		r := mux.NewRouter()
 		r.HandleFunc("/signup", handlerTest.SignUp).Methods("POST")
-		w := httptest.NewRecorder()
 		req, err := http.NewRequest("POST", "/signup", bytes.NewBuffer(bodyUserJSON))
 		require.NoError(t, err, logTestMessage+"NewRequest error")
+
+		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
 		wTest := httptest.NewRecorder()
@@ -186,27 +185,27 @@ var signInTests = []struct {
 
 func TestSignIn(t *testing.T) {
 	for _, test := range signInTests {
-
-		bodyUserJSON, err := json.Marshal(test.input)
-		require.NoError(t, err, logTestMessage+"err =", err)
-
-		userMail := test.input.Mail
-		userPassword := test.input.Password
-
 		useCaseMock := new(usecase.UseCaseMock)
 		sessionManagerMock := new(session.ManagerMock)
 		csrfManagerMock := new(csrf.ManagerMock)
 		handlerTest := NewDelivery(useCaseMock, sessionManagerMock, csrfManagerMock)
 
+		userMail := test.input.Mail
+		userPassword := test.input.Password
+
 		useCaseMock.On("SignIn", userMail, userPassword).Return("", test.useCaseErr)
 		sessionManagerMock.On("Create", "").Return("", test.sessionManagerErr)
 		csrfManagerMock.On("Create", "").Return("", test.csrfManagerErr)
 
+		bodyUserJSON, err := json.Marshal(test.input)
+		require.NoError(t, err, logTestMessage+"err =", err)
+
 		r := mux.NewRouter()
 		r.HandleFunc("/login", handlerTest.SignIn).Methods("POST")
-		w := httptest.NewRecorder()
 		req, err := http.NewRequest("POST", "/login", bytes.NewBuffer(bodyUserJSON))
 		require.NoError(t, err, logTestMessage+"NewRequest error")
+
+		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
 		wTest := httptest.NewRecorder()
@@ -265,7 +264,6 @@ var logoutTests = []struct {
 
 func TestLogout(t *testing.T) {
 	for _, test := range logoutTests {
-
 		useCaseMock := new(usecase.UseCaseMock)
 		sessionManagerMock := new(session.ManagerMock)
 		csrfManagerMock := new(csrf.ManagerMock)
@@ -279,12 +277,14 @@ func TestLogout(t *testing.T) {
 
 		r := mux.NewRouter()
 		r.HandleFunc("/logout", handlerTest.Logout).Methods("GET")
-		w := httptest.NewRecorder()
+
 		req, err := http.NewRequest("GET", "/logout", bytes.NewBuffer([]byte(csrfToken)))
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 		if cookie.Name != "" {
 			req.AddCookie(cookie)
 		}
+
+		w := httptest.NewRecorder()
 		w.Header().Set("X-CSRF-Token", csrfToken)
 		r.ServeHTTP(w, req)
 

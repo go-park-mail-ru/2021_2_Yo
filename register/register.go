@@ -49,6 +49,6 @@ func UserHTTPEndpoints(r *mux.Router, delivery *userHttp.Delivery, middlewares *
 	r.Handle("", useMiddlewares(r, "", delivery.GetUser, middlewares.GetVars, middlewares.Auth)).Methods("POST")
 	r.HandleFunc("", delivery.GetUser).Methods("GET")
 	r.Handle("/info", useMiddlewares(r, "/info", delivery.UpdateUserInfo, middlewares.GetVars, middlewares.Auth)).Methods("POST")
-	r.Handle("/password", useMiddlewares(r, "/info", delivery.UpdateUserPassword, middlewares.GetVars, middlewares.Auth)).Methods("POST")
-	r.Handle("/avatar", useMiddlewares(r, "/info", delivery.UpdateUserPhoto, middlewares.GetVars, middlewares.Auth)).Methods("POST")
+	r.Handle("/password", useMiddlewares(r, "/password", delivery.UpdateUserPassword, middlewares.GetVars, middlewares.Auth)).Methods("POST")
+	r.Handle("/avatar", useMiddlewares(r, "/avatar", delivery.UpdateUserAvatar, middlewares.GetVars, middlewares.Auth)).Methods("POST")
 }

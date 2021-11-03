@@ -24,6 +24,8 @@ func NewDelivery(useCase user.UseCase, imgManager image.Manager) *Delivery {
 	}
 }
 
+//TODO: Проверять везде контекст на пустоту
+
 func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetUser:"
 	log.Debug(message + "started")
@@ -48,7 +50,6 @@ func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 	} else {
 		userId = r.Context().Value("id").(string)
 	}
-	log.Debug(message+"userId 2 =", userId)
 	foundUser, err := h.useCase.GetUser(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
@@ -89,7 +90,7 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "ended")
 }
 
-func (h *Delivery) UpdateUserPhoto(w http.ResponseWriter, r *http.Request) {
+func (h *Delivery) UpdateUserAvatar(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserPhoto:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
