@@ -110,6 +110,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddlewares(app.SessionManager)
 
 	r := mux.NewRouter()
+	r.Use(mw.GetVars)
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
