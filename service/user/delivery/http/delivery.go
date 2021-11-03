@@ -6,6 +6,7 @@ import (
 	"backend/response/utils"
 	"backend/service/image"
 	"backend/service/user"
+	"github.com/gorilla/mux"
 	"net/http"
 )
 
@@ -38,7 +39,16 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetUserById:"
 	log.Debug(message + "started")
-	userId := r.Context().Value("userId").(string)
+	//TODO: Костыль из-за дебильной библиотеки.
+	//TODO: Или менять на джина или терпеть.
+	var userId string
+	if r.Context().Value("id") == nil {
+		vars := mux.Vars(r)
+		userId = vars["id"]
+	} else {
+		userId = r.Context().Value("id").(string)
+	}
+	log.Debug(message+"userId 2 =", userId)
 	foundUser, err := h.useCase.GetUser(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return

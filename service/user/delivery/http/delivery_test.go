@@ -99,8 +99,14 @@ func TestGetUserById(t *testing.T) {
 		req, err := http.NewRequest("GET", "/user", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
+		//TODO: Баг библиотеки, из-за него пришлось делать дополнительную миддлвару, достающую значения из контекста
+		/*
+			req = mux.SetURLVars(req, map[string]string{
+				"id": userId,
+			})
+		*/
 		w := httptest.NewRecorder()
-		userIdContext := context.WithValue(context.Background(), "userId", userId)
+		userIdContext := context.WithValue(context.Background(), "id", userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 
 		wTest := httptest.NewRecorder()
