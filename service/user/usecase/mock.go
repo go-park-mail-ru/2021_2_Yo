@@ -9,7 +9,7 @@ type UseCaseMock struct {
 	mock.Mock
 }
 
-func (m *UseCaseMock) GetUser(userId string) (*models.User, error) {
+func (m *UseCaseMock) GetUserById(userId string) (*models.User, error) {
 	args := m.Called(userId)
 	return args.Get(0).(*models.User), args.Error(1)
 }

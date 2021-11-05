@@ -24,6 +24,8 @@ func NewRepository(database *sql.DB) *Repository {
 	}
 }
 
+//TODO: ErrDataExists
+
 func (s *Repository) CreateUser(user *models.User) (string, error) {
 	newUser := toPostgresUser(user)
 	query := createUserQuery

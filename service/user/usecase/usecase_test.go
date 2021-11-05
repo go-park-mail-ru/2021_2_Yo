@@ -1,70 +1,117 @@
 package usecase
 
 import (
-	"backend/auth/repository/mock"
 	"backend/models"
-	"github.com/dgrijalva/jwt-go/v4"
+	error2 "backend/service/user/error"
+	"backend/service/user/repository/mock"
+	"backend/utils"
 	"github.com/stretchr/testify/require"
+	"strconv"
 	"testing"
 )
 
-func TestSignUp(t *testing.T) {
-	secretWord := []byte("secret")
-	repositoryMock := new(mock.RepositoryMock)
-	useCaseTest := NewUseCase(repositoryMock, secretWord)
+const logTestMessage = "service:user:usecase:"
 
-	userTest := &models.User{
-		Name:     "nameTest",
-		Surname:  "surnameTest",
-		Mail:     "mailTest",
-		Password: "passwordTest",
-	}
-
-	repositoryMock.On("CreateUser", userTest).Return(nil)
-	err := useCaseTest.SignUp(userTest.Name, userTest.Surname, userTest.Mail, userTest.Password)
-	require.NoError(t, err, err)
+var getUserByIdTests = []struct {
+	id         int
+	input      string
+	outputUser *models.User
+	outputErr  error
+}{
+	{
+		1,
+		"1",
+		&models.User{
+			ID: "1",
+		},
+		nil,
+	},
+	{
+		2,
+		"",
+		nil,
+		error2.ErrEmptyData,
+	},
 }
 
-func TestSignIn(t *testing.T) {
-	secretWord := []byte("secret")
-	repositoryMock := new(mock.RepositoryMock)
-	useCaseTest := NewUseCase(repositoryMock, secretWord)
-
-	testId := "0"
-
-	userTest := &models.User{
-		ID: testId,
+func TestGetUserById(t *testing.T) {
+	for _, test := range getUserByIdTests {
+		repositoryMock := new(mock.RepositoryMock)
+		useCaseTest := NewUseCase(repositoryMock)
+		repositoryMock.On("GetUserById", test.input).Return(test.outputUser, test.outputErr)
+		actualUser, actualErr := useCaseTest.GetUserById(test.input)
+		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+		require.Equal(t, test.outputUser, actualUser, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
-
-	mail := "mailTest"
-	password := "passwordTest"
-
-	repositoryMock.On("GetUser", mail, password).Return(userTest, nil)
-	signedStringTest, err := useCaseTest.SignIn(mail, password)
-	require.NoError(t, err, "TestSignIn : useCase.SignIn err = ", err)
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims{ID: testId})
-	signedString, err := token.SignedString(secretWord)
-	require.NoError(t, err, "TestSignIn : token.SignedString err = ", err)
-
-	require.Equal(t, signedString, signedStringTest, "TestSignIn : signedStrings are not equal")
 }
 
-func TestParseToken(t *testing.T) {
-	secretWord := []byte("secret")
-	repositoryMock := new(mock.RepositoryMock)
-	useCaseTest := NewUseCase(repositoryMock, secretWord)
+var updateUserInfoTests = []struct {
+	id        int
+	userId    string
+	name      string
+	surname   string
+	about     string
+	outputErr error
+}{
+	{
+		1,
+		"1",
+		"testName",
+		"testSurname",
+		"testAbout",
+		nil,
+	},
+	{
+		2,
+		"",
+		"",
+		"",
+		"testAbout",
+		error2.ErrEmptyData,
+	},
+}
 
-	userIdTest := "0"
-	repositoryMock.On("GetUserById", userIdTest).Return(&models.User{
-		ID: "0",
-	}, nil)
+func TestUpdateUserInfo(t *testing.T) {
+	for _, test := range updateUserInfoTests {
+		repositoryMock := new(mock.RepositoryMock)
+		useCaseTest := NewUseCase(repositoryMock)
+		repositoryMock.On("UpdateUserInfo",
+			test.userId,
+			test.name,
+			test.surname,
+			test.about).Return(test.outputErr)
+		actualErr := useCaseTest.UpdateUserInfo(test.userId, test.name, test.surname, test.about)
+		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+	}
+}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims{ID: userIdTest})
-	signedString, err := token.SignedString(useCaseTest.secretWord)
-	require.NoError(t, err, "TestSignIn : token.SignedString err = ", err)
-	result, err := useCaseTest.ParseToken(signedString)
-	require.NoError(t, err, "TestSignIn : useCaseTest.ParseToken err = ", err)
+var updateUserPasswordTests = []struct {
+	id        int
+	userId    string
+	password  string
+	outputErr error
+}{
+	{
+		1,
+		"1",
+		"testPassword",
+		nil,
+	},
+	{
+		2,
+		"",
+		"",
+		error2.ErrEmptyData,
+	},
+}
 
-	require.Equal(t, userIdTest, result.ID, "TestParseToken : expected and got IDs are not equal")
+func TestUpdateUserPassword(t *testing.T) {
+	for _, test := range updateUserPasswordTests {
+		repositoryMock := new(mock.RepositoryMock)
+		useCaseTest := NewUseCase(repositoryMock)
+		hashedPassword := utils.CreatePasswordHash(test.password)
+		repositoryMock.On("UpdateUserPassword", test.userId, hashedPassword).Return(test.outputErr)
+		actualErr := useCaseTest.UpdateUserPassword(test.userId, test.password)
+		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+	}
 }

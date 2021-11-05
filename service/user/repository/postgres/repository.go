@@ -29,10 +29,10 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	query := getUserByIdQuery
 	user := User{}
 	err := s.db.Get(&user, query, userId)
-	if err == sql2.ErrNoRows {
-		return nil, error2.ErrUserNotFound
-	}
 	if err != nil {
+		if err == sql2.ErrNoRows {
+			return nil, error2.ErrUserNotFound
+		}
 		return nil, error2.ErrPostgres
 	}
 	return toModelUser(&user), nil
@@ -44,7 +44,7 @@ func (s *Repository) UpdateUserInfo(userId, name, surname, about string) error {
 		return error2.ErrAtoi
 	}
 	query := updateUserInfoQuery
-	_, err = s.db.Exec(query, name, surname, about, userIdInt)
+	_, err = s.db.Query(query, name, surname, about, userIdInt)
 	if err != nil {
 		return error2.ErrPostgres
 	}
@@ -57,7 +57,7 @@ func (s *Repository) UpdateUserPassword(userId, password string) error {
 		return error2.ErrAtoi
 	}
 	query := updateUserPasswordQuery
-	_, err = s.db.Exec(query, password, userIdInt)
+	_, err = s.db.Query(query, password, userIdInt)
 	if err != nil {
 		return error2.ErrPostgres
 	}

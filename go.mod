@@ -3,6 +3,7 @@ module backend
 go 1.13
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/go-sanitize/sanitize v1.0.1
 	github.com/gomodule/redigo v2.0.0+incompatible

@@ -96,7 +96,7 @@ func TestSignUp(t *testing.T) {
 		useCaseMock := new(usecase.UseCaseMock)
 		sessionManagerMock := new(session.ManagerMock)
 		csrfManagerMock := new(csrf.ManagerMock)
-		handlerTest := NewDelivery(useCaseMock, sessionManagerMock, csrfManagerMock)
+		deliveryTest := NewDelivery(useCaseMock, sessionManagerMock, csrfManagerMock)
 
 		bodyUserJSON, err := json.Marshal(test.input)
 		require.NoError(t, err, logTestMessage+"err =", err)
@@ -108,12 +108,12 @@ func TestSignUp(t *testing.T) {
 		userModel.Mail = test.input.Mail
 		userModel.Password = test.input.Password
 
-		useCaseMock.On("SignUp", userModel).Return(test.useCaseErr)
+		useCaseMock.On("SignUp", userModel).Return("", test.useCaseErr)
 		sessionManagerMock.On("Create", "").Return("", test.sessionManagerErr)
 		csrfManagerMock.On("Create", "").Return("", test.csrfManagerErr)
 
 		r := mux.NewRouter()
-		r.HandleFunc("/signup", handlerTest.SignUp).Methods("POST")
+		r.HandleFunc("/signup", deliveryTest.SignUp).Methods("POST")
 		req, err := http.NewRequest("POST", "/signup", bytes.NewBuffer(bodyUserJSON))
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
@@ -188,7 +188,7 @@ func TestSignIn(t *testing.T) {
 		useCaseMock := new(usecase.UseCaseMock)
 		sessionManagerMock := new(session.ManagerMock)
 		csrfManagerMock := new(csrf.ManagerMock)
-		handlerTest := NewDelivery(useCaseMock, sessionManagerMock, csrfManagerMock)
+		deliveryTest := NewDelivery(useCaseMock, sessionManagerMock, csrfManagerMock)
 
 		userMail := test.input.Mail
 		userPassword := test.input.Password
@@ -201,7 +201,7 @@ func TestSignIn(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"err =", err)
 
 		r := mux.NewRouter()
-		r.HandleFunc("/login", handlerTest.SignIn).Methods("POST")
+		r.HandleFunc("/login", deliveryTest.SignIn).Methods("POST")
 		req, err := http.NewRequest("POST", "/login", bytes.NewBuffer(bodyUserJSON))
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
@@ -267,7 +267,7 @@ func TestLogout(t *testing.T) {
 		useCaseMock := new(usecase.UseCaseMock)
 		sessionManagerMock := new(session.ManagerMock)
 		csrfManagerMock := new(csrf.ManagerMock)
-		handlerTest := NewDelivery(useCaseMock, sessionManagerMock, csrfManagerMock)
+		deliveryTest := NewDelivery(useCaseMock, sessionManagerMock, csrfManagerMock)
 
 		cookie := test.input
 		csrfToken := test.csrfToken
@@ -276,7 +276,7 @@ func TestLogout(t *testing.T) {
 		csrfManagerMock.On("Delete", csrfToken).Return(test.csrfManagerErr)
 
 		r := mux.NewRouter()
-		r.HandleFunc("/logout", handlerTest.Logout).Methods("GET")
+		r.HandleFunc("/logout", deliveryTest.Logout).Methods("GET")
 
 		req, err := http.NewRequest("GET", "/logout", bytes.NewBuffer([]byte(csrfToken)))
 		require.NoError(t, err, logTestMessage+"NewRequest error")

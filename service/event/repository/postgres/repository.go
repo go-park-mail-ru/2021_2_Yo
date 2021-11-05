@@ -1,9 +1,9 @@
 package postgres
 
 import (
-	error2 "backend/service/event/error"
 	log "backend/logger"
 	"backend/models"
+	error2 "backend/service/event/error"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -138,7 +138,7 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 	return nil
 }
 
-func (s *Repository) GetEvent(eventId string) (*models.Event, error) {
+func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 	eventIdInt, err := strconv.Atoi(eventId)
 	if err != nil {
 		return nil, error2.ErrAtoi

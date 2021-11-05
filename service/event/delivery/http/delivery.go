@@ -1,10 +1,10 @@
 package http
 
 import (
-	"backend/service/event"
 	log "backend/logger"
 	"backend/response"
 	"backend/response/utils"
+	"backend/service/event"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
@@ -26,9 +26,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "CreateEvent:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	log.Debug(message+"userId =", userId)
 	eventFromRequest, err := response.GetEventFromJSON(r)
-	log.Debug(message+"eventFromRequest = ", *eventFromRequest)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -73,12 +71,12 @@ func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "ended")
 }
 
-func (h *Delivery) GetEvent(w http.ResponseWriter, r *http.Request) {
+func (h *Delivery) GetEventById(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetEvent:"
 	log.Debug(message + "started")
 	vars := mux.Vars(r)
 	eventId := vars["id"]
-	resultEvent, err := h.useCase.GetEvent(eventId)
+	resultEvent, err := h.useCase.GetEventById(eventId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -100,7 +98,6 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	category := vars["category"]
 	tag := vars["tags"]
 	tags := strings.Split(tag, "|")
-	log.Debug("vars =", vars)
 	//err := response.ValidateAndSanitize(title)
 	//if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 	//	return

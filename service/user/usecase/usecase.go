@@ -19,7 +19,7 @@ func NewUseCase(userRepo user.Repository) *UseCase {
 	}
 }
 
-func (a *UseCase) GetUser(userId string) (*models.User, error) {
+func (a *UseCase) GetUserById(userId string) (*models.User, error) {
 	if userId == "" {
 		return nil, error2.ErrEmptyData
 	}
@@ -27,7 +27,7 @@ func (a *UseCase) GetUser(userId string) (*models.User, error) {
 }
 
 func (a *UseCase) UpdateUserInfo(userId string, name string, surname string, about string) error {
-	if userId == "" {
+	if userId == "" || name == "" || surname == "" {
 		return error2.ErrEmptyData
 	}
 	return a.repository.UpdateUserInfo(userId, name, surname, about)

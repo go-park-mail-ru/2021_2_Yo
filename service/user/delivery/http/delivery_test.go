@@ -44,13 +44,13 @@ func TestGetUser(t *testing.T) {
 	for _, test := range getUserTests {
 		useCaseMock := new(usecase.UseCaseMock)
 		imageManagerMock := new(image.ManagerMock)
-		handlerTest := NewDelivery(useCaseMock, imageManagerMock)
+		deliveryTest := NewDelivery(useCaseMock, imageManagerMock)
 
 		userId := test.input
-		useCaseMock.On("GetUser", userId).Return(test.user, test.useCaseErr)
+		useCaseMock.On("GetUserById", userId).Return(test.user, test.useCaseErr)
 
 		r := mux.NewRouter()
-		r.HandleFunc("/user", handlerTest.GetUser).Methods("GET")
+		r.HandleFunc("/user", deliveryTest.GetUser).Methods("GET")
 		w := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/user", bytes.NewBuffer(nil))
 		require.NoError(t, err, logTestMessage+"NewRequest error")
@@ -93,11 +93,11 @@ func TestGetUserById(t *testing.T) {
 		userId := test.input
 		useCaseMock := new(usecase.UseCaseMock)
 		imageManagerMock := new(image.ManagerMock)
-		handlerTest := NewDelivery(useCaseMock, imageManagerMock)
+		deliveryTest := NewDelivery(useCaseMock, imageManagerMock)
 		useCaseMock.On("GetUser", userId).Return(test.user, test.useCaseErr)
 
 		r := mux.NewRouter()
-		r.HandleFunc("/user", handlerTest.GetUserById).Methods("GET")
+		r.HandleFunc("/user", deliveryTest.GetUserById).Methods("GET")
 		req, err := http.NewRequest("GET", "/user", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
@@ -155,7 +155,7 @@ func TestUpdateUserInfo(t *testing.T) {
 	for _, test := range updateUserInfoTests {
 		useCaseMock := new(usecase.UseCaseMock)
 		imageManagerMock := new(image.ManagerMock)
-		handlerTest := NewDelivery(useCaseMock, imageManagerMock)
+		deliveryTest := NewDelivery(useCaseMock, imageManagerMock)
 
 		userId := test.input
 
@@ -180,7 +180,7 @@ func TestUpdateUserInfo(t *testing.T) {
 		}
 
 		r := mux.NewRouter()
-		r.HandleFunc("/user/info", handlerTest.UpdateUserInfo).Methods("POST")
+		r.HandleFunc("/user/info", deliveryTest.UpdateUserInfo).Methods("POST")
 		req, err := http.NewRequest("POST", "/user/info", bytes.NewBuffer(bodyUserJSON))
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
@@ -228,7 +228,7 @@ func TestUpdateUserPassword(t *testing.T) {
 	for _, test := range updateUserPasswordTests {
 		useCaseMock := new(usecase.UseCaseMock)
 		imageManagerMock := new(image.ManagerMock)
-		handlerTest := NewDelivery(useCaseMock, imageManagerMock)
+		deliveryTest := NewDelivery(useCaseMock, imageManagerMock)
 
 		userId := test.input
 
@@ -249,7 +249,7 @@ func TestUpdateUserPassword(t *testing.T) {
 		}
 
 		r := mux.NewRouter()
-		r.HandleFunc("/user/password", handlerTest.UpdateUserPassword).Methods("POST")
+		r.HandleFunc("/user/password", deliveryTest.UpdateUserPassword).Methods("POST")
 		req, err := http.NewRequest("POST", "/user/password", bytes.NewBuffer(bodyUserJSON))
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
@@ -281,12 +281,12 @@ func TestUpdateUserAvatar(t *testing.T) {
 	for _, test := range updateUserAvatarTests {
 		useCaseMock := new(usecase.UseCaseMock)
 		imageManagerMock := new(image.ManagerMock)
-		handlerTest := NewDelivery(useCaseMock, imageManagerMock)
+		deliveryTest := NewDelivery(useCaseMock, imageManagerMock)
 
 		userId := test.input
 
 		r := mux.NewRouter()
-		r.HandleFunc("/user/avatar", handlerTest.UpdateUserAvatar).Methods("POST")
+		r.HandleFunc("/user/avatar", deliveryTest.UpdateUserAvatar).Methods("POST")
 		req, err := http.NewRequest("POST", "/user/avatar", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 

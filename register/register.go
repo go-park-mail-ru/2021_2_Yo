@@ -35,7 +35,7 @@ func EventHTTPEndpoints(r *mux.Router, delivery *eventHttp.Delivery, mws *middle
 	r.HandleFunc("", delivery.GetEvents).Queries("category", "{category}").Methods("GET")
 	r.HandleFunc("", delivery.GetEvents).Queries("tags", "{tags}").Methods("GET")
 	r.HandleFunc("", delivery.GetEvents).Methods("GET")
-	r.HandleFunc("/{id:[0-9]+}", delivery.GetEvent).Methods("GET")
+	r.HandleFunc("/{id:[0-9]+}", delivery.GetEventById).Methods("GET")
 	updateEventHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.UpdateEvent)))
 	r.Handle("/{id:[0-9]+}", updateEventHandlerFunc).Methods("POST")
 	deleteEventHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.DeleteEvent)))

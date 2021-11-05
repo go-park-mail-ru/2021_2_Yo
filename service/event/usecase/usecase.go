@@ -1,9 +1,9 @@
 package usecase
 
 import (
+	"backend/models"
 	"backend/service/event"
 	error2 "backend/service/event/error"
-	"backend/models"
 )
 
 const logMessage = "service:event:usecase:"
@@ -43,11 +43,11 @@ func (a *UseCase) DeleteEvent(userId string, eventID string) error {
 	return a.eventRepo.DeleteEvent(userId, eventID)
 }
 
-func (a *UseCase) GetEvent(eventId string) (*models.Event, error) {
+func (a *UseCase) GetEventById(eventId string) (*models.Event, error) {
 	if eventId == "" {
 		return nil, error2.ErrEmptyData
 	}
-	return a.eventRepo.GetEvent(eventId)
+	return a.eventRepo.GetEventById(eventId)
 }
 
 func (a *UseCase) GetEvents(title string, category string, tags []string) ([]*models.Event, error) {

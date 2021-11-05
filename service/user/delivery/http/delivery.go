@@ -30,7 +30,7 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetUser:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	foundUser, err := h.useCase.GetUser(userId)
+	foundUser, err := h.useCase.GetUserById(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -50,7 +50,7 @@ func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 	} else {
 		userId = r.Context().Value("id").(string)
 	}
-	foundUser, err := h.useCase.GetUser(userId)
+	foundUser, err := h.useCase.GetUserById(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

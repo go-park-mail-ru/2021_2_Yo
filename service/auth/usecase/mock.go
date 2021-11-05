@@ -11,7 +11,7 @@ type UseCaseMock struct {
 
 func (m *UseCaseMock) SignUp(user *models.User) (string, error) {
 	args := m.Called(user)
-	return "", args.Error(0)
+	return args.Get(0).(string), args.Error(1)
 }
 
 func (m *UseCaseMock) SignIn(mail string, password string) (string, error) {
