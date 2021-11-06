@@ -41,7 +41,7 @@ func ValidateAndSanitize(object interface{}) error {
 	return nil
 }
 
-func GetEventFromJSON(r *http.Request) (*models.Event, error) {
+func GetEventFromRequest(r *http.Request) (*models.Event, error) {
 	eventInput := new(models.ResponseBodyEvent)
 	err := json.NewDecoder(r.Body).Decode(eventInput)
 	if err != nil {

@@ -41,15 +41,8 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetUserById:"
 	log.Debug(message + "started")
-	//TODO: Костыль из-за дебильной библиотеки.
-	//TODO: Или менять на джина или терпеть.
-	var userId string
-	if r.Context().Value("id") == nil {
-		vars := mux.Vars(r)
-		userId = vars["id"]
-	} else {
-		userId = r.Context().Value("id").(string)
-	}
+	vars := mux.Vars(r)
+	userId := vars["id"]
 	foundUser, err := h.useCase.GetUserById(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return

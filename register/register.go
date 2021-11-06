@@ -27,6 +27,7 @@ func useMiddlewares(r *mux.Router, path string, handlerFunc http.HandlerFunc, mi
 
 func EventHTTPEndpoints(r *mux.Router, delivery *eventHttp.Delivery, mws *middleware.Middlewares) {
 	r.HandleFunc("", delivery.GetEventsFromAuthor).Queries("authorid", "{authorid:[0-9]+}").Methods("GET")
+	//TODO: Попросить фронт заменить "query" на "title", ибо понятно, почему.
 	r.HandleFunc("", delivery.GetEvents).Queries("query", "{query}", "category", "{category}", "tags", "{tags}").Methods("GET")
 	r.HandleFunc("", delivery.GetEvents).Queries("query", "{query}", "category", "{category}").Methods("GET")
 	r.HandleFunc("", delivery.GetEvents).Queries("query", "{query}", "tags", "{tags}").Methods("GET")

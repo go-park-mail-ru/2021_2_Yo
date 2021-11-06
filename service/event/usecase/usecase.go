@@ -51,7 +51,7 @@ func (a *UseCase) GetEventById(eventId string) (*models.Event, error) {
 }
 
 func (a *UseCase) GetEvents(title string, category string, tags []string) ([]*models.Event, error) {
-	if tags[0] == "" {
+	if tags != nil && tags[0] == "" {
 		tags = nil
 	}
 	return a.eventRepo.GetEvents(title, category, tags)

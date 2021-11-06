@@ -26,7 +26,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "CreateEvent:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	eventFromRequest, err := response.GetEventFromJSON(r)
+	eventFromRequest, err := response.GetEventFromRequest(r)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -44,7 +44,7 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	vars := r.Context().Value("vars").(map[string]string)
 	eventId := vars["id"]
 	userId := r.Context().Value("userId").(string)
-	eventFromRequest, err := response.GetEventFromJSON(r)
+	eventFromRequest, err := response.GetEventFromRequest(r)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
