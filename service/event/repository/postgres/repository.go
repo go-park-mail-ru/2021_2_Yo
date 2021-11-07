@@ -41,7 +41,7 @@ const (
 func (s *Repository) checkAuthor(eventId int, userId int) error {
 	var authorId int
 	query := checkAuthorQuery
-	err := s.db.QueryRow(query, eventId).Scan(&authorId)
+	err := s.db.Get(&authorId, query, eventId)
 	if err != nil {
 		return error2.ErrPostgres
 	}
@@ -59,7 +59,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	}
 	var eventId int
 	query := createEventQuery
-	err = s.db.QueryRow(query,
+	err = s.db.Get(&eventId, query,
 		newEvent.Title,
 		newEvent.Description,
 		newEvent.Text,
@@ -70,7 +70,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		newEvent.Date,
 		newEvent.Geo,
 		newEvent.Tag,
-		newEvent.AuthorID).Scan(&eventId)
+		newEvent.AuthorID)
 	if err != nil {
 		if err == sql2.ErrNoRows {
 			return "", error2.ErrNoRows
@@ -99,7 +99,7 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 	}
 	e.ID = eventIdInt
 	query := updateEventQuery
-	_, err = s.db.Exec(query,
+	_, err = s.db.Query(query,
 		e.Title,
 		e.Description,
 		e.Text,
@@ -178,11 +178,8 @@ func (s *Repository) GetEvents(title string, category string, tags []string) ([]
 	} else {
 		query += `$3 = $3`
 	}
-	log.Debug(logMessage+"GetEvents:query =", query)
-	log.Debug("title =", title, ",category=", category, ", tags =", postgresTags)
 	rows, err := s.db.Queryx(query, title, category, postgresTags)
 	if err != nil {
-		log.Error(logMessage+"GetEvents:err =", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
