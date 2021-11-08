@@ -60,7 +60,7 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	imgUrl, err := utils.SaveImageFromRequest(r, "avatar")
+	imgUrl, err := utils.SaveImageFromRequest(r, "file")
 	/*
 		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
