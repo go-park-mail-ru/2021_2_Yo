@@ -2,9 +2,10 @@ CREATE TABLE "user" (
                         id serial not null unique,
                         name varchar(50) not null,
                         surname varchar(50) not null,
+                        about varchar(150),
+                        img_url varchar(150),
                         mail varchar(150) not null unique,
-                        password varchar(255) not null,
-                        about varchar(150)
+                        password varchar(255) not null
 );
 
 CREATE TABLE "event" (
@@ -15,7 +16,7 @@ CREATE TABLE "event" (
                          city varchar(255) not null,
                          category varchar(255) not null,
                          viewed BIGINT not null,
-                         img_url varchar(500) not null,
+                         img_url varchar(500),
                          date varchar(10) not null,
                          geo varchar(255) not null,
                          tag varchar(30)[],
@@ -28,7 +29,31 @@ VALUES ('Andrey', 'Ivanov', 'test@mail.ru', 'hashhashhash', 'I am soooo coool DA
        ('Petr', 'Leshiy', 'clown@mail.ru', 'hashhashhash', 'Yo my desctiption');
 
 INSERT INTO "event" (title, description, text, city, category, viewed, img_url, date, geo, tag, author_id)
-VALUES ('Tusovka', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+VALUES ('Tusovka', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Концерты', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+        array['Stupid', 'Alcohol'], 1),
+       ('Funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Вечеринки', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+        array['Alcohol', 'Hype'], 3),
+       ('Really funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Тусовки', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+        array ['Hype', 'Boomerang'], 2),
+       ('PAPAPAPA', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Выставки', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+        array['Boring', 'Alcohol'], 1),
+       ('Tusovka', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Театры', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+        array['Stupid', 'Alcohol'], 1),
+       ('Funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+        array['Alcohol', 'Hype'], 3),
+       ('Really funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+        array ['Hype', 'Boomerang'], 2),
+       ('PAPAPAPA', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+        array['Boring', 'Alcohol'], 1),
+       ('Tusovka', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+        array['Stupid', 'Alcohol'], 1),
+       ('Funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+        array['Alcohol', 'Hype'], 3),
+       ('Really funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+        array ['Hype', 'Boomerang'], 2),
+       ('PAPAPAPA', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
+        array['Boring', 'Alcohol'], 1),
+       ('Tusovka', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
         array['Stupid', 'Alcohol'], 1),
        ('Funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
         array['Alcohol', 'Hype'], 3),

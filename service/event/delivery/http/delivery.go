@@ -3,8 +3,8 @@ package http
 import (
 	log "backend/logger"
 	"backend/response"
-	"backend/response/utils"
 	"backend/service/event"
+	"backend/utils"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strings"

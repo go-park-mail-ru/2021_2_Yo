@@ -3,9 +3,8 @@ package http
 import (
 	log "backend/logger"
 	"backend/response"
-	"backend/response/utils"
-	"backend/service/image"
 	"backend/service/user"
+	"backend/utils"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -13,14 +12,12 @@ import (
 const logMessage = "service:user:delivery:http:"
 
 type Delivery struct {
-	useCase    user.UseCase
-	imgManager image.Manager
+	useCase user.UseCase
 }
 
-func NewDelivery(useCase user.UseCase, imgManager image.Manager) *Delivery {
+func NewDelivery(useCase user.UseCase) *Delivery {
 	return &Delivery{
-		useCase:    useCase,
-		imgManager: imgManager,
+		useCase: useCase,
 	}
 }
 
@@ -54,12 +51,19 @@ func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserInfo:"
 	log.Debug(message + "started")
-	userId := r.Context().Value("userId").(string)
 	u, err := response.GetUserFromRequest(r)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	err = h.useCase.UpdateUserInfo(userId, u.Name, u.Surname, u.About)
+	imgUrl, err := utils.SaveImageFromRequest(r, "avatar")
+	/*
+		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+		}
+	*/
+	u.ImgUrl = imgUrl
+	u.ID = r.Context().Value("userId").(string)
+	err = h.useCase.UpdateUserInfo(u)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
@@ -68,7 +72,7 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "UpdateUserInfo:"
+	message := logMessage + "UpdateUserPassword:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
 	u, err := response.GetUserFromRequest(r)
@@ -81,31 +85,4 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
-}
-
-func (h *Delivery) UpdateUserAvatar(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "UpdateUserPhoto:"
-	log.Debug(message + "started")
-	userId := r.Context().Value("userId").(string)
-	r.ParseMultipartForm(1 << 2)
-	// Get handler for filename, size and headers
-	file, handler, err := r.FormFile("myFile")
-	if err != nil {
-		log.Error("error Retrieving the File")
-		return
-	}
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		return
-	}
-	defer file.Close()
-
-	log.Info("Uploaded File: %+v\n", handler.Filename)
-	log.Info("File Size: %+v\n", handler.Size)
-	log.Info("MIME Header: %+v\n", handler.Header)
-
-	err = h.imgManager.SaveFile(userId, handler.Filename, file)
-	if err != nil {
-		log.Error(err)
-	}
-	log.Info(w, "Successfully Uploaded File\n"+"")
 }

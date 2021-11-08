@@ -2,8 +2,8 @@ package middleware
 
 import (
 	log "backend/logger"
-	"backend/response/utils"
 	"backend/service/csrf"
+	"backend/utils"
 	"context"
 	"net/http"
 )

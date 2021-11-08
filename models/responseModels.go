@@ -5,6 +5,7 @@ type ResponseBodyUser struct {
 	Name     string `json:"name,omitempty" valid:"type(string),length(0|50)" san:"xss"`
 	Surname  string `json:"surname,omitempty" valid:"type(string),length(0|50)" san:"xss"`
 	About    string `json:"description,omitempty" valid:"type(string),length(0|150)" san:"xss"`
+	ImgUrl   string `json:"img_url,omitempty" valid:"type(string)" san:"xss"`
 	Mail     string `json:"email,omitempty" valid:"email,length(0|150)" san:"xss"`
 	Password string `json:"password,omitempty" valid:"type(string),length(0|50)" san:"xss"`
 }
@@ -17,7 +18,7 @@ type ResponseBodyEvent struct {
 	City        string   `json:"city" valid:"type(string),length(0|30)" san:"xss"`
 	Category    string   `json:"category" valid:"type(string),length(0|30)" san:"xss"`
 	Viewed      int      `json:"viewed" valid:"type(int)" san:"xss"`
-	ImgUrl      string   `json:"imgUrl" valid:"type(string),length(0|255)" san:"xss"`
+	ImgUrl      string   `json:"img_url" valid:"type(string),length(0|255)" san:"xss"`
 	Tag         []string `json:"tag" san:"xss"`
 	Date        string   `json:"date" valid:"type(string),length(0|10)" san:"xss"`
 	Geo         string   `json:"geo" valid:"type(string),length(0|255)" san:"xss"`

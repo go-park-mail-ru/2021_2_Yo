@@ -6,6 +6,6 @@ import (
 
 type Repository interface {
 	GetUserById(userId string) (*models.User, error)
-	UpdateUserInfo(userId, name, surname, about string) error
+	UpdateUserInfo(user *models.User) error
 	UpdateUserPassword(userId, password string) error
 }

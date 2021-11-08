@@ -26,11 +26,11 @@ func (a *UseCase) GetUserById(userId string) (*models.User, error) {
 	return a.repository.GetUserById(userId)
 }
 
-func (a *UseCase) UpdateUserInfo(userId string, name string, surname string, about string) error {
-	if userId == "" || name == "" || surname == "" {
+func (a *UseCase) UpdateUserInfo(user *models.User) error {
+	if user.ID == "" || user.Name == "" || user.Surname == "" {
 		return error2.ErrEmptyData
 	}
-	return a.repository.UpdateUserInfo(userId, name, surname, about)
+	return a.repository.UpdateUserInfo(user)
 }
 
 func (a *UseCase) UpdateUserPassword(userId string, password string) error {

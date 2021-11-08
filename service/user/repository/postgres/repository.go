@@ -11,7 +11,7 @@ import (
 const (
 	logMessage              = "service:user:repository:postgres:"
 	getUserByIdQuery        = `select * from "user" where id = $1`
-	updateUserInfoQuery     = `update "user" set name = $1, surname = $2, about = $3 where id = $4`
+	updateUserInfoQuery     = `update "user" set name = $1, surname = $2, about = $3, img_url = $4 where id = $5`
 	updateUserPasswordQuery = `update "user" set password = $1 where id = $2`
 )
 
@@ -38,13 +38,13 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	return toModelUser(&user), nil
 }
 
-func (s *Repository) UpdateUserInfo(userId, name, surname, about string) error {
-	userIdInt, err := strconv.Atoi(userId)
+func (s *Repository) UpdateUserInfo(user *models.User) error {
+	postgresUser, err := toPostgresUser(user)
 	if err != nil {
-		return error2.ErrAtoi
+		return err
 	}
 	query := updateUserInfoQuery
-	_, err = s.db.Query(query, name, surname, about, userIdInt)
+	_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
 	if err != nil {
 		return error2.ErrPostgres
 	}

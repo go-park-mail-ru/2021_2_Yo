@@ -3,8 +3,8 @@ package middleware
 import (
 	log "backend/logger"
 	"backend/response"
-	"backend/response/utils"
 	"backend/service/session"
+	"backend/utils"
 	"context"
 	"github.com/gorilla/mux"
 	"net/http"

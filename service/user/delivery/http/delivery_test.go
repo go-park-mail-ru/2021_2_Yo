@@ -3,7 +3,6 @@ package http
 import (
 	"backend/models"
 	"backend/response"
-	image "backend/service/image/manager"
 	error3 "backend/service/user/error"
 	"backend/service/user/usecase"
 	"bytes"
@@ -43,8 +42,7 @@ var getUserTests = []struct {
 func TestGetUser(t *testing.T) {
 	for _, test := range getUserTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		imageManagerMock := new(image.ManagerMock)
-		deliveryTest := NewDelivery(useCaseMock, imageManagerMock)
+		deliveryTest := NewDelivery(useCaseMock)
 
 		userId := test.input
 		useCaseMock.On("GetUserById", userId).Return(test.user, test.useCaseErr)
@@ -92,8 +90,7 @@ func TestGetUserById(t *testing.T) {
 	for _, test := range getUserByIdTests {
 		userId := test.input
 		useCaseMock := new(usecase.UseCaseMock)
-		imageManagerMock := new(image.ManagerMock)
-		deliveryTest := NewDelivery(useCaseMock, imageManagerMock)
+		deliveryTest := NewDelivery(useCaseMock)
 		useCaseMock.On("GetUserById", userId).Return(test.user, test.useCaseErr)
 
 		r := mux.NewRouter()
@@ -146,8 +143,7 @@ var updateUserInfoTests = []struct {
 func TestUpdateUserInfo(t *testing.T) {
 	for _, test := range updateUserInfoTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		imageManagerMock := new(image.ManagerMock)
-		deliveryTest := NewDelivery(useCaseMock, imageManagerMock)
+		deliveryTest := NewDelivery(useCaseMock)
 
 		userId := test.input
 
@@ -219,8 +215,7 @@ var updateUserPasswordTests = []struct {
 func TestUpdateUserPassword(t *testing.T) {
 	for _, test := range updateUserPasswordTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		imageManagerMock := new(image.ManagerMock)
-		deliveryTest := NewDelivery(useCaseMock, imageManagerMock)
+		deliveryTest := NewDelivery(useCaseMock)
 
 		userId := test.input
 
@@ -255,44 +250,4 @@ func TestUpdateUserPassword(t *testing.T) {
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
-}
-
-//TODO: TestUpdateUserPhoto
-
-var updateUserAvatarTests = []struct {
-	id     int
-	input  string
-	output *response.Response
-}{
-	{1,
-		"1",
-		response.OkResponse()},
-}
-
-func TestUpdateUserAvatar(t *testing.T) {
-	/*
-		for _, test := range updateUserAvatarTests {
-			useCaseMock := new(usecase.UseCaseMock)
-			imageManagerMock := new(image.ManagerMock)
-			deliveryTest := NewDelivery(useCaseMock, imageManagerMock)
-
-			userId := test.input
-
-			r := mux.NewRouter()
-			r.HandleFunc("/user/avatar", deliveryTest.UpdateUserAvatar).Methods("POST")
-			req, err := http.NewRequest("POST", "/user/avatar", nil)
-			require.NoError(t, err, logTestMessage+"NewRequest error")
-
-			w := httptest.NewRecorder()
-			userIdContext := context.WithValue(context.Background(), "userId", userId)
-			r.ServeHTTP(w, req.WithContext(userIdContext))
-
-			wTest := httptest.NewRecorder()
-			response.SendResponse(wTest, test.output)
-			expected := wTest.Body
-			actual := w.Body
-			require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
-		}
-
-	*/
 }

@@ -2,14 +2,20 @@ package utils
 
 import (
 	log "backend/logger"
+	"backend/response"
 	"crypto/sha256"
 	"errors"
 	"flag"
 	"fmt"
 	"github.com/gomodule/redigo/redis"
 	sql "github.com/jmoiron/sqlx"
+	uuid "github.com/satori/go.uuid"
 	"github.com/spf13/viper"
+	"io"
+	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 const logMessage = "config:"
@@ -66,4 +72,44 @@ func InitRedisDB(dbConfName string) (redis.Conn, error) {
 
 	redisAddr := flag.String(name, value, usage)
 	return redis.DialURL(*redisAddr)
+}
+
+func SaveImageFromRequest(r *http.Request, key string) (string, error) {
+	err := r.ParseMultipartForm(1 << 2)
+	if err != nil {
+		return "", err
+	}
+	file, handler, err := r.FormFile(key)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	log.Debug("Uploaded File: %+v\n", handler.Filename)
+	log.Debug("File Size: %+v\n", handler.Size)
+	log.Debug("MIME Header: %+v\n", handler.Header)
+
+	imgUuid := uuid.NewV4()
+	s := strings.Split(handler.Filename, ".")
+	s[0] = imgUuid.String()
+	fileName := s[0] + s[1]
+	dst, err := os.Create(filepath.Join("/home/ubuntu/go/2021_2_Yo/static/images", filepath.Base(fileName)))
+	if err != nil {
+		return "", err
+	}
+	defer dst.Close()
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		return "", err
+	}
+	return fileName, nil
+}
+
+func CheckIfNoError(w *http.ResponseWriter, err error, msg string, status response.HttpStatus) bool {
+	if err != nil {
+		log.Error(msg+"err =", err)
+		response.SendResponse(*w, response.ErrorResponse(err.Error()))
+		return false
+	}
+	return true
 }

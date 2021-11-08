@@ -7,4 +7,5 @@ type User struct {
 	Mail     string
 	Password string
 	About    string
+	ImgUrl   string
 }

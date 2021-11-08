@@ -4,6 +4,6 @@ import "backend/models"
 
 type UseCase interface {
 	GetUserById(userId string) (*models.User, error)
-	UpdateUserInfo(userId string, name string, surname string, about string) error
+	UpdateUserInfo(user *models.User) error
 	UpdateUserPassword(userId string, password string) error
 }

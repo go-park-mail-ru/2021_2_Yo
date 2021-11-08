@@ -3,11 +3,11 @@ package http
 import (
 	log "backend/logger"
 	"backend/response"
-	"backend/response/utils"
 	"backend/service/auth"
 	error2 "backend/service/auth/error"
 	"backend/service/csrf"
 	"backend/service/session"
+	"backend/utils"
 	"net/http"
 )
 
