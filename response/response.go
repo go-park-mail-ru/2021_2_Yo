@@ -163,6 +163,7 @@ func UserResponse(user *models.User) *Response {
 			Surname: user.Surname,
 			Mail:    user.Mail,
 			About:   user.About,
+			ImgUrl:  user.ImgUrl,
 		},
 	}
 }

@@ -18,7 +18,7 @@ type ResponseBodyEvent struct {
 	City        string   `json:"city" valid:"type(string),length(0|30)" san:"xss"`
 	Category    string   `json:"category" valid:"type(string),length(0|30)" san:"xss"`
 	Viewed      int      `json:"viewed" valid:"type(int)" san:"xss"`
-	ImgUrl      string   `json:"img_url" valid:"type(string),length(0|255)" san:"xss"`
+	ImgUrl      string   `json:"imgUrl" valid:"type(string),length(0|255)" san:"xss"`
 	Tag         []string `json:"tag" san:"xss"`
 	Date        string   `json:"date" valid:"type(string),length(0|10)" san:"xss"`
 	Geo         string   `json:"geo" valid:"type(string),length(0|255)" san:"xss"`
