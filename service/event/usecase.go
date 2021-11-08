@@ -3,7 +3,7 @@ package event
 import "backend/models"
 
 type UseCase interface {
-	CreateEvent(e *models.Event, userId string) (string, error)
+	CreateEvent(e *models.Event) (string, error)
 	UpdateEvent(e *models.Event, userId string) error
 	DeleteEvent(eventId string, userId string) error
 	GetEventById(eventId string) (*models.Event, error)

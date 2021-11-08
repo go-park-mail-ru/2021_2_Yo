@@ -18,11 +18,10 @@ func NewUseCase(eventRepo event.Repository) *UseCase {
 	}
 }
 
-func (a *UseCase) CreateEvent(e *models.Event, userId string) (string, error) {
-	if e == nil || userId == "" {
+func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
+	if e == nil || e.AuthorId == "" {
 		return "", error2.ErrEmptyData
 	}
-	e.AuthorId = userId
 	return a.eventRepo.CreateEvent(e)
 }
 
