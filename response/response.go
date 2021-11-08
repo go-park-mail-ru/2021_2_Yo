@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/go-sanitize/sanitize"
 	"net/http"
+	"strings"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -70,12 +71,8 @@ func GetEventFromRequest(r *http.Request) (*models.Event, error) {
 func GetUserFromRequest(r *http.Request) (*models.User, error) {
 	message := logMessage + "GetUserFromRequest:"
 	userInput := new(models.ResponseBodyUser)
-	file, _, err := r.FormFile("json")
-	log.Debug(message + "HERE 1")
-	if err != nil {
-		return nil, err
-	}
-	err = json.NewDecoder(file).Decode(userInput)
+	jsonReader := strings.NewReader(r.FormValue("json"))
+	err := json.NewDecoder(jsonReader).Decode(userInput)
 	log.Debug(message + "HERE 2")
 	//err := json.NewDecoder(r.Body).Decode(userInput)
 	if err != nil {
