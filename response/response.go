@@ -68,12 +68,15 @@ func GetEventFromRequest(r *http.Request) (*models.Event, error) {
 }
 
 func GetUserFromRequest(r *http.Request) (*models.User, error) {
+	message := logMessage + "GetUserFromRequest:"
 	userInput := new(models.ResponseBodyUser)
 	file, _, err := r.FormFile("json")
+	log.Debug(message + "HERE 1")
 	if err != nil {
 		return nil, err
 	}
 	err = json.NewDecoder(file).Decode(userInput)
+	log.Debug(message + "HERE 2")
 	//err := json.NewDecoder(r.Body).Decode(userInput)
 	if err != nil {
 		return nil, ErrJSONDecoding
@@ -90,6 +93,7 @@ func GetUserFromRequest(r *http.Request) (*models.User, error) {
 		About:    userInput.About,
 	}
 	valid, err := govalidator.ValidateStruct(result)
+	log.Debug(message + "HERE 3")
 	if err != nil || !valid {
 		return nil, ErrValidation
 	}

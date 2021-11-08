@@ -99,10 +99,15 @@ func (m *Middlewares) ParseMultipartForm(next http.Handler) http.Handler {
 	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseMultipartForm(1 << 2)
+		cookie, err := r.Cookie("session_id")
 		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 			return
 		}
-		//userCtx := context.WithValue(r.Context(), "userId", userId)
-		//next.ServeHTTP(w, r.WithContext(userCtx))
+		userId, err := m.manager.Check(cookie.Value)
+		if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
+			return
+		}
+		userCtx := context.WithValue(r.Context(), "userId", userId)
+		next.ServeHTTP(w, r.WithContext(userCtx))
 	})
 }
