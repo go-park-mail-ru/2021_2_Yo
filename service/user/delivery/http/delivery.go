@@ -56,6 +56,7 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
+	log.Debug(message+"json =", r.FormValue("json"))
 	u, err := response.GetUserFromRequest(r)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return

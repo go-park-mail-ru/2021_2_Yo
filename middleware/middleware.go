@@ -93,3 +93,16 @@ func (m *Middlewares) Auth(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(userCtx))
 	})
 }
+
+func (m *Middlewares) ParseMultipartForm(next http.Handler) http.Handler {
+	message := logMessage + "ParseMultipartForm:"
+	log.Debug(message + "started")
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseMultipartForm(1 << 2)
+		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+			return
+		}
+		//userCtx := context.WithValue(r.Context(), "userId", userId)
+		//next.ServeHTTP(w, r.WithContext(userCtx))
+	})
+}
