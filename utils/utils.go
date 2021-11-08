@@ -77,12 +77,6 @@ func InitRedisDB(dbConfName string) (redis.Conn, error) {
 func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	message := logMessage + "SaveImageFromRequest"
 	log.Debug(message + "HERE 1")
-	/*
-		err := r.ParseMultipartForm(1 << 2)
-		if err != nil {
-			return "", err
-		}
-	*/
 	file, handler, err := r.FormFile(key)
 	log.Debug(message + "HERE 2")
 	if err != nil {
@@ -97,7 +91,7 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	imgUuid := uuid.NewV4()
 	s := strings.Split(handler.Filename, ".")
 	s[0] = imgUuid.String()
-	fileName := s[0] + s[1]
+	fileName := s[0] + "." + s[1]
 	dst, err := os.Create(filepath.Join("/home/ubuntu/go/2021_2_Yo/static/images", filepath.Base(fileName)))
 	if err != nil {
 		return "", err
@@ -107,7 +101,8 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return "~\\go\\2021_2_Yo\\static\\images" + fileName, nil
+	log.Debug(message+"imgUrl =", "https://bmstusa.ru/images/"+fileName)
+	return "https://bmstusa.ru/images/" + fileName, nil
 }
 
 func CheckIfNoError(w *http.ResponseWriter, err error, msg string, status response.HttpStatus) bool {
