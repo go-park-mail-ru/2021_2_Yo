@@ -75,10 +75,12 @@ func InitRedisDB(dbConfName string) (redis.Conn, error) {
 }
 
 func SaveImageFromRequest(r *http.Request, key string) (string, error) {
-	err := r.ParseMultipartForm(1 << 2)
-	if err != nil {
-		return "", err
-	}
+	/*
+		err := r.ParseMultipartForm(1 << 2)
+		if err != nil {
+			return "", err
+		}
+	*/
 	file, handler, err := r.FormFile(key)
 	if err != nil {
 		return "", err
