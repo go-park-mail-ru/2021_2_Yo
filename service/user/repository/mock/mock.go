@@ -14,8 +14,8 @@ func (s *RepositoryMock) GetUserById(userId string) (*models.User, error) {
 	return args.Get(0).(*models.User), args.Error(1)
 }
 
-func (s *RepositoryMock) UpdateUserInfo(userId, name, surname, about string) error {
-	args := s.Called(userId, name, surname, about)
+func (s *RepositoryMock) UpdateUserInfo(user *models.User) error {
+	args := s.Called(user)
 	return args.Error(0)
 }
 

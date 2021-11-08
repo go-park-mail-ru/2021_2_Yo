@@ -149,16 +149,13 @@ func TestUpdateUserInfo(t *testing.T) {
 
 		userModel := new(models.User)
 		if test.user != nil {
+			userModel.ID = userId
 			userModel.Name = test.user.Name
 			userModel.Surname = test.user.Surname
 			userModel.About = test.user.About
 		}
 
-		useCaseMock.On("UpdateUserInfo",
-			userId,
-			userModel.Name,
-			userModel.Surname,
-			userModel.About).Return(test.useCaseErr)
+		useCaseMock.On("UpdateUserInfo", userModel).Return(test.useCaseErr)
 
 		bodyUserJSON, err := json.Marshal(test.user)
 		require.NoError(t, err, logTestMessage+"err =", err)

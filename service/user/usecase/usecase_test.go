@@ -47,26 +47,27 @@ func TestGetUserById(t *testing.T) {
 
 var updateUserInfoTests = []struct {
 	id        int
-	userId    string
-	name      string
-	surname   string
-	about     string
+	user      *models.User
 	outputErr error
 }{
 	{
 		1,
-		"1",
-		"testName",
-		"testSurname",
-		"testAbout",
+		&models.User{
+			ID:      "1",
+			Name:    "testName",
+			Surname: "testSurname",
+			About:   "testAbout",
+		},
 		nil,
 	},
 	{
 		2,
-		"",
-		"",
-		"",
-		"testAbout",
+		&models.User{
+			ID:      "",
+			Name:    "",
+			Surname: "",
+			About:   "",
+		},
 		error2.ErrEmptyData,
 	},
 }
@@ -75,12 +76,8 @@ func TestUpdateUserInfo(t *testing.T) {
 	for _, test := range updateUserInfoTests {
 		repositoryMock := new(mock.RepositoryMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		repositoryMock.On("UpdateUserInfo",
-			test.userId,
-			test.name,
-			test.surname,
-			test.about).Return(test.outputErr)
-		actualErr := useCaseTest.UpdateUserInfo(test.userId, test.name, test.surname, test.about)
+		repositoryMock.On("UpdateUserInfo", test.user).Return(test.outputErr)
+		actualErr := useCaseTest.UpdateUserInfo(test.user)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }

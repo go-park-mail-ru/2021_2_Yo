@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	log "backend/logger"
 	"backend/models"
 	error2 "backend/service/user/error"
 	sql2 "database/sql"
@@ -31,7 +30,6 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	user := User{}
 	err := s.db.Get(&user, query, userId)
 	if err != nil {
-		log.Error(logMessage+"GetUserById: err =", err)
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrUserNotFound
 		}

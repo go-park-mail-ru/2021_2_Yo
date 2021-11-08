@@ -14,8 +14,8 @@ func (m *UseCaseMock) GetUserById(userId string) (*models.User, error) {
 	return args.Get(0).(*models.User), args.Error(1)
 }
 
-func (m *UseCaseMock) UpdateUserInfo(userId string, name string, surname string, about string) error {
-	args := m.Called(userId, name, surname, about)
+func (m *UseCaseMock) UpdateUserInfo(user *models.User) error {
+	args := m.Called(user)
 	return args.Error(0)
 }
 

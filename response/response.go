@@ -69,7 +69,12 @@ func GetEventFromRequest(r *http.Request) (*models.Event, error) {
 
 func GetUserFromRequest(r *http.Request) (*models.User, error) {
 	userInput := new(models.ResponseBodyUser)
-	err := json.NewDecoder(r.Body).Decode(userInput)
+	file, _, err := r.FormFile("json")
+	if err != nil {
+		return nil, err
+	}
+	err = json.NewDecoder(file).Decode(userInput)
+	//err := json.NewDecoder(r.Body).Decode(userInput)
 	if err != nil {
 		return nil, ErrJSONDecoding
 	}
