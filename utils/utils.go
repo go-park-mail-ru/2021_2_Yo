@@ -102,7 +102,7 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fileName, nil
+	return "~\\go\\2021_2_Yo\\static\\images" + fileName, nil
 }
 
 func CheckIfNoError(w *http.ResponseWriter, err error, msg string, status response.HttpStatus) bool {
