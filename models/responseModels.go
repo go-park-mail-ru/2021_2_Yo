@@ -5,7 +5,7 @@ type ResponseBodyUser struct {
 	Name     string `json:"name,omitempty" valid:"type(string),length(0|50)" san:"xss"`
 	Surname  string `json:"surname,omitempty" valid:"type(string),length(0|50)" san:"xss"`
 	About    string `json:"description,omitempty" valid:"type(string),length(0|150)" san:"xss"`
-	ImgUrl   string `json:"img_url,omitempty" valid:"type(string)" san:"xss"`
+	ImgUrl   string `json:"imgUrl,omitempty" valid:"type(string)" san:"xss"`
 	Mail     string `json:"email,omitempty" valid:"email,length(0|150)" san:"xss"`
 	Password string `json:"password,omitempty" valid:"type(string),length(0|50)" san:"xss"`
 }
