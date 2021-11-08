@@ -12,6 +12,7 @@ type User struct {
 	Mail     string `db:"mail"`
 	Password string `db:"password"`
 	About    string `db:"about"`
+	ImgUrl   string `db:"img_url"`
 }
 
 func toPostgresUser(u *models.User) *User {
@@ -21,6 +22,7 @@ func toPostgresUser(u *models.User) *User {
 		Mail:     u.Mail,
 		Password: u.Password,
 		About:    u.About,
+		ImgUrl:   u.ImgUrl,
 	}
 }
 
@@ -32,5 +34,6 @@ func toModelUser(u *User) *models.User {
 		Mail:     u.Mail,
 		Password: u.Password,
 		About:    u.About,
+		ImgUrl:   u.ImgUrl,
 	}
 }
