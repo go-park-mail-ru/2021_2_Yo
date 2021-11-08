@@ -27,6 +27,7 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetUser:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
+	log.Debug(message+"userId =", userId)
 	foundUser, err := h.useCase.GetUserById(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
