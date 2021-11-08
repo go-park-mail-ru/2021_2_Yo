@@ -7,6 +7,7 @@ import (
 	"backend/utils"
 	"github.com/gorilla/mux"
 	"net/http"
+	"strings"
 )
 
 const logMessage = "service:user:delivery:http:"
@@ -53,12 +54,11 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserInfo:"
 	log.Debug(message + "started")
 	err := r.ParseMultipartForm(0)
-	log.Debug(message+"err = ", err)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	log.Debug(message+"json =", r.FormValue("json"))
-	u, err := response.GetUserFromRequest(r)
+	userReader := strings.NewReader(r.FormValue("json"))
+	u, err := response.GetUserFromRequest(userReader)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -82,7 +82,7 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserPassword:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	u, err := response.GetUserFromRequest(r)
+	u, err := response.GetUserFromRequest(r.Body)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

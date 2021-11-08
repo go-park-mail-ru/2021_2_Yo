@@ -52,7 +52,7 @@ func setExpiredCookie(w http.ResponseWriter) {
 func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
-	u, err := response.GetUserFromRequest(r)
+	u, err := response.GetUserFromRequest(r.Body)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -78,7 +78,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignIn:"
 	log.Debug(message + "started")
-	u, err := response.GetUserFromRequest(r)
+	u, err := response.GetUserFromRequest(r.Body)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

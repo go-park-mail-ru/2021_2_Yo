@@ -76,9 +76,8 @@ func InitRedisDB(dbConfName string) (redis.Conn, error) {
 
 func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	message := logMessage + "SaveImageFromRequest"
-	log.Debug(message + "HERE 1")
+	_ = message
 	file, handler, err := r.FormFile(key)
-	log.Debug(message + "HERE 2")
 	if err != nil {
 		return "", err
 	}

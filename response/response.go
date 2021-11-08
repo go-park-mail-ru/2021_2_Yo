@@ -5,11 +5,10 @@ import (
 	"backend/models"
 	"encoding/json"
 	"errors"
-	"github.com/go-sanitize/sanitize"
-	"net/http"
-	"strings"
-
 	"github.com/asaskevich/govalidator"
+	"github.com/go-sanitize/sanitize"
+	"io"
+	"net/http"
 )
 
 const logMessage = "response:response:"
@@ -42,9 +41,9 @@ func ValidateAndSanitize(object interface{}) error {
 	return nil
 }
 
-func GetEventFromRequest(r *http.Request) (*models.Event, error) {
+func GetEventFromRequest(r io.Reader) (*models.Event, error) {
 	eventInput := new(models.ResponseBodyEvent)
-	err := json.NewDecoder(r.Body).Decode(eventInput)
+	err := json.NewDecoder(r).Decode(eventInput)
 	if err != nil {
 		return nil, ErrJSONDecoding
 	}
@@ -68,13 +67,11 @@ func GetEventFromRequest(r *http.Request) (*models.Event, error) {
 	return result, nil
 }
 
-func GetUserFromRequest(r *http.Request) (*models.User, error) {
+func GetUserFromRequest(r io.Reader) (*models.User, error) {
 	message := logMessage + "GetUserFromRequest:"
+	_ = message
 	userInput := new(models.ResponseBodyUser)
-	jsonReader := strings.NewReader(r.FormValue("json"))
-	err := json.NewDecoder(jsonReader).Decode(userInput)
-	log.Debug(message + "HERE 2")
-	//err := json.NewDecoder(r.Body).Decode(userInput)
+	err := json.NewDecoder(r).Decode(userInput)
 	if err != nil {
 		return nil, ErrJSONDecoding
 	}
@@ -90,7 +87,6 @@ func GetUserFromRequest(r *http.Request) (*models.User, error) {
 		About:    userInput.About,
 	}
 	valid, err := govalidator.ValidateStruct(result)
-	log.Debug(message + "HERE 3")
 	if err != nil || !valid {
 		return nil, ErrValidation
 	}
