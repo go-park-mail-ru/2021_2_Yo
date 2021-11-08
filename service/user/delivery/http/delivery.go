@@ -31,6 +31,7 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
+	log.Debug(message+"imgUrl =", foundUser.ImgUrl)
 	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }
