@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	log "backend/logger"
 	"backend/models"
 	error2 "backend/service/auth/error"
 	sql2 "database/sql"
@@ -46,6 +47,7 @@ func (s *Repository) GetUser(mail, password string) (*models.User, error) {
 	user := User{}
 	err := s.db.Get(&user, query, mail, password)
 	if err != nil {
+		log.Error(logMessage+"GetUser:err =", err)
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrUserNotFound
 		}
