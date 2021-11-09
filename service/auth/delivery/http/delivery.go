@@ -35,6 +35,7 @@ func setSessionIdCookie(w http.ResponseWriter, sessionId string) {
 		Secure:   true,
 		SameSite: http.SameSiteNoneMode,
 	}
+	log.Debug("setSessionIdCookie:cookie.Value =", cookie.Value)
 	http.SetCookie(w, cookie)
 }
 
