@@ -1,6 +1,7 @@
 package register
 
 import (
+	log "backend/logger"
 	"backend/middleware"
 	authHttp "backend/service/auth/delivery/http"
 	eventHttp "backend/service/event/delivery/http"
@@ -22,6 +23,7 @@ func useMiddlewares(r *mux.Router, path string, handlerFunc http.HandlerFunc, mi
 	for _, mw := range middlewares {
 		result.Use(mw)
 	}
+	log.Debug("useMiddlewares ended")
 	return result
 }
 
