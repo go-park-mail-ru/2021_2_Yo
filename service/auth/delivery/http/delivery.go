@@ -8,7 +8,6 @@ import (
 	"backend/service/session"
 	"backend/utils"
 	"net/http"
-	"time"
 )
 
 const logMessage = "service:auth:delivery:http:"
@@ -32,7 +31,7 @@ func setSessionIdCookie(w http.ResponseWriter, sessionId string) {
 		HttpOnly: true,
 		Secure:   true,
 		SameSite: http.SameSiteNoneMode,
-		MaxAge:   int(time.Hour * 24),
+		Path:     "/",
 	}
 	http.SetCookie(w, cookie)
 }
