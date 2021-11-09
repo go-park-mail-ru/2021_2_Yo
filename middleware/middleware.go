@@ -63,11 +63,8 @@ func (m *Middlewares) Logging(next http.Handler) http.Handler {
 }
 
 func (m *Middlewares) GetVars(next http.Handler) http.Handler {
-	message := logMessage + "GetVars:"
-	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		log.Debug(message+"vars =", vars)
 		if vars != nil {
 			varsCtx := context.WithValue(r.Context(), "vars", vars)
 			next.ServeHTTP(w, r.WithContext(varsCtx))
@@ -79,24 +76,6 @@ func (m *Middlewares) GetVars(next http.Handler) http.Handler {
 
 func (m *Middlewares) Auth(next http.Handler) http.Handler {
 	message := logMessage + "Auth:"
-	log.Debug(message + "started")
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("session_id")
-		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-			return
-		}
-		userId, err := m.manager.Check(cookie.Value)
-		if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
-			return
-		}
-		userCtx := context.WithValue(r.Context(), "userId", userId)
-		next.ServeHTTP(w, r.WithContext(userCtx))
-	})
-}
-
-func (m *Middlewares) ParseMultipartForm(next http.Handler) http.Handler {
-	message := logMessage + "ParseMultipartForm:"
-	log.Debug(message + "started")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_id")
 		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
