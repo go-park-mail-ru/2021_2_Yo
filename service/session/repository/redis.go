@@ -23,6 +23,7 @@ func (s *Repository) Create(data *models.SessionData) error {
 
 func (s *Repository) Check(sessionId string) (string, error) {
 	res := s.db.Get(sessionId)
+	log.Debug("Session redis check res =", res.Val(), res.Err(), res)
 	return res.Val(), res.Err()
 }
 

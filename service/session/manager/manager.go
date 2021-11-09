@@ -40,6 +40,7 @@ func (m *Manager) Create(userId string) (string, error) {
 		UserId:     userId,
 		Expiration: sessionLifeTime,
 	}
+	log.Debug("Session manager create : expiration =", sessionData.Expiration)
 	err := m.repository.Create(sessionData)
 	if err != nil {
 		return "", err
