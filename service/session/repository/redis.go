@@ -37,8 +37,9 @@ func (s *Repository) Check(sessionId string) (string, error) {
 }
 
 func (s *Repository) Delete(sessionId string) error {
+	log.Debug("Redis delete sessionId =", sessionId)
 	result, err := redis.String(s.db.Do("DEL", sessionId))
-	log.Debug("Redis delete err =", err)
+	log.Error("Redis delete err =", err)
 	log.Debug("Redis delete result = ", result)
 	if err != nil {
 		return error2.ErrDeleteSession
