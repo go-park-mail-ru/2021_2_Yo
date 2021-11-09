@@ -5,9 +5,11 @@ import (
 	"backend/response"
 	"backend/service/auth"
 	error2 "backend/service/auth/error"
+	//"backend/service/csrf"
 	"backend/service/session"
 	"backend/utils"
 	"net/http"
+	"github.com/gorilla/csrf"
 )
 
 const logMessage = "service:auth:delivery:http:"
@@ -65,7 +67,13 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
+	//CSRFToken, err := h.csrfManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
 	setSessionIdCookie(w, sessionId)
+	//log.Info(CSRFToken)
+	w.Header().Set("X-CSRF-Token", csrf.Token(r))
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -85,7 +93,12 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
+	//CSRFToken, err := h.csrfManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
 	setSessionIdCookie(w, sessionId)
+	w.Header().Set("X-CSRF-Token", csrf.Token(r))
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -102,6 +115,11 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = h.sessionManager.Delete(cookie.Value)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	//CSRFToken := w.Header().Get("X-CSRF-Token")
+	//err = h.csrfManager.Delete(CSRFToken)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

@@ -28,6 +28,7 @@ import (
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+	"github.com/gorilla/csrf"
 )
 
 const logMessage = "server:"
@@ -116,6 +117,9 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	getUserHandlerFunc := mw.Auth(http.HandlerFunc(app.UserManager.GetUser))
 	r.Handle("/user", getUserHandlerFunc).Methods("GET")
 	//register.UserHTTPEndpoints(userRouter, app.UserManager, mw)
+
+	csrfMiddleware := csrf.Protect([]byte("temporary_secret"), csrf.TrustedOrigins([]string{"http://127.0.0.1:3000"}))
+	r.Use(csrfMiddleware)
 
 	return r
 }

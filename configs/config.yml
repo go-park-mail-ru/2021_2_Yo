@@ -18,3 +18,5 @@ redis_db_csrf:
     value: "redis://user:@localhost:6379/1"
     usage: "redis csrf"
 
+csrf:
+    secret: "please_start_listen_to_me"
