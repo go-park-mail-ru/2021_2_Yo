@@ -88,10 +88,11 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	log.Debug("MIME Header: %+v\n", handler.Header)
 
 	imgUuid := uuid.NewV4()
-	s := strings.Split(handler.Filename, ".")
-	s[0] = imgUuid.String()
-	log.Debug(message+"file extention =", s[1])
-	fileName := s[0] + "." + s[1]
+	fileNameParts := strings.Split(handler.Filename, ".")
+	fileNameParts[0] = imgUuid.String()
+	fileName := fileNameParts[0] + "." + fileNameParts[1]
+	fileExtension := filepath.Ext(fileName)
+	log.Debug(message+"file extension =", fileExtension)
 	dst, err := os.Create(filepath.Join("/home/ubuntu/go/2021_2_Yo/static/images", filepath.Base(fileName)))
 	if err != nil {
 		return "", err
