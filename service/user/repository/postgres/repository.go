@@ -12,7 +12,7 @@ import (
 const (
 	logMessage                       = "service:user:repository:postgres:"
 	getUserByIdQuery                 = `select * from "user" where id = $1`
-	updateUserInfoQueryWithoutImgUrl = `update "user" set name = $1, surname = $2, about = $3, $4 = $4 where id = $5`
+	updateUserInfoQueryWithoutImgUrl = `update "user" set name = $1, surname = $2, about = $3, where id = $5`
 	updateUserInfoQuery              = `update "user" set name = $1, surname = $2, about = $3, img_url = $4 where id = $5`
 	updateUserPasswordQuery          = `update "user" set password = $1 where id = $2`
 )
