@@ -63,7 +63,10 @@ func (m *Middlewares) Logging(next http.Handler) http.Handler {
 }
 
 func (m *Middlewares) GetVars(next http.Handler) http.Handler {
+	message := logMessage + "GetVars:"
+	_ = message
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Debug(message+"r.URL =", r.URL)
 		vars := mux.Vars(r)
 		if vars != nil {
 			varsCtx := context.WithValue(r.Context(), "vars", vars)
@@ -77,6 +80,7 @@ func (m *Middlewares) GetVars(next http.Handler) http.Handler {
 func (m *Middlewares) Auth(next http.Handler) http.Handler {
 	message := logMessage + "Auth:"
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Debug(message+"r.URL =", r.URL)
 		cookie, err := r.Cookie("session_id")
 		log.Debug(message+"cookie.value =", cookie.Value)
 		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
