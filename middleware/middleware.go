@@ -60,8 +60,8 @@ func (m *Middlewares) CORS(next http.Handler) http.Handler {
 
 func (m *Middlewares) Logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err1 := r.Cookie("session_id")
-		log.Error("LOGGING"+"err =", err1, "cookie", cookie)
+		cookie, _ := r.Cookie("session_id")
+		log.Error("LOGGING:"+"cookie=", cookie)
 		start := time.Now()
 		next.ServeHTTP(w, r)
 		log.Info(r.Method, r.RequestURI, time.Since(start))
