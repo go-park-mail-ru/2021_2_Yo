@@ -61,9 +61,14 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	imgUrl, err := utils.SaveImageFromRequest(r, "file")
+	if eventFromRequest.ImgUrl != "" {
+		imgUrl, err := utils.SaveImageFromRequest(r, "file")
+		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+			return
+		}
+		eventFromRequest.ImgUrl = imgUrl
+	}
 	eventFromRequest.ID = eventId
-	eventFromRequest.ImgUrl = imgUrl
 	err = h.useCase.UpdateEvent(eventFromRequest, userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return

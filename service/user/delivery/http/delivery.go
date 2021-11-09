@@ -58,19 +58,19 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userReader := strings.NewReader(r.FormValue("json"))
-	u, err := response.GetUserFromRequest(userReader)
+	userFromRequest, err := response.GetUserFromRequest(userReader)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	imgUrl, err := utils.SaveImageFromRequest(r, "file")
-	/*
+	if userFromRequest.ImgUrl != "" {
+		imgUrl, err := utils.SaveImageFromRequest(r, "file")
 		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		return
+			return
 		}
-	*/
-	u.ImgUrl = imgUrl
-	u.ID = r.Context().Value("userId").(string)
-	err = h.useCase.UpdateUserInfo(u)
+		userFromRequest.ImgUrl = imgUrl
+	}
+	userFromRequest.ID = r.Context().Value("userId").(string)
+	err = h.useCase.UpdateUserInfo(userFromRequest)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
