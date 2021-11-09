@@ -78,6 +78,7 @@ func (m *Middlewares) Auth(next http.Handler) http.Handler {
 	message := logMessage + "Auth:"
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_id")
+		log.Debug(message+"cookie.value =", cookie.Value)
 		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 			return
 		}

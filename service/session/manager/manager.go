@@ -1,6 +1,7 @@
 package manager
 
 import (
+	log "backend/logger"
 	error2 "backend/service/session/error"
 	"backend/service/session/models"
 	"backend/service/session/repository"
@@ -47,6 +48,7 @@ func (m *Manager) Create(userId string) (string, error) {
 }
 
 func (m *Manager) Check(sessionId string) (string, error) {
+	log.Debug("SessionManager:Check:sessionId =", sessionId)
 	if sessionId == "" {
 		return "", error2.ErrEmptySessionId
 	}
