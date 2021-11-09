@@ -2,47 +2,33 @@ package repository
 
 import (
 	log "backend/logger"
-	error2 "backend/service/session/error"
 	"backend/service/session/models"
-	"github.com/gomodule/redigo/redis"
+	"github.com/go-redis/redis"
 )
 
 type Repository struct {
-	db redis.Conn
+	db *redis.Client
 }
 
-func NewRepository(database redis.Conn) *Repository {
+func NewRepository(database *redis.Client) *Repository {
 	return &Repository{
 		db: database,
 	}
 }
 
 func (s *Repository) Create(data *models.SessionData) error {
-	result, err := redis.String(s.db.Do("SET", data.SessionId, data.UserId, "EX", data.Expiration))
-	if err != nil {
-		return error2.ErrRedis
-	}
-	if result != "OK" {
-		return error2.ErrCreateSession
-	}
-	return nil
+	res := s.db.Set(data.SessionId, data.UserId, data.Expiration)
+	return res.Err()
 }
 
 func (s *Repository) Check(sessionId string) (string, error) {
-	result, err := redis.String(s.db.Do("GET", sessionId))
-	if err != nil {
-		return "", error2.ErrCheckSession
-	}
-	return result, nil
+	res := s.db.Get(sessionId)
+	return res.Val(), res.Err()
 }
 
 func (s *Repository) Delete(sessionId string) error {
-	log.Debug("Redis delete sessionId =", sessionId)
-	result, err := redis.String(s.db.Do("DEL", sessionId))
-	log.Error("Redis delete err =", err)
-	log.Debug("Redis delete result = ", result)
-	if err != nil {
-		return error2.ErrDeleteSession
-	}
-	return nil
+	res := s.db.Del(sessionId)
+	log.Error("Redis delete err =", res.Err())
+	log.Debug("Redis delete result = ", res.Val())
+	return res.Err()
 }

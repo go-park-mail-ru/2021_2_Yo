@@ -5,9 +5,8 @@ import (
 	"backend/response"
 	"crypto/sha256"
 	"errors"
-	"flag"
 	"fmt"
-	"github.com/gomodule/redigo/redis"
+	"github.com/go-redis/redis"
 	sql "github.com/jmoiron/sqlx"
 	uuid "github.com/satori/go.uuid"
 	"github.com/spf13/viper"
@@ -65,17 +64,22 @@ func InitPostgresDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func InitRedisDB(dbConfName string) (redis.Conn, error) {
+func InitRedisDB(dbConfName string) (*redis.Client, error) {
 	message := logMessage + "InitRedisDB:"
 	log.Debug(message + "started")
 
-	name := viper.GetString(dbConfName + ".name")
-	value := viper.GetString(dbConfName + ".value")
-	usage := viper.GetString(dbConfName + ".usage")
-	log.Debug(message+"name,value,usage =", name, value, usage)
+	addr := viper.GetString(dbConfName + ".addr")
+	dbId := viper.GetInt(dbConfName + ".db_id")
 
-	redisAddr := flag.String(name, value, usage)
-	return redis.DialURL(*redisAddr)
+	client := redis.NewClient(&redis.Options{
+		Addr:     addr,
+		Password: "",
+		DB:       dbId,
+	})
+	if client == nil {
+		return nil, errors.New("init redis db")
+	}
+	return client, nil
 }
 
 func SaveImageFromRequest(r *http.Request, key string) (string, error) {

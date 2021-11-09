@@ -38,7 +38,7 @@ func (m *Manager) Create(userId string) (string, error) {
 	sessionData := &models.SessionData{
 		SessionId:  generateSessionId(sessionIdLength),
 		UserId:     userId,
-		Expiration: int(sessionLifeTime.Milliseconds()),
+		Expiration: sessionLifeTime,
 	}
 	err := m.repository.Create(sessionData)
 	if err != nil {

@@ -10,9 +10,8 @@ postgres_db:
 
 
 redis_db_session:
-    name: "addr"
-    value: "redis://user:@localhost:6379/0"
-    usage: "redis addr"
+    addr: "localhost:6379"
+    db_id: 0
 
 redis_db_csrf:
     name: "addr_csrf"

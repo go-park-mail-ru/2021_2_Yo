@@ -6,6 +6,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/go-pg/pg v8.0.7+incompatible
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-sanitize/sanitize v1.0.1
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/gorilla/mux v1.8.0

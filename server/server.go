@@ -13,8 +13,6 @@ import (
 	eventRepository "backend/service/event/repository/postgres"
 	eventUseCase "backend/service/event/usecase"
 
-	csrf "backend/service/csrf/manager"
-	csrfRepository "backend/service/csrf/repository"
 	session "backend/service/session/manager"
 	sessionRepository "backend/service/session/repository"
 
@@ -39,7 +37,6 @@ type App struct {
 	UserManager    *userDelivery.Delivery
 	EventManager   *eventDelivery.Delivery
 	SessionManager *session.Manager
-	CsrfManager    *csrf.Manager
 	db             *sql.DB
 }
 
@@ -58,26 +55,18 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		log.Error(message+"err =", err)
 		return nil, err
 	}
-	redisConnSessions, err := utils.InitRedisDB("redis_db_session")
-	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, err
-	}
-	redisConnCSRFTokens, err := utils.InitRedisDB("redis_db_csrf")
+	redisDB, err := utils.InitRedisDB("redis_db_session")
 	if err != nil {
 		log.Error(message+"err =", err)
 		return nil, err
 	}
 
-	sessionR := sessionRepository.NewRepository(redisConnSessions)
+	sessionR := sessionRepository.NewRepository(redisDB)
 	sessionM := session.NewManager(*sessionR)
-
-	csrfR := csrfRepository.NewRepository(redisConnCSRFTokens)
-	csrfM := csrf.NewManager(*csrfR)
 
 	authR := authRepository.NewRepository(db)
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
-	authD := authDelivery.NewDelivery(authUC, sessionM, csrfM)
+	authD := authDelivery.NewDelivery(authUC, sessionM)
 
 	userR := userRepository.NewRepository(db)
 	userUC := userUseCase.NewUseCase(userR)
@@ -92,7 +81,6 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		UserManager:    userD,
 		EventManager:   eventD,
 		SessionManager: sessionM,
-		CsrfManager:    csrfM,
 		db:             db,
 	}, nil
 }
