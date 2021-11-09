@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	log "backend/logger"
 	"backend/models"
 	error2 "backend/service/auth/error"
 	sql2 "database/sql"
@@ -30,12 +29,10 @@ func NewRepository(database *sql.DB) *Repository {
 
 func (s *Repository) CreateUser(user *models.User) (string, error) {
 	newUser := toPostgresUser(user)
-	log.Debug(logMessage+"CreateUser:newUser =", newUser)
 	query := createUserQuery
 	var userId int
 	err := s.db.Get(&userId, query, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About, newUser.ImgUrl)
 	if err != nil {
-		log.Error(logMessage+"CreateUser:err =", err)
 		if strings.Contains(err.Error(), "duplicate key value violates") {
 			return "", error2.ErrUserExists
 		}
