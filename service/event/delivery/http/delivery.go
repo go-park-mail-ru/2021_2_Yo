@@ -52,11 +52,18 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	vars := r.Context().Value("vars").(map[string]string)
 	eventId := vars["id"]
 	userId := r.Context().Value("userId").(string)
-	eventFromRequest, err := response.GetEventFromRequest(r.Body)
+	err := r.ParseMultipartForm(0)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
+	eventReader := strings.NewReader(r.FormValue("json"))
+	eventFromRequest, err := response.GetEventFromRequest(eventReader)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	imgUrl, err := utils.SaveImageFromRequest(r, "file")
 	eventFromRequest.ID = eventId
+	eventFromRequest.ImgUrl = imgUrl
 	err = h.useCase.UpdateEvent(eventFromRequest, userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
