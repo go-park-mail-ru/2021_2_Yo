@@ -13,8 +13,8 @@ import (
 	eventRepository "backend/service/event/repository/postgres"
 	eventUseCase "backend/service/event/usecase"
 
-	csrf "backend/service/csrf/manager"
-	csrfRepository "backend/service/csrf/repository"
+	//csrf "backend/service/csrf/manager"
+	//csrfRepository "backend/service/csrf/repository"
 	session "backend/service/session/manager"
 	sessionRepository "backend/service/session/repository"
 
@@ -30,6 +30,7 @@ import (
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+	"github.com/gorilla/csrf"
 )
 
 const logMessage = "server:"
@@ -39,7 +40,7 @@ type App struct {
 	UserManager    *userDelivery.Delivery
 	EventManager   *eventDelivery.Delivery
 	SessionManager *session.Manager
-	CsrfManager    *csrf.Manager
+//	CsrfManager    *csrf.Manager
 	db             *sql.DB
 }
 
@@ -63,21 +64,21 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		log.Error(message+"err =", err)
 		return nil, err
 	}
-	redisConnCSRFTokens, err := utils.InitRedisDB("redis_db_csrf")
+	/*redisConnCSRFTokens, err := utils.InitRedisDB("redis_db_csrf")
 	if err != nil {
 		log.Error(message+"err =", err)
 		return nil, err
-	}
+	}*/
 
 	sessionR := sessionRepository.NewRepository(redisConnSessions)
 	sessionM := session.NewManager(*sessionR)
 
-	csrfR := csrfRepository.NewRepository(redisConnCSRFTokens)
-	csrfM := csrf.NewManager(*csrfR)
+	//csrfR := csrfRepository.NewRepository(redisConnCSRFTokens)
+	//csrfM := csrf.NewManager(*csrfR)
 
 	authR := authRepository.NewRepository(db)
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
-	authD := authDelivery.NewDelivery(authUC, sessionM, csrfM)
+	authD := authDelivery.NewDelivery(authUC, sessionM, /*csrfM*/)
 
 	userR := userRepository.NewRepository(db)
 	userUC := userUseCase.NewUseCase(userR)
@@ -92,7 +93,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		UserManager:    userD,
 		EventManager:   eventD,
 		SessionManager: sessionM,
-		CsrfManager:    csrfM,
+		//CsrfManager:    csrfM,
 		db:             db,
 	}, nil
 }
@@ -123,6 +124,9 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 
 	userRouter := r.PathPrefix("/user").Subrouter()
 	register.UserHTTPEndpoints(userRouter, app.UserManager, mw)
+
+	csrfMiddleware := csrf.Protect([]byte("temporary_secret"), csrf.TrustedOrigins([]string{"http://127.0.0.1:3000"}))
+	r.Use(csrfMiddleware)
 
 	return r
 }
