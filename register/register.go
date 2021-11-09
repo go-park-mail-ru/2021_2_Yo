@@ -47,10 +47,11 @@ func EventHTTPEndpoints(r *mux.Router, delivery *eventHttp.Delivery, mws *middle
 	r.Handle("", createEventHandlerFunc).Methods("POST")
 }
 
-func UserHTTPEndpoints(r *mux.Router, delivery *userHttp.Delivery, middlewares *middleware.Middlewares) {
+func UserHTTPEndpoints(r *mux.Router, delivery *userHttp.Delivery, mws *middleware.Middlewares) {
 	r.HandleFunc("/{id:[0-9]+}", delivery.GetUserById).Methods("GET")
-	r.Handle("", useMiddlewares(r, "", delivery.GetUser, middlewares.GetVars, middlewares.Auth)).Methods("POST")
+	getUserHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.GetUser)))
+	r.Handle("", getUserHandlerFunc).Methods("POST")
 	r.HandleFunc("", delivery.GetUser).Methods("GET")
-	r.Handle("/info", useMiddlewares(r, "/info", delivery.UpdateUserInfo, middlewares.GetVars, middlewares.Auth)).Methods("POST")
-	r.Handle("/password", useMiddlewares(r, "/password", delivery.UpdateUserPassword, middlewares.GetVars, middlewares.Auth)).Methods("POST")
+	r.Handle("/info", useMiddlewares(r, "/info", delivery.UpdateUserInfo, mws.GetVars, mws.Auth)).Methods("POST")
+	r.Handle("/password", useMiddlewares(r, "/password", delivery.UpdateUserPassword, mws.GetVars, mws.Auth)).Methods("POST")
 }
