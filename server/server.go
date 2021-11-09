@@ -110,7 +110,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	register.EventHTTPEndpoints(eventRouter, app.EventManager, mw)
 
 	//userRouter := r.PathPrefix("/user").Subrouter()
-	getUserHandlerFunc := mw.Auth(mw.GetVars(http.HandlerFunc(app.UserManager.GetUser)))
+	getUserHandlerFunc := mw.Auth(http.HandlerFunc(app.UserManager.GetUser))
 	r.Handle("/user", getUserHandlerFunc).Methods("GET")
 	//register.UserHTTPEndpoints(userRouter, app.UserManager, mw)
 
