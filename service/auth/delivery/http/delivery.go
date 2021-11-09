@@ -93,7 +93,7 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Logout:"
 	log.Debug(message + "started")
-	defer setExpiredCookie(w)
+	setExpiredCookie(w)
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
 		err = error2.ErrCookie
