@@ -53,6 +53,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
 	u, err := response.GetUserFromRequest(r.Body)
+	log.Debug(message+"u =", *u)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
