@@ -90,6 +90,7 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	imgUuid := uuid.NewV4()
 	s := strings.Split(handler.Filename, ".")
 	s[0] = imgUuid.String()
+	log.Debug(message+"file extention =", s[1])
 	fileName := s[0] + "." + s[1]
 	dst, err := os.Create(filepath.Join("/home/ubuntu/go/2021_2_Yo/static/images", filepath.Base(fileName)))
 	if err != nil {

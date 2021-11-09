@@ -53,7 +53,8 @@ func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserInfo:"
 	log.Debug(message + "started")
-	err := r.ParseMultipartForm(0)
+	log.Debug(message+"maxMemory =", 5<<20)
+	err := r.ParseMultipartForm(5 << 20)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

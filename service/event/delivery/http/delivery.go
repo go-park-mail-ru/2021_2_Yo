@@ -26,7 +26,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "CreateEvent:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	err := r.ParseMultipartForm(0)
+	err := r.ParseMultipartForm(5 << 20)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -52,7 +52,7 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	vars := r.Context().Value("vars").(map[string]string)
 	eventId := vars["id"]
 	userId := r.Context().Value("userId").(string)
-	err := r.ParseMultipartForm(0)
+	err := r.ParseMultipartForm(5 << 20)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
