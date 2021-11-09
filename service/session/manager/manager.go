@@ -32,7 +32,6 @@ func generateSessionId(n int) string {
 	for i := range b {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
-	log.Debug("generateSessionId b =", b)
 	return string(b)
 }
 
