@@ -100,6 +100,7 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	case ".swg":
 	case ".webp":
 	case ".webm":
+	case ".gif":
 	default:
 		return "", ErrFileExt
 	}
