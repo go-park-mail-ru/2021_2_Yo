@@ -37,8 +37,8 @@ const (
 		where event.id = $11`
 	updateEventQueryWithoutImgUrl = `update "event" set
 		title = $1, description = $2, text = $3, city = $4, category = $5, 
-		viewed = $6, $7 = $7, date = $8, geo = $9, tag = $10 
-		where event.id = $11`
+		viewed = $6, date = $7, geo = $8, tag = $9 
+		where event.id = $10`
 	deleteEventQuery = `delete from "event" where id = $1`
 )
 
