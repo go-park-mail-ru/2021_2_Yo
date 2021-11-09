@@ -27,7 +27,7 @@ func (m *Middlewares) Recovery(next http.Handler) http.Handler {
 	message := logMessage + "Recovery:"
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_id")
-		log.Error(message+"err =", err, "cookie.value =", cookie.Value)
+		log.Error(message+"err =", err, "cookie", cookie)
 		defer func() {
 			err := recover()
 			if err != nil {
@@ -42,7 +42,7 @@ func (m *Middlewares) Recovery(next http.Handler) http.Handler {
 func (m *Middlewares) CORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_id")
-		log.Error("CORS"+"err =", err, "cookie.value =", cookie.Value)
+		log.Error("CORS"+"err =", err, "cookie", cookie)
 		w.Header().Set("Access-Control-Allow-Origin", "https://bmstusssa.herokuapp.com")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Headers",
@@ -61,7 +61,7 @@ func (m *Middlewares) CORS(next http.Handler) http.Handler {
 func (m *Middlewares) Logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_id")
-		log.Error("LOGGING"+"err =", err, "cookie.value =", cookie.Value)
+		log.Error("LOGGING"+"err =", err, "cookie", cookie)
 		start := time.Now()
 		next.ServeHTTP(w, r)
 		log.Info(r.Method, r.RequestURI, time.Since(start))
@@ -71,7 +71,7 @@ func (m *Middlewares) Logging(next http.Handler) http.Handler {
 func (m *Middlewares) GetVars(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_id")
-		log.Error("GetVars"+"err =", err, "cookie.value =", cookie.Value)
+		log.Error("GetVars"+"err =", err, "cookie", cookie)
 		vars := mux.Vars(r)
 		if vars != nil {
 			varsCtx := context.WithValue(r.Context(), "vars", vars)
