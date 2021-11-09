@@ -4,6 +4,7 @@ import (
 	log "backend/logger"
 	"backend/response"
 	"backend/service/session"
+	"backend/utils"
 	"context"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -62,10 +63,7 @@ func (m *Middlewares) Logging(next http.Handler) http.Handler {
 }
 
 func (m *Middlewares) GetVars(next http.Handler) http.Handler {
-	message := logMessage + "GetVars:"
-	_ = message
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Debug(message+"r.URL =", r.URL)
 		vars := mux.Vars(r)
 		if vars != nil {
 			varsCtx := context.WithValue(r.Context(), "vars", vars)
@@ -79,22 +77,16 @@ func (m *Middlewares) GetVars(next http.Handler) http.Handler {
 func (m *Middlewares) Auth(next http.Handler) http.Handler {
 	message := logMessage + "Auth:"
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Debug(message+"r.URL =", r.URL)
-		log.Debug(message+"r.Header =", r.Header)
 		cookie, err := r.Cookie("session_id")
-		log.Debug(message+"err =", err)
-		log.Debug(message+"cookie =", cookie)
-		//cookie := http.Cookie{}
-		/*log.Debug(message+"cookie.value =", cookie.Value)
 		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 			return
 		}
+		log.Debug(message+"cookie.value =", cookie.Value)
 		userId, err := m.manager.Check(cookie.Value)
 		if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 			return
 		}
 		userCtx := context.WithValue(r.Context(), "userId", userId)
 		next.ServeHTTP(w, r.WithContext(userCtx))
-		*/
 	})
 }
