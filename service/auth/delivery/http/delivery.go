@@ -34,8 +34,6 @@ func setSessionIdCookie(w http.ResponseWriter, sessionId string) {
 		SameSite: http.SameSiteNoneMode,
 		MaxAge:   int(time.Hour * 24),
 	}
-	log.Debug("setSessionIdCooke:cookie.value =", cookie.Value)
-	log.Debug("setSessionIdCooke:cookie.age =", cookie.MaxAge)
 	http.SetCookie(w, cookie)
 }
 
