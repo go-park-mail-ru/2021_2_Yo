@@ -28,9 +28,11 @@ var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func generateSessionId(n int) string {
 	b := make([]rune, n)
+	rand.Seed(time.Now().UnixNano())
 	for i := range b {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
+	log.Debug("generateSessionId b =", b)
 	return string(b)
 }
 
