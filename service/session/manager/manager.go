@@ -60,6 +60,7 @@ func (m *Manager) Check(sessionId string) (string, error) {
 }
 
 func (m *Manager) Delete(sessionId string) error {
+	log.Debug("Manager:Delete:sessionId =", sessionId)
 	err := m.repository.Delete(sessionId)
 	if err != nil {
 		return err
