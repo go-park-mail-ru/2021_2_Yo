@@ -4,7 +4,6 @@ import (
 	log "backend/logger"
 	"backend/response"
 	"backend/service/session"
-	"backend/utils"
 	"context"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -82,8 +81,9 @@ func (m *Middlewares) Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Debug(message+"r.URL =", r.URL)
 		log.Debug(message+"r.Header =", r.Header)
-		cookie, err := r.Cookie("session_id")
-		log.Debug(message+"cookie.value =", cookie.Value)
+		//cookie, err := r.Cookie("session_id")
+		//cookie := http.Cookie{}
+		/*log.Debug(message+"cookie.value =", cookie.Value)
 		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 			return
 		}
@@ -93,5 +93,6 @@ func (m *Middlewares) Auth(next http.Handler) http.Handler {
 		}
 		userCtx := context.WithValue(r.Context(), "userId", userId)
 		next.ServeHTTP(w, r.WithContext(userCtx))
+		*/
 	})
 }
