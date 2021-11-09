@@ -36,6 +36,7 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Debug(message+"imgUrl =", foundUser.ImgUrl)
 	w.Header().Set("X-CSRF-Token", csrf.Token(r))
+	log.Debug(w.Header().Get("X-CSRF-Token"))
 	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }
