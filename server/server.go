@@ -113,14 +113,14 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	eventRouter := r.PathPrefix("/events").Subrouter()
 	register.EventHTTPEndpoints(eventRouter, app.EventManager, mw)
 
-	//userRouter := r.PathPrefix("/user").Subrouter()
-	getUserHandlerFunc := mw.Auth(http.HandlerFunc(app.UserManager.GetUser))
-	r.Handle("/user", getUserHandlerFunc).Methods("GET")
-	//register.UserHTTPEndpoints(userRouter, app.UserManager, mw)
+	userRouter := r.PathPrefix("/user").Subrouter()
+	//getUserHandlerFunc := mw.Auth(http.HandlerFunc(app.UserManager.GetUser))
+	//r.Handle("/user", getUserHandlerFunc).Methods("GET")
+	register.UserHTTPEndpoints(userRouter, app.UserManager, mw)
 
 	csrfMiddleware := csrf.Protect([]byte("temporary_secret"), csrf.TrustedOrigins([]string{"https://bmstusssa.herokuapp.com"}))
 	eventRouter.Use(csrfMiddleware)
-	r.PathPrefix("/user").Subrouter().Use(csrfMiddleware)
+	userRouter.Use(csrfMiddleware)
 
 	return r
 }
