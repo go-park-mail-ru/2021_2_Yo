@@ -64,7 +64,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	setSessionIdCookie(&w, sessionId)
+	setSessionIdCookie(w, sessionId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
@@ -84,7 +84,7 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	setSessionIdCookie(&w, sessionId)
+	setSessionIdCookie(w, sessionId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
