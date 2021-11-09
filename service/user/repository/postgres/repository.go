@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	log "backend/logger"
 	"backend/models"
 	error2 "backend/service/user/error"
 	sql2 "database/sql"
@@ -36,6 +37,7 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 		}
 		return nil, error2.ErrPostgres
 	}
+	log.Debug(logMessage+"GetUserById:foundUser =", user)
 	return toModelUser(&user), nil
 }
 
