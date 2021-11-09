@@ -119,7 +119,8 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	//register.UserHTTPEndpoints(userRouter, app.UserManager, mw)
 
 	csrfMiddleware := csrf.Protect([]byte("temporary_secret"), csrf.TrustedOrigins([]string{"https://bmstusssa.herokuapp.com"}))
-	r.Use(csrfMiddleware)
+	eventRouter.Use(csrfMiddleware)
+	r.PathPrefix("/user").Subrouter().Use(csrfMiddleware)
 
 	return r
 }
