@@ -53,8 +53,8 @@ func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserInfo:"
 	log.Debug(message + "started")
-	log.Debug(message+"maxMemory =", 5<<20)
-	err := r.ParseMultipartForm(5 << 20)
+	log.Debug(message+"maxMemory =", 1<<20)
+	err := r.ParseMultipartForm(1 << 20)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -64,6 +64,10 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	imgUrl, err := utils.SaveImageFromRequest(r, "file")
+	if err == utils.ErrFileExt {
+		utils.CheckIfNoError(&w, err, message, http.StatusBadRequest)
+		return
+	}
 	if err == nil {
 		userFromRequest.ImgUrl = imgUrl
 	}

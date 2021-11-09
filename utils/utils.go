@@ -20,6 +20,10 @@ import (
 
 const logMessage = "config:"
 
+var (
+	ErrFileExt = errors.New("wrong file extension")
+)
+
 func GetSecret() (string, error) {
 	message := logMessage + "getSecret:"
 	log.Debug(message + "started")
@@ -82,17 +86,23 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 		return "", err
 	}
 	defer file.Close()
-
-	log.Debug("Uploaded File: %+v\n", handler.Filename)
-	log.Debug("File Size: %+v\n", handler.Size)
-	log.Debug("MIME Header: %+v\n", handler.Header)
-
 	imgUuid := uuid.NewV4()
 	fileNameParts := strings.Split(handler.Filename, ".")
 	fileNameParts[0] = imgUuid.String()
 	fileName := fileNameParts[0] + "." + fileNameParts[1]
 	fileExtension := filepath.Ext(fileName)
-	log.Debug(message+"file extension =", fileExtension)
+	switch fileExtension {
+	case ".jpg":
+	case ".jpeg":
+	case ".png":
+	case ".ico":
+	case ".woff":
+	case ".swg":
+	case ".webp":
+	case ".webm":
+	default:
+		return "", ErrFileExt
+	}
 	dst, err := os.Create(filepath.Join("/home/ubuntu/go/2021_2_Yo/static/images", filepath.Base(fileName)))
 	if err != nil {
 		return "", err

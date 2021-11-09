@@ -26,7 +26,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "CreateEvent:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	err := r.ParseMultipartForm(5 << 20)
+	err := r.ParseMultipartForm(1 << 20)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -36,7 +36,13 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	imgUrl, err := utils.SaveImageFromRequest(r, "file")
-	eventFromRequest.ImgUrl = imgUrl
+	if err == utils.ErrFileExt {
+		utils.CheckIfNoError(&w, err, message, http.StatusBadRequest)
+		return
+	}
+	if err != nil {
+		eventFromRequest.ImgUrl = imgUrl
+	}
 	eventFromRequest.AuthorId = userId
 	eventID, err := h.useCase.CreateEvent(eventFromRequest)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
@@ -52,7 +58,7 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	vars := r.Context().Value("vars").(map[string]string)
 	eventId := vars["id"]
 	userId := r.Context().Value("userId").(string)
-	err := r.ParseMultipartForm(5 << 20)
+	err := r.ParseMultipartForm(1 << 20)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -62,6 +68,10 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	imgUrl, err := utils.SaveImageFromRequest(r, "file")
+	if err == utils.ErrFileExt {
+		utils.CheckIfNoError(&w, err, message, http.StatusBadRequest)
+		return
+	}
 	if err == nil {
 		eventFromRequest.ImgUrl = imgUrl
 	}
