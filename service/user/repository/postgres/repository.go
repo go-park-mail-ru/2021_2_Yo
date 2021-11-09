@@ -12,7 +12,7 @@ import (
 const (
 	logMessage                       = "service:user:repository:postgres:"
 	getUserByIdQuery                 = `select * from "user" where id = $1`
-	updateUserInfoQueryWithoutImgUrl = `update "user" set name = $1, surname = $2, about = $3 where id = $5`
+	updateUserInfoQueryWithoutImgUrl = `update "user" set name = $1, surname = $2, about = $3 where id = $4`
 	updateUserInfoQuery              = `update "user" set name = $1, surname = $2, about = $3, img_url = $4 where id = $5`
 	updateUserPasswordQuery          = `update "user" set password = $1 where id = $2`
 )
@@ -46,12 +46,15 @@ func (s *Repository) UpdateUserInfo(user *models.User) error {
 		return err
 	}
 	var query string
+	args := make([]interface{}, 0)
 	if postgresUser.ImgUrl == "" {
 		query = updateUserInfoQueryWithoutImgUrl
+		args = append(args, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ID)
 	} else {
 		query = updateUserInfoQuery
+		args = append(args, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
 	}
-	_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
+	_, err = s.db.Query(query, args)
 	log.Error(logMessage+"err =", err)
 	if err != nil {
 		return error2.ErrPostgres
