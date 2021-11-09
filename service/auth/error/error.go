@@ -7,4 +7,5 @@ var (
 	ErrCookie       = errors.New("error with cookie")
 	ErrEmptyData    = errors.New("required data is empty")
 	ErrPostgres     = errors.New("internal DB server error")
+	ErrUserExists   = errors.New("user already exists")
 )

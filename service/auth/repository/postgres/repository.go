@@ -5,6 +5,7 @@ import (
 	"backend/models"
 	error2 "backend/service/auth/error"
 	sql2 "database/sql"
+	"github.com/go-pg/pg"
 	sql "github.com/jmoiron/sqlx"
 	"strconv"
 )
@@ -34,7 +35,11 @@ func (s *Repository) CreateUser(user *models.User) (string, error) {
 	var userId int
 	err := s.db.Get(&userId, query, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About, newUser.ImgUrl)
 	if err != nil {
-		log.Error(logMessage+"CreateUser:err =", err)
+		pgErr := err.(pg.Error)
+		log.Error(logMessage+"CreateUser:pgErr =", pgErr)
+		if pgErr.IntegrityViolation() {
+			return "", error2.ErrUserExists
+		}
 		return "", error2.ErrPostgres
 	}
 	return strconv.Itoa(userId), nil
