@@ -47,6 +47,7 @@ func setExpiredCookie(w http.ResponseWriter) {
 		MaxAge:   -1,
 		SameSite: http.SameSiteNoneMode,
 	}
+	log.Debug("setExpiredCooke:cookie.value =", cookie.Value)
 	http.SetCookie(w, cookie)
 }
 
