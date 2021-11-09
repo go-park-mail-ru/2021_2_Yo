@@ -35,7 +35,11 @@ func (s *Repository) CreateUser(user *models.User) (string, error) {
 	var userId int
 	err := s.db.Get(&userId, query, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About, newUser.ImgUrl)
 	if err != nil {
-		pgErr := err.(pg.Error)
+		log.Error(logMessage+"CreateUser:err =", err)
+		pgErr, ok := err.(pg.Error)
+		if !ok {
+			return "", error2.ErrPostgres
+		}
 		log.Error(logMessage+"CreateUser:pgErr =", pgErr)
 		if pgErr.IntegrityViolation() {
 			return "", error2.ErrUserExists
