@@ -27,7 +27,7 @@ func NewDelivery(useCase auth.UseCase, manager session.Manager, csrfManager csrf
 	}
 }
 
-func setSessionIdCookie(w http.ResponseWriter, sessionId string) {
+func setSessionIdCookie(w *http.ResponseWriter, sessionId string) {
 	cookie := &http.Cookie{
 		Name:     "session_id",
 		Value:    sessionId,
@@ -35,8 +35,7 @@ func setSessionIdCookie(w http.ResponseWriter, sessionId string) {
 		Secure:   true,
 		SameSite: http.SameSiteNoneMode,
 	}
-	log.Debug("setSessionIdCookie:cookie.Value =", cookie.Value)
-	http.SetCookie(w, cookie)
+	http.SetCookie(*w, cookie)
 }
 
 func setExpiredCookie(w http.ResponseWriter) {
@@ -70,7 +69,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	setSessionIdCookie(w, sessionId)
+	setSessionIdCookie(&w, sessionId)
 	log.Info(CSRFToken)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
@@ -96,7 +95,7 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	setSessionIdCookie(w, sessionId)
+	setSessionIdCookie(&w, sessionId)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
