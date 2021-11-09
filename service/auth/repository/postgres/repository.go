@@ -5,9 +5,9 @@ import (
 	"backend/models"
 	error2 "backend/service/auth/error"
 	sql2 "database/sql"
-	"github.com/go-pg/pg"
 	sql "github.com/jmoiron/sqlx"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -36,12 +36,7 @@ func (s *Repository) CreateUser(user *models.User) (string, error) {
 	err := s.db.Get(&userId, query, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About, newUser.ImgUrl)
 	if err != nil {
 		log.Error(logMessage+"CreateUser:err =", err)
-		pgErr, ok := err.(pg.Error)
-		if !ok {
-			return "", error2.ErrPostgres
-		}
-		log.Error(logMessage+"CreateUser:pgErr =", pgErr)
-		if pgErr.IntegrityViolation() {
+		if strings.Contains(err.Error(), "duplicate key value violates") {
 			return "", error2.ErrUserExists
 		}
 		return "", error2.ErrPostgres
