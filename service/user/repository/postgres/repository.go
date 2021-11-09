@@ -46,18 +46,20 @@ func (s *Repository) UpdateUserInfo(user *models.User) error {
 		return err
 	}
 	var query string
-	args := make([]interface{}, 0)
 	if postgresUser.ImgUrl == "" {
 		query = updateUserInfoQueryWithoutImgUrl
-		args = append(args, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ID)
+		_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ID)
+		log.Error(logMessage+"err =", err)
+		if err != nil {
+			return error2.ErrPostgres
+		}
 	} else {
 		query = updateUserInfoQuery
-		args = append(args, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
-	}
-	_, err = s.db.Query(query, args)
-	log.Error(logMessage+"err =", err)
-	if err != nil {
-		return error2.ErrPostgres
+		_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
+		log.Error(logMessage+"err =", err)
+		if err != nil {
+			return error2.ErrPostgres
+		}
 	}
 	return nil
 }
