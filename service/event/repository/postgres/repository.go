@@ -105,23 +105,37 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 	var query string
 	if e.ImgUrl != "" {
 		query = updateEventQuery
+		_, err = s.db.Query(query,
+			e.Title,
+			e.Description,
+			e.Text,
+			e.City,
+			e.Category,
+			e.Viewed,
+			e.ImgUrl,
+			e.Date,
+			e.Geo,
+			e.Tag,
+			e.ID)
+		if err != nil {
+			return error2.ErrPostgres
+		}
 	} else {
 		query = updateEventQueryWithoutImgUrl
-	}
-	_, err = s.db.Query(query,
-		e.Title,
-		e.Description,
-		e.Text,
-		e.City,
-		e.Category,
-		e.Viewed,
-		e.ImgUrl,
-		e.Date,
-		e.Geo,
-		e.Tag,
-		e.ID)
-	if err != nil {
-		return error2.ErrPostgres
+		_, err = s.db.Query(query,
+			e.Title,
+			e.Description,
+			e.Text,
+			e.City,
+			e.Category,
+			e.Viewed,
+			e.Date,
+			e.Geo,
+			e.Tag,
+			e.ID)
+		if err != nil {
+			return error2.ErrPostgres
+		}
 	}
 	return nil
 }

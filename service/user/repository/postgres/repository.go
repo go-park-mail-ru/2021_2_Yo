@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	log "backend/logger"
 	"backend/models"
 	error2 "backend/service/user/error"
 	sql2 "database/sql"
@@ -49,14 +48,12 @@ func (s *Repository) UpdateUserInfo(user *models.User) error {
 	if postgresUser.ImgUrl == "" {
 		query = updateUserInfoQueryWithoutImgUrl
 		_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ID)
-		log.Error(logMessage+"err =", err)
 		if err != nil {
 			return error2.ErrPostgres
 		}
 	} else {
 		query = updateUserInfoQuery
 		_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
-		log.Error(logMessage+"err =", err)
 		if err != nil {
 			return error2.ErrPostgres
 		}
