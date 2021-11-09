@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
+	"github.com/gorilla/csrf"
 )
 
 const logMessage = "service:user:delivery:http:"
@@ -34,6 +35,7 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Debug(message+"imgUrl =", foundUser.ImgUrl)
+	w.Header().Set("X-CSRF-Token", csrf.Token(r))
 	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }
