@@ -110,8 +110,13 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Methods("OPTIONS").HandlerFunc(options)
 
 	//TODO: Потом раскоментить и убрать то, что снизу
-	authRouter := r.PathPrefix("/auth").Subrouter()
-	register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)
+	//authRouter := r.PathPrefix("/auth").Subrouter()
+	//register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)
+
+	r.HandleFunc("/signup", app.AuthManager.SignUp)
+	r.HandleFunc("/login", app.AuthManager.SignIn)
+	logoutHandlerFunc := http.HandlerFunc(app.AuthManager.Logout)
+	r.Handle("/logout", mw.Auth(logoutHandlerFunc))
 
 	eventRouter := r.PathPrefix("/events").Subrouter()
 	register.EventHTTPEndpoints(eventRouter, app.EventManager, mw)
