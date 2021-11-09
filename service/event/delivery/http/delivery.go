@@ -40,7 +40,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		utils.CheckIfNoError(&w, err, message, http.StatusBadRequest)
 		return
 	}
-	if err != nil {
+	if err == nil {
 		eventFromRequest.ImgUrl = imgUrl
 	}
 	eventFromRequest.AuthorId = userId
