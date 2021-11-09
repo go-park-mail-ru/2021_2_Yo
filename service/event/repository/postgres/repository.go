@@ -35,6 +35,10 @@ const (
 		title = $1, description = $2, text = $3, city = $4, category = $5, 
 		viewed = $6, img_url = $7, date = $8, geo = $9, tag = $10 
 		where event.id = $11`
+	updateEventQueryWithoutImgUrl = `update "event" set
+		title = $1, description = $2, text = $3, city = $4, category = $5, 
+		viewed = $6, $7 = $7, date = $8, geo = $9, tag = $10 
+		where event.id = $11`
 	deleteEventQuery = `delete from "event" where id = $1`
 )
 
@@ -98,7 +102,12 @@ func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) erro
 		return err
 	}
 	e.ID = eventIdInt
-	query := updateEventQuery
+	var query string
+	if e.ImgUrl != "" {
+		query = updateEventQuery
+	} else {
+		query = updateEventQueryWithoutImgUrl
+	}
 	_, err = s.db.Query(query,
 		e.Title,
 		e.Description,

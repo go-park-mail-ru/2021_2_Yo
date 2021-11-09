@@ -9,10 +9,11 @@ import (
 )
 
 const (
-	logMessage              = "service:user:repository:postgres:"
-	getUserByIdQuery        = `select * from "user" where id = $1`
-	updateUserInfoQuery     = `update "user" set name = $1, surname = $2, about = $3, img_url = $4 where id = $5`
-	updateUserPasswordQuery = `update "user" set password = $1 where id = $2`
+	logMessage                       = "service:user:repository:postgres:"
+	getUserByIdQuery                 = `select * from "user" where id = $1`
+	updateUserInfoQueryWithoutImgUrl = `update "user" set name = $1, surname = $2, about = $3, $4 = $4 where id = $5`
+	updateUserInfoQuery              = `update "user" set name = $1, surname = $2, about = $3, img_url = $4 where id = $5`
+	updateUserPasswordQuery          = `update "user" set password = $1 where id = $2`
 )
 
 type Repository struct {
@@ -43,7 +44,12 @@ func (s *Repository) UpdateUserInfo(user *models.User) error {
 	if err != nil {
 		return err
 	}
-	query := updateUserInfoQuery
+	var query string
+	if postgresUser.ImgUrl == "" {
+		query = updateUserInfoQueryWithoutImgUrl
+	} else {
+		query = updateUserInfoQuery
+	}
 	_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
 	if err != nil {
 		return error2.ErrPostgres
