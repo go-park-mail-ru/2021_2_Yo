@@ -24,7 +24,7 @@ func NewDelivery(useCase auth.UseCase, manager session.Manager) *Delivery {
 	}
 }
 
-func setSessionIdCookie(w *http.ResponseWriter, sessionId string) {
+func setSessionIdCookie(w http.ResponseWriter, sessionId string) {
 	cookie := &http.Cookie{
 		Name:     "session_id",
 		Value:    sessionId,
@@ -33,7 +33,7 @@ func setSessionIdCookie(w *http.ResponseWriter, sessionId string) {
 		SameSite: http.SameSiteNoneMode,
 	}
 	log.Debug("setSessionIdCooke:cookie.value =", cookie.Value)
-	http.SetCookie(*w, cookie)
+	http.SetCookie(w, cookie)
 }
 
 func setExpiredCookie(w http.ResponseWriter) {
