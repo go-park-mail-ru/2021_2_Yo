@@ -85,7 +85,10 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	}, nil
 }
 
-func options(w http.ResponseWriter, r *http.Request) {}
+func options(w http.ResponseWriter, r *http.Request) {
+	cookie, _ := r.Cookie("session_id")
+	log.Debug("options: ", cookie)
+}
 
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddlewares(app.SessionManager)
