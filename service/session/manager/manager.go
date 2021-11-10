@@ -33,7 +33,6 @@ func generateSessionId(n int) string {
 	for i := range b {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
-	log.Debug(logMessage+"generateSessionId:string(b) =", string(b))
 	return string(b)
 }
 
@@ -47,12 +46,10 @@ func (m *Manager) Create(userId string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	log.Debug(logMessage+"Create:sessionData.SessionId =", sessionData.SessionId)
 	return sessionData.SessionId, nil
 }
 
 func (m *Manager) Check(sessionId string) (string, error) {
-	log.Debug("SessionManager:Check:sessionId =", sessionId)
 	if sessionId == "" {
 		return "", error2.ErrEmptySessionId
 	}
@@ -60,12 +57,10 @@ func (m *Manager) Check(sessionId string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	log.Debug(logMessage+"Check:userId =", userId)
 	return userId, nil
 }
 
 func (m *Manager) Delete(sessionId string) error {
-	log.Debug("Manager:Delete:sessionId =", sessionId)
 	err := m.repository.Delete(sessionId)
 	if err != nil {
 		log.Error(logMessage+"Delete:err =", err)
