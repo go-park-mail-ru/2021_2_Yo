@@ -18,7 +18,7 @@ func NewMiddleware(manager csrf.Manager) *Middleware {
 	}
 }
 
-const logMessage = "session:middleware:"
+const logMessage = "csrf:middleware:"
 
 func (m *Middleware) CSRF(next http.Handler) http.Handler {
 	message := logMessage + "CSRF:"

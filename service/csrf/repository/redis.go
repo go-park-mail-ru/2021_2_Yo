@@ -1,44 +1,37 @@
 package repository
 
 import (
-	my_error "backend/service/csrf/error"
 	"backend/service/csrf/models"
-	"github.com/gomodule/redigo/redis"
+	"github.com/go-redis/redis"
+	log "backend/logger"
 )
 
+const logMessage = "service:csrf:repository:"
+
 type Repository struct {
-	db redis.Conn
+	db *redis.Client
 }
 
-func NewRepository(database redis.Conn) *Repository {
+func NewRepository(database *redis.Client) *Repository {
 	return &Repository{
 		db: database,
 	}
 }
 
 func (s *Repository) Create(data *models.CSRFData) error {
-	result, err := redis.String(s.db.Do("SET", data.CSRFToken, data.UserId, "EX", data.Expiration))
-	if err != nil {
-		return my_error.ErrRedis
-	}
-	if result != "OK" {
-		return my_error.ErrRedis
-	}
-	return nil
+	res := s.db.Set(data.CSRFToken, data.UserId, data.Expiration)
+	log.Debug(logMessage+"Create:res =", res)
+	return res.Err()
 }
 
 func (s *Repository) Check(susToken string) (string, error) {
-	result, err := redis.String(s.db.Do("GET", susToken))
-	if err != nil {
-		return "", my_error.ErrRedis
-	}
-	return result, nil
+	res := s.db.Get(susToken)
+	log.Debug("Check:res =", res)
+	return res.Val(), res.Err()
 }
 
 func (s *Repository) Delete(susToken string) error {
-	_, err := redis.String(s.db.Do("DEL", susToken))
-	if err != nil {
-		return my_error.ErrRedis
-	}
-	return nil
+	res := s.db.Del(susToken)
+	log.Debug("Check:delete =", res)
+	return res.Err()
 }

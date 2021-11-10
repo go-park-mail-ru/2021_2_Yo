@@ -25,10 +25,13 @@ import (
 	"net/http"
 	"os"
 
+	"backend/service/csrf/manager"
+	csrfMiddleware "backend/service/csrf/middleware"
+	csrfRepository "backend/service/csrf/repository"
+
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
-	"github.com/gorilla/csrf"
 )
 
 const logMessage = "server:"
@@ -38,6 +41,7 @@ type App struct {
 	UserManager    *userDelivery.Delivery
 	EventManager   *eventDelivery.Delivery
 	SessionManager *session.Manager
+	csrfManager    *csrf.Manager
 	db             *sql.DB
 }
 
@@ -62,12 +66,21 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		return nil, err
 	}
 
+	redisConnCSRFTokens, err := utils.InitRedisDB("redis_db_csrf")
+	if err != nil {
+		log.Error(message+"err =", err)
+		return nil, err
+	}
+
 	sessionR := sessionRepository.NewRepository(redisDB)
 	sessionM := session.NewManager(*sessionR)
 
+	csrfR := csrfRepository.NewRepository(redisConnCSRFTokens)
+	csrfM := csrf.NewManager(*csrfR)
+
 	authR := authRepository.NewRepository(db)
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
-	authD := authDelivery.NewDelivery(authUC, sessionM)
+	authD := authDelivery.NewDelivery(authUC, sessionM, csrfM)
 
 	userR := userRepository.NewRepository(db)
 	userUC := userUseCase.NewUseCase(userR)
@@ -93,6 +106,7 @@ func options(w http.ResponseWriter, r *http.Request) {
 
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddlewares(app.SessionManager)
+	csrfMW := csrfMiddleware.NewMiddleware(app.csrfManager)
 
 	r := mux.NewRouter()
 	r.Use(mw.GetVars)
@@ -111,16 +125,16 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Handle("/auth/logout", mw.Auth(logoutHandlerFunc))
 
 	eventRouter := r.PathPrefix("/events").Subrouter()
+	eventRouter.Methods("POST").Subrouter().Use(csrfMW.CSRF)
+	
 	register.EventHTTPEndpoints(eventRouter, app.EventManager, mw)
 
 	userRouter := r.PathPrefix("/user").Subrouter()
+	userRouter.Methods("POST").Subrouter().Use(csrfMW.CSRF)
 	//getUserHandlerFunc := mw.Auth(http.HandlerFunc(app.UserManager.GetUser))
 	//r.Handle("/user", getUserHandlerFunc).Methods("GET")
 	register.UserHTTPEndpoints(userRouter, app.UserManager, mw)
 
-	csrfMiddleware := csrf.Protect([]byte("temporary_secret"), csrf.TrustedOrigins([]string{"https://bmstusssa.herokuapp.com"}))
-	eventRouter.Use(csrfMiddleware)
-	userRouter.Use(csrfMiddleware)
 
 	return r
 }

@@ -29,7 +29,7 @@ func (m *Manager) Create(userID string) (string, error) {
 	CSRFData := &models.CSRFData{
 		CSRFToken:  generateCSRFToken(),
 		UserId:     userID,
-		Expiration: int(sessionLifeTime),
+		Expiration: sessionLifeTime,
 	}
 	err := m.repository.Create(CSRFData)
 	if err != nil {

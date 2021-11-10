@@ -14,9 +14,8 @@ redis_db_session:
     db_id: 0
 
 redis_db_csrf:
-    name: "addr_csrf"
-    value: "redis://user:@localhost:6379/1"
-    usage: "redis csrf"
+    addr: "localhost:6379"
+    db_id: 1
 
 csrf:
     secret: "please_start_listen_to_me"
