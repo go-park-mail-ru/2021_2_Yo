@@ -4,22 +4,24 @@ import (
 	log "backend/logger"
 	"backend/response"
 	"backend/service/user"
+	"backend/service/csrf"
 	"backend/utils"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
-	"github.com/gorilla/csrf"
 )
 
 const logMessage = "service:user:delivery:http:"
 
 type Delivery struct {
 	useCase user.UseCase
+	csrfManager    csrf.Manager
 }
 
-func NewDelivery(useCase user.UseCase) *Delivery {
+func NewDelivery(useCase user.UseCase, csrfManager csrf.Manager) *Delivery {
 	return &Delivery{
 		useCase: useCase,
+		csrfManager: csrfManager,
 	}
 }
 
@@ -35,8 +37,12 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Debug(message+"imgUrl =", foundUser.ImgUrl)
-	w.Header().Set("X-CSRF-Token", csrf.Token(r))
-	log.Debug(w.Header().Get("X-CSRF-Token"))
+	CSRFToken, err := h.csrfManager.Create(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	log.Info(CSRFToken)
+	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }

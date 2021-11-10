@@ -84,7 +84,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 
 	userR := userRepository.NewRepository(db)
 	userUC := userUseCase.NewUseCase(userR)
-	userD := userDelivery.NewDelivery(userUC)
+	userD := userDelivery.NewDelivery(userUC,csrfM)
 
 	eventR := eventRepository.NewRepository(db)
 	eventUC := eventUseCase.NewUseCase(eventR)
