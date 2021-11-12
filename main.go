@@ -2,7 +2,6 @@ package main
 
 import (
 	"backend/server"
-	"net/smtp"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -18,35 +17,11 @@ func env() {
     }
 }
 
-func email() {
-	from := os.Getenv("EMAIL_ADDR")
-	password := os.Getenv("EMAIL_PASSWORD")
 
-	toEmail := "longhaul2@mail.ru"
-	to := []string{toEmail}
-
-	host := "smtp.gmail.com"
-	port := "587"
-	address := host + ":" + port
-
-	subject := "Golang Email\n"
-	body := "Bmstusaaaaaaaa Stepa krutoy!!!!"
-	message := []byte(subject + body)
-
-	auth := smtp.PlainAuth("",from,password,host)
-
-	err := smtp.SendMail(address, auth, from, to, message)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	log.Info("Check email")
-}
 
 func main() {
 	log.Info("Main : start")
 	env()
-	email()
 	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
 	err := viper.ReadInConfig()

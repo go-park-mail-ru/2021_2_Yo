@@ -9,6 +9,7 @@ import (
 	"backend/service/session"
 	"backend/utils"
 	"net/http"
+	"backend/service/email"
 )
 
 const logMessage = "service:auth:delivery:http:"
@@ -76,6 +77,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Info(CSRFToken)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
+	email.SendEmail("Подтвержение регистрации","Вы зарегистрировались на bmstuse")
 	log.Debug(message + "ended")
 }
 
