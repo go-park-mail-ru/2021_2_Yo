@@ -6,23 +6,20 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func SendEmail(theme, message string) {
+func SendEmail(theme, message string, recievers []string) {
 	from := os.Getenv("EMAIL_ADDR")
 	password := os.Getenv("EMAIL_PASSWORD")
-
-	toEmail := "artyomsh01@yandex.ru"
-	to := []string{toEmail}
-
+	
 	host := "smtp.gmail.com"
 	port := "587"
 	address := host + ":" + port
 
-
-	emailMessage := []byte(theme + message)
+	theme += "\n"
+	emailMessage := []byte(theme +  message)
 
 	auth := smtp.PlainAuth("",from,password,host)
 
-	err := smtp.SendMail(address, auth, from, to, emailMessage)
+	err := smtp.SendMail(address, auth, from, recievers, emailMessage)
 	if err != nil {
 		log.Error(err)
 		return

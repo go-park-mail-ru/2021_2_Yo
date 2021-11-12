@@ -23,6 +23,20 @@ CREATE TABLE "event" (
                          author_id int references "user" (id) on delete cascade not null
 );
 
+CREATE TABLE "view" (
+                        id serial not null unique,
+                        event_id int references "event" (id) on delete cascade not null,
+                        user_id int references "user" (id) on delete cascade,
+                        view_time timestamp
+);
+
+CREATE TABLE "visitor" (
+                        id serial not null unique,
+                        event_id int references "event" (id) on delete cascade not null,
+                        user_id int references "user" (id) on delete cascade,
+                        agree_to_go_date date
+);
+
 INSERT INTO "user" (name, surname, mail, password, about)
 VALUES ('Andrey', 'Ivanov', 'test@mail.ru', 'hashhashhash', 'I am soooo coool DAAAMN'),
        ('Ivan', 'Andreev', 'kool@mail.ru', 'hashhashhash', 'My name is Ivan Andreev'),

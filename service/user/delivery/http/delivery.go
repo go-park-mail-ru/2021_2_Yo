@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
+	"backend/service/email"
 )
 
 const logMessage = "service:user:delivery:http:"
@@ -103,5 +104,6 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response.SendResponse(w, response.OkResponse())
+	email.SendEmail("Ваш пароль был изменён", "Если это были не вы, обратитесь в службу безопасности,возможно, ваш аккаунт собираются угнать",[]string{u.Mail})
 	log.Debug(message + "ended")
 }

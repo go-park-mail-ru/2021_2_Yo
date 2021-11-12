@@ -40,6 +40,7 @@ const (
 		viewed = $6, date = $7, geo = $8, tag = $9 
 		where event.id = $10`
 	deleteEventQuery = `delete from "event" where id = $1`
+	
 )
 
 func (s *Repository) checkAuthor(eventId int, userId int) error {
