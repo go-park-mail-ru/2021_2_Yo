@@ -77,7 +77,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Info(CSRFToken)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
-	email.SendEmail("Подтвержение регистрации","Вы зарегистрировались на bmstuse")
+	email.SendEmail("Подтвержение регистрации","Вы зарегистрировались на bmstuse",[]string{u.Mail})
 	log.Debug(message + "ended")
 }
 
