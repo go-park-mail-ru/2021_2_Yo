@@ -22,11 +22,11 @@ func email() {
 	from := os.Getenv("EMAIL_ADDR")
 	password := os.Getenv("EMAIL_PASSWORD")
 
-	toEmail := "vosamih691@gyn5.com"
+	toEmail := "longhaul2@mail.ru"
 	to := []string{toEmail}
 
-	host := "smtp.yandex.ru"
-	port := "465"
+	host := "smtp.gmail.com"
+	port := "587"
 	address := host + ":" + port
 
 	subject := "Golang Email\n"
