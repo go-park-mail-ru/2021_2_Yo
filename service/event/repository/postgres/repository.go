@@ -40,6 +40,7 @@ const (
 		viewed = $6, date = $7, geo = $8, tag = $9 
 		where event.id = $10`
 	deleteEventQuery = `delete from "event" where id = $1`
+	updateEventViewed = `update "event" set viewed = viewed + 1 where id = $1`
 	
 )
 
@@ -176,8 +177,8 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 		}
 		return nil, error2.ErrPostgres
 	}
-	var resultEvent *models.Event
-	resultEvent = toModelEvent(&e)
+	s.db.Exec(updateEventViewed,eventIdInt)
+	resultEvent  := toModelEvent(&e)
 	return resultEvent, nil
 }
 
