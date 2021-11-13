@@ -202,7 +202,7 @@ func (s *Repository) GetEvents(title string, category string, tags []string) ([]
 	} else {
 		query += `$3 = $3`
 	}
-	query += "order by viewed"
+	query += "order by viewed DESC"
 	rows, err := s.db.Queryx(query, title, category, postgresTags)
 	if err != nil {
 		return nil, error2.ErrPostgres
