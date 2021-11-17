@@ -1,5 +1,9 @@
 syntax = "proto3";
 
+//export PATH=$PATH:$HOME/go/bin
+//export PATH=$PATH:/usr/local/go/bin
+//protoc --go_out=plugins=grpc:. *.proto
+
 option go_package = "backend/microservices/proto";
 
 package protoAuth;
@@ -16,9 +20,12 @@ message UserAuthData {
     string Password = 2;
 }
 
-message SessionData {
-    string SessionId = 1;
-    string UserId = 2;
+message Session {
+    string Session = 1;
+}
+
+message UserId {
+    string UserId = 1;
 }
 
 message SuccessUserResponse {
@@ -29,10 +36,22 @@ message SuccessUserResponse {
     string Password = 5;
     string About = 6;
     string ImgUrl = 7;
+}
 
+message CSRFToken {
+    string CSRFToken = 1;
+}
+
+message Success {
+    string Ok = 1;
 }
 
 service Auth {
     rpc CreateUser (User) returns (SuccessUserResponse) {}
-    rpc GetUser (UserAuthData) returns (SuccessUserResponse) {}
+    rpc GetUser (UserAuthData) returns (UserId) {}
+    rpc CreateSession (UserId) returns (Session) {}
+    rpc CheckSession (Session) returns (UserId) {}
+    rpc DeleteSession (Session) returns (Success) {}
+    rpc CreateToken (UserId) returns (CSRFToken) {}
+    rpc CheckToken (CSRFToken) returns (UserId) {}
 }
