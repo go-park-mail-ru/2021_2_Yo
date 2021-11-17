@@ -2,8 +2,6 @@ package server
 
 import (
 	authDelivery "backend/service/auth/delivery/http"
-	authRepository "backend/service/auth/repository/postgres"
-	authUseCase "backend/service/auth/usecase"
 
 	userDelivery "backend/service/user/delivery/http"
 	userRepository "backend/service/user/repository/postgres"
@@ -12,10 +10,6 @@ import (
 	eventDelivery "backend/service/event/delivery/http"
 	eventRepository "backend/service/event/repository/postgres"
 	eventUseCase "backend/service/event/usecase"
-
-	session "backend/service/session/manager"
-	sessionRepository "backend/service/session/repository"
-
 	"backend/register"
 
 	log "backend/logger"
@@ -24,10 +18,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-
-	"backend/service/csrf/manager"
-	csrfMiddleware "backend/service/csrf/middleware"
-	csrfRepository "backend/service/csrf/repository"
 
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
@@ -44,8 +34,7 @@ type App struct {
 	AuthManager    *authDelivery.Delivery
 	UserManager    *userDelivery.Delivery
 	EventManager   *eventDelivery.Delivery
-	SessionManager *session.Manager
-	csrfManager    *csrf.Manager
+	authService    *microAuth.AuthService
 	db             *sql.DB
 }
 
@@ -54,33 +43,11 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	log.Init(logLevel)
 	log.Info(fmt.Sprintf(message+"started, log level = %s", logLevel))
 
-	secret, err := utils.GetSecret()
-	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, err
-	}
 	db, err := utils.InitPostgresDB()
 	if err != nil {
 		log.Error(message+"err =", err)
 		return nil, err
 	}
-	redisDB, err := utils.InitRedisDB("redis_db_session")
-	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, err
-	}
-
-	redisConnCSRFTokens, err := utils.InitRedisDB("redis_db_csrf")
-	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, err
-	}
-
-	sessionR := sessionRepository.NewRepository(redisDB)
-	sessionM := session.NewManager(*sessionR)
-
-	csrfR := csrfRepository.NewRepository(redisConnCSRFTokens)
-	csrfM := csrf.NewManager(*csrfR)
 
 
 	AuthAddr := "localhost:8081"
@@ -97,13 +64,12 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	}
 
 
-	authR := authRepository.NewRepository(db)
-	authUC := authUseCase.NewUseCase(authR, []byte(secret))
-	authD := authDelivery.NewDelivery(authUC, authService, sessionM, csrfM)
+	
+	authD := authDelivery.NewDelivery(authService)
 
 	userR := userRepository.NewRepository(db)
 	userUC := userUseCase.NewUseCase(userR)
-	userD := userDelivery.NewDelivery(userUC,csrfM)
+	userD := userDelivery.NewDelivery(userUC,authService)
 
 	eventR := eventRepository.NewRepository(db)
 	eventUC := eventUseCase.NewUseCase(eventR)
@@ -113,7 +79,6 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		AuthManager:    authD,
 		UserManager:    userD,
 		EventManager:   eventD,
-		SessionManager: sessionM,
 		db:             db,
 	}, nil
 }
@@ -124,8 +89,7 @@ func options(w http.ResponseWriter, r *http.Request) {
 }
 
 func newRouterWithEndpoints(app *App) *mux.Router {
-	mw := middleware.NewMiddlewares(app.SessionManager)
-	csrfMW := csrfMiddleware.NewMiddleware(app.csrfManager)
+	mw := middleware.NewMiddlewares(*app.authService)
 
 	r := mux.NewRouter()
 	r.Use(mw.GetVars)
@@ -144,12 +108,12 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Handle("/auth/logout", mw.Auth(logoutHandlerFunc))
 
 	eventRouter := r.PathPrefix("/events").Subrouter()
-	eventRouter.Methods("POST").Subrouter().Use(csrfMW.CSRF)
+	eventRouter.Methods("POST").Subrouter().Use(mw.CSRF)
 	
 	register.EventHTTPEndpoints(eventRouter, app.EventManager, mw)
 
 	userRouter := r.PathPrefix("/user").Subrouter()
-	userRouter.Methods("POST").Subrouter().Use(csrfMW.CSRF)
+	userRouter.Methods("POST").Subrouter().Use(mw.CSRF)
 	//getUserHandlerFunc := mw.Auth(http.HandlerFunc(app.UserManager.GetUser))
 	//r.Handle("/user", getUserHandlerFunc).Methods("GET")
 	register.UserHTTPEndpoints(userRouter, app.UserManager, mw)

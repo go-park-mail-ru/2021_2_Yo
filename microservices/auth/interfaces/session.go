@@ -1,11 +1,11 @@
 package interfaces
 
 import (
-	"backend/service/session/models"
+	authServiceModels "backend/microservices/auth/models"
 )
 
 type SessionRepository interface {
-	Create(data *models.SessionData) error 
+	Create(data *authServiceModels.SessionData) error 
 	Check(sessionId string) (string, error)
 	Delete(sessionId string) error
 }

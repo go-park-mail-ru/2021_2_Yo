@@ -4,8 +4,8 @@ import (
 	"time"
 )
 
-type CSRFData struct {
-	CSRFToken  string
+type SessionData struct {
+	SessionId  string
 	UserId     string
 	Expiration time.Duration
 }

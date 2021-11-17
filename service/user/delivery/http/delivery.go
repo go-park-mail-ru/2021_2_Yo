@@ -3,26 +3,28 @@ package http
 import (
 	log "backend/logger"
 	"backend/response"
+	"backend/service/email"
+	microAuth "backend/service/microservices/auth"
 	"backend/service/user"
-	"backend/service/csrf"
 	"backend/utils"
-	"github.com/gorilla/mux"
+	"context"
 	"net/http"
 	"strings"
-	"backend/service/email"
+
+	"github.com/gorilla/mux"
 )
 
 const logMessage = "service:user:delivery:http:"
 
 type Delivery struct {
 	useCase user.UseCase
-	csrfManager    csrf.Manager
+	authService microAuth.AuthService
 }
 
-func NewDelivery(useCase user.UseCase, csrfManager csrf.Manager) *Delivery {
+func NewDelivery(useCase user.UseCase, authService microAuth.AuthService) *Delivery {
 	return &Delivery{
 		useCase: useCase,
-		csrfManager: csrfManager,
+		authService: authService,
 	}
 }
 
@@ -38,7 +40,8 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Debug(message+"imgUrl =", foundUser.ImgUrl)
-	CSRFToken, err := h.csrfManager.Create(userId)
+	ctx := context.Background()
+	CSRFToken, err := h.authService.CreateToken(ctx, userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}

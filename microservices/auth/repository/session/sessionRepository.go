@@ -2,7 +2,7 @@ package session
 
 import (
 	log "backend/logger"
-	"backend/service/session/models"
+	authServiceModels "backend/microservices/auth/models"
 	"github.com/go-redis/redis"
 )
 
@@ -18,7 +18,7 @@ func NewRepository(database *redis.Client) *Repository {
 	}
 }
 
-func (s *Repository) Create(data *models.SessionData) error {
+func (s *Repository) Create(data *authServiceModels.SessionData) error {
 	res := s.db.Set(data.SessionId, data.UserId, data.Expiration)
 	log.Debug(logMessage+"Create:res =", res)
 	return res.Err()

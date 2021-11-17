@@ -3,23 +3,23 @@ package middleware
 import (
 	log "backend/logger"
 	"backend/response"
-	"backend/service/session"
 	"backend/utils"
 	"context"
 	"github.com/gorilla/mux"
 	"net/http"
 	"time"
+	microAuth "backend/service/microservices/auth"
 )
 
 const logMessage = "middleware:"
 
 type Middlewares struct {
-	manager session.Manager
+	authService    microAuth.AuthService
 }
 
-func NewMiddlewares(sm session.Manager) *Middlewares {
+func NewMiddlewares(authService microAuth.AuthService) *Middlewares {
 	return &Middlewares{
-		manager: sm,
+		authService: authService,
 	}
 }
 
@@ -82,7 +82,23 @@ func (m *Middlewares) Auth(next http.Handler) http.Handler {
 			return
 		}
 		log.Debug(message+"cookie.value =", cookie.Value)
-		userId, err := m.manager.Check(cookie.Value)
+		ctx := context.Background()
+		userId, err := m.authService.CheckSession(ctx, cookie.Value)
+		if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
+			return
+		}
+		userCtx := context.WithValue(r.Context(), "userId", userId)
+		next.ServeHTTP(w, r.WithContext(userCtx))
+	})
+}
+
+func (m *Middlewares) CSRF(next http.Handler) http.Handler {
+	message := logMessage + "CSRF:"
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gottenToken := (*r).Header.Get("X-CSRF-Token")
+		log.Info("gottenToken", gottenToken)
+		ctx := context.Background()
+		userId, err := m.authService.CheckToken(ctx, gottenToken)
 		if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 			return
 		}

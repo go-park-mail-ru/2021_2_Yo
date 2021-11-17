@@ -3,12 +3,9 @@ package http
 import (
 	log "backend/logger"
 	"backend/response"
-	"backend/service/auth"
 	error2 "backend/service/auth/error"
-	"backend/service/csrf"
 	"backend/service/email"
 	microAuth "backend/service/microservices/auth"
-	"backend/service/session"
 	"backend/utils"
 	"context"
 	"net/http"
@@ -17,18 +14,12 @@ import (
 const logMessage = "service:auth:delivery:http:"
 
 type Delivery struct {
-	useCase        auth.UseCase
 	authService    microAuth.AuthService
-	sessionManager session.Manager
-	csrfManager    csrf.Manager
 }
 
-func NewDelivery(useCase auth.UseCase, authService microAuth.AuthService, manager session.Manager, csrf csrf.Manager) *Delivery {
+func NewDelivery(authService microAuth.AuthService) *Delivery {
 	return &Delivery{
-		useCase:        useCase,
 		authService:    authService, 
-		sessionManager: manager,
-		csrfManager:    csrf,
 	}
 }
 
@@ -65,18 +56,17 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	//userId, err := h.useCase.SignUp(u)
 	ctx := context.Background()
-	userResponse, err := h.authService.Create(ctx,*u)
+	userResponse, err := h.authService.SignUp(ctx,*u)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
 	userId := userResponse.ID
-	sessionId, err := h.sessionManager.Create(userId)
+	sessionId, err := h.authService.CreateSession(ctx, userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	CSRFToken, err := h.csrfManager.Create(userId)
+	CSRFToken, err := h.authService.CreateToken(ctx, userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
@@ -95,15 +85,16 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	userId, err := h.useCase.SignIn(u.Mail, u.Password)
+	ctx := context.Background()
+	userId, err := h.authService.SignIn(ctx, *u)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 		return
 	}
-	sessionId, err := h.sessionManager.Create(userId)
+	sessionId, err := h.authService.CreateSession(ctx,userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	CSRFToken, err := h.csrfManager.Create(userId)
+	CSRFToken, err := h.authService.CreateToken(ctx,userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
@@ -124,12 +115,8 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	err = h.sessionManager.Delete(cookie.Value)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		return
-	}
-	CSRFToken := w.Header().Get("X-CSRF-Token")
-	err = h.csrfManager.Delete(CSRFToken)
+	ctx := context.Background()
+	err = h.authService.DeleteSession(ctx, cookie.Value)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

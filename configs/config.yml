@@ -16,6 +16,3 @@ redis_db_session:
 redis_db_csrf:
     addr: "localhost:6379"
     db_id: 1
-
-csrf:
-    secret: "please_start_listen_to_me"

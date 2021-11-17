@@ -8,17 +8,24 @@ import (
 	protoAuth "backend/microservices/proto/auth"
 
 	"backend/microservices/auth/usecase"
-	//"backend/service/csrf/repository"
 	"backend/utils"
 	"net"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"os"
 	_ "github.com/lib/pq"
+	"github.com/joho/godotenv"
 )
 
-func main() {
+func env() {
+    // loads values from .env into the system
+    if err := godotenv.Load(); err != nil {
+        log.Print("No .env file found")
+    }
+}
 
+func main() {
+	env()
 	viper.AddConfigPath("../../../configs")
 	viper.SetConfigName("config")
 	logLevel := log.DebugLevel
