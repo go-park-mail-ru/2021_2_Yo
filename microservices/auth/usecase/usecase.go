@@ -6,6 +6,7 @@ import (
 	"backend/models"
 	"context"
 	"backend/utils"
+	log "github.com/sirupsen/logrus"
 )
 
 type authService struct {
@@ -33,6 +34,7 @@ func userConvertToProto(user *models.User) protoAuth.SuccessUserResponse {
 }
 
 func (s *authService) CreateUser(ctx context.Context, protoUser *protoAuth.User) (*protoAuth.SuccessUserResponse, error) {
+	log.Info(protoUser)
 	newUser := models.User {
 		Name: protoUser.Name,
 		Surname: protoUser.Surname,
