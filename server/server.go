@@ -79,6 +79,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		AuthManager:    authD,
 		UserManager:    userD,
 		EventManager:   eventD,
+		authService: &authService,
 		db:             db,
 	}, nil
 }
