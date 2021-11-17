@@ -21,17 +21,11 @@ func main() {
 	if err != nil {
 		log.Error(err)
 	}
-	err = postDB.Ping()
-	if err != nil {
-		log.Error(err)
-	}
-
 	//Подключение редис
 	redisDB, err := utils.InitRedisDB("redis_db_session")
 	if err != nil {
 		log.Error(err)
 	}
-	redisDB.Ping()
 
 	//Попробую 8081
 	authListener, err := net.Listen("tcp", ":8081")
