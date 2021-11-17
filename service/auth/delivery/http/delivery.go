@@ -6,23 +6,27 @@ import (
 	"backend/service/auth"
 	error2 "backend/service/auth/error"
 	"backend/service/csrf"
+	"backend/service/email"
+	microAuth "backend/service/microservices/auth"
 	"backend/service/session"
 	"backend/utils"
+	"context"
 	"net/http"
-	"backend/service/email"
 )
 
 const logMessage = "service:auth:delivery:http:"
 
 type Delivery struct {
 	useCase        auth.UseCase
+	authService    microAuth.AuthService
 	sessionManager session.Manager
 	csrfManager    csrf.Manager
 }
 
-func NewDelivery(useCase auth.UseCase, manager session.Manager, csrf csrf.Manager) *Delivery {
+func NewDelivery(useCase auth.UseCase, authService microAuth.AuthService, manager session.Manager, csrf csrf.Manager) *Delivery {
 	return &Delivery{
 		useCase:        useCase,
+		authService:    authService, 
 		sessionManager: manager,
 		csrfManager:    csrf,
 	}
@@ -61,10 +65,13 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	userId, err := h.useCase.SignUp(u)
+	//userId, err := h.useCase.SignUp(u)
+	ctx := context.Background()
+	userResponse, err := h.authService.Create(ctx,*u)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
+	userId := userResponse.ID
 	sessionId, err := h.sessionManager.Create(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return

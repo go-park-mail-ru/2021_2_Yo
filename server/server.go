@@ -32,6 +32,10 @@ import (
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
+
+	protoAuth "backend/microservices/proto/auth"
+	microAuth "backend/service/microservices/auth"
 )
 
 const logMessage = "server:"
@@ -78,9 +82,24 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	csrfR := csrfRepository.NewRepository(redisConnCSRFTokens)
 	csrfM := csrf.NewManager(*csrfR)
 
+
+	AuthAddr := "localhost:8081"
+	grpcConnAuth, err := grpc.Dial(
+		AuthAddr,
+		grpc.WithInsecure(),
+	)
+
+	authClient := protoAuth.NewAuthClient(grpcConnAuth)
+	authService := microAuth.NewService(authClient)
+
+	if err != nil {
+		log.Error("can't connect to grpc")
+	}
+
+
 	authR := authRepository.NewRepository(db)
 	authUC := authUseCase.NewUseCase(authR, []byte(secret))
-	authD := authDelivery.NewDelivery(authUC, sessionM, csrfM)
+	authD := authDelivery.NewDelivery(authUC, authService, sessionM, csrfM)
 
 	userR := userRepository.NewRepository(db)
 	userUC := userUseCase.NewUseCase(userR)
@@ -145,6 +164,9 @@ func (app *App) Run() error {
 	}
 	message := logMessage + "Run:"
 	log.Info(message + "start")
+
+
+
 	r := newRouterWithEndpoints(app)
 	port := os.Getenv("PORT")
 	if port == "" {

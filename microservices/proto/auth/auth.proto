@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option go_package = "backend/microservices/proto";
+
+package protoAuth;
+
+message User {
+    string Name = 2;
+    string Surname = 3;
+    string Mail = 4;
+    string Password = 5;
+}
+
+message UserAuthData {
+    string Mail = 1;
+    string Password = 2;
+}
+
+message SessionData {
+    string SessionId = 1;
+    string UserId = 2;
+}
+
+message SuccessUserResponse {
+    string ID = 1;
+    string Name = 2;
+    string Surname = 3;
+    string Mail = 4;
+    string Password = 5;
+    string About = 6;
+    string ImgUrl = 7;
+
+}
+
+service Auth {
+    rpc CreateUser (User) returns (SuccessUserResponse) {}
+    rpc GetUser (UserAuthData) returns (SuccessUserResponse) {}
+}
