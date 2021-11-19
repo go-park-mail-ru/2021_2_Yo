@@ -4,6 +4,7 @@ import (
 	"backend/models"
 	"backend/service/event"
 	error2 "backend/service/event/error"
+	"strings"
 )
 
 const logMessage = "service:event:usecase:"
@@ -22,6 +23,9 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 	if e == nil || e.AuthorId == "" {
 		return "", error2.ErrEmptyData
 	}
+	for _, tag := range e.Tag {
+		tag = strings.ToLower(tag)
+	}
 	return a.eventRepo.CreateEvent(e)
 }
 
@@ -31,6 +35,9 @@ func (a *UseCase) UpdateEvent(e *models.Event, userId string) error {
 	}
 	if e.ID == "" {
 		return error2.ErrEmptyData
+	}
+	for _, tag := range e.Tag {
+		tag = strings.ToLower(tag)
 	}
 	return a.eventRepo.UpdateEvent(e, userId)
 }
