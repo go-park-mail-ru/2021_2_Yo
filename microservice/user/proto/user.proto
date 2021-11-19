@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option go_package = "backend/microservice/user";
+
+message UserId {
+    string ID = 1;
+}
+
+message UpdateUserPasswordRequest {
+    string ID = 1;
+    string password = 2;
+}
+
+message User {
+    string ID = 1;
+    string Name = 2;
+    string Surname = 3;
+    string Mail = 4;
+    string Password = 5;
+    string About = 6;
+    string ImgUrl = 7;
+}
+
+message Nothing {
+    bool nothing = 1;
+}
+
+service UserRepository {
+    rpc GetUserById(UserId) returns (User) {}
+    rpc UpdateUserInfo(User) returns (Nothing) {}
+    rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (Nothing) {}
+}
