@@ -1,8 +1,8 @@
 package register
 
 import (
-	log "backend/logger"
 	"backend/middleware"
+	log "backend/pkg/logger"
 	authHttp "backend/service/auth/delivery/http"
 	eventHttp "backend/service/event/delivery/http"
 	userHttp "backend/service/user/delivery/http"

@@ -1,7 +1,7 @@
 package session
 
 import (
-	log "backend/logger"
+	log "backend/pkg/logger"
 	authServiceModels "backend/microservice/auth/models"
 	"github.com/go-redis/redis"
 )

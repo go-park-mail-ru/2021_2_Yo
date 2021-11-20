@@ -1,9 +1,9 @@
 package repository
 
 import (
-	log "backend/logger"
 	proto "backend/microservice/user/proto"
 	"backend/models"
+	log "backend/pkg/logger"
 	error2 "backend/service/user/error"
 	"context"
 	sql2 "database/sql"
@@ -20,8 +20,8 @@ const (
 	//TODO: updateUserImg в отдельный метод
 	updateUserImgUrlQuery = `update "user" set img_url = $1 where id = $2`
 	subscribeQuery        = `insert into "subscribe" (subscribed_id, subscriber_id) values ($1, $2)`
-	getSubscribersQuery   = `select u.* from "user" as u join subscribe s on s.subscribed_id = u.id where s.subscribed_id = $1`
-	getSubscribesQuery    = `select u.* from "user" as u join subscribe s on s.subscriber_id = u.id where s.subscriber_id = $1`
+	getSubscribersQuery   = `select u.* from "user" as u join subscribe s on s.subscriber_id = u.id where s.subscribed_id = $1`
+	getSubscribesQuery    = `select u.* from "user" as u join subscribe s on s.subscribed_id = u.id where s.subscriber_id = $1`
 	getVisitorsQuery      = `select u.* from "user" as u join visitor v on u.id = v.user_id where v.event_id = $1`
 )
 
@@ -36,6 +36,8 @@ func NewRepository(database *sql.DB) *Repository {
 }
 
 func (s *Repository) GetUserById(ctx context.Context, in *proto.UserId) (*proto.User, error) {
+	message := logMessage + "GetUserById:"
+	log.Debug(message + "started")
 
 	userId := in.ID
 
@@ -52,11 +54,14 @@ func (s *Repository) GetUserById(ctx context.Context, in *proto.UserId) (*proto.
 	modelUser := toModelUser(&user)
 	protoUser := toProtoUser(modelUser)
 
+	log.Debug(message + "ended")
 	return protoUser, nil
 
 }
 
 func (s *Repository) UpdateUserInfo(ctx context.Context, in *proto.User) (*proto.Empty, error) {
+	message := logMessage + "UpdateUserInfo:"
+	log.Debug(message + "started")
 
 	postgresUser, err := toPostgresUser(&models.User{
 		ID:       in.ID,
@@ -86,11 +91,15 @@ func (s *Repository) UpdateUserInfo(ctx context.Context, in *proto.User) (*proto
 		}
 	}
 
+	log.Debug(message + "ended")
 	return nil, nil
 
 }
 
 func (s *Repository) UpdateUserPassword(ctx context.Context, in *proto.UpdateUserPasswordRequest) (*proto.Empty, error) {
+
+	message := logMessage + "UpdateUserPassword:"
+	log.Debug(message + "started")
 
 	userId := in.ID
 	password := in.Password
@@ -106,6 +115,7 @@ func (s *Repository) UpdateUserPassword(ctx context.Context, in *proto.UpdateUse
 		return nil, error2.ErrPostgres
 	}
 
+	log.Debug(message + "ended")
 	return nil, nil
 
 }
@@ -113,6 +123,7 @@ func (s *Repository) UpdateUserPassword(ctx context.Context, in *proto.UpdateUse
 func (s *Repository) Subscribe(ctx context.Context, in *proto.SubscribeRequest) (*proto.Empty, error) {
 
 	message := logMessage + "Subscribe:"
+	log.Debug(message + "started")
 
 	subscribedId := in.SubscribedId
 	subscriberId := in.SubscriberId
@@ -130,10 +141,10 @@ func (s *Repository) Subscribe(ctx context.Context, in *proto.SubscribeRequest) 
 	query := subscribeQuery
 	_, err = s.db.Query(query, subscribedIdInt, subscriberIdInt)
 	if err != nil {
-		log.Error(message+"err =", err)
 		return nil, error2.ErrPostgres
 	}
 
+	log.Debug(message + "ended")
 	return nil, nil
 
 }
@@ -141,6 +152,7 @@ func (s *Repository) Subscribe(ctx context.Context, in *proto.SubscribeRequest) 
 func (s *Repository) GetSubscribers(ctx context.Context, in *proto.UserId) (*proto.Users, error) {
 
 	message := logMessage + "GetSubscribers:"
+	log.Debug(message + "started")
 
 	userId := in.ID
 
@@ -152,7 +164,6 @@ func (s *Repository) GetSubscribers(ctx context.Context, in *proto.UserId) (*pro
 	query := getSubscribersQuery
 	rows, err := s.db.Queryx(query, userIdInt)
 	if err != nil {
-		log.Error(message+"err =", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -172,12 +183,15 @@ func (s *Repository) GetSubscribers(ctx context.Context, in *proto.UserId) (*pro
 		outUsers[i] = toProtoUser(event)
 	}
 	out := &proto.Users{Users: outUsers}
+
+	log.Debug(message + "ended")
 	return out, nil
 }
 
 func (s *Repository) GetSubscribes(ctx context.Context, in *proto.UserId) (*proto.Users, error) {
 
-	message := logMessage + "GetSubscribers:"
+	message := logMessage + "GetSubscribes:"
+	log.Debug(message + "started")
 
 	userId := in.ID
 
@@ -189,7 +203,6 @@ func (s *Repository) GetSubscribes(ctx context.Context, in *proto.UserId) (*prot
 	query := getSubscribesQuery
 	rows, err := s.db.Queryx(query, userIdInt)
 	if err != nil {
-		log.Error(message+"err =", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -209,6 +222,8 @@ func (s *Repository) GetSubscribes(ctx context.Context, in *proto.UserId) (*prot
 		outUsers[i] = toProtoUser(event)
 	}
 	out := &proto.Users{Users: outUsers}
+
+	log.Debug(message + "ended")
 	return out, nil
 
 }
@@ -216,6 +231,7 @@ func (s *Repository) GetSubscribes(ctx context.Context, in *proto.UserId) (*prot
 func (s *Repository) GetVisitors(ctx context.Context, in *proto.EventId) (*proto.Users, error) {
 
 	message := logMessage + "GetVisitors:"
+	log.Debug(message + "started")
 
 	eventId := in.ID
 
@@ -227,7 +243,6 @@ func (s *Repository) GetVisitors(ctx context.Context, in *proto.EventId) (*proto
 	query := getVisitorsQuery
 	rows, err := s.db.Queryx(query, eventIdInt)
 	if err != nil {
-		log.Error(message+"err =", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -247,6 +262,8 @@ func (s *Repository) GetVisitors(ctx context.Context, in *proto.EventId) (*proto
 		outUsers[i] = toProtoUser(event)
 	}
 	out := &proto.Users{Users: outUsers}
+
+	log.Debug(message + "ended")
 	return out, nil
 
 }

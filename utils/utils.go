@@ -1,7 +1,7 @@
 package utils
 
 import (
-	log "backend/logger"
+	log "backend/pkg/logger"
 	"backend/response"
 	"crypto/sha256"
 	"errors"

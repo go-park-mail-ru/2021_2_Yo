@@ -1,9 +1,9 @@
 package eventRepository
 
 import (
-	log "backend/logger"
 	proto "backend/microservice/event/proto"
 	"backend/models"
+	log "backend/pkg/logger"
 	error2 "backend/service/event/error"
 	"context"
 	sql2 "database/sql"
@@ -11,8 +11,6 @@ import (
 	"github.com/lib/pq"
 	"strconv"
 )
-
-const logMessage = "microservice:event:repository:"
 
 type Repository struct {
 	db *sql.DB
@@ -25,6 +23,7 @@ func NewRepository(database *sql.DB) *Repository {
 }
 
 const (
+	logMessage               = "microservice:event:repository:"
 	checkAuthorQuery         = `select author_id from "event" where id = $1`
 	listQuery                = `select * from "event"`
 	getEventQuery            = `select * from "event" where id = $1`
@@ -46,17 +45,6 @@ const (
 	visitedQuery     = `select e.* from "event" as e join visitor as v on v.event_id = e.id where v.user_id = $1`
 )
 
-/*
-type RepositoryServer interface {
-	CreateEvent(context.Context, *Event) (*proto.EventId, error)
-	UpdateEvent(context.Context, *UpdateEventRequest) (*proto.Empty, error)
-	DeleteEvent(context.Context, *DeleteEventRequest) (*proto.Empty, error)
-	GetEventById(context.Context, *EventId) (*proto.Event, error)
-	GetEvents(context.Context, *GetEventsRequest) (*proto.Events, error)
-	GetEventsFromAuthor(context.Context, *AuthorId) (*proto.Events, error)
-}
-*/
-
 func (s *Repository) checkAuthor(eventId int, userId int) error {
 	var authorId int
 	query := checkAuthorQuery
@@ -72,6 +60,9 @@ func (s *Repository) checkAuthor(eventId int, userId int) error {
 }
 
 func (s *Repository) CreateEvent(ctx context.Context, in *proto.Event) (*proto.EventId, error) {
+
+	message := logMessage + "CreateEvent:"
+	log.Debug(message + "started")
 
 	e := fromProtoToModel(in)
 
@@ -102,11 +93,16 @@ func (s *Repository) CreateEvent(ctx context.Context, in *proto.Event) (*proto.E
 	}
 
 	out := &proto.EventId{ID: strconv.Itoa(eventId)}
+
+	log.Debug(message + "ended")
 	return out, nil
 
 }
 
 func (s *Repository) UpdateEvent(ctx context.Context, in *proto.UpdateEventRequest) (*proto.Empty, error) {
+
+	message := logMessage + "UpdateEvent:"
+	log.Debug(message + "started")
 
 	e := fromProtoToModel(in.Event)
 	userId := in.UserId
@@ -166,11 +162,15 @@ func (s *Repository) UpdateEvent(ctx context.Context, in *proto.UpdateEventReque
 		}
 	}
 
+	log.Debug(message + "ended")
 	return nil, nil
 
 }
 
 func (s *Repository) DeleteEvent(ctx context.Context, in *proto.DeleteEventRequest) (*proto.Empty, error) {
+
+	message := logMessage + "DeleteEvent:"
+	log.Debug(message + "started")
 
 	eventId := in.EventId
 	userId := in.UserId
@@ -194,11 +194,15 @@ func (s *Repository) DeleteEvent(ctx context.Context, in *proto.DeleteEventReque
 		return nil, error2.ErrPostgres
 	}
 
+	log.Debug(message + "ended")
 	return nil, nil
 
 }
 
 func (s *Repository) GetEventById(ctx context.Context, in *proto.EventId) (*proto.Event, error) {
+
+	message := logMessage + "GetEventById:"
+	log.Debug(message + "started")
 
 	eventId := in.ID
 
@@ -219,11 +223,16 @@ func (s *Repository) GetEventById(ctx context.Context, in *proto.EventId) (*prot
 	resultEvent := toModelEvent(&e)
 
 	out := toProtoEvent(resultEvent)
+
+	log.Debug(message + "ended")
 	return out, nil
 
 }
 
 func (s *Repository) GetEvents(ctx context.Context, in *proto.GetEventsRequest) (*proto.Events, error) {
+
+	message := logMessage + "GetEvents:"
+	log.Debug(message + "started")
 
 	tags := in.Tags
 	title := in.Title
@@ -272,10 +281,15 @@ func (s *Repository) GetEvents(ctx context.Context, in *proto.GetEventsRequest) 
 		outEvents[i] = toProtoEvent(event)
 	}
 	out := &proto.Events{Events: outEvents}
+
+	log.Debug(message + "ended")
 	return out, nil
 }
 
 func (s *Repository) GetEventsFromAuthor(ctx context.Context, in *proto.AuthorId) (*proto.Events, error) {
+
+	message := logMessage + "GetEvents:"
+	log.Debug(message + "started")
 
 	authorId := in.ID
 
@@ -287,7 +301,6 @@ func (s *Repository) GetEventsFromAuthor(ctx context.Context, in *proto.AuthorId
 	query := getEventsFromAuthorQuery
 	rows, err := s.db.Queryx(query, authorIdInt)
 	if err != nil {
-		log.Error(logMessage+"GetEvents:err =", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -307,12 +320,15 @@ func (s *Repository) GetEventsFromAuthor(ctx context.Context, in *proto.AuthorId
 		outEvents[i] = toProtoEvent(event)
 	}
 	out := &proto.Events{Events: outEvents}
+
+	log.Debug(message + "ended")
 	return out, nil
 }
 
 func (s *Repository) Visit(ctx context.Context, in *proto.VisitRequest) (*proto.Empty, error) {
 
 	message := logMessage + "Visit:"
+	log.Debug(message + "started")
 
 	eventId := in.EventId
 	userId := in.UserId
@@ -330,15 +346,18 @@ func (s *Repository) Visit(ctx context.Context, in *proto.VisitRequest) (*proto.
 	query := visitQuery
 	_, err = s.db.Query(query, eventIdInt, userIdInt)
 	if err != nil {
-		log.Error(message+"err =", err)
 		return nil, error2.ErrPostgres
 	}
 
+	log.Debug(message + "ended")
 	return nil, nil
 
 }
 
 func (s *Repository) GetVisitedEvents(ctx context.Context, in *proto.UserId) (*proto.Events, error) {
+
+	message := logMessage + "GetVisitedEvents:"
+	log.Debug(message + "started")
 
 	userId := in.ID
 
@@ -350,7 +369,6 @@ func (s *Repository) GetVisitedEvents(ctx context.Context, in *proto.UserId) (*p
 	query := visitedQuery
 	rows, err := s.db.Queryx(query, userIdInt)
 	if err != nil {
-		log.Error(logMessage+"GetEvents:err =", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -370,5 +388,7 @@ func (s *Repository) GetVisitedEvents(ctx context.Context, in *proto.UserId) (*p
 		outEvents[i] = toProtoEvent(event)
 	}
 	out := &proto.Events{Events: outEvents}
+
+	log.Debug(message + "ended")
 	return out, nil
 }
