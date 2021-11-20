@@ -9,14 +9,14 @@ services:
       - postgres-db
       - redis-db
 
-
-  postgres-db:
-    restart: always
-    image: postgres:latest
-    environment:
-      - POSTGRES_PASSWORD=password
-    ports:
-      - "5432:5432"
+# for remote
+#  postgres-db:
+#    restart: always
+#   image: postgres:latest
+#   environment:
+#     - POSTGRES_PASSWORD=password
+#  ports:
+#    - "5432:5432"
   
   redis-db:
     restart: always
