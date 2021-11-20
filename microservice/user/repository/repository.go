@@ -1,9 +1,10 @@
-package postgres
+package repository
 
 import (
-	log "backend/logger"
+	"backend/microservice/user/proto"
 	"backend/models"
 	error2 "backend/service/user/error"
+	"context"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
 	"strconv"
@@ -15,6 +16,8 @@ const (
 	updateUserInfoQueryWithoutImgUrl = `update "user" set name = $1, surname = $2, about = $3 where id = $4`
 	updateUserInfoQuery              = `update "user" set name = $1, surname = $2, about = $3, img_url = $4 where id = $5`
 	updateUserPasswordQuery          = `update "user" set password = $1 where id = $2`
+	//TODO: updateUserImg в отдельный метод
+	updateUserImgUrl = `update "user" set img_url = $1 where id = $2`
 )
 
 type Repository struct {
@@ -27,7 +30,10 @@ func NewRepository(database *sql.DB) *Repository {
 	}
 }
 
-func (s *Repository) GetUserById(userId string) (*models.User, error) {
+func (s *Repository) GetUserById(ctx context.Context, in *proto.UserId) (*proto.User, error) {
+
+	userId := in.ID
+
 	query := getUserByIdQuery
 	user := User{}
 	err := s.db.Get(&user, query, userId)
@@ -37,41 +43,64 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 		}
 		return nil, error2.ErrPostgres
 	}
-	log.Debug(logMessage+"GetUserById:foundUser =", user)
-	return toModelUser(&user), nil
+
+	modelUser := toModelUser(&user)
+	protoUser := toProtoUser(modelUser)
+
+	return protoUser, nil
+
 }
 
-func (s *Repository) UpdateUserInfo(user *models.User) error {
-	postgresUser, err := toPostgresUser(user)
+func (s *Repository) UpdateUserInfo(ctx context.Context, in *proto.User) (*proto.Empty, error) {
+
+	postgresUser, err := toPostgresUser(&models.User{
+		ID:       in.ID,
+		Name:     in.Name,
+		Surname:  in.Surname,
+		Mail:     in.Mail,
+		Password: in.Password,
+		About:    in.About,
+		ImgUrl:   in.ImgUrl,
+	})
 	if err != nil {
-		return err
+		return nil, err
 	}
+
 	var query string
 	if postgresUser.ImgUrl == "" {
 		query = updateUserInfoQueryWithoutImgUrl
 		_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ID)
 		if err != nil {
-			return error2.ErrPostgres
+			return nil, error2.ErrPostgres
 		}
 	} else {
 		query = updateUserInfoQuery
 		_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
 		if err != nil {
-			return error2.ErrPostgres
+			return nil, error2.ErrPostgres
 		}
 	}
-	return nil
+
+	return nil, nil
+
 }
 
-func (s *Repository) UpdateUserPassword(userId, password string) error {
+func (s *Repository) UpdateUserPassword(ctx context.Context, in *proto.UpdateUserPasswordRequest) (*proto.Empty, error) {
+
+	userId := in.ID
+	password := in.Password
+
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return error2.ErrAtoi
+		return nil, error2.ErrAtoi
 	}
+
 	query := updateUserPasswordQuery
 	_, err = s.db.Query(query, password, userIdInt)
 	if err != nil {
-		return error2.ErrPostgres
+		return nil, error2.ErrPostgres
 	}
-	return nil
+
+	return nil, nil
+
 }

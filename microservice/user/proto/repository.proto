@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "backend/microservice/user";
+option go_package = "../proto";
 
 message UserId {
     string ID = 1;
@@ -21,12 +21,10 @@ message User {
     string ImgUrl = 7;
 }
 
-message Nothing {
-    bool nothing = 1;
-}
+message Empty {}
 
-service UserRepository {
+service Repository {
     rpc GetUserById(UserId) returns (User) {}
-    rpc UpdateUserInfo(User) returns (Nothing) {}
-    rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (Nothing) {}
+    rpc UpdateUserInfo(User) returns (Empty) {}
+    rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (Empty) {}
 }

@@ -3,14 +3,14 @@ package server
 import (
 	authDelivery "backend/service/auth/delivery/http"
 
+	userRepository "backend/microservice/user/proto"
 	userDelivery "backend/service/user/delivery/http"
-	userRepository "backend/service/user/repository/postgres"
 	userUseCase "backend/service/user/usecase"
 
-	eventDelivery "backend/service/event/delivery/http"
-	eventRepository "backend/service/event/repository/postgres"
-	eventUseCase "backend/service/event/usecase"
+	eventRepository "backend/microservice/event/proto"
 	"backend/register"
+	eventDelivery "backend/service/event/delivery/http"
+	eventUseCase "backend/service/event/usecase"
 
 	log "backend/logger"
 	"backend/middleware"
@@ -31,11 +31,11 @@ import (
 const logMessage = "server:"
 
 type App struct {
-	AuthManager    *authDelivery.Delivery
-	UserManager    *userDelivery.Delivery
-	EventManager   *eventDelivery.Delivery
-	authService    *microAuth.AuthService
-	db             *sql.DB
+	AuthManager  *authDelivery.Delivery
+	UserManager  *userDelivery.Delivery
+	EventManager *eventDelivery.Delivery
+	authService  *microAuth.AuthService
+	db           *sql.DB
 }
 
 func NewApp(logLevel logrus.Level) (*App, error) {
@@ -49,38 +49,45 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		return nil, err
 	}
 
-
 	AuthAddr := "localhost:8081"
 	grpcConnAuth, err := grpc.Dial(
 		AuthAddr,
 		grpc.WithInsecure(),
 	)
-
-	authClient := protoAuth.NewAuthClient(grpcConnAuth)
-	authService := microAuth.NewService(authClient)
-
 	if err != nil {
 		log.Error("can't connect to grpc")
 	}
 
-
-	
+	authClient := protoAuth.NewAuthClient(grpcConnAuth)
+	authService := microAuth.NewService(authClient)
 	authD := authDelivery.NewDelivery(authService)
 
-	userR := userRepository.NewRepository(db)
-	userUC := userUseCase.NewUseCase(userR)
-	userD := userDelivery.NewDelivery(userUC,authService)
+	userMicroserviceAddr := "localhost:8082"
+	userGrpcConn, err := grpc.Dial(userMicroserviceAddr, grpc.WithInsecure())
+	if err != nil {
+		log.Error(message+"err =", err)
+	}
 
-	eventR := eventRepository.NewRepository(db)
+	userR := userRepository.NewRepositoryClient(userGrpcConn)
+	userUC := userUseCase.NewUseCase(userR)
+	userD := userDelivery.NewDelivery(userUC, authService)
+
+	eventMicroserviceAddr := "localhost:8083"
+	eventGrpcConn, err := grpc.Dial(eventMicroserviceAddr, grpc.WithInsecure())
+	if err != nil {
+		log.Error(message+"err =", err)
+	}
+
+	eventR := eventRepository.NewRepositoryClient(eventGrpcConn)
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
 	return &App{
-		AuthManager:    authD,
-		UserManager:    userD,
-		EventManager:   eventD,
-		authService: &authService,
-		db:             db,
+		AuthManager:  authD,
+		UserManager:  userD,
+		EventManager: eventD,
+		authService:  &authService,
+		db:           db,
 	}, nil
 }
 
@@ -110,15 +117,12 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 
 	eventRouter := r.PathPrefix("/events").Subrouter()
 	eventRouter.Methods("POST").Subrouter().Use(mw.CSRF)
-	
+
 	register.EventHTTPEndpoints(eventRouter, app.EventManager, mw)
 
 	userRouter := r.PathPrefix("/user").Subrouter()
 	userRouter.Methods("POST").Subrouter().Use(mw.CSRF)
-	//getUserHandlerFunc := mw.Auth(http.HandlerFunc(app.UserManager.GetUser))
-	//r.Handle("/user", getUserHandlerFunc).Methods("GET")
 	register.UserHTTPEndpoints(userRouter, app.UserManager, mw)
-
 
 	return r
 }
@@ -129,8 +133,6 @@ func (app *App) Run() error {
 	}
 	message := logMessage + "Run:"
 	log.Info(message + "start")
-
-
 
 	r := newRouterWithEndpoints(app)
 	port := os.Getenv("PORT")

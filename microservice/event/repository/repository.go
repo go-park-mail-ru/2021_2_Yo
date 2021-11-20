@@ -1,9 +1,11 @@
-package postgres
+package repository
 
 import (
 	log "backend/logger"
+	"backend/microservice/event/proto"
 	"backend/models"
 	error2 "backend/service/event/error"
+	"context"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -40,8 +42,18 @@ const (
 		viewed = $6, date = $7, geo = $8, tag = $9 
 		where event.id = $10`
 	deleteEventQuery = `delete from "event" where id = $1`
-	
 )
+
+/*
+type RepositoryServer interface {
+	CreateEvent(context.Context, *Event) (*proto.EventId, error)
+	UpdateEvent(context.Context, *UpdateEventRequest) (*proto.Empty, error)
+	DeleteEvent(context.Context, *DeleteEventRequest) (*proto.Empty, error)
+	GetEventById(context.Context, *EventId) (*proto.Event, error)
+	GetEvents(context.Context, *GetEventsRequest) (*proto.Events, error)
+	GetEventsFromAuthor(context.Context, *AuthorId) (*proto.Events, error)
+}
+*/
 
 func (s *Repository) checkAuthor(eventId int, userId int) error {
 	var authorId int
@@ -57,11 +69,15 @@ func (s *Repository) checkAuthor(eventId int, userId int) error {
 	}
 }
 
-func (s *Repository) CreateEvent(e *models.Event) (string, error) {
+func (s *Repository) CreateEvent(ctx context.Context, in *proto.Event) (*proto.EventId, error) {
+
+	e := fromProtoToModel(in)
+
 	newEvent, err := toPostgresEvent(e)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
+
 	var eventId int
 	query := createEventQuery
 	err = s.db.Get(&eventId, query,
@@ -78,95 +94,117 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		newEvent.AuthorID)
 	if err != nil {
 		if err == sql2.ErrNoRows {
-			return "", error2.ErrNoRows
+			return nil, error2.ErrNoRows
 		}
-		return "", error2.ErrPostgres
+		return nil, error2.ErrPostgres
 	}
-	return strconv.Itoa(eventId), nil
+
+	out := &proto.EventId{ID: strconv.Itoa(eventId)}
+	return out, nil
+
 }
 
-func (s *Repository) UpdateEvent(updatedEvent *models.Event, userId string) error {
-	eventIdInt, err := strconv.Atoi(updatedEvent.ID)
+func (s *Repository) UpdateEvent(ctx context.Context, in *proto.UpdateEventRequest) (*proto.Empty, error) {
+
+	e := fromProtoToModel(in.Event)
+	userId := in.UserId
+
+	eventIdInt, err := strconv.Atoi(e.ID)
 	if err != nil {
-		return error2.ErrAtoi
+		return nil, error2.ErrAtoi
 	}
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return error2.ErrAtoi
+		return nil, error2.ErrAtoi
 	}
+
 	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	e, err := toPostgresEvent(updatedEvent)
+	postgresEvent, err := toPostgresEvent(e)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	e.ID = eventIdInt
+	postgresEvent.ID = eventIdInt
+
 	var query string
-	if e.ImgUrl != "" {
+	if postgresEvent.ImgUrl != "" {
 		query = updateEventQuery
 		_, err = s.db.Query(query,
-			e.Title,
-			e.Description,
-			e.Text,
-			e.City,
-			e.Category,
-			e.Viewed,
-			e.ImgUrl,
-			e.Date,
-			e.Geo,
-			e.Tag,
-			e.ID)
+			postgresEvent.Title,
+			postgresEvent.Description,
+			postgresEvent.Text,
+			postgresEvent.City,
+			postgresEvent.Category,
+			postgresEvent.Viewed,
+			postgresEvent.ImgUrl,
+			postgresEvent.Date,
+			postgresEvent.Geo,
+			postgresEvent.Tag,
+			postgresEvent.ID)
 		if err != nil {
-			return error2.ErrPostgres
+			return nil, error2.ErrPostgres
 		}
 	} else {
 		query = updateEventQueryWithoutImgUrl
 		_, err = s.db.Query(query,
-			e.Title,
-			e.Description,
-			e.Text,
-			e.City,
-			e.Category,
-			e.Viewed,
-			e.Date,
-			e.Geo,
-			e.Tag,
-			e.ID)
+			postgresEvent.Title,
+			postgresEvent.Description,
+			postgresEvent.Text,
+			postgresEvent.City,
+			postgresEvent.Category,
+			postgresEvent.Viewed,
+			postgresEvent.Date,
+			postgresEvent.Geo,
+			postgresEvent.Tag,
+			postgresEvent.ID)
 		if err != nil {
-			return error2.ErrPostgres
+			return nil, error2.ErrPostgres
 		}
 	}
-	return nil
+
+	return nil, nil
+
 }
 
-func (s *Repository) DeleteEvent(eventId string, userId string) error {
-	eventIdInt, err := strconv.Atoi(eventId)
-	if err != nil {
-		return error2.ErrAtoi
-	}
-	userIdInt, err := strconv.Atoi(userId)
-	if err != nil {
-		return error2.ErrAtoi
-	}
-	err = s.checkAuthor(eventIdInt, userIdInt)
-	if err != nil {
-		return err
-	}
-	query := deleteEventQuery
-	_, err = s.db.Exec(query, eventIdInt)
-	if err != nil {
-		return error2.ErrPostgres
-	}
-	return nil
-}
+func (s *Repository) DeleteEvent(ctx context.Context, in *proto.DeleteEventRequest) (*proto.Empty, error) {
 
-func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
+	eventId := in.EventId
+	userId := in.UserId
+
 	eventIdInt, err := strconv.Atoi(eventId)
 	if err != nil {
 		return nil, error2.ErrAtoi
 	}
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+	err = s.checkAuthor(eventIdInt, userIdInt)
+	if err != nil {
+		return nil, err
+	}
+
+	query := deleteEventQuery
+	_, err = s.db.Exec(query, eventIdInt)
+	if err != nil {
+		return nil, error2.ErrPostgres
+	}
+
+	return nil, nil
+
+}
+
+func (s *Repository) GetEventById(ctx context.Context, in *proto.EventId) (*proto.Event, error) {
+
+	eventId := in.ID
+
+	eventIdInt, err := strconv.Atoi(eventId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+
 	query := getEventQuery
 	var e Event
 	err = s.db.Get(&e, query, eventIdInt)
@@ -176,15 +214,24 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 		}
 		return nil, error2.ErrPostgres
 	}
-	resultEvent  := toModelEvent(&e)
-	return resultEvent, nil
+	resultEvent := toModelEvent(&e)
+
+	out := toProtoEvent(resultEvent)
+	return out, nil
+
 }
 
-func (s *Repository) GetEvents(title string, category string, tags []string) ([]*models.Event, error) {
+func (s *Repository) GetEvents(ctx context.Context, in *proto.GetEventsRequest) (*proto.Events, error) {
+
+	tags := in.Tags
+	title := in.Title
+	category := in.Category
+
 	postgresTags := make(pq.StringArray, len(tags))
 	for i := range tags {
 		postgresTags[i] = tags[i]
 	}
+
 	query := listQuery + " "
 	if title != "" {
 		query += `where lower(title) ~ lower($1) and `
@@ -217,14 +264,24 @@ func (s *Repository) GetEvents(title string, category string, tags []string) ([]
 		modelEvent := toModelEvent(&e)
 		resultEvents = append(resultEvents, modelEvent)
 	}
-	return resultEvents, nil
+
+	outEvents := make([]*proto.Event, len(resultEvents))
+	for i, event := range resultEvents {
+		outEvents[i] = toProtoEvent(event)
+	}
+	out := &proto.Events{Event: outEvents}
+	return out, nil
 }
 
-func (s *Repository) GetEventsFromAuthor(authorId string) ([]*models.Event, error) {
+func (s *Repository) GetEventsFromAuthor(ctx context.Context, in *proto.AuthorId) (*proto.Events, error) {
+
+	authorId := in.ID
+
 	authorIdInt, err := strconv.Atoi(authorId)
 	if err != nil {
 		return nil, error2.ErrAtoi
 	}
+
 	query := getEventsFromAuthorQuery
 	rows, err := s.db.Queryx(query, authorIdInt)
 	if err != nil {
@@ -242,5 +299,11 @@ func (s *Repository) GetEventsFromAuthor(authorId string) ([]*models.Event, erro
 		modelEvent := toModelEvent(&e)
 		resultEvents = append(resultEvents, modelEvent)
 	}
-	return resultEvents, nil
+
+	outEvents := make([]*proto.Event, len(resultEvents))
+	for i, event := range resultEvents {
+		outEvents[i] = toProtoEvent(event)
+	}
+	out := &proto.Events{Event: outEvents}
+	return out, nil
 }
