@@ -1,7 +1,7 @@
 package http
 
 import (
-	log "backend/logger"
+	log "backend/pkg/logger"
 	"backend/response"
 	"backend/service/email"
 	microAuth "backend/service/microservices/auth"

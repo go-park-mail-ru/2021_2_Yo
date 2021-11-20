@@ -1,7 +1,7 @@
 package http
 
 import (
-	log "backend/logger"
+	log "backend/pkg/logger"
 	"backend/response"
 	error2 "backend/service/auth/error"
 	"backend/service/email"
@@ -14,12 +14,12 @@ import (
 const logMessage = "service:auth:delivery:http:"
 
 type Delivery struct {
-	authService    microAuth.AuthService
+	authService microAuth.AuthService
 }
 
 func NewDelivery(authService microAuth.AuthService) *Delivery {
 	return &Delivery{
-		authService:    authService, 
+		authService: authService,
 	}
 }
 
@@ -57,7 +57,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctx := context.Background()
-	userResponse, err := h.authService.SignUp(ctx,*u)
+	userResponse, err := h.authService.SignUp(ctx, *u)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
@@ -74,7 +74,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Info(CSRFToken)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
-	email.SendEmail("Подтвержение регистрации","Вы зарегистрировались на bmstuse",[]string{u.Mail})
+	email.SendEmail("Подтвержение регистрации", "Вы зарегистрировались на bmstuse", []string{u.Mail})
 	log.Debug(message + "ended")
 }
 
@@ -90,11 +90,11 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 		return
 	}
-	sessionId, err := h.authService.CreateSession(ctx,userId)
+	sessionId, err := h.authService.CreateSession(ctx, userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	CSRFToken, err := h.authService.CreateToken(ctx,userId)
+	CSRFToken, err := h.authService.CreateToken(ctx, userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}

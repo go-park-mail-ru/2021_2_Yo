@@ -1,20 +1,20 @@
 package middleware
 
 import (
-	log "backend/logger"
+	log "backend/pkg/logger"
 	"backend/response"
+	microAuth "backend/service/microservices/auth"
 	"backend/utils"
 	"context"
 	"github.com/gorilla/mux"
 	"net/http"
 	"time"
-	microAuth "backend/service/microservices/auth"
 )
 
 const logMessage = "middleware:"
 
 type Middlewares struct {
-	authService    microAuth.AuthService
+	authService microAuth.AuthService
 }
 
 func NewMiddlewares(authService microAuth.AuthService) *Middlewares {

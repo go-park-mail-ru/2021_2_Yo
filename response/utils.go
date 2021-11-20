@@ -1,8 +1,8 @@
 package response
 
 import (
-	log "backend/logger"
 	"backend/models"
+	log "backend/pkg/logger"
 	"encoding/json"
 	"errors"
 	"github.com/asaskevich/govalidator"

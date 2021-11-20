@@ -1,27 +1,27 @@
 package main
 
 import (
-	log "github.com/sirupsen/logrus"
-	"backend/logger"
 	sessionRepo "backend/microservices/auth/repository/session"
 	userRepo "backend/microservices/auth/repository/user"
 	protoAuth "backend/microservices/proto/auth"
+	"backend/pkg/logger"
+	log "github.com/sirupsen/logrus"
 
 	"backend/microservices/auth/usecase"
 	"backend/utils"
-	"net"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
+	"net"
 	"os"
-	_ "github.com/lib/pq"
-	"github.com/joho/godotenv"
 )
 
 func env() {
-    // loads values from .env into the system
-    if err := godotenv.Load(); err != nil {
-        log.Print("No .env file found")
-    }
+	// loads values from .env into the system
+	if err := godotenv.Load(); err != nil {
+		log.Print("No .env file found")
+	}
 }
 
 func main() {
@@ -59,7 +59,7 @@ func main() {
 	authSessionRepository := sessionRepo.NewRepository(redisDB)
 
 	authService := usecase.NewService(authUserRepository, authSessionRepository)
-	protoAuth.RegisterAuthServer(server,authService)
+	protoAuth.RegisterAuthServer(server, authService)
 
 	log.Info("started auth microservice on 8081")
 	err = server.Serve(authListener)
