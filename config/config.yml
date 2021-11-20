@@ -1,8 +1,14 @@
-port: "8080"
+bmstusa_port: "8080"
+
+auth_port: "8081"
+
+user_port: "8084"
+
+event_port: "8083"
 
 postgres_db:
     user: "postgres"
-    host: "localhost"
+    host: "postgres-db"
     port: "5432"
     password: password
     dbname: "postgres"
@@ -10,5 +16,6 @@ postgres_db:
 
 
 redis_db_session:
-    addr: "localhost:6379"
+    addr: "redis-db:6379"
     db_id: 0
+

@@ -13,10 +13,8 @@ RUN go mod download
 
 COPY . .
 
-RUN apt-get install ca-certificates -y
-
-RUN go build 
+RUN go build
 
 EXPOSE 8080
 
-CMD ["./backend"]
+CMD ["./backend]

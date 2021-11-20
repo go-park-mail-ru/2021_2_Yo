@@ -18,6 +18,7 @@ func env() {
 }
 
 func main() {
+	env()
 	log.Info("Main : start")
 	viper.AddConfigPath("config")
 	viper.SetConfigName("config")

@@ -1,4 +1,4 @@
-package main
+package auth
 
 import (
 	protoAuth "backend/microservice/auth/proto"
@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc"
 	"net"
 	"os"
+	"sync"
 )
 
 func env() {
@@ -22,6 +23,26 @@ func env() {
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
+}
+
+var lock = &sync.Mutex{}
+
+type microservice struct {
+
+}
+
+var microserviceInstance *microservice
+
+
+func RunMicroservice(){
+	if microserviceInstance == nil {
+		lock.Lock()
+		defer lock.Unlock()
+        if microserviceInstance == nil {
+            microserviceInstance = &microservice{}
+			go main()
+		}
+    } 
 }
 
 func main() {
@@ -36,7 +57,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	port := viper.GetString("port")
+	port := viper.GetString("auth_port")
 
 	//Подключение постгрес
 	postDB, err := utils.InitPostgresDB()
@@ -48,7 +69,7 @@ func main() {
 	if err != nil {
 		log.Error(err)
 	}
-
+	log.Info(redisDB)
 	//Попробую 8081
 	authListener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
@@ -63,7 +84,7 @@ func main() {
 	authService := usecase.NewService(authUserRepository, authSessionRepository)
 	protoAuth.RegisterAuthServer(server, authService)
 
-	log.Info("started auth microservice on", port)
+	log.Info("started auth microservice on ", port)
 	err = server.Serve(authListener)
 	if err != nil {
 		log.Error("serve troubles")

@@ -1,4 +1,4 @@
-package main
+package user
 
 import (
 	proto "backend/microservice/user/proto"
@@ -11,9 +11,30 @@ import (
 	"google.golang.org/grpc"
 	"net"
 	"os"
+	"sync"
 )
 
 const logMessage = "microservice:event:"
+
+var lock = &sync.Mutex{}
+
+type microservice struct {
+
+}
+
+var microserviceInstance *microservice
+
+
+func RunMicroservice(){
+	if microserviceInstance == nil {
+		lock.Lock()
+		defer lock.Unlock()
+        if microserviceInstance == nil {
+            microserviceInstance = &microservice{}
+			go main()
+		}
+    } 
+}
 
 func main() {
 
@@ -36,7 +57,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	listener, err := net.Listen("tcp", ":8082")
+	port := viper.GetString("user_port")
+	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Error(logMessage+"err =", err)
 		os.Exit(1)
@@ -47,7 +69,7 @@ func main() {
 	userRepositoryService := repository.NewRepository(db)
 	proto.RegisterRepositoryServer(server, userRepositoryService)
 
-	log.Info("started user microservice on 8082")
+	log.Info("started user microservice on ", port)
 	err = server.Serve(listener)
 	if err != nil {
 		log.Error(logMessage+"err =", err)

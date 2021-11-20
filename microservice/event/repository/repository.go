@@ -262,7 +262,7 @@ func (s *Repository) GetEvents(ctx context.Context, in *proto.GetEventsRequest) 
 	query += "order by viewed DESC"
 	rows, err := s.db.Queryx(query, title, category, postgresTags)
 	if err != nil {
-		return nil, error2.ErrPostgres
+		return nil, err
 	}
 	defer rows.Close()
 	var resultEvents []*models.Event
