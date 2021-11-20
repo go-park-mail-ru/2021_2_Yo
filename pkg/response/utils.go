@@ -2,7 +2,7 @@ package response
 
 import (
 	log "backend/pkg/logger"
-	models2 "backend/pkg/models"
+	"backend/pkg/models"
 	"encoding/json"
 	"errors"
 	"github.com/asaskevich/govalidator"
@@ -34,8 +34,8 @@ func ValidateAndSanitize(object interface{}) error {
 	return nil
 }
 
-func GetEventFromRequest(r io.Reader) (*models2.Event, error) {
-	eventInput := new(models2.EventResponseBody)
+func GetEventFromRequest(r io.Reader) (*models.Event, error) {
+	eventInput := new(models.EventResponseBody)
 	err := json.NewDecoder(r).Decode(eventInput)
 	if err != nil {
 		return nil, ErrJSONDecoding
@@ -44,7 +44,7 @@ func GetEventFromRequest(r io.Reader) (*models2.Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	result := &models2.Event{
+	result := &models.Event{
 		ID:          eventInput.ID,
 		Title:       eventInput.Title,
 		Description: eventInput.Description,
@@ -60,10 +60,10 @@ func GetEventFromRequest(r io.Reader) (*models2.Event, error) {
 	return result, nil
 }
 
-func GetUserFromRequest(r io.Reader) (*models2.User, error) {
+func GetUserFromRequest(r io.Reader) (*models.User, error) {
 	message := logMessage + "GetUserFromRequest:"
 	_ = message
-	userInput := new(models2.UserResponseBody)
+	userInput := new(models.UserResponseBody)
 	err := json.NewDecoder(r).Decode(userInput)
 	if err != nil {
 		return nil, ErrJSONDecoding
@@ -72,7 +72,7 @@ func GetUserFromRequest(r io.Reader) (*models2.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	result := &models2.User{
+	result := &models.User{
 		Name:     userInput.Name,
 		Surname:  userInput.Surname,
 		Mail:     userInput.Mail,
@@ -86,8 +86,8 @@ func GetUserFromRequest(r io.Reader) (*models2.User, error) {
 	return result, nil
 }
 
-func MakeEventResponseBody(e *models2.Event) models2.EventResponseBody {
-	return models2.EventResponseBody{
+func MakeEventResponseBody(e *models.Event) models.EventResponseBody {
+	return models.EventResponseBody{
 		ID:          e.ID,
 		Title:       e.Title,
 		Description: e.Description,
@@ -103,18 +103,18 @@ func MakeEventResponseBody(e *models2.Event) models2.EventResponseBody {
 	}
 }
 
-func MakeEventListResponseBody(events []*models2.Event) models2.EventListResponseBody {
-	result := make([]models2.EventResponseBody, len(events))
+func MakeEventListResponseBody(events []*models.Event) models.EventListResponseBody {
+	result := make([]models.EventResponseBody, len(events))
 	for i := 0; i < len(events); i++ {
 		result[i] = MakeEventResponseBody(events[i])
 	}
-	return models2.EventListResponseBody{
+	return models.EventListResponseBody{
 		Events: result,
 	}
 }
 
-func MakeUserResponseBody(u *models2.User) models2.UserResponseBody {
-	return models2.UserResponseBody{
+func MakeUserResponseBody(u *models.User) models.UserResponseBody {
+	return models.UserResponseBody{
 		ID:       u.ID,
 		Name:     u.Name,
 		Surname:  u.Surname,
@@ -125,12 +125,12 @@ func MakeUserResponseBody(u *models2.User) models2.UserResponseBody {
 	}
 }
 
-func MakeUserListResponseBody(users []*models2.User) models2.UserListResponseBody {
-	result := make([]models2.UserResponseBody, len(users))
+func MakeUserListResponseBody(users []*models.User) models.UserListResponseBody {
+	result := make([]models.UserResponseBody, len(users))
 	for i := 0; i < len(users); i++ {
 		result[i] = MakeUserResponseBody(users[i])
 	}
-	return models2.UserListResponseBody{
+	return models.UserListResponseBody{
 		Users: result,
 	}
 }

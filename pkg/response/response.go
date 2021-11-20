@@ -1,7 +1,7 @@
 package response
 
 import (
-	models2 "backend/pkg/models"
+	"backend/pkg/models"
 )
 
 const logMessage = "response:response:"
@@ -43,7 +43,7 @@ func ErrorResponse(errorMessage string) *Response {
 	}
 }
 
-func UserResponse(user *models2.User) *Response {
+func UserResponse(user *models.User) *Response {
 	return &Response{
 		Status:  200,
 		Message: "",
@@ -51,7 +51,7 @@ func UserResponse(user *models2.User) *Response {
 	}
 }
 
-func UserListResponse(users []*models2.User) *Response {
+func UserListResponse(users []*models.User) *Response {
 	return &Response{
 		Status:  200,
 		Message: "",
@@ -59,7 +59,7 @@ func UserListResponse(users []*models2.User) *Response {
 	}
 }
 
-func EventResponse(event *models2.Event) *Response {
+func EventResponse(event *models.Event) *Response {
 	return &Response{
 		Status:  200,
 		Message: "",
@@ -71,13 +71,13 @@ func EventIdResponse(eventID string) *Response {
 	return &Response{
 		Status:  200,
 		Message: "",
-		Body: models2.EventIDResponseBody{
+		Body: models.EventIDResponseBody{
 			ID: eventID,
 		},
 	}
 }
 
-func EventListResponse(events []*models2.Event) *Response {
+func EventListResponse(events []*models.Event) *Response {
 	return &Response{
 		Status:  200,
 		Message: "",

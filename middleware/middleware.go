@@ -2,7 +2,7 @@ package middleware
 
 import (
 	log "backend/pkg/logger"
-	response2 "backend/pkg/response"
+	"backend/pkg/response"
 	"backend/pkg/utils"
 	microAuth "backend/service/microservices/auth"
 	"context"
@@ -30,7 +30,7 @@ func (m *Middlewares) Recovery(next http.Handler) http.Handler {
 			err := recover()
 			if err != nil {
 				log.Error(message+"err =", err)
-				response2.SendResponse(w, response2.ErrorResponse("Internal server error"))
+				response.SendResponse(w, response.ErrorResponse("Internal server error"))
 			}
 		}()
 		next.ServeHTTP(w, r)

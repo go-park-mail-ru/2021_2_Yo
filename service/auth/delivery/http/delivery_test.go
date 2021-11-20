@@ -1,9 +1,8 @@
 package http
 
 import (
-	"backend/models"
-	models2 "backend/pkg/models"
-	response2 "backend/pkg/response"
+	"backend/pkg/models"
+	"backend/pkg/response"
 	error3 "backend/service/auth/error"
 	"backend/service/auth/usecase"
 	error4 "backend/service/csrf/error"
@@ -28,7 +27,7 @@ var signUpTests = []struct {
 	useCaseErr        error
 	sessionManagerErr error
 	csrfManagerErr    error
-	output            *response2.Response
+	output            *response.Response
 }{
 	{1,
 		&models.ResponseBodyUser{
@@ -37,7 +36,7 @@ var signUpTests = []struct {
 		nil,
 		nil,
 		nil,
-		response2.OkResponse()},
+		response.OkResponse()},
 	{2,
 		&models.ResponseBodyUser{
 			Mail: "testMail",
@@ -45,7 +44,7 @@ var signUpTests = []struct {
 		nil,
 		nil,
 		nil,
-		response2.ErrorResponse(response2.ErrValidation.Error())},
+		response.ErrorResponse(response.ErrValidation.Error())},
 	{3,
 		&models.ResponseBodyUser{
 			Mail: "testMail@mail.ru",
@@ -53,7 +52,7 @@ var signUpTests = []struct {
 		error3.ErrUserNotFound,
 		nil,
 		nil,
-		response2.ErrorResponse(error3.ErrUserNotFound.Error())},
+		response.ErrorResponse(error3.ErrUserNotFound.Error())},
 	{4,
 		&models.ResponseBodyUser{
 			Mail: "testMail@mail.ru",
@@ -61,7 +60,7 @@ var signUpTests = []struct {
 		nil,
 		error2.ErrEmptySessionId,
 		nil,
-		response2.ErrorResponse(error2.ErrEmptySessionId.Error())},
+		response.ErrorResponse(error2.ErrEmptySessionId.Error())},
 	{5,
 		&models.ResponseBodyUser{
 			Mail: "testMail@mail.ru",
@@ -69,7 +68,7 @@ var signUpTests = []struct {
 		nil,
 		nil,
 		error4.ErrEmptyToken,
-		response2.ErrorResponse(error4.ErrEmptyToken.Error())},
+		response.ErrorResponse(error4.ErrEmptyToken.Error())},
 }
 
 func TestSignUp(t *testing.T) {
@@ -82,7 +81,7 @@ func TestSignUp(t *testing.T) {
 		bodyUserJSON, err := json.Marshal(test.input)
 		require.NoError(t, err, logTestMessage+"err =", err)
 
-		userModel := new(models2.User)
+		userModel := new(models.User)
 		userModel.Name = test.input.Name
 		userModel.Surname = test.input.Surname
 		userModel.About = test.input.About
@@ -102,7 +101,7 @@ func TestSignUp(t *testing.T) {
 		r.ServeHTTP(w, req)
 
 		wTest := httptest.NewRecorder()
-		response2.SendResponse(wTest, test.output)
+		response.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
@@ -115,7 +114,7 @@ var signInTests = []struct {
 	useCaseErr        error
 	sessionManagerErr error
 	csrfManagerErr    error
-	output            *response2.Response
+	output            *response.Response
 }{
 	{1,
 		&models.ResponseBodyUser{
@@ -125,7 +124,7 @@ var signInTests = []struct {
 		nil,
 		nil,
 		nil,
-		response2.OkResponse()},
+		response.OkResponse()},
 	{2,
 		&models.ResponseBodyUser{
 			Mail:     "testMail",
@@ -134,7 +133,7 @@ var signInTests = []struct {
 		nil,
 		nil,
 		nil,
-		response2.ErrorResponse(response2.ErrValidation.Error())},
+		response.ErrorResponse(response.ErrValidation.Error())},
 	{3,
 		&models.ResponseBodyUser{
 			Mail:     "testMail@mail.ru",
@@ -143,7 +142,7 @@ var signInTests = []struct {
 		error3.ErrUserNotFound,
 		nil,
 		nil,
-		response2.ErrorResponse(error3.ErrUserNotFound.Error())},
+		response.ErrorResponse(error3.ErrUserNotFound.Error())},
 	{4,
 		&models.ResponseBodyUser{
 			Mail:     "testMail@mail.ru",
@@ -152,7 +151,7 @@ var signInTests = []struct {
 		nil,
 		error2.ErrEmptySessionId,
 		nil,
-		response2.ErrorResponse(error2.ErrEmptySessionId.Error())},
+		response.ErrorResponse(error2.ErrEmptySessionId.Error())},
 	{5,
 		&models.ResponseBodyUser{
 			Mail:     "testMail@mail.ru",
@@ -161,7 +160,7 @@ var signInTests = []struct {
 		nil,
 		nil,
 		error4.ErrEmptyToken,
-		response2.ErrorResponse(error4.ErrEmptyToken.Error())},
+		response.ErrorResponse(error4.ErrEmptyToken.Error())},
 }
 
 func TestSignIn(t *testing.T) {
@@ -190,7 +189,7 @@ func TestSignIn(t *testing.T) {
 		r.ServeHTTP(w, req)
 
 		wTest := httptest.NewRecorder()
-		response2.SendResponse(wTest, test.output)
+		response.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
@@ -203,7 +202,7 @@ var logoutTests = []struct {
 	csrfToken         string
 	sessionManagerErr error
 	csrfManagerErr    error
-	output            *response2.Response
+	output            *response.Response
 }{
 	{1,
 		&http.Cookie{
@@ -213,7 +212,7 @@ var logoutTests = []struct {
 		"token",
 		nil,
 		nil,
-		response2.OkResponse()},
+		response.OkResponse()},
 	{2,
 		&http.Cookie{
 			Name:  "",
@@ -222,7 +221,7 @@ var logoutTests = []struct {
 		"token",
 		nil,
 		nil,
-		response2.ErrorResponse(error3.ErrCookie.Error())},
+		response.ErrorResponse(error3.ErrCookie.Error())},
 	{3,
 		&http.Cookie{
 			Name:  "session_id",
@@ -231,7 +230,7 @@ var logoutTests = []struct {
 		"token",
 		error2.ErrDeleteSession,
 		nil,
-		response2.ErrorResponse(error2.ErrDeleteSession.Error())},
+		response.ErrorResponse(error2.ErrDeleteSession.Error())},
 	{4,
 		&http.Cookie{
 			Name:  "session_id",
@@ -240,7 +239,7 @@ var logoutTests = []struct {
 		"token",
 		nil,
 		error4.ErrRedis,
-		response2.ErrorResponse(error4.ErrRedis.Error())},
+		response.ErrorResponse(error4.ErrRedis.Error())},
 }
 
 func TestLogout(t *testing.T) {
@@ -270,7 +269,7 @@ func TestLogout(t *testing.T) {
 		r.ServeHTTP(w, req)
 
 		wTest := httptest.NewRecorder()
-		response2.SendResponse(wTest, test.output)
+		response.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")

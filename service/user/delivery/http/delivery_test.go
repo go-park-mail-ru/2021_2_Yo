@@ -1,10 +1,9 @@
 package http
 
 import (
-	"backend/models"
-	models2 "backend/pkg/models"
-	response2 "backend/pkg/response"
-	error3 "backend/service/user/error"
+	"backend/pkg/models"
+	"backend/pkg/response"
+	error2 "backend/service/user/error"
 	"backend/service/user/usecase"
 	"bytes"
 	"context"
@@ -22,22 +21,22 @@ const logTestMessage = "auth:delivery:test"
 var getUserTests = []struct {
 	id         int
 	input      string
-	user       *models2.User
+	user       *models.User
 	useCaseErr error
-	output     *response2.Response
+	output     *response.Response
 }{
 	{1,
 		"1",
-		&models2.User{
+		&models.User{
 			ID: "1",
 		},
 		nil,
-		response2.UserResponse(&models2.User{ID: "1"})},
+		response.UserResponse(&models.User{ID: "1"})},
 	{2,
 		"1",
 		nil,
-		error3.ErrUserNotFound,
-		response2.ErrorResponse(error3.ErrUserNotFound.Error())},
+		error2.ErrUserNotFound,
+		response.ErrorResponse(error2.ErrUserNotFound.Error())},
 }
 
 func TestGetUser(t *testing.T) {
@@ -57,7 +56,7 @@ func TestGetUser(t *testing.T) {
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 
 		wTest := httptest.NewRecorder()
-		response2.SendResponse(wTest, test.output)
+		response.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
@@ -67,24 +66,24 @@ func TestGetUser(t *testing.T) {
 var getUserByIdTests = []struct {
 	id         int
 	input      string
-	user       *models2.User
+	user       *models.User
 	useCaseErr error
-	output     *response2.Response
+	output     *response.Response
 }{
 	{1,
 		"1",
-		&models2.User{
+		&models.User{
 			ID: "1",
 		},
 		nil,
-		response2.UserResponse(&models2.User{
+		response.UserResponse(&models.User{
 			ID: "1",
 		})},
 	{2,
 		"1",
 		nil,
-		error3.ErrUserNotFound,
-		response2.ErrorResponse(error3.ErrUserNotFound.Error())},
+		error2.ErrUserNotFound,
+		response.ErrorResponse(error2.ErrUserNotFound.Error())},
 }
 
 func TestGetUserById(t *testing.T) {
@@ -102,7 +101,7 @@ func TestGetUserById(t *testing.T) {
 		r.ServeHTTP(w, req)
 
 		wTest := httptest.NewRecorder()
-		response2.SendResponse(wTest, test.output)
+		response.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
@@ -114,7 +113,7 @@ var updateUserInfoTests = []struct {
 	input      string
 	user       *models.ResponseBodyUser
 	useCaseErr error
-	output     *response2.Response
+	output     *response.Response
 }{
 	{1,
 		"1",
@@ -124,7 +123,7 @@ var updateUserInfoTests = []struct {
 			About:   "testAbout",
 		},
 		nil,
-		response2.OkResponse()},
+		response.OkResponse()},
 	{2,
 		"1",
 		&models.ResponseBodyUser{
@@ -132,13 +131,13 @@ var updateUserInfoTests = []struct {
 			Surname: "testSurname",
 			About:   "testAbout",
 		},
-		error3.ErrUserNotFound,
-		response2.ErrorResponse(error3.ErrUserNotFound.Error())},
+		error2.ErrUserNotFound,
+		response.ErrorResponse(error2.ErrUserNotFound.Error())},
 	{3,
 		"1",
 		nil,
 		nil,
-		response2.ErrorResponse(response2.ErrJSONDecoding.Error())},
+		response.ErrorResponse(response.ErrJSONDecoding.Error())},
 }
 
 func TestUpdateUserInfo(t *testing.T) {
@@ -148,7 +147,7 @@ func TestUpdateUserInfo(t *testing.T) {
 
 		userId := test.input
 
-		userModel := new(models2.User)
+		userModel := new(models.User)
 		if test.user != nil {
 			userModel.ID = userId
 			userModel.Name = test.user.Name
@@ -175,7 +174,7 @@ func TestUpdateUserInfo(t *testing.T) {
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 
 		wTest := httptest.NewRecorder()
-		response2.SendResponse(wTest, test.output)
+		response.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
@@ -187,7 +186,7 @@ var updateUserPasswordTests = []struct {
 	input      string
 	user       *models.ResponseBodyUser
 	useCaseErr error
-	output     *response2.Response
+	output     *response.Response
 }{
 	{1,
 		"1",
@@ -195,19 +194,19 @@ var updateUserPasswordTests = []struct {
 			Password: "testPassword",
 		},
 		nil,
-		response2.OkResponse()},
+		response.OkResponse()},
 	{2,
 		"1",
 		&models.ResponseBodyUser{
 			Password: "testPassword",
 		},
-		error3.ErrUserNotFound,
-		response2.ErrorResponse(error3.ErrUserNotFound.Error())},
+		error2.ErrUserNotFound,
+		response.ErrorResponse(error2.ErrUserNotFound.Error())},
 	{3,
 		"1",
 		nil,
 		nil,
-		response2.ErrorResponse(response2.ErrJSONDecoding.Error())},
+		response.ErrorResponse(response.ErrJSONDecoding.Error())},
 }
 
 func TestUpdateUserPassword(t *testing.T) {
@@ -217,7 +216,7 @@ func TestUpdateUserPassword(t *testing.T) {
 
 		userId := test.input
 
-		userModel := new(models2.User)
+		userModel := new(models.User)
 		if test.user != nil {
 			userModel.Password = test.user.Password
 		}
@@ -243,7 +242,7 @@ func TestUpdateUserPassword(t *testing.T) {
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 
 		wTest := httptest.NewRecorder()
-		response2.SendResponse(wTest, test.output)
+		response.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
