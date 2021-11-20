@@ -2,13 +2,13 @@ package auth
 
 import (
 	protoAuth "backend/microservice/auth/proto"
-	"backend/models"
+	models2 "backend/pkg/models"
 	"context"
 )
 
 type AuthService interface {
-	SignUp(ctx context.Context, user models.User) (*models.UserResponseBody, error)
-	SignIn(ctx context.Context, user models.User) (string, error)
+	SignUp(ctx context.Context, user models2.User) (*models2.UserResponseBody, error)
+	SignIn(ctx context.Context, user models2.User) (string, error)
 	CreateSession(ctx context.Context, userId string) (string, error)
 	CheckSession(ctx context.Context, sessionId string) (string, error)
 	DeleteSession(ctx context.Context, sessionId string) error
@@ -26,7 +26,7 @@ func NewService(authService protoAuth.AuthClient) AuthService {
 	}
 }
 
-func (s *service) SignUp(ctx context.Context, user models.User) (*models.UserResponseBody, error) {
+func (s *service) SignUp(ctx context.Context, user models2.User) (*models2.UserResponseBody, error) {
 	request := protoAuth.User{
 		Name:     user.Name,
 		Surname:  user.Surname,
@@ -35,10 +35,10 @@ func (s *service) SignUp(ctx context.Context, user models.User) (*models.UserRes
 	}
 	userResponse, err := s.authService.CreateUser(ctx, &request)
 	if err != nil {
-		return &models.UserResponseBody{}, err
+		return &models2.UserResponseBody{}, err
 	}
 
-	response := models.UserResponseBody{
+	response := models2.UserResponseBody{
 		ID:      userResponse.ID,
 		Name:    user.Name,
 		Surname: user.Surname,
@@ -48,7 +48,7 @@ func (s *service) SignUp(ctx context.Context, user models.User) (*models.UserRes
 	return &response, nil
 }
 
-func (s *service) SignIn(ctx context.Context, user models.User) (string, error) {
+func (s *service) SignIn(ctx context.Context, user models2.User) (string, error) {
 	request := protoAuth.UserAuthData{
 		Mail:     user.Mail,
 		Password: user.Password,

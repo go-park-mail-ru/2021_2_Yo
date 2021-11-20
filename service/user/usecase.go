@@ -1,6 +1,8 @@
 package user
 
-import "backend/models"
+import (
+	"backend/pkg/models"
+)
 
 type UseCase interface {
 	GetUserById(userId string) (*models.User, error)

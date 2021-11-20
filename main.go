@@ -19,7 +19,7 @@ func env() {
 
 func main() {
 	log.Info("Main : start")
-	viper.AddConfigPath("configs")
+	viper.AddConfigPath("config")
 	viper.SetConfigName("config")
 	err := viper.ReadInConfig()
 	if err != nil {

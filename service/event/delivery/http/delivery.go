@@ -2,9 +2,9 @@ package http
 
 import (
 	log "backend/pkg/logger"
-	"backend/response"
+	response2 "backend/pkg/response"
+	"backend/pkg/utils"
 	"backend/service/event"
-	"backend/utils"
 	"errors"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -32,7 +32,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	eventReader := strings.NewReader(r.FormValue("json"))
-	eventFromRequest, err := response.GetEventFromRequest(eventReader)
+	eventFromRequest, err := response2.GetEventFromRequest(eventReader)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -49,7 +49,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.EventIdResponse(eventID))
+	response2.SendResponse(w, response2.EventIdResponse(eventID))
 	log.Debug(message + "ended")
 }
 
@@ -64,7 +64,7 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	eventReader := strings.NewReader(r.FormValue("json"))
-	eventFromRequest, err := response.GetEventFromRequest(eventReader)
+	eventFromRequest, err := response2.GetEventFromRequest(eventReader)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -81,7 +81,7 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -95,7 +95,7 @@ func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -109,7 +109,7 @@ func (h *Delivery) GetEventById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Debug("delivery:getEvent:resultEvent.authorId = ", resultEvent.AuthorId)
-	response.SendResponse(w, response.EventResponse(resultEvent))
+	response2.SendResponse(w, response2.EventResponse(resultEvent))
 }
 
 type getEventsVars struct {
@@ -134,7 +134,7 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.EventListResponse(eventsList))
+	response2.SendResponse(w, response2.EventListResponse(eventsList))
 }
 
 func (h *Delivery) GetEventsFromAuthor(w http.ResponseWriter, r *http.Request) {
@@ -146,7 +146,7 @@ func (h *Delivery) GetEventsFromAuthor(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.EventListResponse(eventList))
+	response2.SendResponse(w, response2.EventListResponse(eventList))
 }
 
 /*
@@ -172,7 +172,7 @@ func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 
 	log.Debug(message + "ended")
 
@@ -187,5 +187,5 @@ func (h *Delivery) GetVisitedEvents(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.EventListResponse(eventList))
+	response2.SendResponse(w, response2.EventListResponse(eventList))
 }

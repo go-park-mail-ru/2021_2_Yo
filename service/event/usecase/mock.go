@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"backend/models"
+	"backend/pkg/models"
 	"github.com/stretchr/testify/mock"
 )
 

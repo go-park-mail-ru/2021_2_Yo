@@ -2,8 +2,8 @@ package eventRepository
 
 import (
 	proto "backend/microservice/event/proto"
-	"backend/models"
 	log "backend/pkg/logger"
+	"backend/pkg/models"
 	error2 "backend/service/event/error"
 	"context"
 	sql2 "database/sql"

@@ -1,10 +1,10 @@
 package usecase
 
 import (
-	"backend/models"
+	"backend/pkg/models"
+	"backend/pkg/utils"
 	error2 "backend/service/user/error"
 	"backend/service/user/repository/mock"
-	"backend/utils"
 	"github.com/stretchr/testify/require"
 	"strconv"
 	"testing"

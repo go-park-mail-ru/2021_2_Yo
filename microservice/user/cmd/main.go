@@ -4,7 +4,7 @@ import (
 	proto "backend/microservice/user/proto"
 	"backend/microservice/user/repository"
 	log "backend/pkg/logger"
-	"backend/utils"
+	"backend/pkg/utils"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"

@@ -2,8 +2,8 @@ package repository
 
 import (
 	proto "backend/microservice/user/proto"
-	"backend/models"
 	log "backend/pkg/logger"
+	"backend/pkg/models"
 	error2 "backend/service/user/error"
 	"context"
 	sql2 "database/sql"

@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	"backend/models"
+	"backend/pkg/models"
 )
 
 type UserRepository interface {

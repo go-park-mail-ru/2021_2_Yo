@@ -1,14 +1,14 @@
 package main
 
 import (
+	protoAuth "backend/microservice/auth/proto"
 	sessionRepo "backend/microservice/auth/repository/session"
 	userRepo "backend/microservice/auth/repository/user"
-	protoAuth "backend/microservice/auth/proto"
 	"backend/pkg/logger"
+	"backend/pkg/utils"
 	log "github.com/sirupsen/logrus"
 
 	"backend/microservice/auth/usecase"
-	"backend/utils"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"

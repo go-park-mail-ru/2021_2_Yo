@@ -2,11 +2,11 @@ package http
 
 import (
 	log "backend/pkg/logger"
-	"backend/response"
+	response2 "backend/pkg/response"
+	"backend/pkg/utils"
 	"backend/service/email"
 	microAuth "backend/service/microservices/auth"
 	"backend/service/user"
-	"backend/utils"
 	"context"
 	"errors"
 	"net/http"
@@ -48,7 +48,7 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Info(CSRFToken)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
-	response.SendResponse(w, response.UserResponse(foundUser))
+	response2.SendResponse(w, response2.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }
 
@@ -61,7 +61,7 @@ func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.UserResponse(foundUser))
+	response2.SendResponse(w, response2.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }
 
@@ -74,7 +74,7 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userReader := strings.NewReader(r.FormValue("json"))
-	userFromRequest, err := response.GetUserFromRequest(userReader)
+	userFromRequest, err := response2.GetUserFromRequest(userReader)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -91,7 +91,7 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -99,7 +99,7 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserPassword:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	u, err := response.GetUserFromRequest(r.Body)
+	u, err := response2.GetUserFromRequest(r.Body)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -107,7 +107,7 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	email.SendEmail("Ваш пароль был изменён", "Если это были не вы, обратитесь в службу безопасности,возможно, ваш аккаунт собираются угнать", []string{u.Mail})
 	log.Debug(message + "ended")
 }
@@ -128,7 +128,7 @@ func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -141,7 +141,7 @@ func (h *Delivery) GetSubscribers(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.UserListResponse(subscribers))
+	response2.SendResponse(w, response2.UserListResponse(subscribers))
 	log.Debug(message + "ended")
 }
 
@@ -154,7 +154,7 @@ func (h *Delivery) GetSubscribes(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.UserListResponse(subscribers))
+	response2.SendResponse(w, response2.UserListResponse(subscribers))
 	log.Debug(message + "ended")
 }
 
@@ -176,7 +176,7 @@ func (h *Delivery) GetVisitors(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.SendResponse(w, response.UserListResponse(userList))
+	response2.SendResponse(w, response2.UserListResponse(userList))
 
 	log.Debug(message + "ended")
 

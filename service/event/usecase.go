@@ -1,6 +1,8 @@
 package event
 
-import "backend/models"
+import (
+	"backend/pkg/models"
+)
 
 type UseCase interface {
 	CreateEvent(e *models.Event) (string, error)

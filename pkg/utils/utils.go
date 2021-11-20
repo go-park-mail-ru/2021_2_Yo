@@ -2,7 +2,7 @@ package utils
 
 import (
 	log "backend/pkg/logger"
-	"backend/response"
+	response2 "backend/pkg/response"
 	"crypto/sha256"
 	"errors"
 	"fmt"
@@ -121,10 +121,10 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	return "https://bmstusa.ru/images/" + fileName, nil
 }
 
-func CheckIfNoError(w *http.ResponseWriter, err error, msg string, status response.HttpStatus) bool {
+func CheckIfNoError(w *http.ResponseWriter, err error, msg string, status response2.HttpStatus) bool {
 	if err != nil {
 		log.Error(msg+"err =", err)
-		response.SendResponse(*w, response.ErrorResponse(err.Error()))
+		response2.SendResponse(*w, response2.ErrorResponse(err.Error()))
 		return false
 	}
 	return true

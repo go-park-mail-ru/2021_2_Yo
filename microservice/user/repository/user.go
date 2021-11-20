@@ -2,7 +2,7 @@ package repository
 
 import (
 	proto "backend/microservice/user/proto"
-	"backend/models"
+	"backend/pkg/models"
 	error2 "backend/service/user/error"
 	"strconv"
 )

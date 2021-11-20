@@ -1,7 +1,7 @@
 package user
 
 import (
-	"backend/models"
+	"backend/pkg/models"
 	"strconv"
 )
 

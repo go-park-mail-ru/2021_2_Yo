@@ -1,7 +1,8 @@
 package http
 
 import (
-	"backend/models"
+	"backend/pkg/models"
+	response2 "backend/pkg/response"
 	"backend/response"
 	error2 "backend/service/event/error"
 	"backend/service/event/usecase"
@@ -25,7 +26,7 @@ var createEventTests = []struct {
 	eventId    string
 	event      *models.Event
 	useCaseErr error
-	output     *response.Response
+	output     *response2.Response
 }{
 	{1,
 		"1",
@@ -34,13 +35,13 @@ var createEventTests = []struct {
 			ID: "1",
 		},
 		nil,
-		response.EventIdResponse("100")},
+		response2.EventIdResponse("100")},
 	{2,
 		"1",
 		"100",
 		nil,
 		nil,
-		response.ErrorResponse(response.ErrJSONDecoding.Error())},
+		response2.ErrorResponse(response2.ErrJSONDecoding.Error())},
 	{3,
 		"1",
 		"100",
@@ -48,7 +49,7 @@ var createEventTests = []struct {
 			ID: "1",
 		},
 		error2.ErrEmptyData,
-		response.ErrorResponse(error2.ErrEmptyData.Error())},
+		response2.ErrorResponse(error2.ErrEmptyData.Error())},
 }
 
 func TestCreateEvent(t *testing.T) {
@@ -79,7 +80,7 @@ func TestCreateEvent(t *testing.T) {
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 
 		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
+		response2.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
@@ -93,7 +94,7 @@ var updateEventTests = []struct {
 	vars       map[string]string
 	event      *models.Event
 	useCaseErr error
-	output     *response.Response
+	output     *response2.Response
 }{
 	{1,
 		"1",
@@ -105,14 +106,14 @@ var updateEventTests = []struct {
 			ID: "100",
 		},
 		nil,
-		response.OkResponse()},
+		response2.OkResponse()},
 	{2,
 		"1",
 		"100",
 		nil,
 		nil,
 		nil,
-		response.ErrorResponse(response.ErrJSONDecoding.Error())},
+		response2.ErrorResponse(response2.ErrJSONDecoding.Error())},
 	{3,
 		"1",
 		"100",
@@ -123,7 +124,7 @@ var updateEventTests = []struct {
 			ID: "100",
 		},
 		error2.ErrEmptyData,
-		response.ErrorResponse(error2.ErrEmptyData.Error())},
+		response2.ErrorResponse(error2.ErrEmptyData.Error())},
 }
 
 func TestUpdateEvent(t *testing.T) {
@@ -155,7 +156,7 @@ func TestUpdateEvent(t *testing.T) {
 		r.ServeHTTP(w, req.WithContext(varsContext))
 
 		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
+		response2.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
@@ -168,7 +169,7 @@ var deleteEventTests = []struct {
 	eventId    string
 	vars       map[string]string
 	useCaseErr error
-	output     *response.Response
+	output     *response2.Response
 }{
 	{1,
 		"1",
@@ -177,13 +178,13 @@ var deleteEventTests = []struct {
 			"id": "100",
 		},
 		nil,
-		response.OkResponse()},
+		response2.OkResponse()},
 	{2,
 		"1",
 		"",
 		nil,
 		error2.ErrEmptyData,
-		response.ErrorResponse(error2.ErrEmptyData.Error())},
+		response2.ErrorResponse(error2.ErrEmptyData.Error())},
 }
 
 func TestDeleteEvent(t *testing.T) {
@@ -204,7 +205,7 @@ func TestDeleteEvent(t *testing.T) {
 		r.ServeHTTP(w, req.WithContext(varsContext))
 
 		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
+		response2.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
@@ -217,7 +218,7 @@ var getEventByIdTests = []struct {
 	vars       map[string]string
 	event      *models.Event
 	useCaseErr error
-	output     *response.Response
+	output     *response2.Response
 }{
 	{1,
 		"1",
@@ -228,7 +229,7 @@ var getEventByIdTests = []struct {
 			ID: "1",
 		},
 		nil,
-		response.EventResponse(&models.Event{
+		response2.EventResponse(&models.Event{
 			ID: "1",
 		})},
 	{1,
@@ -240,7 +241,7 @@ var getEventByIdTests = []struct {
 			ID: "1",
 		},
 		error2.ErrEmptyData,
-		response.ErrorResponse(error2.ErrEmptyData.Error())},
+		response2.ErrorResponse(error2.ErrEmptyData.Error())},
 }
 
 func TestGetEventById(t *testing.T) {
@@ -259,7 +260,7 @@ func TestGetEventById(t *testing.T) {
 		r.ServeHTTP(w, req)
 
 		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
+		response2.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
@@ -272,7 +273,7 @@ var getEventsTests = []struct {
 	query      string
 	eventList  []*models.Event
 	useCaseErr error
-	output     *response.Response
+	output     *response2.Response
 }{
 	{1,
 		map[string]string{
@@ -293,7 +294,7 @@ var getEventsTests = []struct {
 		"?query=testQuery&category=testCategory&tags=testTags|testTags|testTags",
 		nil,
 		error2.ErrEmptyData,
-		response.ErrorResponse(error2.ErrEmptyData.Error())},
+		response2.ErrorResponse(error2.ErrEmptyData.Error())},
 }
 
 func TestGetEvents(t *testing.T) {
@@ -319,7 +320,7 @@ func TestGetEvents(t *testing.T) {
 		r.ServeHTTP(w, req)
 
 		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
+		response2.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
@@ -332,7 +333,7 @@ var getEventsFromAuthorTests = []struct {
 	query      string
 	eventList  []*models.Event
 	useCaseErr error
-	output     *response.Response
+	output     *response2.Response
 }{
 	{1,
 		map[string]string{
@@ -349,7 +350,7 @@ var getEventsFromAuthorTests = []struct {
 		"?authorid=123",
 		nil,
 		error2.ErrEmptyData,
-		response.ErrorResponse(error2.ErrEmptyData.Error())},
+		response2.ErrorResponse(error2.ErrEmptyData.Error())},
 }
 
 func TestGetEventsFromAuthor(t *testing.T) {
@@ -372,7 +373,7 @@ func TestGetEventsFromAuthor(t *testing.T) {
 		r.ServeHTTP(w, req)
 
 		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
+		response2.SendResponse(wTest, test.output)
 		expected := wTest.Body
 		actual := w.Body
 		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")

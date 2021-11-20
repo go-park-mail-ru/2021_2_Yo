@@ -2,11 +2,11 @@ package http
 
 import (
 	log "backend/pkg/logger"
-	"backend/response"
+	response2 "backend/pkg/response"
+	"backend/pkg/utils"
 	error2 "backend/service/auth/error"
 	"backend/service/email"
 	microAuth "backend/service/microservices/auth"
-	"backend/utils"
 	"context"
 	"net/http"
 )
@@ -51,7 +51,7 @@ func setExpiredCookie(w http.ResponseWriter) {
 func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
-	u, err := response.GetUserFromRequest(r.Body)
+	u, err := response2.GetUserFromRequest(r.Body)
 	log.Debug(message+"u =", *u)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
@@ -73,7 +73,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	setSessionIdCookie(w, sessionId)
 	log.Info(CSRFToken)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	email.SendEmail("Подтвержение регистрации", "Вы зарегистрировались на bmstuse", []string{u.Mail})
 	log.Debug(message + "ended")
 }
@@ -81,7 +81,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignIn:"
 	log.Debug(message + "started")
-	u, err := response.GetUserFromRequest(r.Body)
+	u, err := response2.GetUserFromRequest(r.Body)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
@@ -100,7 +100,7 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	setSessionIdCookie(w, sessionId)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -120,6 +120,6 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }

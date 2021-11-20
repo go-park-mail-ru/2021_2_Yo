@@ -2,6 +2,8 @@ package server
 
 import (
 	log "backend/pkg/logger"
+	"backend/pkg/register"
+	"backend/pkg/utils"
 	authDelivery "backend/service/auth/delivery/http"
 
 	userRepository "backend/microservice/user/proto"
@@ -9,12 +11,10 @@ import (
 	userUseCase "backend/service/user/usecase"
 
 	eventRepository "backend/microservice/event/proto"
-	"backend/register"
 	eventDelivery "backend/service/event/delivery/http"
 	eventUseCase "backend/service/event/usecase"
 
 	"backend/middleware"
-	"backend/utils"
 	"fmt"
 	"net/http"
 	"os"

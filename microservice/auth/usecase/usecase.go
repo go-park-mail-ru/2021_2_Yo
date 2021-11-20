@@ -3,8 +3,8 @@ package usecase
 import (
 	"backend/microservice/auth/interfaces"
 	protoAuth "backend/microservice/auth/proto"
-	"backend/models"
-	"backend/utils"
+	"backend/pkg/models"
+	"backend/pkg/utils"
 	"context"
 
 	log "github.com/sirupsen/logrus"
@@ -15,28 +15,25 @@ const (
 )
 
 type authService struct {
-	authUserRepository interfaces.UserRepository
+	authUserRepository    interfaces.UserRepository
 	authSessionRepository interfaces.SessionRepository
 }
 
 func NewService(authUserRepository interfaces.UserRepository, authSessionRepository interfaces.SessionRepository) *authService {
-	return &authService {
-		authUserRepository: authUserRepository,
+	return &authService{
+		authUserRepository:    authUserRepository,
 		authSessionRepository: authSessionRepository,
 	}
 }
 
-
-
 func userConvertToProto(user *models.User) protoAuth.SuccessUserResponse {
-	return protoAuth.SuccessUserResponse {
-		ID: user.ID,
-		Name: user.Name,
-		Surname: user.Surname,
-		Mail: user.Mail,
+	return protoAuth.SuccessUserResponse{
+		ID:       user.ID,
+		Name:     user.Name,
+		Surname:  user.Surname,
+		Mail:     user.Mail,
 		Password: user.Password,
-		About: user.About,
-
+		About:    user.About,
 	}
 }
 
@@ -44,10 +41,10 @@ func (s *authService) CreateUser(ctx context.Context, protoUser *protoAuth.User)
 	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
 	log.Info(protoUser)
-	newUser := models.User {
-		Name: protoUser.Name,
-		Surname: protoUser.Surname,
-		Mail: protoUser.Mail,
+	newUser := models.User{
+		Name:     protoUser.Name,
+		Surname:  protoUser.Surname,
+		Mail:     protoUser.Mail,
 		Password: utils.CreatePasswordHash(protoUser.Password),
 	}
 
@@ -64,7 +61,7 @@ func (s *authService) CreateUser(ctx context.Context, protoUser *protoAuth.User)
 func (s *authService) GetUser(ctx context.Context, protoUser *protoAuth.UserAuthData) (*protoAuth.UserId, error) {
 	message := logMessage + "GetUser:"
 	log.Debug(message + "started")
-	user, err := s.authUserRepository.GetUser(protoUser.Mail,utils.CreatePasswordHash(protoUser.Password))
+	user, err := s.authUserRepository.GetUser(protoUser.Mail, utils.CreatePasswordHash(protoUser.Password))
 
 	if err != nil {
 		return &protoAuth.UserId{}, err
@@ -74,4 +71,3 @@ func (s *authService) GetUser(ctx context.Context, protoUser *protoAuth.UserAuth
 	}
 	return response, nil
 }
-

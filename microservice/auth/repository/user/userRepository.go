@@ -1,8 +1,8 @@
 package user
 
 import (
-	"backend/models"
 	log "backend/pkg/logger"
+	"backend/pkg/models"
 	error2 "backend/service/auth/error"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
