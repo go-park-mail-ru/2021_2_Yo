@@ -12,7 +12,7 @@ import (
 	"strconv"
 )
 
-const logMessage = "service:event:repository:postgres:"
+const logMessage = "microservice:event:repository:"
 
 type Repository struct {
 	db *sql.DB
@@ -42,6 +42,7 @@ const (
 		viewed = $6, date = $7, geo = $8, tag = $9 
 		where event.id = $10`
 	deleteEventQuery = `delete from "event" where id = $1`
+	visitQuery       = `insert into "visitor" (event_id, user_id) values ($1, $2)`
 )
 
 /*
@@ -306,4 +307,32 @@ func (s *Repository) GetEventsFromAuthor(ctx context.Context, in *proto.AuthorId
 	}
 	out := &proto.Events{Event: outEvents}
 	return out, nil
+}
+
+func (s *Repository) Visit(ctx context.Context, in *proto.VisitRequest) (*proto.Empty, error) {
+
+	message := logMessage + "Visit:"
+
+	eventId := in.EventId
+	userId := in.UserId
+
+	eventIdInt, err := strconv.Atoi(eventId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+
+	query := visitQuery
+	_, err = s.db.Query(query, eventIdInt, userIdInt)
+	if err != nil {
+		log.Error(message+"err =", err)
+		return nil, error2.ErrPostgres
+	}
+
+	return nil, nil
+
 }

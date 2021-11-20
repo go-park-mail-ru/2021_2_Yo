@@ -23,55 +23,43 @@ CREATE TABLE "event" (
                          author_id int references "user" (id) on delete cascade not null
 );
 
+/*
+Просмотр (<=> избранное)
+event_id - id мероприятия
+user_id - id посетителя
+date - для графиков
+*/
 CREATE TABLE "view" (
                         id serial not null unique,
                         event_id int references "event" (id) on delete cascade not null,
                         user_id int references "user" (id) on delete cascade,
-                        view_time timestamp
+                        UNIQUE(event_id, user_id),
+                        date date
 );
 
+/*
+Посетитель (<=> избранное)
+event_id - id мероприятия
+user_id - id посетителя
+date - для графиков
+*/
 CREATE TABLE "visitor" (
                         id serial not null unique,
                         event_id int references "event" (id) on delete cascade not null,
-                        user_id int references "user" (id) on delete cascade,
-                        agree_to_go_date date
+                        user_id int references "user" (id) on delete cascade not null,
+                        UNIQUE(event_id, user_id),
+                        date date
 );
 
-INSERT INTO "user" (name, surname, mail, password, about)
-VALUES ('Andrey', 'Ivanov', 'test@mail.ru', 'hashhashhash', 'I am soooo coool DAAAMN'),
-       ('Ivan', 'Andreev', 'kool@mail.ru', 'hashhashhash', 'My name is Ivan Andreev'),
-       ('Petr', 'Leshiy', 'clown@mail.ru', 'hashhashhash', 'Yo my desctiption');
-
-INSERT INTO "event" (title, description, text, city, category, viewed, img_url, date, geo, tag, author_id)
-VALUES ('Tusovka', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Концерты', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array['Stupid', 'Alcohol'], 1),
-       ('Funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Вечеринки', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array['Alcohol', 'Hype'], 3),
-       ('Really funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Тусовки', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array ['Hype', 'Boomerang'], 2),
-       ('PAPAPAPA', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Выставки', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array['Boring', 'Alcohol'], 1),
-       ('Tusovka', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Театры', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array['Stupid', 'Alcohol'], 1),
-       ('Funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array['Alcohol', 'Hype'], 3),
-       ('Really funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array ['Hype', 'Boomerang'], 2),
-       ('PAPAPAPA', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array['Boring', 'Alcohol'], 1),
-       ('Tusovka', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array['Stupid', 'Alcohol'], 1),
-       ('Funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array['Alcohol', 'Hype'], 3),
-       ('Really funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array ['Hype', 'Boomerang'], 2),
-       ('PAPAPAPA', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array['Boring', 'Alcohol'], 1),
-       ('Tusovka', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array['Stupid', 'Alcohol'], 1),
-       ('Funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array['Alcohol', 'Hype'], 3),
-       ('Really funny party', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array ['Hype', 'Boomerang'], 2),
-       ('PAPAPAPA', 'Funny party this time', 'YOOOOOOOOOOOOOOOOOOOOOOOOOOOo', 'Moscow', 'Party', 123, 'img.png', '10.10.2008', 'ul Pushkina',
-        array['Boring', 'Alcohol'], 1);
+/*
+Подписка
+subscriber_id - id пользователя, который подписался
+subscribed_id - id пользователя, на которого подписались
+*/
+CREATE TABLE "subscribe" (
+                           id serial not null unique,
+                           subscribed_id int references "user" (id) on delete cascade not null,
+                           subscriber_id int references "user" (id) on delete cascade not null,
+                           UNIQUE(subscribed_id, subscriber_id),
+                           CHECK ( subscribed_id <> subscribe.subscriber_id )
+);

@@ -81,3 +81,20 @@ func (a *UseCase) UpdateUserPassword(userId string, password string) error {
 	_, err := a.userRepo.UpdateUserPassword(context.Background(), in)
 	return err
 }
+
+func (a *UseCase) Subscribe(subscribedId string, subscriberId string) error {
+
+	if subscribedId == "" || subscriberId == "" {
+		return error2.ErrEmptyData
+	}
+
+	in := &proto.SubscribeRequest{
+		SubscribedId: subscribedId,
+		SubscriberId: subscriberId,
+	}
+
+	_, err := a.userRepo.Subscribe(context.Background(), in)
+
+	return err
+
+}

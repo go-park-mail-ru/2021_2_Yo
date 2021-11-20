@@ -1,6 +1,7 @@
 package repository
 
 import (
+	log "backend/logger"
 	proto "backend/microservice/user/proto"
 	"backend/models"
 	error2 "backend/service/user/error"
@@ -11,13 +12,14 @@ import (
 )
 
 const (
-	logMessage                       = "service:user:repository:postgres:"
+	logMessage                       = "microservice:user:repository:"
 	getUserByIdQuery                 = `select * from "user" where id = $1`
 	updateUserInfoQueryWithoutImgUrl = `update "user" set name = $1, surname = $2, about = $3 where id = $4`
 	updateUserInfoQuery              = `update "user" set name = $1, surname = $2, about = $3, img_url = $4 where id = $5`
 	updateUserPasswordQuery          = `update "user" set password = $1 where id = $2`
 	//TODO: updateUserImg в отдельный метод
-	updateUserImgUrl = `update "user" set img_url = $1 where id = $2`
+	updateUserImgUrlQuery = `update "user" set img_url = $1 where id = $2`
+	subscribeQuery        = `insert into "subscribe" (subscribed_id, subscriber_id) values ($1, $2)`
 )
 
 type Repository struct {
@@ -98,6 +100,34 @@ func (s *Repository) UpdateUserPassword(ctx context.Context, in *proto.UpdateUse
 	query := updateUserPasswordQuery
 	_, err = s.db.Query(query, password, userIdInt)
 	if err != nil {
+		return nil, error2.ErrPostgres
+	}
+
+	return nil, nil
+
+}
+
+func (s *Repository) Subscribe(ctx context.Context, in *proto.SubscribeRequest) (*proto.Empty, error) {
+
+	message := logMessage + "Subscribe:"
+
+	subscribedId := in.SubscribedId
+	subscriberId := in.SubscriberId
+
+	subscribedIdInt, err := strconv.Atoi(subscribedId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+
+	subscriberIdInt, err := strconv.Atoi(subscriberId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+
+	query := subscribeQuery
+	_, err = s.db.Query(query, subscribedIdInt, subscriberIdInt)
+	if err != nil {
+		log.Error(message+"err =", err)
 		return nil, error2.ErrPostgres
 	}
 

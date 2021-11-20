@@ -5,6 +5,7 @@ import (
 	"backend/response"
 	"backend/service/event"
 	"backend/utils"
+	"errors"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
@@ -146,4 +147,33 @@ func (h *Delivery) GetEventsFromAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response.SendResponse(w, response.EventsListResponse(eventsList))
+}
+
+/*
+POST /events/14/visit
+*/
+func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
+
+	message := logMessage + "Visit:"
+	log.Debug(message + "started")
+
+	vars, ok := r.Context().Value("vars").(map[string]string)
+	if !ok {
+		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+	}
+	userId, ok := r.Context().Value("userId").(string)
+	if !ok {
+		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+	}
+	eventId := vars["id"]
+
+	err := h.useCase.Visit(eventId, userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+
+	response.SendResponse(w, response.OkResponse())
+
+	log.Debug(message + "ended")
+
 }

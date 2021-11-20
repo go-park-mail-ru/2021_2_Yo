@@ -8,6 +8,7 @@ import (
 	"backend/service/user"
 	"backend/utils"
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -17,13 +18,13 @@ import (
 const logMessage = "service:user:delivery:http:"
 
 type Delivery struct {
-	useCase user.UseCase
+	useCase     user.UseCase
 	authService microAuth.AuthService
 }
 
 func NewDelivery(useCase user.UseCase, authService microAuth.AuthService) *Delivery {
 	return &Delivery{
-		useCase: useCase,
+		useCase:     useCase,
 		authService: authService,
 	}
 }
@@ -107,6 +108,32 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response.SendResponse(w, response.OkResponse())
-	email.SendEmail("Ваш пароль был изменён", "Если это были не вы, обратитесь в службу безопасности,возможно, ваш аккаунт собираются угнать",[]string{u.Mail})
+	email.SendEmail("Ваш пароль был изменён", "Если это были не вы, обратитесь в службу безопасности,возможно, ваш аккаунт собираются угнать", []string{u.Mail})
 	log.Debug(message + "ended")
+}
+
+/*
+POST /user/14/subscribe
+*/
+func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
+
+	message := logMessage + "Subscribe:"
+	log.Debug(message + "started")
+
+	vars, ok := r.Context().Value("vars").(map[string]string)
+	if !ok {
+		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+	}
+	userId := r.Context().Value("userId").(string)
+	subscriptedId := vars["id"]
+
+	err := h.useCase.Subscribe(subscriptedId, userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+
+	response.SendResponse(w, response.OkResponse())
+
+	log.Debug(message + "ended")
+
 }

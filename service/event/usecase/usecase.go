@@ -178,3 +178,20 @@ func (a *UseCase) GetEventsFromAuthor(authorId string) ([]*models.Event, error) 
 	}
 	return result, nil
 }
+
+func (a *UseCase) Visit(eventId string, userId string) error {
+
+	if eventId == "" || userId == "" {
+		return error2.ErrEmptyData
+	}
+
+	in := &proto.VisitRequest{
+		EventId: eventId,
+		UserId:  userId,
+	}
+
+	_, err := a.eventRepo.Visit(context.Background(), in)
+
+	return err
+
+}

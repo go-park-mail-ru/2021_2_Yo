@@ -52,6 +52,11 @@ message Events {
     repeated Event event = 1;
 }
 
+message VisitRequest {
+    string eventId = 1;
+    string userId = 2;
+}
+
 message Empty {}
 
 service Repository {
@@ -61,4 +66,5 @@ service Repository {
     rpc GetEventById(EventId) returns (Event) {}
     rpc GetEvents(GetEventsRequest) returns (Events) {}
     rpc GetEventsFromAuthor(AuthorId) returns (Events) {}
+    rpc Visit(VisitRequest) returns (Empty) {}
 }

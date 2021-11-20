@@ -24,10 +24,16 @@ message User {
     string ImgUrl = 7;
 }
 
+message SubscribeRequest {
+    string SubscribedId = 1;
+    string SubscriberId = 2;
+}
+
 message Empty {}
 
 service Repository {
     rpc GetUserById(UserId) returns (User) {}
     rpc UpdateUserInfo(User) returns (Empty) {}
     rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (Empty) {}
+    rpc Subscribe(SubscribeRequest) returns (Empty) {}
 }
