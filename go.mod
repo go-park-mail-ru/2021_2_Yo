@@ -3,7 +3,7 @@ module backend
 go 1.17
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/go-redis/redis v6.15.9+incompatible

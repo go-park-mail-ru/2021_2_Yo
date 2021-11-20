@@ -2,7 +2,7 @@ package main
 
 import (
 	"backend/logger"
-	"backend/microservice/user/proto"
+	proto "backend/microservice/user/proto"
 	"backend/microservice/user/repository"
 	"backend/utils"
 	_ "github.com/lib/pq"

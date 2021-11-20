@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"backend/microservice/user/proto"
+	proto "backend/microservice/user/proto"
 	"backend/models"
 	error2 "backend/service/user/error"
 	"backend/utils"

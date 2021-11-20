@@ -1,8 +1,8 @@
-package repository
+package eventRepository
 
 import (
 	log "backend/logger"
-	"backend/microservice/event/proto"
+	proto "backend/microservice/event/proto"
 	"backend/models"
 	error2 "backend/service/event/error"
 	"context"

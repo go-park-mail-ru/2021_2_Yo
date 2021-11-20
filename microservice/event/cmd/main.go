@@ -2,8 +2,8 @@ package main
 
 import (
 	"backend/logger"
-	"backend/microservice/event/proto"
-	"backend/microservice/event/repository"
+	proto "backend/microservice/event/proto"
+	repository "backend/microservice/event/repository"
 	"backend/utils"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"

@@ -1,7 +1,7 @@
-package repository
+package eventRepository
 
 import (
-	"backend/microservice/event/proto"
+	proto "backend/microservice/event/proto"
 	"backend/models"
 	error2 "backend/service/event/error"
 	"github.com/lib/pq"
