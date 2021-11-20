@@ -134,7 +134,7 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.EventsListResponse(eventsList))
+	response.SendResponse(w, response.EventListResponse(eventsList))
 }
 
 func (h *Delivery) GetEventsFromAuthor(w http.ResponseWriter, r *http.Request) {
@@ -146,7 +146,7 @@ func (h *Delivery) GetEventsFromAuthor(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.EventsListResponse(eventsList))
+	response.SendResponse(w, response.EventListResponse(eventsList))
 }
 
 /*

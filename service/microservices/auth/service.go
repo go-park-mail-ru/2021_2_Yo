@@ -7,7 +7,7 @@ import (
 )
 
 type AuthService interface {
-	SignUp(ctx context.Context, user models.User) (*models.ResponseBodyUser, error)
+	SignUp(ctx context.Context, user models.User) (*models.UserResponseBody, error)
 	SignIn(ctx context.Context, user models.User) (string, error)
 	CreateSession(ctx context.Context, userId string) (string, error)
 	CheckSession(ctx context.Context, sessionId string) (string, error)
@@ -20,29 +20,29 @@ type service struct {
 	authService protoAuth.AuthClient
 }
 
-func NewService (authService protoAuth.AuthClient) AuthService {
+func NewService(authService protoAuth.AuthClient) AuthService {
 	return &service{
 		authService: authService,
 	}
 }
 
-func (s *service) SignUp(ctx context.Context, user models.User) (*models.ResponseBodyUser, error)  {
+func (s *service) SignUp(ctx context.Context, user models.User) (*models.UserResponseBody, error) {
 	request := protoAuth.User{
-		Name: user.Name,
-		Surname: user.Surname,
-		Mail: user.Mail,
+		Name:     user.Name,
+		Surname:  user.Surname,
+		Mail:     user.Mail,
 		Password: user.Password,
 	}
-	userResponse, err := s.authService.CreateUser(ctx,&request) 
+	userResponse, err := s.authService.CreateUser(ctx, &request)
 	if err != nil {
-		return &models.ResponseBodyUser{}, err
+		return &models.UserResponseBody{}, err
 	}
-	
-	response := models.ResponseBodyUser {
-		ID: userResponse.ID,
-		Name: user.Name,
+
+	response := models.UserResponseBody{
+		ID:      userResponse.ID,
+		Name:    user.Name,
 		Surname: user.Surname,
-		Mail: user.Mail,
+		Mail:    user.Mail,
 	}
 
 	return &response, nil
@@ -50,7 +50,7 @@ func (s *service) SignUp(ctx context.Context, user models.User) (*models.Respons
 
 func (s *service) SignIn(ctx context.Context, user models.User) (string, error) {
 	request := protoAuth.UserAuthData{
-		Mail: user.Mail,
+		Mail:     user.Mail,
 		Password: user.Password,
 	}
 	userResponse, err := s.authService.GetUser(ctx, &request)
@@ -63,7 +63,7 @@ func (s *service) SignIn(ctx context.Context, user models.User) (string, error) 
 }
 
 func (s *service) CreateSession(ctx context.Context, userId string) (string, error) {
-	request := protoAuth.UserId {
+	request := protoAuth.UserId{
 		UserId: userId,
 	}
 	sessionResponse, err := s.authService.CreateSession(ctx, &request)
@@ -75,7 +75,7 @@ func (s *service) CreateSession(ctx context.Context, userId string) (string, err
 }
 
 func (s *service) CheckSession(ctx context.Context, SessionId string) (string, error) {
-	request := protoAuth.Session {
+	request := protoAuth.Session{
 		Session: SessionId,
 	}
 	userIdResponse, err := s.authService.CheckSession(ctx, &request)
@@ -87,18 +87,18 @@ func (s *service) CheckSession(ctx context.Context, SessionId string) (string, e
 }
 
 func (s *service) DeleteSession(ctx context.Context, SessionId string) error {
-	request := protoAuth.Session {
+	request := protoAuth.Session{
 		Session: SessionId,
 	}
 	_, err := s.authService.DeleteSession(ctx, &request)
 	if err != nil {
-		return  err
+		return err
 	}
 	return nil
 }
 
 func (s *service) CreateToken(ctx context.Context, userId string) (string, error) {
-	request := protoAuth.UserId {
+	request := protoAuth.UserId{
 		UserId: userId,
 	}
 	tokenResponse, err := s.authService.CreateToken(ctx, &request)
@@ -110,10 +110,10 @@ func (s *service) CreateToken(ctx context.Context, userId string) (string, error
 }
 
 func (s *service) CheckToken(ctx context.Context, csrfToken string) (string, error) {
-	request := protoAuth.CSRFToken {
+	request := protoAuth.CSRFToken{
 		CSRFToken: csrfToken,
 	}
-	userIdResponse, err := s.authService.CheckToken(ctx,&request)
+	userIdResponse, err := s.authService.CheckToken(ctx, &request)
 	if err != nil {
 		return "", err
 	}

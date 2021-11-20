@@ -116,24 +116,33 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 POST /user/14/subscribe
 */
 func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
-
 	message := logMessage + "Subscribe:"
 	log.Debug(message + "started")
-
 	vars, ok := r.Context().Value("vars").(map[string]string)
 	if !ok {
 		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
 	}
 	userId := r.Context().Value("userId").(string)
 	subscriptedId := vars["id"]
-
 	err := h.useCase.Subscribe(subscriptedId, userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-
 	response.SendResponse(w, response.OkResponse())
-
 	log.Debug(message + "ended")
-
 }
+
+/*
+func (h *Delivery) GetSubscribers(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetSubscribers:"
+	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	userId := vars["id"]
+	subscribers, err := h.useCase.GetSubscribers(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	response.SendResponse(w, response.UserResponse(foundUser))
+	log.Debug(message + "ended")
+}
+*/

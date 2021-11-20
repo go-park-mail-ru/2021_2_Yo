@@ -1,6 +1,6 @@
 package models
 
-type ResponseBodyUser struct {
+type UserResponseBody struct {
 	ID       string `json:"id,omitempty"`
 	Name     string `json:"name,omitempty" valid:"type(string),length(0|50)" san:"xss"`
 	Surname  string `json:"surname,omitempty" valid:"type(string),length(0|50)" san:"xss"`
@@ -10,7 +10,15 @@ type ResponseBodyUser struct {
 	Password string `json:"password,omitempty" valid:"type(string),length(0|50)" san:"xss"`
 }
 
-type ResponseBodyEvent struct {
+type UserListResponseBody struct {
+	Users []UserResponseBody `json:"users"`
+}
+
+type EventIDResponseBody struct {
+	ID string `json:"id"`
+}
+
+type EventResponseBody struct {
 	ID          string   `json:"id,omitempty"`
 	Title       string   `json:"title" valid:"type(string),length(0|255)" san:"xss"`
 	Description string   `json:"description" valid:"type(string),length(0|500)" san:"xss"`
@@ -23,4 +31,8 @@ type ResponseBodyEvent struct {
 	Date        string   `json:"date" valid:"type(string),length(0|10)" san:"xss"`
 	Geo         string   `json:"geo" valid:"type(string),length(0|255)" san:"xss"`
 	AuthorID    string   `json:"authorid" san:"xss"`
+}
+
+type EventListResponseBody struct {
+	Events []EventResponseBody `json:"events"`
 }
