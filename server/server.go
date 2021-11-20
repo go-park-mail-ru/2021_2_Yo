@@ -24,7 +24,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
-	protoAuth "backend/microservices/proto/auth"
+	protoAuth "backend/microservice/auth/proto"
 	microAuth "backend/service/microservices/auth"
 )
 

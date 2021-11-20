@@ -5,7 +5,7 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 	"os"
 	"context"
-	protoAuth "backend/microservices/proto/auth"
+	protoAuth "backend/microservice/auth/proto"
 	log "github.com/sirupsen/logrus"
 )
 

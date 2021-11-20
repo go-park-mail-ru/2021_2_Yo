@@ -1,7 +1,7 @@
 package auth
 
 import (
-	protoAuth "backend/microservices/proto/auth"
+	protoAuth "backend/microservice/auth/proto"
 	"backend/models"
 	"context"
 )

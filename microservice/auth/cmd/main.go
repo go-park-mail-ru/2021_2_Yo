@@ -3,11 +3,11 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 	"backend/logger"
-	sessionRepo "backend/microservices/auth/repository/session"
-	userRepo "backend/microservices/auth/repository/user"
-	protoAuth "backend/microservices/proto/auth"
+	sessionRepo "backend/microservice/auth/repository/session"
+	userRepo "backend/microservice/auth/repository/user"
+	protoAuth "backend/microservice/auth/proto"
 
-	"backend/microservices/auth/usecase"
+	"backend/microservice/auth/usecase"
 	"backend/utils"
 	"net"
 	"github.com/spf13/viper"
@@ -26,7 +26,7 @@ func env() {
 
 func main() {
 	env()
-	viper.AddConfigPath("../../../configs")
+	viper.AddConfigPath("../configs")
 	viper.SetConfigName("config")
 	logLevel := log.DebugLevel
 	logger.Init(logLevel)
@@ -35,6 +35,8 @@ func main() {
 		log.Error("main:err = ", err)
 		os.Exit(1)
 	}
+
+	port := viper.GetString("port")
 
 	//Подключение постгрес
 	postDB, err := utils.InitPostgresDB()
@@ -48,7 +50,7 @@ func main() {
 	}
 
 	//Попробую 8081
-	authListener, err := net.Listen("tcp", ":8081")
+	authListener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Error(err)
 	}
@@ -61,7 +63,7 @@ func main() {
 	authService := usecase.NewService(authUserRepository, authSessionRepository)
 	protoAuth.RegisterAuthServer(server,authService)
 
-	log.Info("started auth microservice on 8081")
+	log.Info("started auth microservice on", port)
 	err = server.Serve(authListener)
 	if err != nil {
 		log.Error("serve troubles")

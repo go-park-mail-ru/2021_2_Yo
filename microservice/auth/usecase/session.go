@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	authServiceModels "backend/microservices/auth/models"
-	protoAuth "backend/microservices/proto/auth"
+	authServiceModels "backend/microservice/auth/models"
+	protoAuth "backend/microservice/auth/proto"
 	"context"
 	"math/rand"
 	"time"

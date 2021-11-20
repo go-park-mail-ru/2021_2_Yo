@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	authServiceModels "backend/microservices/auth/models"
+	authServiceModels "backend/microservice/auth/models"
 )
 
 type SessionRepository interface {
