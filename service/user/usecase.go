@@ -7,4 +7,6 @@ type UseCase interface {
 	UpdateUserInfo(user *models.User) error
 	UpdateUserPassword(userId string, password string) error
 	Subscribe(subscribedId string, subscriberId string) error
+	GetSubscribers(userId string) ([]*models.User, error)
+	GetSubscribes(userId string) ([]*models.User, error)
 }

@@ -98,3 +98,65 @@ func (a *UseCase) Subscribe(subscribedId string, subscriberId string) error {
 	return err
 
 }
+
+func (a *UseCase) GetSubscribers(userId string) ([]*models.User, error) {
+
+	if userId == "" {
+		return nil, error2.ErrEmptyData
+	}
+
+	in := &proto.UserId{
+		ID: userId,
+	}
+
+	out, err := a.userRepo.GetSubscribers(context.Background(), in)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*models.User, len(out.Users))
+	for i, protoUser := range out.Users {
+		result[i] = &models.User{
+			ID:       protoUser.ID,
+			Name:     protoUser.Name,
+			Surname:  protoUser.Surname,
+			Mail:     protoUser.Mail,
+			Password: protoUser.Password,
+			About:    protoUser.About,
+			ImgUrl:   protoUser.ImgUrl,
+		}
+	}
+
+	return result, nil
+
+}
+
+func (a *UseCase) GetSubscribes(userId string) ([]*models.User, error) {
+
+	if userId == "" {
+		return nil, error2.ErrEmptyData
+	}
+
+	in := &proto.UserId{
+		ID: userId,
+	}
+
+	out, err := a.userRepo.GetSubscribes(context.Background(), in)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*models.User, len(out.Users))
+	for i, protoUser := range out.Users {
+		result[i] = &models.User{
+			ID:       protoUser.ID,
+			Name:     protoUser.Name,
+			Surname:  protoUser.Surname,
+			Mail:     protoUser.Mail,
+			Password: protoUser.Password,
+			About:    protoUser.About,
+			ImgUrl:   protoUser.ImgUrl,
+		}
+	}
+
+	return result, nil
+
+}

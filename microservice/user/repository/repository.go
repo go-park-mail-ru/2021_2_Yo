@@ -20,6 +20,8 @@ const (
 	//TODO: updateUserImg в отдельный метод
 	updateUserImgUrlQuery = `update "user" set img_url = $1 where id = $2`
 	subscribeQuery        = `insert into "subscribe" (subscribed_id, subscriber_id) values ($1, $2)`
+	getSubscribersQuery   = `select * from "user" as u join subscribe s on s.subscribed_id = u.id`
+	getSubscribesQuery    = `select * from "user" as u join subscribe s on s.subscriber_id = u.id`
 )
 
 type Repository struct {
@@ -133,4 +135,78 @@ func (s *Repository) Subscribe(ctx context.Context, in *proto.SubscribeRequest) 
 
 	return nil, nil
 
+}
+
+func (s *Repository) GetSubscribers(ctx context.Context, in *proto.UserId) (*proto.Users, error) {
+
+	message := logMessage + "GetSubscribers:"
+
+	userId := in.ID
+
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+
+	query := getSubscribersQuery
+	rows, err := s.db.Queryx(query, userIdInt)
+	if err != nil {
+		log.Error(message+"err =", err)
+		return nil, error2.ErrPostgres
+	}
+	defer rows.Close()
+	var resultUsers []*models.User
+	for rows.Next() {
+		var u User
+		err := rows.StructScan(&u)
+		if err != nil {
+			return nil, error2.ErrPostgres
+		}
+		modelUser := toModelUser(&u)
+		resultUsers = append(resultUsers, modelUser)
+	}
+
+	outUsers := make([]*proto.User, len(resultUsers))
+	for i, event := range resultUsers {
+		outUsers[i] = toProtoUser(event)
+	}
+	out := &proto.Users{Users: outUsers}
+	return out, nil
+}
+
+func (s *Repository) GetSubscribes(ctx context.Context, in *proto.UserId) (*proto.Users, error) {
+
+	message := logMessage + "GetSubscribers:"
+
+	userId := in.ID
+
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+
+	query := getSubscribesQuery
+	rows, err := s.db.Queryx(query, userIdInt)
+	if err != nil {
+		log.Error(message+"err =", err)
+		return nil, error2.ErrPostgres
+	}
+	defer rows.Close()
+	var resultUsers []*models.User
+	for rows.Next() {
+		var u User
+		err := rows.StructScan(&u)
+		if err != nil {
+			return nil, error2.ErrPostgres
+		}
+		modelUser := toModelUser(&u)
+		resultUsers = append(resultUsers, modelUser)
+	}
+
+	outUsers := make([]*proto.User, len(resultUsers))
+	for i, event := range resultUsers {
+		outUsers[i] = toProtoUser(event)
+	}
+	out := &proto.Users{Users: outUsers}
+	return out, nil
 }

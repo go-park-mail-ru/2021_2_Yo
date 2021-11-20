@@ -130,8 +130,8 @@ func (a *UseCase) GetEvents(title string, category string, tags []string) ([]*mo
 	if err != nil {
 		return nil, err
 	}
-	result := make([]*models.Event, len(out.Event))
-	for i, protoEvent := range out.Event {
+	result := make([]*models.Event, len(out.Events))
+	for i, protoEvent := range out.Events {
 		result[i] = &models.Event{
 			ID:          protoEvent.ID,
 			Title:       protoEvent.Title,
@@ -159,8 +159,8 @@ func (a *UseCase) GetEventsFromAuthor(authorId string) ([]*models.Event, error) 
 	if err != nil {
 		return nil, err
 	}
-	result := make([]*models.Event, len(out.Event))
-	for i, protoEvent := range out.Event {
+	result := make([]*models.Event, len(out.Events))
+	for i, protoEvent := range out.Events {
 		result[i] = &models.Event{
 			ID:          protoEvent.ID,
 			Title:       protoEvent.Title,

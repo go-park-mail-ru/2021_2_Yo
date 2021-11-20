@@ -270,7 +270,7 @@ func (s *Repository) GetEvents(ctx context.Context, in *proto.GetEventsRequest) 
 	for i, event := range resultEvents {
 		outEvents[i] = toProtoEvent(event)
 	}
-	out := &proto.Events{Event: outEvents}
+	out := &proto.Events{Events: outEvents}
 	return out, nil
 }
 
@@ -305,7 +305,7 @@ func (s *Repository) GetEventsFromAuthor(ctx context.Context, in *proto.AuthorId
 	for i, event := range resultEvents {
 		outEvents[i] = toProtoEvent(event)
 	}
-	out := &proto.Events{Event: outEvents}
+	out := &proto.Events{Events: outEvents}
 	return out, nil
 }
 
