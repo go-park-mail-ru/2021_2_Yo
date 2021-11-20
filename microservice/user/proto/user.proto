@@ -33,6 +33,10 @@ message SubscribeRequest {
     string SubscriberId = 2;
 }
 
+message EventId {
+    string ID = 1;
+}
+
 message Empty {}
 
 service Repository {
@@ -42,4 +46,5 @@ service Repository {
     rpc Subscribe(SubscribeRequest) returns (Empty) {}
     rpc GetSubscribers(UserId) returns (Users) {}
     rpc GetSubscribes(UserId) returns (Users) {}
+    rpc GetVisitors(EventId) returns (Users) {}
 }

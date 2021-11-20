@@ -20,14 +20,8 @@ func NewUseCase(eventRepo proto.RepositoryClient) *UseCase {
 	}
 }
 
-func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
-	if e == nil || e.AuthorId == "" {
-		return "", error2.ErrEmptyData
-	}
-	for _, tag := range e.Tag {
-		tag = strings.ToLower(tag)
-	}
-	in := &proto.Event{
+func MakeProtoEvent(e *models.Event) *proto.Event {
+	return &proto.Event{
 		ID:          e.ID,
 		Title:       e.Title,
 		Description: e.Description,
@@ -41,6 +35,33 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 		Geo:         e.Geo,
 		AuthorId:    e.AuthorId,
 	}
+}
+
+func MakeModelEvent(out *proto.Event) *models.Event {
+	return &models.Event{
+		ID:          out.ID,
+		Title:       out.Title,
+		Description: out.Description,
+		Text:        out.Text,
+		City:        out.City,
+		Category:    out.Category,
+		Viewed:      int(out.Viewed),
+		ImgUrl:      out.ImgUrl,
+		Tag:         out.Tag,
+		Date:        out.Date,
+		Geo:         out.Geo,
+		AuthorId:    out.AuthorId,
+	}
+}
+
+func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
+	if e == nil || e.AuthorId == "" {
+		return "", error2.ErrEmptyData
+	}
+	for _, tag := range e.Tag {
+		tag = strings.ToLower(tag)
+	}
+	in := MakeProtoEvent(e)
 	res, err := a.eventRepo.CreateEvent(context.Background(), in)
 	if err != nil {
 		return "", err
@@ -59,20 +80,7 @@ func (a *UseCase) UpdateEvent(e *models.Event, userId string) error {
 		tag = strings.ToLower(tag)
 	}
 	in := &proto.UpdateEventRequest{
-		Event: &proto.Event{
-			ID:          e.ID,
-			Title:       e.Title,
-			Description: e.Description,
-			Text:        e.Text,
-			City:        e.City,
-			Category:    e.Category,
-			Viewed:      int32(e.Viewed),
-			ImgUrl:      e.ImgUrl,
-			Tag:         e.Tag,
-			Date:        e.Date,
-			Geo:         e.Geo,
-			AuthorId:    e.AuthorId,
-		},
+		Event:  MakeProtoEvent(e),
 		UserId: userId,
 	}
 	_, err := a.eventRepo.UpdateEvent(context.Background(), in)
@@ -100,20 +108,7 @@ func (a *UseCase) GetEventById(eventId string) (*models.Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	result := &models.Event{
-		ID:          out.ID,
-		Title:       out.Title,
-		Description: out.Description,
-		Text:        out.Text,
-		City:        out.City,
-		Category:    out.Category,
-		Viewed:      int(out.Viewed),
-		ImgUrl:      out.ImgUrl,
-		Tag:         out.Tag,
-		Date:        out.Date,
-		Geo:         out.Geo,
-		AuthorId:    out.AuthorId,
-	}
+	result := MakeModelEvent(out)
 	return result, nil
 }
 
@@ -132,20 +127,7 @@ func (a *UseCase) GetEvents(title string, category string, tags []string) ([]*mo
 	}
 	result := make([]*models.Event, len(out.Events))
 	for i, protoEvent := range out.Events {
-		result[i] = &models.Event{
-			ID:          protoEvent.ID,
-			Title:       protoEvent.Title,
-			Description: protoEvent.Description,
-			Text:        protoEvent.Text,
-			City:        protoEvent.City,
-			Category:    protoEvent.Category,
-			Viewed:      int(protoEvent.Viewed),
-			ImgUrl:      protoEvent.ImgUrl,
-			Tag:         protoEvent.Tag,
-			Date:        protoEvent.Date,
-			Geo:         protoEvent.Geo,
-			AuthorId:    protoEvent.AuthorId,
-		}
+		result[i] = MakeModelEvent(protoEvent)
 	}
 	return result, nil
 }
@@ -161,37 +143,37 @@ func (a *UseCase) GetEventsFromAuthor(authorId string) ([]*models.Event, error) 
 	}
 	result := make([]*models.Event, len(out.Events))
 	for i, protoEvent := range out.Events {
-		result[i] = &models.Event{
-			ID:          protoEvent.ID,
-			Title:       protoEvent.Title,
-			Description: protoEvent.Description,
-			Text:        protoEvent.Text,
-			City:        protoEvent.City,
-			Category:    protoEvent.Category,
-			Viewed:      int(protoEvent.Viewed),
-			ImgUrl:      protoEvent.ImgUrl,
-			Tag:         protoEvent.Tag,
-			Date:        protoEvent.Date,
-			Geo:         protoEvent.Geo,
-			AuthorId:    protoEvent.AuthorId,
-		}
+		result[i] = MakeModelEvent(protoEvent)
 	}
 	return result, nil
 }
 
 func (a *UseCase) Visit(eventId string, userId string) error {
-
 	if eventId == "" || userId == "" {
 		return error2.ErrEmptyData
 	}
-
 	in := &proto.VisitRequest{
 		EventId: eventId,
 		UserId:  userId,
 	}
-
 	_, err := a.eventRepo.Visit(context.Background(), in)
-
 	return err
+}
 
+func (a *UseCase) GetVisitedEvents(userId string) ([]*models.Event, error) {
+	if userId == "" {
+		return nil, error2.ErrEmptyData
+	}
+	in := &proto.UserId{
+		ID: userId,
+	}
+	out, err := a.eventRepo.GetVisitedEvents(context.Background(), in)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*models.Event, len(out.Events))
+	for i, protoEvent := range out.Events {
+		result[i] = MakeModelEvent(protoEvent)
+	}
+	return result, nil
 }

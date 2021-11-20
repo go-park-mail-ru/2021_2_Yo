@@ -20,8 +20,9 @@ const (
 	//TODO: updateUserImg в отдельный метод
 	updateUserImgUrlQuery = `update "user" set img_url = $1 where id = $2`
 	subscribeQuery        = `insert into "subscribe" (subscribed_id, subscriber_id) values ($1, $2)`
-	getSubscribersQuery   = `select * from "user" as u join subscribe s on s.subscribed_id = u.id`
-	getSubscribesQuery    = `select * from "user" as u join subscribe s on s.subscriber_id = u.id`
+	getSubscribersQuery   = `select u.* from "user" as u join subscribe s on s.subscribed_id = u.id where s.subscribed_id = $1`
+	getSubscribesQuery    = `select u.* from "user" as u join subscribe s on s.subscriber_id = u.id where s.subscriber_id = $1`
+	getVisitorsQuery      = `select u.* from "user" as u join visitor v on u.id = v.user_id where v.event_id = $1`
 )
 
 type Repository struct {
@@ -209,4 +210,43 @@ func (s *Repository) GetSubscribes(ctx context.Context, in *proto.UserId) (*prot
 	}
 	out := &proto.Users{Users: outUsers}
 	return out, nil
+
+}
+
+func (s *Repository) GetVisitors(ctx context.Context, in *proto.EventId) (*proto.Users, error) {
+
+	message := logMessage + "GetVisitors:"
+
+	eventId := in.ID
+
+	eventIdInt, err := strconv.Atoi(eventId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+
+	query := getVisitorsQuery
+	rows, err := s.db.Queryx(query, eventIdInt)
+	if err != nil {
+		log.Error(message+"err =", err)
+		return nil, error2.ErrPostgres
+	}
+	defer rows.Close()
+	var resultUsers []*models.User
+	for rows.Next() {
+		var u User
+		err := rows.StructScan(&u)
+		if err != nil {
+			return nil, error2.ErrPostgres
+		}
+		modelUser := toModelUser(&u)
+		resultUsers = append(resultUsers, modelUser)
+	}
+
+	outUsers := make([]*proto.User, len(resultUsers))
+	for i, event := range resultUsers {
+		outUsers[i] = toProtoUser(event)
+	}
+	out := &proto.Users{Users: outUsers}
+	return out, nil
+
 }

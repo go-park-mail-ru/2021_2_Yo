@@ -157,3 +157,27 @@ func (h *Delivery) GetSubscribes(w http.ResponseWriter, r *http.Request) {
 	response.SendResponse(w, response.UserListResponse(subscribers))
 	log.Debug(message + "ended")
 }
+
+/*
+GET /events/14/visit
+*/
+func (h *Delivery) GetVisitors(w http.ResponseWriter, r *http.Request) {
+
+	message := logMessage + "Visit:"
+	log.Debug(message + "started")
+
+	eventId, ok := r.Context().Value("eventId").(string)
+	if !ok {
+		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+	}
+
+	userList, err := h.useCase.GetVisitors(eventId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+
+	response.SendResponse(w, response.UserListResponse(userList))
+
+	log.Debug(message + "ended")
+
+}

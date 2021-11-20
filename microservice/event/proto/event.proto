@@ -32,6 +32,10 @@ message AuthorId {
     string ID = 1;
 }
 
+message UserId {
+    string ID = 1;
+}
+
 message UpdateEventRequest {
     Event event = 1;
     string userId = 2;
@@ -67,4 +71,5 @@ service Repository {
     rpc GetEvents(GetEventsRequest) returns (Events) {}
     rpc GetEventsFromAuthor(AuthorId) returns (Events) {}
     rpc Visit(VisitRequest) returns (Empty) {}
+    rpc GetVisitedEvents(UserId) returns (Events) {}
 }

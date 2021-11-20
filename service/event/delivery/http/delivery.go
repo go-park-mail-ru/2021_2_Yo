@@ -142,15 +142,15 @@ func (h *Delivery) GetEventsFromAuthor(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	vars := mux.Vars(r)
 	authorId := vars["authorid"]
-	eventsList, err := h.useCase.GetEventsFromAuthor(authorId)
+	eventList, err := h.useCase.GetEventsFromAuthor(authorId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	response.SendResponse(w, response.EventListResponse(eventsList))
+	response.SendResponse(w, response.EventListResponse(eventList))
 }
 
 /*
-POST /events/14/visit
+GET /user/14/visited
 */
 func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
 
@@ -176,4 +176,16 @@ func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
 
 	log.Debug(message + "ended")
 
+}
+
+func (h *Delivery) GetVisitedEvents(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetEventsFromAuthor:"
+	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	userId := vars["id"]
+	eventList, err := h.useCase.GetVisitedEvents(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	response.SendResponse(w, response.EventListResponse(eventList))
 }

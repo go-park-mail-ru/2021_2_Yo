@@ -22,6 +22,30 @@ func NewUseCase(userRepo proto.RepositoryClient) *UseCase {
 	}
 }
 
+func MakeProtoUser(u *models.User) *proto.User {
+	return &proto.User{
+		ID:       u.ID,
+		Name:     u.Name,
+		Surname:  u.Surname,
+		Mail:     u.Mail,
+		Password: u.Password,
+		About:    u.About,
+		ImgUrl:   u.ImgUrl,
+	}
+}
+
+func MakeModelUser(u *proto.User) *models.User {
+	return &models.User{
+		ID:       u.ID,
+		Name:     u.Name,
+		Surname:  u.Surname,
+		Mail:     u.Mail,
+		Password: u.Password,
+		About:    u.About,
+		ImgUrl:   u.ImgUrl,
+	}
+}
+
 func (a *UseCase) GetUserById(userId string) (*models.User, error) {
 
 	if userId == "" {
@@ -29,20 +53,12 @@ func (a *UseCase) GetUserById(userId string) (*models.User, error) {
 	}
 
 	in := &proto.UserId{ID: userId}
-	protoUser, err := a.userRepo.GetUserById(context.Background(), in)
+	out, err := a.userRepo.GetUserById(context.Background(), in)
 
 	if err != nil {
 		return nil, err
 	}
-	resultUser := &models.User{
-		ID:       protoUser.ID,
-		Name:     protoUser.Name,
-		Surname:  protoUser.Surname,
-		Mail:     protoUser.Mail,
-		Password: protoUser.Password,
-		About:    protoUser.About,
-		ImgUrl:   protoUser.ImgUrl,
-	}
+	resultUser := MakeModelUser(out)
 	return resultUser, nil
 
 }
@@ -53,15 +69,7 @@ func (a *UseCase) UpdateUserInfo(u *models.User) error {
 		return error2.ErrEmptyData
 	}
 
-	in := &proto.User{
-		ID:       u.ID,
-		Name:     u.Name,
-		Surname:  u.Surname,
-		Mail:     u.Mail,
-		Password: u.Password,
-		About:    u.About,
-		ImgUrl:   u.ImgUrl,
-	}
+	in := MakeProtoUser(u)
 
 	_, err := a.userRepo.UpdateUserInfo(context.Background(), in)
 	return err
@@ -115,15 +123,7 @@ func (a *UseCase) GetSubscribers(userId string) ([]*models.User, error) {
 	}
 	result := make([]*models.User, len(out.Users))
 	for i, protoUser := range out.Users {
-		result[i] = &models.User{
-			ID:       protoUser.ID,
-			Name:     protoUser.Name,
-			Surname:  protoUser.Surname,
-			Mail:     protoUser.Mail,
-			Password: protoUser.Password,
-			About:    protoUser.About,
-			ImgUrl:   protoUser.ImgUrl,
-		}
+		result[i] = MakeModelUser(protoUser)
 	}
 
 	return result, nil
@@ -146,17 +146,31 @@ func (a *UseCase) GetSubscribes(userId string) ([]*models.User, error) {
 	}
 	result := make([]*models.User, len(out.Users))
 	for i, protoUser := range out.Users {
-		result[i] = &models.User{
-			ID:       protoUser.ID,
-			Name:     protoUser.Name,
-			Surname:  protoUser.Surname,
-			Mail:     protoUser.Mail,
-			Password: protoUser.Password,
-			About:    protoUser.About,
-			ImgUrl:   protoUser.ImgUrl,
-		}
+		result[i] = MakeModelUser(protoUser)
 	}
 
+	return result, nil
+
+}
+
+func (a *UseCase) GetVisitors(eventId string) ([]*models.User, error) {
+
+	if eventId == "" {
+		return nil, error2.ErrEmptyData
+	}
+
+	in := &proto.EventId{
+		ID: eventId,
+	}
+
+	out, err := a.userRepo.GetVisitors(context.Background(), in)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*models.User, len(out.Users))
+	for i, protoUser := range out.Users {
+		result[i] = MakeModelUser(protoUser)
+	}
 	return result, nil
 
 }

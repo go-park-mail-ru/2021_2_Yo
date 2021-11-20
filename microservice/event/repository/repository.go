@@ -43,6 +43,7 @@ const (
 		where event.id = $10`
 	deleteEventQuery = `delete from "event" where id = $1`
 	visitQuery       = `insert into "visitor" (event_id, user_id) values ($1, $2)`
+	visitedQuery     = `select e.* from "event" as e join visitor as v on v.event_id = e.id where v.user_id = $1`
 )
 
 /*
@@ -335,4 +336,39 @@ func (s *Repository) Visit(ctx context.Context, in *proto.VisitRequest) (*proto.
 
 	return nil, nil
 
+}
+
+func (s *Repository) GetVisitedEvents(ctx context.Context, in *proto.UserId) (*proto.Events, error) {
+
+	userId := in.ID
+
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+
+	query := visitedQuery
+	rows, err := s.db.Queryx(query, userIdInt)
+	if err != nil {
+		log.Error(logMessage+"GetEvents:err =", err)
+		return nil, error2.ErrPostgres
+	}
+	defer rows.Close()
+	var resultEvents []*models.Event
+	for rows.Next() {
+		var e Event
+		err := rows.StructScan(&e)
+		if err != nil {
+			return nil, error2.ErrPostgres
+		}
+		modelEvent := toModelEvent(&e)
+		resultEvents = append(resultEvents, modelEvent)
+	}
+
+	outEvents := make([]*proto.Event, len(resultEvents))
+	for i, event := range resultEvents {
+		outEvents[i] = toProtoEvent(event)
+	}
+	out := &proto.Events{Events: outEvents}
+	return out, nil
 }
