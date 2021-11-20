@@ -8,9 +8,9 @@ event_port: "8083"
 
 postgres_db:
     user: "postgres"
-    #for remote localhost
+    #for remote 95.163.212.36
     #for new postgres-db
-    host: "localhost"
+    host: "95.163.212.36"
     port: "5432"
     password: password
     dbname: "postgres"
