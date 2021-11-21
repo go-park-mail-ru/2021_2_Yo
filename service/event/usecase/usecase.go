@@ -132,22 +132,6 @@ func (a *UseCase) GetEvents(title string, category string, tags []string) ([]*mo
 	return result, nil
 }
 
-func (a *UseCase) GetEventsFromAuthor(authorId string) ([]*models.Event, error) {
-	if authorId == "" {
-		return nil, error2.ErrEmptyData
-	}
-	in := &proto.AuthorId{ID: authorId}
-	out, err := a.eventRepo.GetEventsFromAuthor(context.Background(), in)
-	if err != nil {
-		return nil, err
-	}
-	result := make([]*models.Event, len(out.Events))
-	for i, protoEvent := range out.Events {
-		result[i] = MakeModelEvent(protoEvent)
-	}
-	return result, nil
-}
-
 func (a *UseCase) Visit(eventId string, userId string) error {
 	if eventId == "" || userId == "" {
 		return error2.ErrEmptyData
@@ -168,6 +152,22 @@ func (a *UseCase) GetVisitedEvents(userId string) ([]*models.Event, error) {
 		ID: userId,
 	}
 	out, err := a.eventRepo.GetVisitedEvents(context.Background(), in)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*models.Event, len(out.Events))
+	for i, protoEvent := range out.Events {
+		result[i] = MakeModelEvent(protoEvent)
+	}
+	return result, nil
+}
+
+func (a *UseCase) GetCreatedEvents(userId string) ([]*models.Event, error) {
+	if userId == "" {
+		return nil, error2.ErrEmptyData
+	}
+	in := &proto.UserId{ID: userId}
+	out, err := a.eventRepo.GetCreatedEvents(context.Background(), in)
 	if err != nil {
 		return nil, err
 	}

@@ -30,9 +30,9 @@ func AuthHTTPEndpoints(r *mux.Router, delivery *authHttp.Delivery, middlewares *
 func UserHTTPEndpoints(r *mux.Router, uDelivery *userHttp.Delivery, eDelivery *eventHttp.Delivery, mws *middleware.Middlewares) {
 	r.HandleFunc("/{id:[0-9]+}", uDelivery.GetUserById).Methods("GET")
 	r.HandleFunc("/{id:[0-9]+}/events/favourite", eDelivery.GetVisitedEvents).Methods("GET")
-	r.HandleFunc("/{id:[0-9]+}/events/created", eDelivery.GetEventsFromAuthor).Methods("GET")
+	r.HandleFunc("/{id:[0-9]+}/events/created", eDelivery.GetCreatedEvents).Methods("GET")
 	r.HandleFunc("/{id:[0-9]+}/subscribers", uDelivery.GetSubscribers).Methods("GET")
-	r.HandleFunc("/{id:[0-9]+}/subscribes", uDelivery.GetSubscribes).Methods("GET")
+	r.HandleFunc("/{id:[0-9]+}/subscriptions", uDelivery.GetSubscribes).Methods("GET")
 	getUserHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.GetUser)))
 	r.Handle("", getUserHandlerFunc).Methods("GET")
 	r.Handle("/info", useMiddlewares(r, "/info", uDelivery.UpdateUserInfo, mws.GetVars, mws.Auth)).Methods("POST")
@@ -40,7 +40,6 @@ func UserHTTPEndpoints(r *mux.Router, uDelivery *userHttp.Delivery, eDelivery *e
 }
 
 func EventHTTPEndpoints(r *mux.Router, delivery *eventHttp.Delivery, mws *middleware.Middlewares) {
-	r.HandleFunc("", delivery.GetEventsFromAuthor).Queries("authorid", "{authorid:[0-9]+}").Methods("GET")
 	//TODO: Попросить фронт заменить "query" на "title", ибо понятно, почему.
 	r.HandleFunc("", delivery.GetEvents).Queries("query", "{query}", "category", "{category}", "tags", "{tags}").Methods("GET")
 	r.HandleFunc("", delivery.GetEvents).Queries("query", "{query}", "category", "{category}").Methods("GET")
