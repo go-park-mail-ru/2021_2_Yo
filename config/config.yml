@@ -19,3 +19,8 @@ postgres_db:
     dbname: "postgres"
     sslmode: "disable"
 
+main_host:
+    "http://localhost:3000"
+
+#main_host:
+#    "https://bmstusssa.herokuapp.com"
