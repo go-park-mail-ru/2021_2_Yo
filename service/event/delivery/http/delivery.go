@@ -167,7 +167,7 @@ func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Delivery) GetVisitedEvents(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "GetEventsFromAuthor:"
+	message := logMessage + "GetVisitedEvents:"
 	log.Debug(message + "started")
 	vars := mux.Vars(r)
 	userId := vars["id"]
