@@ -27,6 +27,8 @@ import (
 
 	protoAuth "backend/microservice/auth/proto"
 	microAuth "backend/service/microservices/auth"
+
+	"backend/prometheus"
 )
 
 const logMessage = "server:"
@@ -133,6 +135,8 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	userRouter := r.PathPrefix("/user").Subrouter()
 	userRouter.Methods("POST").Subrouter().Use(mw.CSRF)
 	register.UserHTTPEndpoints(userRouter, app.UserManager, app.EventManager, mw)
+
+	prometheus.RegisterPrometheus(r)
 
 	return r
 }

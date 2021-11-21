@@ -35,6 +35,13 @@ services:
     command: "./user"
     ports:
       - "8084:8084"
+  
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./prometheus:/etc/prometheus"
 
 # for remote
 #  postgres-db:
@@ -50,5 +57,11 @@ services:
     image: redis:latest
     ports:
       - "6380:6379"
+
+  
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
 
     
