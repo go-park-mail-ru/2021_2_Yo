@@ -48,7 +48,11 @@ func main() {
 	if err != nil {
 		log.Error(err)
 	}
+
+	response := redisDB.Ping()
+
 	log.Info(redisDB)
+	log.Info(response)
 	//Попробую 8081
 	authListener, err := net.Listen("tcp", ":"+port)
 	if err != nil {

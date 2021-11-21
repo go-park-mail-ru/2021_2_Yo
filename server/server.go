@@ -51,7 +51,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	}
 
 	authPort := viper.GetString("auth_port")
-	authHost := viper.GetString("auth_port")
+	authHost := viper.GetString("auth_host")
 	AuthAddr := authHost+":"+authPort
 
 	grpcConnAuth, err := grpc.Dial(
