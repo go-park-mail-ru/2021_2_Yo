@@ -137,18 +137,6 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	response.SendResponse(w, response.EventListResponse(eventsList))
 }
 
-func (h *Delivery) GetEventsFromAuthor(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "GetEventsFromAuthor:"
-	log.Debug(message + "started")
-	vars := mux.Vars(r)
-	authorId := vars["authorid"]
-	eventList, err := h.useCase.GetEventsFromAuthor(authorId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		return
-	}
-	response.SendResponse(w, response.EventListResponse(eventList))
-}
-
 /*
 GET /user/14/visited
 */
@@ -184,6 +172,18 @@ func (h *Delivery) GetVisitedEvents(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["id"]
 	eventList, err := h.useCase.GetVisitedEvents(userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	response.SendResponse(w, response.EventListResponse(eventList))
+}
+
+func (h *Delivery) GetCreatedEvents(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetCreatedEvents:"
+	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	userId := vars["id"]
+	eventList, err := h.useCase.GetCreatedEvents(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

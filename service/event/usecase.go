@@ -10,7 +10,7 @@ type UseCase interface {
 	DeleteEvent(eventId string, userId string) error
 	GetEventById(eventId string) (*models.Event, error)
 	GetEvents(title string, category string, tags []string) ([]*models.Event, error)
-	GetEventsFromAuthor(authorId string) ([]*models.Event, error)
 	Visit(eventId string, userId string) error
+	GetCreatedEvents(authorId string) ([]*models.Event, error)
 	GetVisitedEvents(userId string) ([]*models.Event, error)
 }

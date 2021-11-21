@@ -6,7 +6,7 @@ syntax = "proto3";
 //protoc --go_out=plugins=grpc:. *.proto
 //PATH="${PATH}:${HOME}/go/bin" protoc --go_out=plugins=grpc:. *.proto
 
-option go_package = ".;eventGrpc";
+option go_package = "/eventGrpc";
 package eventGrpc;
 
 message Event {
@@ -69,7 +69,7 @@ service Repository {
     rpc DeleteEvent(DeleteEventRequest) returns (Empty) {}
     rpc GetEventById(EventId) returns (Event) {}
     rpc GetEvents(GetEventsRequest) returns (Events) {}
-    rpc GetEventsFromAuthor(AuthorId) returns (Events) {}
     rpc Visit(VisitRequest) returns (Empty) {}
     rpc GetVisitedEvents(UserId) returns (Events) {}
+    rpc GetCreatedEvents(UserId) returns (Events) {}
 }
