@@ -1,18 +1,9 @@
-bmstusa_port: "8080"
-
-auth_port: "8081"
-
-user_port: "8084"
-
 event_port: "8083"
 
 postgres_db:
     user: "postgres"
-    #for remote 95.163.212.36
-    #for new postgres-db
     host: "95.163.212.36"
     port: "5432"
     password: password
     dbname: "postgres"
     sslmode: "disable"
-

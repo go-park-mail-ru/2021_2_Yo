@@ -13,8 +13,10 @@ RUN go mod download
 
 COPY . .
 
-RUN go build
+RUN cd microservice/event/cmd && go build -o event
 
-EXPOSE 8080
+EXPOSE 8083
 
-CMD ["./backend]
+WORKDIR /app/microservice/event/cmd
+
+CMD ["./event"]

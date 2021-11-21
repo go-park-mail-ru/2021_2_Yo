@@ -9,6 +9,32 @@ services:
 #      - postgres-db
       - redis-db
 
+  auth:
+    build:
+      context: ./ 
+      dockerfile: ./microservice/auth/Dockerfile
+    command: "./auth"
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis-db
+
+  event:
+    build:
+      context: ./ 
+      dockerfile: ./microservice/event/Dockerfile
+    command: "./event"
+    ports:
+      - "8083:8083"
+
+  user:
+    build:
+      context: ./ 
+      dockerfile: ./microservice/user/Dockerfile
+    command: "./user"
+    ports:
+      - "8084:8084"
+
 # for remote
 #  postgres-db:
 #    restart: always

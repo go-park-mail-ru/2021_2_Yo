@@ -9,12 +9,10 @@ import (
 	userRepository "backend/microservice/user/proto"
 	userDelivery "backend/service/user/delivery/http"
 	userUseCase "backend/service/user/usecase"
-	user "backend/microservice/user/cmd"
 
 	eventRepository "backend/microservice/event/proto"
 	eventDelivery "backend/service/event/delivery/http"
 	eventUseCase "backend/service/event/usecase"
-	event "backend/microservice/event/cmd"
 
 	"backend/middleware"
 	"fmt"
@@ -27,7 +25,6 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 
-	auth "backend/microservice/auth/cmd"
 	protoAuth "backend/microservice/auth/proto"
 	microAuth "backend/service/microservices/auth"
 )
@@ -139,9 +136,6 @@ func (app *App) Run() error {
 	}
 	message := logMessage + "Run:"
 	log.Info(message + "start")
-	auth.RunMicroservice()
-	user.RunMicroservice()
-	event.RunMicroservice()
 	r := newRouterWithEndpoints(app)
 	port := os.Getenv("PORT")
 	if port == "" {

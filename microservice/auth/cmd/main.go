@@ -1,4 +1,4 @@
-package auth
+package main
 
 import (
 	protoAuth "backend/microservice/auth/proto"
@@ -15,7 +15,6 @@ import (
 	"google.golang.org/grpc"
 	"net"
 	"os"
-	"sync"
 )
 
 func env() {
@@ -25,29 +24,9 @@ func env() {
 	}
 }
 
-var lock = &sync.Mutex{}
-
-type microservice struct {
-
-}
-
-var microserviceInstance *microservice
-
-
-func RunMicroservice(){
-	if microserviceInstance == nil {
-		lock.Lock()
-		defer lock.Unlock()
-        if microserviceInstance == nil {
-            microserviceInstance = &microservice{}
-			go main()
-		}
-    } 
-}
-
 func main() {
 	env()
-	viper.AddConfigPath("../configs")
+	viper.AddConfigPath("../config")
 	viper.SetConfigName("config")
 	logLevel := log.DebugLevel
 	logger.Init(logLevel)

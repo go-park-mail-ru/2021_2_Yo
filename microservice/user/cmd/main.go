@@ -1,4 +1,4 @@
-package user
+package main
 
 import (
 	proto "backend/microservice/user/proto"
@@ -11,30 +11,10 @@ import (
 	"google.golang.org/grpc"
 	"net"
 	"os"
-	"sync"
 )
 
 const logMessage = "microservice:event:"
 
-var lock = &sync.Mutex{}
-
-type microservice struct {
-
-}
-
-var microserviceInstance *microservice
-
-
-func RunMicroservice(){
-	if microserviceInstance == nil {
-		lock.Lock()
-		defer lock.Unlock()
-        if microserviceInstance == nil {
-            microserviceInstance = &microservice{}
-			go main()
-		}
-    } 
-}
 
 func main() {
 
@@ -43,7 +23,7 @@ func main() {
 
 	log.Info(logMessage + "started")
 
-	viper.AddConfigPath("../../../configs")
+	viper.AddConfigPath("../config")
 	viper.SetConfigName("config")
 	err := viper.ReadInConfig()
 	if err != nil {

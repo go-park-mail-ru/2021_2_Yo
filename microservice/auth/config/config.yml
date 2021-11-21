@@ -1,8 +1,8 @@
-port: "8081"
+auth_port: "8081"
 
 postgres_db:
     user: "postgres"
-    host: "localhost"
+    host: "95.163.212.36"
     port: "5432"
     password: password
     dbname: "postgres"
@@ -10,5 +10,5 @@ postgres_db:
 
 
 redis_db_session:
-    addr: "localhost:6379"
+    addr: "redis-db:6379"
     db_id: 0
