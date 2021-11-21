@@ -1,13 +1,13 @@
 bmstusa_port: "8080"
 
 auth_port: "8081"
-auth_host: "auth"
+auth_host: "localhost"
 
 user_port: "8084"
-user_host: "user"
+user_host: "localhost"
 
 event_port: "8083"
-event_host: "event"
+event_host: "localhost"
 
 postgres_db:
     user: "postgres"
