@@ -20,7 +20,7 @@ postgres_db:
     sslmode: "disable"
 
 main_host:
-    "http://localhost:3000"
+    "http://127.0.0.1:3000"
 
 #main_host:
 #    "https://bmstusssa.herokuapp.com"
