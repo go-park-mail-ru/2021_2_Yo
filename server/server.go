@@ -52,7 +52,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 
 	authPort := viper.GetString("auth_port")
 	authHost := viper.GetString("auth_host")
-	AuthAddr := authHost+":"+authPort
+	AuthAddr := authHost + ":" + authPort
 
 	grpcConnAuth, err := grpc.Dial(
 		AuthAddr,
@@ -65,10 +65,10 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	authClient := protoAuth.NewAuthClient(grpcConnAuth)
 	authService := microAuth.NewService(authClient)
 	authD := authDelivery.NewDelivery(authService)
-	
+
 	userPort := viper.GetString("user_port")
 	userHost := viper.GetString("user_host")
-	userMicroserviceAddr := userHost+":"+userPort
+	userMicroserviceAddr := userHost + ":" + userPort
 
 	userGrpcConn, err := grpc.Dial(userMicroserviceAddr, grpc.WithInsecure())
 	if err != nil {
@@ -81,7 +81,7 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 
 	eventPort := viper.GetString("event_port")
 	eventHost := viper.GetString("event_host")
-	eventMicroserviceAddr := eventHost+":"+eventPort
+	eventMicroserviceAddr := eventHost + ":" + eventPort
 
 	eventGrpcConn, err := grpc.Dial(eventMicroserviceAddr, grpc.WithInsecure())
 	if err != nil {
@@ -132,7 +132,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 
 	userRouter := r.PathPrefix("/user").Subrouter()
 	userRouter.Methods("POST").Subrouter().Use(mw.CSRF)
-	register.UserHTTPEndpoints(userRouter, app.UserManager, mw)
+	register.UserHTTPEndpoints(userRouter, app.UserManager, app.EventManager, mw)
 
 	return r
 }
