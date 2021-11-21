@@ -49,8 +49,11 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		log.Error(message+"err =", err)
 		return nil, err
 	}
+
 	authPort := viper.GetString("auth_port")
-	AuthAddr := "localhost:"+authPort
+	authHost := viper.GetString("auth_port")
+	AuthAddr := authHost+":"+authPort
+
 	grpcConnAuth, err := grpc.Dial(
 		AuthAddr,
 		grpc.WithInsecure(),
@@ -62,9 +65,11 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	authClient := protoAuth.NewAuthClient(grpcConnAuth)
 	authService := microAuth.NewService(authClient)
 	authD := authDelivery.NewDelivery(authService)
-
+	
 	userPort := viper.GetString("user_port")
-	userMicroserviceAddr := "localhost:"+userPort
+	userHost := viper.GetString("user_host")
+	userMicroserviceAddr := userHost+":"+userPort
+
 	userGrpcConn, err := grpc.Dial(userMicroserviceAddr, grpc.WithInsecure())
 	if err != nil {
 		log.Error(message+"err =", err)
@@ -75,7 +80,9 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	userD := userDelivery.NewDelivery(userUC, authService)
 
 	eventPort := viper.GetString("event_port")
-	eventMicroserviceAddr := "localhost:"+eventPort
+	eventHost := viper.GetString("event_host")
+	eventMicroserviceAddr := eventHost+":"+eventPort
+
 	eventGrpcConn, err := grpc.Dial(eventMicroserviceAddr, grpc.WithInsecure())
 	if err != nil {
 		log.Error(message+"err =", err)

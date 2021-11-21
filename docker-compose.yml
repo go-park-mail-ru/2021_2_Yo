@@ -8,9 +8,6 @@ services:
     depends_on:
 #      - postgres-db
       - redis-db
-      - auth
-      - event
-      - user
 
   auth:
     build:
