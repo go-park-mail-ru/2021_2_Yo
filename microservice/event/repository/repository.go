@@ -71,7 +71,7 @@ func (s *Repository) CreateEvent(ctx context.Context, in *proto.Event) (*proto.E
 		return nil, err
 	}
 
-	log.Info("NewEvent = ", newEvent)
+	log.Debug("NewEvent = ", newEvent)
 
 	var eventId int
 	query := createEventQuery
