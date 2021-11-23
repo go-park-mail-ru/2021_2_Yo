@@ -1,17 +1,74 @@
 package prometheus
 
 import (
-	"github.com/gorilla/mux"
+	"backend/pkg/utils"
+	"net/http"
+	"strconv"
+	log "backend/pkg/logger"
+
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"time"
 )
 
-var RequestCount = prometheus.NewCounterVec(prometheus.CounterOpts{
-	Name: "request_count",
-	Help: "Requests count",
-},[]string{"method","path","status"})
+type metricsMiddleware struct {
+	opsProcessed *prometheus.CounterVec
+	requestNow *prometheus.GaugeVec
+	requestDuration *prometheus.HistogramVec
+}
 
-func RegisterPrometheus(r* mux.Router) {
-	r.Handle("/metrics", promhttp.Handler())
-	prometheus.MustRegister(RequestCount)
+func NewMetricsMiddleware() *metricsMiddleware {
+
+	opsProcessed := promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "bmstusa_processed_ops_total",
+		Help: "The total number of processed ops",
+	}, []string{"method","path","status"})
+	
+	requestNow := promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "bmstusa_req_status",
+		Help: "Diagram of total requests Now",
+	}, []string{"method", "path"})
+
+	requestDuration := promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Name: "bmstusa_req_duration",
+		Help: "Request Duration in seconds",
+	}, []string{"method", "path"})
+
+	return &metricsMiddleware{
+		opsProcessed: opsProcessed,
+		requestNow: requestNow,
+		requestDuration: requestDuration,
+	}
+}
+
+func (mm *metricsMiddleware) Metrics(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sw := utils.NewModifiedResponse(w)
+		log.Info(r.URL.Path)
+		if r.URL.Path != "/metrics" {
+			mm.requestNow.With(prometheus.Labels{
+				"method": r.Method, 
+				"path": r.RequestURI,
+				}).Inc()
+		}
+		start := time.Now()
+		next.ServeHTTP(sw,r)
+		if r.URL.Path != "/metrics" {
+			mm.requestDuration.With(prometheus.Labels{
+				"method": r.Method, 
+				"path": r.RequestURI,
+				}).Observe(float64(int(time.Since(start).Milliseconds())))
+			
+			mm.requestNow.With(prometheus.Labels{
+				"method": r.Method, 
+				"path": r.RequestURI,
+				}).Dec()
+				
+			mm.opsProcessed.With(prometheus.Labels{
+				"method": r.Method, 
+				"path": r.RequestURI, 
+				"status": strconv.Itoa(sw.StatusCode),
+				}).Inc()
+		}
+	})
 }

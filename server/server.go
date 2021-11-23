@@ -21,6 +21,7 @@ import (
 
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -110,12 +111,14 @@ func options(w http.ResponseWriter, r *http.Request) {
 
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddlewares(*app.authService)
+	mm := prometheus.NewMetricsMiddleware()
 
 	r := mux.NewRouter()
 	r.Use(mw.GetVars)
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
+	r.Use(mm.Metrics)
 	r.Methods("OPTIONS").HandlerFunc(options)
 
 	//TODO: Потом раскоментить и убрать то, что снизу
@@ -136,7 +139,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	userRouter.Methods("POST").Subrouter().Use(mw.CSRF)
 	register.UserHTTPEndpoints(userRouter, app.UserManager, app.EventManager, mw)
 
-	prometheus.RegisterPrometheus(r)
+	r.Handle("/metrics", promhttp.Handler())
 
 	return r
 }

@@ -18,6 +18,9 @@ var (
 	ErrSanitizerError = errors.New("internal sanitizing package error")
 )
 
+
+
+
 func ValidateAndSanitize(object interface{}) error {
 	s, err := sanitize.New()
 	if err != nil {
@@ -145,3 +148,4 @@ func SendResponse(w http.ResponseWriter, response interface{}) {
 	}
 	w.Write(b)
 }
+

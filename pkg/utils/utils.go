@@ -129,3 +129,17 @@ func CheckIfNoError(w *http.ResponseWriter, err error, msg string, status respon
 	}
 	return true
 }
+
+type modifiedResponse struct {
+	http.ResponseWriter
+	StatusCode int
+}
+
+func NewModifiedResponse (w http.ResponseWriter) *modifiedResponse {
+	return &modifiedResponse{ResponseWriter: w}
+}
+
+func(w *modifiedResponse) WriteHeader(statusCode int) {
+	w.StatusCode = statusCode
+	w.ResponseWriter.WriteHeader(statusCode)
+}
