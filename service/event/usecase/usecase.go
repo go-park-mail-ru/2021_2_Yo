@@ -6,9 +6,10 @@ import (
 	"backend/pkg/models"
 	error2 "backend/service/event/error"
 	"context"
-	geo "github.com/kellydunn/golang-geo"
-	"github.com/spf13/cast"
 	"strings"
+	"net/http"
+	"io/ioutil"
+	"encoding/json"
 )
 
 const logMessage = "service:event:usecase:"
@@ -57,20 +58,38 @@ func MakeModelEvent(out *proto.Event) *models.Event {
 	}
 }
 
-func parseCoordinates(coords string) (float64, float64, error) {
+func cityByCoordinates(latitude, longitude string) string {
+
+	type City struct {
+		City string `json:"city,omitempty"`
+	}
+
+	url := "https://api.bigdatacloud.net/data/reverse-geocode-client"
+	url += "?latitude="+latitude+"&longitude="+longitude+"&localityLanguage=ru"
+
+	response,err := http.Get(url)
+	if err != nil {
+		log.Error(err)
+	}  
+	defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)  
+	if err != nil {
+		log.Error(err)
+	}
+	city := City{}
+	err = json.Unmarshal(body, &city)
+	if err != nil {
+		log.Error(err)
+	}
+	return city.City
+}
+
+func parseCoordinates(coords string) (string, string) {
 	coordsArr := strings.Split(coords, " ")
-	coordsArr[0] = coordsArr[0][1:]
-	coordsArr[1] = coordsArr[1][:len(coordsArr[1])-1]
-	log.Debug("x =", coordsArr[0], "y =", coordsArr[1])
-	lat, err := cast.ToFloat64E(coordsArr[0])
-	if err != nil {
-		return 0, 0, err
-	}
-	lng, err := cast.ToFloat64E(coordsArr[1])
-	if err != nil {
-		return 0, 0, err
-	}
-	return lat, lng, nil
+	lat := coordsArr[0][1:]
+	lng := coordsArr[1][:len(coordsArr[1])-1]
+	log.Debug("x =", lat, "y =", lng)
+	return lat, lng
 }
 
 func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
@@ -80,13 +99,8 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 	for i, tag := range e.Tag {
 		e.Tag[i] = strings.ToLower(tag)
 	}
-	lat, lng, err := parseCoordinates(e.Geo)
-	if err != nil {
-		log.Error(logMessage+"CreateEvent:err =", err)
-		return "", error2.ErrEmptyData
-	}
-	point := geo.NewPoint(lat, lng)
-	_ = point
+	lat, lng := parseCoordinates(e.Geo)
+	e.City = cityByCoordinates(lat,lng)
 	
 	in := MakeProtoEvent(e)
 	res, err := a.eventRepo.CreateEvent(context.Background(), in)
