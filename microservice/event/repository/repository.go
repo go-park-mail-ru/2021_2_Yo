@@ -70,6 +70,7 @@ func (s *Repository) CreateEvent(ctx context.Context, in *proto.Event) (*proto.E
 
 	newEvent, err := toPostgresEvent(e)
 	if err != nil {
+		log.Error(message+"err 1 =", err)
 		return nil, err
 	}
 
@@ -88,6 +89,7 @@ func (s *Repository) CreateEvent(ctx context.Context, in *proto.Event) (*proto.E
 		newEvent.Tag,
 		newEvent.AuthorID)
 	if err != nil {
+		log.Error(message+"err 2 =", err)
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrNoRows
 		}
