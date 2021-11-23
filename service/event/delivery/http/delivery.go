@@ -36,6 +36,9 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
+
+	log.Debug(message+"eventFromRequest =", eventFromRequest)
+
 	imgUrl, err := utils.SaveImageFromRequest(r, "file")
 	if err == utils.ErrFileExt {
 		utils.CheckIfNoError(&w, err, message, http.StatusBadRequest)
