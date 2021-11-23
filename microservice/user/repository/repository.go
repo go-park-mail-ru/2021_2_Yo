@@ -46,9 +46,9 @@ func (s *Repository) GetUserById(ctx context.Context, in *proto.UserId) (*proto.
 	err := s.db.Get(&user, query, userId)
 	if err != nil {
 		if err == sql2.ErrNoRows {
-			return nil, error2.ErrUserNotFound
+			return &proto.User{}, error2.ErrUserNotFound
 		}
-		return nil, error2.ErrPostgres
+		return &proto.User{}, error2.ErrPostgres
 	}
 
 	modelUser := toModelUser(&user)
@@ -73,7 +73,7 @@ func (s *Repository) UpdateUserInfo(ctx context.Context, in *proto.User) (*proto
 		ImgUrl:   in.ImgUrl,
 	})
 	if err != nil {
-		return nil, err
+		return &proto.Empty{}, err
 	}
 
 	var query string
@@ -81,18 +81,18 @@ func (s *Repository) UpdateUserInfo(ctx context.Context, in *proto.User) (*proto
 		query = updateUserInfoQueryWithoutImgUrl
 		_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ID)
 		if err != nil {
-			return nil, error2.ErrPostgres
+			return &proto.Empty{}, error2.ErrPostgres
 		}
 	} else {
 		query = updateUserInfoQuery
 		_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
 		if err != nil {
-			return nil, error2.ErrPostgres
+			return &proto.Empty{}, error2.ErrPostgres
 		}
 	}
 
 	log.Debug(message + "ended")
-	return nil, nil
+	return &proto.Empty{}, nil
 
 }
 
@@ -106,17 +106,17 @@ func (s *Repository) UpdateUserPassword(ctx context.Context, in *proto.UpdateUse
 
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Empty{}, error2.ErrAtoi
 	}
 
 	query := updateUserPasswordQuery
 	_, err = s.db.Query(query, password, userIdInt)
 	if err != nil {
-		return nil, error2.ErrPostgres
+		return &proto.Empty{}, error2.ErrPostgres
 	}
 
 	log.Debug(message + "ended")
-	return nil, nil
+	return &proto.Empty{}, nil
 
 }
 
@@ -130,22 +130,22 @@ func (s *Repository) Subscribe(ctx context.Context, in *proto.SubscribeRequest) 
 
 	subscribedIdInt, err := strconv.Atoi(subscribedId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Empty{}, error2.ErrAtoi
 	}
 
 	subscriberIdInt, err := strconv.Atoi(subscriberId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Empty{}, error2.ErrAtoi
 	}
 
 	query := subscribeQuery
 	_, err = s.db.Query(query, subscribedIdInt, subscriberIdInt)
 	if err != nil {
-		return nil, error2.ErrPostgres
+		return &proto.Empty{}, error2.ErrPostgres
 	}
 
 	log.Debug(message + "ended")
-	return nil, nil
+	return &proto.Empty{}, nil
 
 }
 
@@ -158,13 +158,13 @@ func (s *Repository) GetSubscribers(ctx context.Context, in *proto.UserId) (*pro
 
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Users{}, error2.ErrAtoi
 	}
 
 	query := getSubscribersQuery
 	rows, err := s.db.Queryx(query, userIdInt)
 	if err != nil {
-		return nil, error2.ErrPostgres
+		return &proto.Users{}, error2.ErrPostgres
 	}
 	defer rows.Close()
 	var resultUsers []*models.User
@@ -172,7 +172,7 @@ func (s *Repository) GetSubscribers(ctx context.Context, in *proto.UserId) (*pro
 		var u User
 		err := rows.StructScan(&u)
 		if err != nil {
-			return nil, error2.ErrPostgres
+			return &proto.Users{}, error2.ErrPostgres
 		}
 		modelUser := toModelUser(&u)
 		resultUsers = append(resultUsers, modelUser)
@@ -197,13 +197,13 @@ func (s *Repository) GetSubscribes(ctx context.Context, in *proto.UserId) (*prot
 
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Users{}, error2.ErrAtoi
 	}
 
 	query := getSubscribesQuery
 	rows, err := s.db.Queryx(query, userIdInt)
 	if err != nil {
-		return nil, error2.ErrPostgres
+		return &proto.Users{}, error2.ErrPostgres
 	}
 	defer rows.Close()
 	var resultUsers []*models.User
@@ -211,7 +211,7 @@ func (s *Repository) GetSubscribes(ctx context.Context, in *proto.UserId) (*prot
 		var u User
 		err := rows.StructScan(&u)
 		if err != nil {
-			return nil, error2.ErrPostgres
+			return &proto.Users{}, error2.ErrPostgres
 		}
 		modelUser := toModelUser(&u)
 		resultUsers = append(resultUsers, modelUser)
@@ -237,13 +237,13 @@ func (s *Repository) GetVisitors(ctx context.Context, in *proto.EventId) (*proto
 
 	eventIdInt, err := strconv.Atoi(eventId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Users{}, error2.ErrAtoi
 	}
 
 	query := getVisitorsQuery
 	rows, err := s.db.Queryx(query, eventIdInt)
 	if err != nil {
-		return nil, error2.ErrPostgres
+		return &proto.Users{}, error2.ErrPostgres
 	}
 	defer rows.Close()
 	var resultUsers []*models.User
@@ -251,7 +251,7 @@ func (s *Repository) GetVisitors(ctx context.Context, in *proto.EventId) (*proto
 		var u User
 		err := rows.StructScan(&u)
 		if err != nil {
-			return nil, error2.ErrPostgres
+			return &proto.Users{}, error2.ErrPostgres
 		}
 		modelUser := toModelUser(&u)
 		resultUsers = append(resultUsers, modelUser)

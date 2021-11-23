@@ -71,7 +71,7 @@ func (s *Repository) CreateEvent(ctx context.Context, in *proto.Event) (*proto.E
 	newEvent, err := toPostgresEvent(e)
 	if err != nil {
 		log.Error(message+"err 1 =", err)
-		return nil, err
+		return &proto.EventId{}, err
 	}
 
 	var eventId int
@@ -91,9 +91,9 @@ func (s *Repository) CreateEvent(ctx context.Context, in *proto.Event) (*proto.E
 	if err != nil {
 		log.Error(message+"err 2 =", err)
 		if err == sql2.ErrNoRows {
-			return nil, error2.ErrNoRows
+			return &proto.EventId{}, error2.ErrNoRows
 		}
-		return nil, error2.ErrPostgres
+		return &proto.EventId{}, error2.ErrPostgres
 	}
 
 	out := &proto.EventId{ID: strconv.Itoa(eventId)}
@@ -113,20 +113,20 @@ func (s *Repository) UpdateEvent(ctx context.Context, in *proto.UpdateEventReque
 
 	eventIdInt, err := strconv.Atoi(e.ID)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Empty{}, error2.ErrAtoi
 	}
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Empty{}, error2.ErrAtoi
 	}
 
 	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
-		return nil, err
+		return &proto.Empty{}, err
 	}
 	postgresEvent, err := toPostgresEvent(e)
 	if err != nil {
-		return nil, err
+		return &proto.Empty{}, err
 	}
 	postgresEvent.ID = eventIdInt
 
@@ -146,7 +146,7 @@ func (s *Repository) UpdateEvent(ctx context.Context, in *proto.UpdateEventReque
 			postgresEvent.Tag,
 			postgresEvent.ID)
 		if err != nil {
-			return nil, error2.ErrPostgres
+			return &proto.Empty{}, error2.ErrPostgres
 		}
 	} else {
 		query = updateEventQueryWithoutImgUrl
@@ -162,13 +162,12 @@ func (s *Repository) UpdateEvent(ctx context.Context, in *proto.UpdateEventReque
 			postgresEvent.Tag,
 			postgresEvent.ID)
 		if err != nil {
-			return nil, error2.ErrPostgres
+			return &proto.Empty{}, error2.ErrPostgres
 		}
 	}
 
 	log.Debug(message + "ended")
-	return nil, nil
-
+	return &proto.Empty{}, nil
 }
 
 func (s *Repository) DeleteEvent(ctx context.Context, in *proto.DeleteEventRequest) (*proto.Empty, error) {
@@ -181,25 +180,25 @@ func (s *Repository) DeleteEvent(ctx context.Context, in *proto.DeleteEventReque
 
 	eventIdInt, err := strconv.Atoi(eventId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Empty{}, error2.ErrAtoi
 	}
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Empty{}, error2.ErrAtoi
 	}
 	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
-		return nil, err
+		return &proto.Empty{}, err
 	}
 
 	query := deleteEventQuery
 	_, err = s.db.Exec(query, eventIdInt)
 	if err != nil {
-		return nil, error2.ErrPostgres
+		return &proto.Empty{}, error2.ErrPostgres
 	}
 
 	log.Debug(message + "ended")
-	return nil, nil
+	return &proto.Empty{}, nil
 
 }
 
@@ -212,7 +211,7 @@ func (s *Repository) GetEventById(ctx context.Context, in *proto.EventId) (*prot
 
 	eventIdInt, err := strconv.Atoi(eventId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Event{}, error2.ErrAtoi
 	}
 
 	query := getEventQuery
@@ -220,9 +219,9 @@ func (s *Repository) GetEventById(ctx context.Context, in *proto.EventId) (*prot
 	err = s.db.Get(&e, query, eventIdInt)
 	if err != nil {
 		if err == sql2.ErrNoRows {
-			return nil, error2.ErrNoRows
+			return &proto.Event{}, error2.ErrNoRows
 		}
-		return nil, error2.ErrPostgres
+		return &proto.Event{}, error2.ErrPostgres
 	}
 	resultEvent := toModelEvent(&e)
 
@@ -266,7 +265,7 @@ func (s *Repository) GetEvents(ctx context.Context, in *proto.GetEventsRequest) 
 	query += "order by viewed DESC"
 	rows, err := s.db.Queryx(query, title, category, postgresTags)
 	if err != nil {
-		return nil, err
+		return &proto.Events{}, err
 	}
 	defer rows.Close()
 	var resultEvents []*models.Event
@@ -274,7 +273,7 @@ func (s *Repository) GetEvents(ctx context.Context, in *proto.GetEventsRequest) 
 		var e Event
 		err := rows.StructScan(&e)
 		if err != nil {
-			return nil, error2.ErrPostgres
+			return &proto.Events{}, error2.ErrPostgres
 		}
 		modelEvent := toModelEvent(&e)
 		resultEvents = append(resultEvents, modelEvent)
@@ -300,22 +299,22 @@ func (s *Repository) Visit(ctx context.Context, in *proto.VisitRequest) (*proto.
 
 	eventIdInt, err := strconv.Atoi(eventId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Empty{}, error2.ErrAtoi
 	}
 
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Empty{}, error2.ErrAtoi
 	}
 
 	query := visitQuery
 	_, err = s.db.Query(query, eventIdInt, userIdInt)
 	if err != nil {
-		return nil, error2.ErrPostgres
+		return &proto.Empty{}, error2.ErrPostgres
 	}
 
 	log.Debug(message + "ended")
-	return nil, nil
+	return &proto.Empty{}, nil
 
 }
 
@@ -328,13 +327,13 @@ func (s *Repository) GetVisitedEvents(ctx context.Context, in *proto.UserId) (*p
 
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Events{}, error2.ErrAtoi
 	}
 
 	query := visitedQuery
 	rows, err := s.db.Queryx(query, userIdInt)
 	if err != nil {
-		return nil, error2.ErrPostgres
+		return &proto.Events{}, error2.ErrPostgres
 	}
 	defer rows.Close()
 	var resultEvents []*models.Event
@@ -342,7 +341,7 @@ func (s *Repository) GetVisitedEvents(ctx context.Context, in *proto.UserId) (*p
 		var e Event
 		err := rows.StructScan(&e)
 		if err != nil {
-			return nil, error2.ErrPostgres
+			return &proto.Events{}, error2.ErrPostgres
 		}
 		modelEvent := toModelEvent(&e)
 		resultEvents = append(resultEvents, modelEvent)
@@ -367,13 +366,13 @@ func (s *Repository) GetCreatedEvents(ctx context.Context, in *proto.UserId) (*p
 
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return nil, error2.ErrAtoi
+		return &proto.Events{}, error2.ErrAtoi
 	}
 
 	query := createdQuery
 	rows, err := s.db.Queryx(query, userIdInt)
 	if err != nil {
-		return nil, error2.ErrPostgres
+		return &proto.Events{}, error2.ErrPostgres
 	}
 	defer rows.Close()
 	var resultEvents []*models.Event
@@ -381,7 +380,7 @@ func (s *Repository) GetCreatedEvents(ctx context.Context, in *proto.UserId) (*p
 		var e Event
 		err := rows.StructScan(&e)
 		if err != nil {
-			return nil, error2.ErrPostgres
+			return &proto.Events{}, error2.ErrPostgres
 		}
 		modelEvent := toModelEvent(&e)
 		resultEvents = append(resultEvents, modelEvent)

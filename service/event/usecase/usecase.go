@@ -2,9 +2,12 @@ package usecase
 
 import (
 	proto "backend/microservice/event/proto"
+	log "backend/pkg/logger"
 	"backend/pkg/models"
 	error2 "backend/service/event/error"
 	"context"
+	geo "github.com/kellydunn/golang-geo"
+	"github.com/spf13/cast"
 	"strings"
 )
 
@@ -54,6 +57,22 @@ func MakeModelEvent(out *proto.Event) *models.Event {
 	}
 }
 
+func parseCoordinates(coords string) (float64, float64, error) {
+	coordsArr := strings.Split(coords, " ")
+	coordsArr[0] = coordsArr[0][1:]
+	coordsArr[1] = coordsArr[1][:len(coordsArr[1])-1]
+	log.Debug("x =", coordsArr[0], "y =", coordsArr[1])
+	lat, err := cast.ToFloat64E(coordsArr[0])
+	if err != nil {
+		return 0, 0, err
+	}
+	lng, err := cast.ToFloat64E(coordsArr[1])
+	if err != nil {
+		return 0, 0, err
+	}
+	return lat, lng, nil
+}
+
 func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 	if e == nil || e.AuthorId == "" {
 		return "", error2.ErrEmptyData
@@ -61,6 +80,14 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 	for i, tag := range e.Tag {
 		e.Tag[i] = strings.ToLower(tag)
 	}
+	lat, lng, err := parseCoordinates(e.Geo)
+	if err != nil {
+		log.Error(logMessage+"CreateEvent:err =", err)
+		return "", error2.ErrEmptyData
+	}
+	point := geo.NewPoint(lat, lng)
+	_ = point
+	
 	in := MakeProtoEvent(e)
 	res, err := a.eventRepo.CreateEvent(context.Background(), in)
 	if err != nil {
@@ -84,6 +111,7 @@ func (a *UseCase) UpdateEvent(e *models.Event, userId string) error {
 		UserId: userId,
 	}
 	_, err := a.eventRepo.UpdateEvent(context.Background(), in)
+	log.Debug(logMessage+"UpdateEvent:HERE")
 	return err
 }
 
