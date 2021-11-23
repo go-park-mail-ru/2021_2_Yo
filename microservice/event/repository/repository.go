@@ -23,11 +23,11 @@ func NewRepository(database *sql.DB) *Repository {
 }
 
 const (
-	logMessage               = "microservice:event:repository:"
-	checkAuthorQuery         = `select author_id from "event" where id = $1`
-	listQuery                = `select * from "event"`
-	getEventQuery            = `select * from "event" where id = $1`
-	createEventQuery         = `insert into "event" 
+	logMessage       = "microservice:event:repository:"
+	checkAuthorQuery = `select author_id from "event" where id = $1`
+	listQuery        = `select * from "event"`
+	getEventQuery    = `select * from "event" where id = $1`
+	createEventQuery = `insert into "event" 
 		(title, description, text, city, category, viewed, img_url, date, geo, tag, author_id) 
 		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::varchar[], $11) 
 		returning id`
@@ -42,7 +42,7 @@ const (
 	deleteEventQuery = `delete from "event" where id = $1`
 	visitQuery       = `insert into "visitor" (event_id, user_id) values ($1, $2)`
 	visitedQuery     = `select e.* from "event" as e join visitor as v on v.event_id = e.id where v.user_id = $1`
-	createdQuery = `select * from "event" where author_id = $1`
+	createdQuery     = `select * from "event" where author_id = $1`
 )
 
 func (s *Repository) checkAuthor(eventId int, userId int) error {
@@ -65,6 +65,8 @@ func (s *Repository) CreateEvent(ctx context.Context, in *proto.Event) (*proto.E
 	log.Debug(message + "started")
 
 	e := fromProtoToModel(in)
+
+	log.Debug(message+"e =", e)
 
 	newEvent, err := toPostgresEvent(e)
 	if err != nil {
