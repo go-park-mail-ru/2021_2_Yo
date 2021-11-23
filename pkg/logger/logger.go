@@ -12,17 +12,13 @@ func Init(level log.Level) {
 }
 
 func Debug(args ...interface{}) {
-	singletonLogger.Debug(args)
+	singletonLogger.Debug(args...)
 }
 
 func Info(args ...interface{}) {
-	singletonLogger.Info(args)
+	singletonLogger.Info(args...)
 }
 
 func Error(args ...interface{}) {
-	singletonLogger.Error(args)
-}
-
-func Fatal(args ...interface{}) {
-	singletonLogger.Fatal(args)
+	singletonLogger.Error(args...)
 }
