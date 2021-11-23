@@ -58,30 +58,50 @@ func MakeModelEvent(out *proto.Event) *models.Event {
 	}
 }
 
-func cityByCoordinates(latitude, longitude string) string {
-
-	type City struct {
-		City string `json:"city,omitempty"`
-	}
-
-	url := "https://api.bigdatacloud.net/data/reverse-geocode-client"
-	url += "?latitude="+latitude+"&longitude="+longitude+"&localityLanguage=ru"
-
-	response,err := http.Get(url)
-	if err != nil {
-		log.Error(err)
-	}  
-	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)  
+func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
+	url := "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address"
+	url += "?lat="+latitude+"&lon="+longitude;
+	
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Error(err)
 	}
-	city := City{}
-	err = json.Unmarshal(body, &city)
+	req.Header.Set("Accept","application/json")
+	req.Header.Set("Authorization", "Token aaa00e3861df0b3fe38857306563ad4bee84550f")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Error(err)
 	}
-	return city.City
+	body, err := ioutil.ReadAll(resp.Body)  
+	if err != nil {
+		log.Error(err)
+	}
+
+	type Data struct {
+		City string `json:"city,omittempty`
+	}
+
+	type AddrInfo struct {
+		Value string `json:"value,omittempty`
+		Unrestricted_value string `json:"unresticted_value,omitempty`
+		Data Data `json:"data,omitempty"`
+	}
+
+	type Suggest struct {
+		Suggestions []AddrInfo `json:"suggestions,omitempty"`
+	}
+
+	suggestions := Suggest{}
+	err = json.Unmarshal(body, &suggestions)
+	if err != nil {
+		log.Error(err)
+	}
+	addr := suggestions.Suggestions[0].Value
+	city := suggestions.Suggestions[0].Data.City
+	
+	return city, addr
 }
 
 func parseCoordinates(coords string) (string, string) {
@@ -100,7 +120,7 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 		e.Tag[i] = strings.ToLower(tag)
 	}
 	lat, lng := parseCoordinates(e.Geo)
-	e.City = cityByCoordinates(lat,lng)
+	e.City,_ = сityAndAddrByCoordinates(lat,lng)
 	
 	in := MakeProtoEvent(e)
 	res, err := a.eventRepo.CreateEvent(context.Background(), in)
@@ -120,6 +140,9 @@ func (a *UseCase) UpdateEvent(e *models.Event, userId string) error {
 	for i, tag := range e.Tag {
 		e.Tag[i] = strings.ToLower(tag)
 	}
+	lat, lng := parseCoordinates(e.Geo)
+	e.City,_ = сityAndAddrByCoordinates(lat,lng)
+
 	in := &proto.UpdateEventRequest{
 		Event:  MakeProtoEvent(e),
 		UserId: userId,
