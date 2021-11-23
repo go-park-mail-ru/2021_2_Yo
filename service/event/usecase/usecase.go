@@ -58,8 +58,8 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 	if e == nil || e.AuthorId == "" {
 		return "", error2.ErrEmptyData
 	}
-	for _, tag := range e.Tag {
-		tag = strings.ToLower(tag)
+	for i, tag := range e.Tag {
+		e.Tag[i] = strings.ToLower(tag)
 	}
 	in := MakeProtoEvent(e)
 	res, err := a.eventRepo.CreateEvent(context.Background(), in)
@@ -76,8 +76,8 @@ func (a *UseCase) UpdateEvent(e *models.Event, userId string) error {
 	if e.ID == "" {
 		return error2.ErrEmptyData
 	}
-	for _, tag := range e.Tag {
-		tag = strings.ToLower(tag)
+	for i, tag := range e.Tag {
+		e.Tag[i] = strings.ToLower(tag)
 	}
 	in := &proto.UpdateEventRequest{
 		Event:  MakeProtoEvent(e),
