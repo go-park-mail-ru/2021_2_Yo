@@ -3,7 +3,6 @@ package http
 import (
 	"backend/pkg/models"
 	"backend/pkg/response"
-	"backend/response"
 	error2 "backend/service/event/error"
 	"backend/service/event/usecase"
 	"bytes"

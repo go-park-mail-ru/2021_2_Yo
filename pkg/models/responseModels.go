@@ -29,7 +29,7 @@ type EventResponseBody struct {
 	ImgUrl      string   `json:"imgUrl" valid:"type(string),length(0|255)" san:"xss"`
 	Tag         []string `json:"tag" san:"xss"`
 	Date        string   `json:"date" valid:"type(string),length(0|10)" san:"xss"`
-	Geo         string   `json:"geo" valid:"type(string),length(0|255)" san:"xss"`
+	Geo         string   `json:"geo" valid:"type(string),length(0|255)"`
 	AuthorID    string   `json:"authorid" san:"xss"`
 }
 
