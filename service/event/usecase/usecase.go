@@ -106,6 +106,9 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
 		log.Error(err)
 	}
 	log.Info("here")
+	log.Debug(suggestions)
+	log.Debug(suggestions.Suggestions)
+	log.Debug(suggestions.Suggestions[0])
 	addr := suggestions.Suggestions[0].Value
 	city := suggestions.Suggestions[0].Data.City
 	log.Debug("Ended cityAndAddr")
