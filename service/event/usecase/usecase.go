@@ -108,7 +108,7 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
 
 func parseCoordinates(coords string) (string, string) {
 	coordsArr := strings.Split(coords, " ")
-	lat := coordsArr[0][1:]
+	lat := coordsArr[0][1:len(coordsArr[0])-1]
 	lng := coordsArr[1][:len(coordsArr[1])-1]
 	log.Debug("x =", lat, "y =", lng)
 	return lat, lng
