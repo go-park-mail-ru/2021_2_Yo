@@ -4,10 +4,9 @@ import (
 	log "backend/pkg/logger"
 	"backend/pkg/response"
 	"backend/pkg/utils"
+	microAuth "backend/service/auth"
 	"backend/service/email"
-	microAuth "backend/service/microservices/auth"
 	"backend/service/user"
-	"context"
 	"errors"
 	"net/http"
 	"strings"
@@ -19,10 +18,10 @@ const logMessage = "service:user:delivery:http:"
 
 type Delivery struct {
 	useCase     user.UseCase
-	authService microAuth.AuthService
+	authService microAuth.UseCase
 }
 
-func NewDelivery(useCase user.UseCase, authService microAuth.AuthService) *Delivery {
+func NewDelivery(useCase user.UseCase, authService microAuth.UseCase) *Delivery {
 	return &Delivery{
 		useCase:     useCase,
 		authService: authService,
@@ -41,12 +40,11 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Debug(message+"imgUrl =", foundUser.ImgUrl)
-	ctx := context.Background()
-	CSRFToken, err := h.authService.CreateToken(ctx, userId)
+	CSRFToken, err := h.authService.CreateToken(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		log.Debug(message+"err = ", err)
 		return
 	}
-	log.Info(CSRFToken)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.UserResponse(foundUser))
 	log.Debug(message + "ended")

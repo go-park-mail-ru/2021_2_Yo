@@ -23,3 +23,23 @@ func (m *UseCaseMock) UpdateUserPassword(userId string, password string) error {
 	args := m.Called(userId, password)
 	return args.Error(0)
 }
+
+func (m *UseCaseMock) Subscribe(subscribedId string, subscriberId string) error {
+	args := m.Called(subscribedId, subscriberId)
+	return args.Error(0)
+}
+
+func (m *UseCaseMock) GetSubscribers(userId string) ([]*models.User, error) {
+	args := m.Called(userId)
+	return args.Get(0).([]*models.User), args.Error(1)
+}
+
+func (m *UseCaseMock) GetSubscribes(userId string) ([]*models.User, error) {
+	args := m.Called(userId)
+	return args.Get(0).([]*models.User), args.Error(1)
+}
+
+func (m *UseCaseMock) GetVisitors(eventId string) ([]*models.User, error) {
+	args := m.Called(eventId)
+	return args.Get(0).([]*models.User), args.Error(1)
+}

@@ -27,8 +27,11 @@ func main() {
 		log.Error("main:err = ", err)
 		os.Exit(1)
 	}
-	logLevel := log.DebugLevel
-	app, err := server.NewApp(logLevel)
+	opts := &server.Options{
+		LogLevel: log.DebugLevel,
+		Testing:  false,
+	}
+	app, err := server.NewApp(opts)
 	if err != nil {
 		log.Error("main:err = ", err)
 		os.Exit(1)

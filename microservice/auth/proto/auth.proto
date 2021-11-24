@@ -4,38 +4,27 @@ syntax = "proto3";
 //export PATH=$PATH:/usr/local/go/bin
 //protoc --go_out=plugins=grpc:. *.proto
 
-option go_package = "backend/microservices/proto";
+option go_package = "/authGrpc";
+package authGrpc;
 
-package protoAuth;
-
-message User {
-    string Name = 2;
-    string Surname = 3;
-    string Mail = 4;
-    string Password = 5;
+message UserId {
+    string ID = 1;
 }
 
-message UserAuthData {
+message SignUpRequest {
+    string Name = 1;
+    string Surname = 2;
+    string Mail = 3;
+    string Password = 4;
+}
+
+message SignInRequest {
     string Mail = 1;
     string Password = 2;
 }
 
 message Session {
     string Session = 1;
-}
-
-message UserId {
-    string UserId = 1;
-}
-
-message SuccessUserResponse {
-    string ID = 1;
-    string Name = 2;
-    string Surname = 3;
-    string Mail = 4;
-    string Password = 5;
-    string About = 6;
-    string ImgUrl = 7;
 }
 
 message CSRFToken {
@@ -47,8 +36,8 @@ message Success {
 }
 
 service Auth {
-    rpc CreateUser (User) returns (SuccessUserResponse) {}
-    rpc GetUser (UserAuthData) returns (UserId) {}
+    rpc SignUp (SignUpRequest) returns (UserId) {}
+    rpc SignIn (SignInRequest) returns (UserId) {}
     rpc CreateSession (UserId) returns (Session) {}
     rpc CheckSession (Session) returns (UserId) {}
     rpc DeleteSession (Session) returns (Success) {}

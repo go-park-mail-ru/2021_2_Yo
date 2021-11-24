@@ -12,7 +12,7 @@ import (
 
 const (
 	logMessage      = "service:auth:repository:postgres:"
-	createUserQuery = `insert into "user" (name, surname, mail, password, about, img_url) values($1, $2, $3, $4, $5, $6) returning id`
+	createUserQuery = `insert into "user" (name, surname, mail, password, about) values($1, $2, $3, $4, $5) returning id`
 	getUserQuery    = `select * from "user" where mail = $1 and password = $2`
 )
 
@@ -32,7 +32,7 @@ func (s *Repository) CreateUser(user *models.User) (string, error) {
 	newUser := toPostgresUser(user)
 	query := createUserQuery
 	var userId int
-	err := s.db.Get(&userId, query, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About, newUser.ImgUrl)
+	err := s.db.Get(&userId, query, newUser.Name, newUser.Surname, newUser.Mail, newUser.Password, newUser.About)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates") {
 			return "", error2.ErrUserExists

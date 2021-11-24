@@ -4,21 +4,21 @@ import (
 	log "backend/pkg/logger"
 	"backend/pkg/response"
 	"backend/pkg/utils"
-	microAuth "backend/service/microservices/auth"
+	"backend/service/auth"
 	"context"
 	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
 	"net/http"
 	"time"
-	"github.com/spf13/viper"
 )
 
 const logMessage = "middleware:"
 
 type Middlewares struct {
-	authService microAuth.AuthService
+	authService auth.UseCase
 }
 
-func NewMiddlewares(authService microAuth.AuthService) *Middlewares {
+func NewMiddlewares(authService auth.UseCase) *Middlewares {
 	return &Middlewares{
 		authService: authService,
 	}
@@ -84,8 +84,7 @@ func (m *Middlewares) Auth(next http.Handler) http.Handler {
 			return
 		}
 		log.Debug(message+"cookie.value =", cookie.Value)
-		ctx := context.Background()
-		userId, err := m.authService.CheckSession(ctx, cookie.Value)
+		userId, err := m.authService.CheckSession(cookie.Value)
 		if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 			return
 		}
@@ -99,8 +98,7 @@ func (m *Middlewares) CSRF(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gottenToken := (*r).Header.Get("X-CSRF-Token")
 		log.Info("gottenToken", gottenToken)
-		ctx := context.Background()
-		userId, err := m.authService.CheckToken(ctx, gottenToken)
+		userId, err := m.authService.CheckToken(gottenToken)
 		if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 			return
 		}

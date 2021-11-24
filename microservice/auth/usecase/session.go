@@ -4,15 +4,15 @@ import (
 	authServiceModels "backend/microservice/auth/models"
 	protoAuth "backend/microservice/auth/proto"
 	"context"
-	"math/rand"
-	"time"
 	"errors"
 	log "github.com/sirupsen/logrus"
+	"math/rand"
+	"time"
 )
 
 var (
 	ErrEmptySessionId = errors.New("session id is empty")
-	letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	letterRunes       = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 )
 
 func generateSessionId(n int) string {
@@ -34,10 +34,10 @@ func (s *authService) CreateSession(ctx context.Context, protoUserId *protoAuth.
 	log.Debug(message + "started")
 	sessionData := &authServiceModels.SessionData{
 		SessionId:  generateSessionId(sessionIdLength),
-		UserId:     protoUserId.UserId,
+		UserId:     protoUserId.ID,
 		Expiration: sessionLifeTime,
 	}
-	
+
 	err := s.authSessionRepository.Create(sessionData)
 	if err != nil {
 		return &protoAuth.Session{}, err
@@ -53,14 +53,14 @@ func (s *authService) CheckSession(ctx context.Context, protoSession *protoAuth.
 	log.Debug(message + "started")
 	sessionId := protoSession.Session
 	if sessionId == "" {
-		return &protoAuth.UserId{},ErrEmptySessionId
+		return &protoAuth.UserId{}, ErrEmptySessionId
 	}
 	userId, err := s.authSessionRepository.Check(sessionId)
 	if err != nil {
 		return &protoAuth.UserId{}, err
 	}
 	response := &protoAuth.UserId{
-		UserId: userId,
+		ID: userId,
 	}
 	return response, nil
 }

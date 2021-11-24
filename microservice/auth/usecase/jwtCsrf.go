@@ -1,12 +1,12 @@
 package usecase
 
 import (
-	"time"
-	"github.com/dgrijalva/jwt-go/v4"
-	"os"
-	"context"
 	protoAuth "backend/microservice/auth/proto"
+	"context"
+	"github.com/dgrijalva/jwt-go/v4"
 	log "github.com/sirupsen/logrus"
+	"os"
+	"time"
 )
 
 func parseToken(susToken string, signingKey []byte) (string, error) {
@@ -21,7 +21,7 @@ func parseToken(susToken string, signingKey []byte) (string, error) {
 		return "", err
 	}
 	if claims, ok := token.Claims.(*jwt.StandardClaims); ok && token.Valid {
-		if (claims.ExpiresAt.Before(time.Now())) {
+		if claims.ExpiresAt.Before(time.Now()) {
 			return "", jwt.ErrHashUnavailable
 		}
 		return claims.ID, nil
@@ -29,11 +29,11 @@ func parseToken(susToken string, signingKey []byte) (string, error) {
 	return "", jwt.ErrHashUnavailable
 }
 
-func (s *authService) CreateToken(ctx context.Context, protoUserId *protoAuth.UserId) (*protoAuth.CSRFToken, error)  {
+func (s *authService) CreateToken(ctx context.Context, protoUserId *protoAuth.UserId) (*protoAuth.CSRFToken, error) {
 	message := logMessage + "CreateToken:"
 	log.Debug(message + "started")
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
-		ID: protoUserId.UserId,
+		ID:        protoUserId.ID,
 		ExpiresAt: jwt.At(time.Now().Add(time.Hour * 7 * 24)), //Week  P.S. Maybe Frontend should ask us
 	})
 	secretWord := os.Getenv("CSRFSECRET")
@@ -57,7 +57,7 @@ func (s *authService) CheckToken(ctx context.Context, protoToken *protoAuth.CSRF
 		return &protoAuth.UserId{}, err
 	}
 	response := &protoAuth.UserId{
-		UserId: userId,
+		ID: userId,
 	}
 	return response, err
 }

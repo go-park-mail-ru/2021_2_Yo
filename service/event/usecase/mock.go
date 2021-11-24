@@ -9,8 +9,8 @@ type UseCaseMock struct {
 	mock.Mock
 }
 
-func (m *UseCaseMock) CreateEvent(e *models.Event, userId string) (string, error) {
-	args := m.Called(e, userId)
+func (m *UseCaseMock) CreateEvent(e *models.Event) (string, error) {
+	args := m.Called(e)
 	return args.Get(0).(string), args.Error(1)
 }
 
@@ -34,7 +34,17 @@ func (m *UseCaseMock) GetEvents(title string, category string, tags []string) ([
 	return args.Get(0).([]*models.Event), args.Error(1)
 }
 
-func (m *UseCaseMock) GetEventsFromAuthor(authorId string) ([]*models.Event, error) {
+func (m *UseCaseMock) Visit(eventId string, userId string) error {
+	args := m.Called(eventId, userId)
+	return args.Error(0)
+}
+
+func (m *UseCaseMock) GetCreatedEvents(authorId string) ([]*models.Event, error) {
 	args := m.Called(authorId)
+	return args.Get(0).([]*models.Event), args.Error(1)
+}
+
+func (m *UseCaseMock) GetVisitedEvents(userId string) ([]*models.Event, error) {
+	args := m.Called(userId)
 	return args.Get(0).([]*models.Event), args.Error(1)
 }

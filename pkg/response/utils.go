@@ -34,6 +34,50 @@ func ValidateAndSanitize(object interface{}) error {
 	return nil
 }
 
+func GetUserFromRequest(r io.Reader) (*models.User, error) {
+	message := logMessage + "GetUserFromRequest:"
+	_ = message
+	userInput := new(models.UserResponseBody)
+	err := json.NewDecoder(r).Decode(userInput)
+	if err != nil {
+		return nil, ErrJSONDecoding
+	}
+	err = ValidateAndSanitize(userInput)
+	if err != nil {
+		return nil, err
+	}
+	result := &models.User{
+		Name:     userInput.Name,
+		Surname:  userInput.Surname,
+		Mail:     userInput.Mail,
+		Password: userInput.Password,
+		About:    userInput.About,
+	}
+	return result, nil
+}
+
+func MakeUserResponseBody(u *models.User) models.UserResponseBody {
+	return models.UserResponseBody{
+		ID:       u.ID,
+		Name:     u.Name,
+		Surname:  u.Surname,
+		About:    u.About,
+		ImgUrl:   u.ImgUrl,
+		Mail:     u.Mail,
+		Password: u.Password,
+	}
+}
+
+func MakeUserListResponseBody(users []*models.User) models.UserListResponseBody {
+	result := make([]models.UserResponseBody, len(users))
+	for i := 0; i < len(users); i++ {
+		result[i] = MakeUserResponseBody(users[i])
+	}
+	return models.UserListResponseBody{
+		Users: result,
+	}
+}
+
 func GetEventFromRequest(r io.Reader) (*models.Event, error) {
 	eventInput := new(models.EventResponseBody)
 	err := json.NewDecoder(r).Decode(eventInput)
@@ -56,32 +100,6 @@ func GetEventFromRequest(r io.Reader) (*models.Event, error) {
 		Tag:         eventInput.Tag,
 		Date:        eventInput.Date,
 		Geo:         eventInput.Geo,
-	}
-	return result, nil
-}
-
-func GetUserFromRequest(r io.Reader) (*models.User, error) {
-	message := logMessage + "GetUserFromRequest:"
-	_ = message
-	userInput := new(models.UserResponseBody)
-	err := json.NewDecoder(r).Decode(userInput)
-	if err != nil {
-		return nil, ErrJSONDecoding
-	}
-	err = ValidateAndSanitize(userInput)
-	if err != nil {
-		return nil, err
-	}
-	result := &models.User{
-		Name:     userInput.Name,
-		Surname:  userInput.Surname,
-		Mail:     userInput.Mail,
-		Password: userInput.Password,
-		About:    userInput.About,
-	}
-	valid, err := govalidator.ValidateStruct(result)
-	if err != nil || !valid {
-		return nil, ErrValidation
 	}
 	return result, nil
 }
@@ -110,28 +128,6 @@ func MakeEventListResponseBody(events []*models.Event) models.EventListResponseB
 	}
 	return models.EventListResponseBody{
 		Events: result,
-	}
-}
-
-func MakeUserResponseBody(u *models.User) models.UserResponseBody {
-	return models.UserResponseBody{
-		ID:       u.ID,
-		Name:     u.Name,
-		Surname:  u.Surname,
-		About:    u.About,
-		ImgUrl:   u.ImgUrl,
-		Mail:     u.Mail,
-		Password: u.Password,
-	}
-}
-
-func MakeUserListResponseBody(users []*models.User) models.UserListResponseBody {
-	result := make([]models.UserResponseBody, len(users))
-	for i := 0; i < len(users); i++ {
-		result[i] = MakeUserResponseBody(users[i])
-	}
-	return models.UserListResponseBody{
-		Users: result,
 	}
 }
 

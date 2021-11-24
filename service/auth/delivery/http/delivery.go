@@ -4,22 +4,22 @@ import (
 	log "backend/pkg/logger"
 	"backend/pkg/response"
 	"backend/pkg/utils"
+	"backend/service/auth"
 	error2 "backend/service/auth/error"
 	"backend/service/email"
-	microAuth "backend/service/microservices/auth"
-	"context"
 	"net/http"
 )
 
 const logMessage = "service:auth:delivery:http:"
 
 type Delivery struct {
-	authService microAuth.AuthService
+	//С большой, так как нужен будет в других функциях
+	UseCase auth.UseCase
 }
 
-func NewDelivery(authService microAuth.AuthService) *Delivery {
+func NewDelivery(useCase auth.UseCase) *Delivery {
 	return &Delivery{
-		authService: authService,
+		UseCase: useCase,
 	}
 }
 
@@ -52,21 +52,18 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
 	u, err := response.GetUserFromRequest(r.Body)
-	log.Debug(message+"u =", *u)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	ctx := context.Background()
-	userResponse, err := h.authService.SignUp(ctx, *u)
+	userId, err := h.UseCase.SignUp(u)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	userId := userResponse.ID
-	sessionId, err := h.authService.CreateSession(ctx, userId)
+	sessionId, err := h.UseCase.CreateSession(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	CSRFToken, err := h.authService.CreateToken(ctx, userId)
+	CSRFToken, err := h.UseCase.CreateToken(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
@@ -74,7 +71,7 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	log.Info(CSRFToken)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
-	email.SendEmail("Подтвержение регистрации", "Вы зарегистрировались на bmstuse", []string{u.Mail})
+	email.SendEmail("Подтвержение регистрации", "Вы успешно зарегистрировались на BMSTUSA!", []string{u.Mail})
 	log.Debug(message + "ended")
 }
 
@@ -85,16 +82,15 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	ctx := context.Background()
-	userId, err := h.authService.SignIn(ctx, *u)
+	userId, err := h.UseCase.SignIn(u)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 		return
 	}
-	sessionId, err := h.authService.CreateSession(ctx, userId)
+	sessionId, err := h.UseCase.CreateSession(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-	CSRFToken, err := h.authService.CreateToken(ctx, userId)
+	CSRFToken, err := h.UseCase.CreateToken(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
@@ -115,8 +111,7 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	ctx := context.Background()
-	err = h.authService.DeleteSession(ctx, cookie.Value)
+	err = h.UseCase.DeleteSession(cookie.Value)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

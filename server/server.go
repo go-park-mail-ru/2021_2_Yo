@@ -5,6 +5,7 @@ import (
 	"backend/pkg/register"
 	"backend/pkg/utils"
 	authDelivery "backend/service/auth/delivery/http"
+	"errors"
 
 	userRepository "backend/microservice/user/proto"
 	userDelivery "backend/service/user/delivery/http"
@@ -27,30 +28,40 @@ import (
 	"google.golang.org/grpc"
 
 	protoAuth "backend/microservice/auth/proto"
-	microAuth "backend/service/microservices/auth"
+	authUseCase "backend/service/auth/usecase"
 
 	"backend/prometheus"
 )
 
 const logMessage = "server:"
 
+type Options struct {
+	LogLevel logrus.Level
+	Testing  bool
+}
+
 type App struct {
+	Options      *Options
 	AuthManager  *authDelivery.Delivery
 	UserManager  *userDelivery.Delivery
 	EventManager *eventDelivery.Delivery
-	authService  *microAuth.AuthService
 	db           *sql.DB
 }
 
-func NewApp(logLevel logrus.Level) (*App, error) {
+func NewApp(opts *Options) (*App, error) {
+	if opts == nil {
+		return nil, errors.New("Unexpected NewApp error")
+	}
 	message := logMessage + "NewApp:"
-	log.Init(logLevel)
-	log.Info(fmt.Sprintf(message+"started, log level = %s", logLevel))
+	log.Init(opts.LogLevel)
+	log.Info(fmt.Sprintf(message+"started, log level = %s", opts.LogLevel))
 
 	db, err := utils.InitPostgresDB()
 	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, err
+		log.Error(message+"err = ", err)
+		if !opts.Testing {
+			return nil, err
+		}
 	}
 
 	authPort := viper.GetString("auth_port")
@@ -62,11 +73,14 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 		grpc.WithInsecure(),
 	)
 	if err != nil {
-		log.Error("can't connect to grpc")
+		log.Error(message+"err = ", err)
+		if !opts.Testing {
+			return nil, err
+		}
 	}
 
 	authClient := protoAuth.NewAuthClient(grpcConnAuth)
-	authService := microAuth.NewService(authClient)
+	authService := authUseCase.NewUseCase(authClient)
 	authD := authDelivery.NewDelivery(authService)
 
 	userPort := viper.GetString("user_port")
@@ -75,7 +89,10 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 
 	userGrpcConn, err := grpc.Dial(userMicroserviceAddr, grpc.WithInsecure())
 	if err != nil {
-		log.Error(message+"err =", err)
+		log.Error(message+"err = ", err)
+		if !opts.Testing {
+			return nil, err
+		}
 	}
 
 	userR := userRepository.NewRepositoryClient(userGrpcConn)
@@ -88,7 +105,10 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 
 	eventGrpcConn, err := grpc.Dial(eventMicroserviceAddr, grpc.WithInsecure())
 	if err != nil {
-		log.Error(message+"err =", err)
+		log.Error(message+"err = ", err)
+		if !opts.Testing {
+			return nil, err
+		}
 	}
 
 	eventR := eventRepository.NewRepositoryClient(eventGrpcConn)
@@ -96,10 +116,10 @@ func NewApp(logLevel logrus.Level) (*App, error) {
 	eventD := eventDelivery.NewDelivery(eventUC)
 
 	return &App{
+		Options:      opts,
 		AuthManager:  authD,
 		UserManager:  userD,
 		EventManager: eventD,
-		authService:  &authService,
 		db:           db,
 	}, nil
 }
@@ -110,7 +130,7 @@ func options(w http.ResponseWriter, r *http.Request) {
 }
 
 func newRouterWithEndpoints(app *App) *mux.Router {
-	mw := middleware.NewMiddlewares(*app.authService)
+	mw := middleware.NewMiddlewares(app.AuthManager.UseCase)
 	mm := prometheus.NewMetricsMiddleware()
 
 	r := mux.NewRouter()
@@ -156,9 +176,12 @@ func (app *App) Run() error {
 		port = viper.GetString("bmstusa_port")
 	}
 	log.Info(message+"port =", port)
+	if app.Options.Testing {
+		port = "wrong port"
+	}
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
-		log.Error(message+"err =", err)
+		log.Error(message+"err = ", err)
 		return err
 	}
 	return nil

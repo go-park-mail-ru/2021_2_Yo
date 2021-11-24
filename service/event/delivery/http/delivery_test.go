@@ -2,17 +2,15 @@ package http
 
 import (
 	"backend/pkg/models"
-	"backend/pkg/response"
-	error2 "backend/service/event/error"
 	"backend/service/event/usecase"
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"strings"
 	"testing"
 )
@@ -25,30 +23,32 @@ var createEventTests = []struct {
 	eventId    string
 	event      *models.Event
 	useCaseErr error
-	output     *response.Response
 }{
-	{1,
+	{
+		1,
 		"1",
 		"100",
 		&models.Event{
 			ID: "1",
 		},
 		nil,
-		response.EventIdResponse("100")},
-	{2,
+	},
+	{
+		2,
 		"1",
 		"100",
 		nil,
 		nil,
-		response.ErrorResponse(response.ErrJSONDecoding.Error())},
-	{3,
+	},
+	{
+		3,
 		"1",
 		"100",
 		&models.Event{
 			ID: "1",
 		},
-		error2.ErrEmptyData,
-		response.ErrorResponse(error2.ErrEmptyData.Error())},
+		errors.New("test_err"),
+	},
 }
 
 func TestCreateEvent(t *testing.T) {
@@ -77,12 +77,6 @@ func TestCreateEvent(t *testing.T) {
 		w := httptest.NewRecorder()
 		userIdContext := context.WithValue(context.Background(), "userId", test.userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
-
-		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
-		expected := wTest.Body
-		actual := w.Body
-		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
 
@@ -93,9 +87,9 @@ var updateEventTests = []struct {
 	vars       map[string]string
 	event      *models.Event
 	useCaseErr error
-	output     *response.Response
 }{
-	{1,
+	{
+		1,
 		"1",
 		"100",
 		map[string]string{
@@ -105,15 +99,17 @@ var updateEventTests = []struct {
 			ID: "100",
 		},
 		nil,
-		response.OkResponse()},
-	{2,
+	},
+	{
+		2,
 		"1",
 		"100",
 		nil,
 		nil,
 		nil,
-		response.ErrorResponse(response.ErrJSONDecoding.Error())},
-	{3,
+	},
+	{
+		3,
 		"1",
 		"100",
 		map[string]string{
@@ -122,8 +118,8 @@ var updateEventTests = []struct {
 		&models.Event{
 			ID: "100",
 		},
-		error2.ErrEmptyData,
-		response.ErrorResponse(error2.ErrEmptyData.Error())},
+		errors.New("test_err"),
+	},
 }
 
 func TestUpdateEvent(t *testing.T) {
@@ -153,12 +149,6 @@ func TestUpdateEvent(t *testing.T) {
 		userIdContext := context.WithValue(context.Background(), "userId", test.userId)
 		varsContext := context.WithValue(userIdContext, "vars", test.vars)
 		r.ServeHTTP(w, req.WithContext(varsContext))
-
-		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
-		expected := wTest.Body
-		actual := w.Body
-		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
 
@@ -168,22 +158,23 @@ var deleteEventTests = []struct {
 	eventId    string
 	vars       map[string]string
 	useCaseErr error
-	output     *response.Response
 }{
-	{1,
+	{
+		1,
 		"1",
 		"100",
 		map[string]string{
 			"id": "100",
 		},
 		nil,
-		response.OkResponse()},
-	{2,
+	},
+	{
+		2,
 		"1",
 		"",
 		nil,
-		error2.ErrEmptyData,
-		response.ErrorResponse(error2.ErrEmptyData.Error())},
+		errors.New("test_err"),
+	},
 }
 
 func TestDeleteEvent(t *testing.T) {
@@ -202,12 +193,6 @@ func TestDeleteEvent(t *testing.T) {
 		userIdContext := context.WithValue(context.Background(), "userId", test.userId)
 		varsContext := context.WithValue(userIdContext, "vars", test.vars)
 		r.ServeHTTP(w, req.WithContext(varsContext))
-
-		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
-		expected := wTest.Body
-		actual := w.Body
-		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
 
@@ -217,9 +202,9 @@ var getEventByIdTests = []struct {
 	vars       map[string]string
 	event      *models.Event
 	useCaseErr error
-	output     *response.Response
 }{
-	{1,
+	{
+		1,
 		"1",
 		map[string]string{
 			"id": "100",
@@ -228,10 +213,9 @@ var getEventByIdTests = []struct {
 			ID: "1",
 		},
 		nil,
-		response.EventResponse(&models.Event{
-			ID: "1",
-		})},
-	{1,
+	},
+	{
+		1,
 		"1",
 		map[string]string{
 			"id": "100",
@@ -239,8 +223,8 @@ var getEventByIdTests = []struct {
 		&models.Event{
 			ID: "1",
 		},
-		error2.ErrEmptyData,
-		response.ErrorResponse(error2.ErrEmptyData.Error())},
+		errors.New("test_err"),
+	},
 }
 
 func TestGetEventById(t *testing.T) {
@@ -257,12 +241,6 @@ func TestGetEventById(t *testing.T) {
 
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
-
-		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
-		expected := wTest.Body
-		actual := w.Body
-		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
 
@@ -272,9 +250,9 @@ var getEventsTests = []struct {
 	query      string
 	eventList  []*models.Event
 	useCaseErr error
-	output     *response.Response
 }{
-	{1,
+	{
+		1,
 		map[string]string{
 			"query":    "testQuery",
 			"category": "testCategory",
@@ -283,8 +261,9 @@ var getEventsTests = []struct {
 		"?query=testQuery&category=testCategory&tags=testTags|testTags|testTags",
 		nil,
 		nil,
-		response.EventsListResponse(nil)},
-	{2,
+	},
+	{
+		2,
 		map[string]string{
 			"query":    "testQuery",
 			"category": "testCategory",
@@ -292,8 +271,8 @@ var getEventsTests = []struct {
 		},
 		"?query=testQuery&category=testCategory&tags=testTags|testTags|testTags",
 		nil,
-		error2.ErrEmptyData,
-		response.ErrorResponse(error2.ErrEmptyData.Error())},
+		errors.New("test_err"),
+	},
 }
 
 func TestGetEvents(t *testing.T) {
@@ -317,39 +296,31 @@ func TestGetEvents(t *testing.T) {
 
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
-
-		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
-		expected := wTest.Body
-		actual := w.Body
-		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
 
 var getEventsFromAuthorTests = []struct {
 	id         int
 	vars       map[string]string
-	query      string
 	eventList  []*models.Event
 	useCaseErr error
-	output     *response.Response
 }{
-	{1,
+	{
+		1,
 		map[string]string{
-			"authorid": "123",
+			"id": "123",
 		},
-		"?authorid=123",
 		nil,
 		nil,
-		response.EventsListResponse(nil)},
-	{2,
+	},
+	{
+		2,
 		map[string]string{
-			"authorid": "123",
+			"id": "123",
 		},
-		"?authorid=123",
 		nil,
-		error2.ErrEmptyData,
-		response.ErrorResponse(error2.ErrEmptyData.Error())},
+		errors.New("test_err"),
+	},
 }
 
 func TestGetEventsFromAuthor(t *testing.T) {
@@ -359,22 +330,153 @@ func TestGetEventsFromAuthor(t *testing.T) {
 
 		authorId := test.vars["authorid"]
 
-		useCaseMock.On("GetEventsFromAuthor", authorId).Return(test.eventList, test.useCaseErr)
+		useCaseMock.On("GetCreatedEvents", authorId).Return(test.eventList, test.useCaseErr)
 
 		r := mux.NewRouter()
-		r.HandleFunc("/events", deliveryTest.GetEventsFromAuthor).
-			Queries("authorid", "{authorid:[0-9]+}").
+		r.HandleFunc("{id:[0-9]+}", deliveryTest.GetCreatedEvents).
 			Methods("GET")
-		req, err := http.NewRequest("GET", "/events"+test.query, nil)
+		req, err := http.NewRequest("GET", authorId, nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
+	}
+}
 
-		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
-		expected := wTest.Body
-		actual := w.Body
-		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+var visitTests = []struct {
+	id         int
+	vars       interface{}
+	userId     interface{}
+	useCaseErr error
+}{
+	{
+		1,
+		map[string]string{
+			"id": "123",
+		},
+		"1",
+		nil,
+	},
+	{
+		2,
+		errors.New(""),
+		"2",
+		errors.New("test_err"),
+	},
+	{
+		3,
+		map[string]string{
+			"id": "123",
+		},
+		errors.New(""),
+		errors.New("test_err"),
+	},
+}
+
+func TestVisit(t *testing.T) {
+	for _, test := range visitTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		deliveryTest := NewDelivery(useCaseMock)
+
+		var eId string
+		var uId string
+		vars, ok := test.vars.(map[string]string)
+		if ok {
+			eId = vars["id"]
+		}
+		userId, ok := test.userId.(string)
+		if ok {
+			uId = userId
+		}
+
+		useCaseMock.On("Visit", eId, uId).Return(test.useCaseErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/test", deliveryTest.Visit).Methods("GET")
+		req, err := http.NewRequest("GET", "/test", nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+
+		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
+		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
+		req = req.WithContext(ctxUserId)
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+	}
+}
+
+var getVisitedEventsTests = []struct {
+	id         int
+	userId     string
+	useCaseErr error
+}{
+	{
+		1,
+		"1",
+		nil,
+	},
+	{
+		2,
+		"1",
+		errors.New("test_err"),
+	},
+	{
+		3,
+		"1",
+		errors.New("test_err"),
+	},
+}
+
+func TestGetVisitedEvents(t *testing.T) {
+	for _, test := range getVisitedEventsTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		deliveryTest := NewDelivery(useCaseMock)
+
+		useCaseMock.On("GetVisitedEvents", test.userId).Return([]*models.Event{}, test.useCaseErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/{id:[0-9]+}", deliveryTest.GetVisitedEvents).Methods("GET")
+		req, err := http.NewRequest("GET", "/"+test.userId, nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+	}
+}
+
+var getCreatedEventsTests = []struct {
+	id         int
+	userId     string
+	useCaseErr error
+}{
+	{
+		1,
+		"1",
+		nil,
+	},
+	{
+		2,
+		"1",
+		errors.New("test_err"),
+	},
+	{
+		3,
+		"1",
+		errors.New("test_err"),
+	},
+}
+
+func TestGetCreatedEvents(t *testing.T) {
+	for _, test := range getVisitedEventsTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		deliveryTest := NewDelivery(useCaseMock)
+
+		useCaseMock.On("GetCreatedEvents", test.userId).Return([]*models.Event{}, test.useCaseErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/{id:[0-9]+}", deliveryTest.GetCreatedEvents).Methods("GET")
+		req, err := http.NewRequest("GET", "/"+test.userId, nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
 	}
 }

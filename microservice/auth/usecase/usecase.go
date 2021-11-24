@@ -26,48 +26,41 @@ func NewService(authUserRepository interfaces.UserRepository, authSessionReposit
 	}
 }
 
-func userConvertToProto(user *models.User) protoAuth.SuccessUserResponse {
-	return protoAuth.SuccessUserResponse{
-		ID:       user.ID,
-		Name:     user.Name,
-		Surname:  user.Surname,
-		Mail:     user.Mail,
-		Password: user.Password,
-		About:    user.About,
-	}
-}
-
-func (s *authService) CreateUser(ctx context.Context, protoUser *protoAuth.User) (*protoAuth.SuccessUserResponse, error) {
+func (s *authService) SignUp(ctx context.Context, in *protoAuth.SignUpRequest) (*protoAuth.UserId, error) {
 	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
-	log.Info(protoUser)
+
+	log.Debug(message+"in = ", in)
+
 	newUser := models.User{
-		Name:     protoUser.Name,
-		Surname:  protoUser.Surname,
-		Mail:     protoUser.Mail,
-		Password: utils.CreatePasswordHash(protoUser.Password),
+		Name:     in.Name,
+		Surname:  in.Surname,
+		Mail:     in.Mail,
+		Password: utils.CreatePasswordHash(in.Password),
 	}
 
-	var err error
-	newUser.ID, err = s.authUserRepository.CreateUser(&newUser)
-
-	if err != nil {
-		return &protoAuth.SuccessUserResponse{}, err
-	}
-	response := userConvertToProto(&newUser)
-	return &response, nil
-}
-
-func (s *authService) GetUser(ctx context.Context, protoUser *protoAuth.UserAuthData) (*protoAuth.UserId, error) {
-	message := logMessage + "GetUser:"
-	log.Debug(message + "started")
-	user, err := s.authUserRepository.GetUser(protoUser.Mail, utils.CreatePasswordHash(protoUser.Password))
-
+	userId, err := s.authUserRepository.CreateUser(&newUser)
 	if err != nil {
 		return &protoAuth.UserId{}, err
 	}
-	response := &protoAuth.UserId{
-		UserId: user.ID,
+
+	out := &protoAuth.UserId{ID: userId}
+	return out, nil
+}
+
+func (s *authService) SignIn(ctx context.Context, in *protoAuth.SignInRequest) (*protoAuth.UserId, error) {
+	message := logMessage + "SignIn:"
+	log.Debug(message + "started")
+
+	log.Debug(message+"in = ", in)
+
+	u, err := s.authUserRepository.GetUser(in.Mail, utils.CreatePasswordHash(in.Password))
+	if err != nil {
+		return &protoAuth.UserId{}, err
 	}
-	return response, nil
+
+	out := &protoAuth.UserId{
+		ID: u.ID,
+	}
+	return out, nil
 }
