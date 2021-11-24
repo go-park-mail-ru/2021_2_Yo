@@ -4,10 +4,8 @@ import (
 	log "backend/pkg/logger"
 	"backend/pkg/response"
 	"backend/pkg/utils"
-	microAuth "backend/service/auth"
 	"backend/service/email"
 	"backend/service/user"
-	"errors"
 	"net/http"
 	"strings"
 
@@ -17,18 +15,14 @@ import (
 const logMessage = "service:user:delivery:http:"
 
 type Delivery struct {
-	useCase     user.UseCase
-	authService microAuth.UseCase
+	useCase user.UseCase
 }
 
-func NewDelivery(useCase user.UseCase, authService microAuth.UseCase) *Delivery {
+func NewDelivery(useCase user.UseCase) *Delivery {
 	return &Delivery{
-		useCase:     useCase,
-		authService: authService,
+		useCase: useCase,
 	}
 }
-
-//TODO: Проверять везде контекст на пустоту
 
 func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetUser:"
@@ -40,7 +34,7 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Debug(message+"imgUrl =", foundUser.ImgUrl)
-	CSRFToken, err := h.authService.CreateToken(userId)
+	CSRFToken, err := utils.GenerateCsrfToken(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		log.Debug(message+"err = ", err)
 		return
@@ -116,10 +110,7 @@ POST /user/14/subscribe
 func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Subscribe:"
 	log.Debug(message + "started")
-	vars, ok := r.Context().Value("vars").(map[string]string)
-	if !ok {
-		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
-	}
+	vars := r.Context().Value("vars").(map[string]string)
 	userId := r.Context().Value("userId").(string)
 	subscriptedId := vars["id"]
 	err := h.useCase.Subscribe(subscriptedId, userId)
@@ -160,22 +151,13 @@ func (h *Delivery) GetSubscribes(w http.ResponseWriter, r *http.Request) {
 GET /events/14/visit
 */
 func (h *Delivery) GetVisitors(w http.ResponseWriter, r *http.Request) {
-
 	message := logMessage + "Visit:"
 	log.Debug(message + "started")
-
-	eventId, ok := r.Context().Value("eventId").(string)
-	if !ok {
-		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
-	}
-
+	eventId := r.Context().Value("eventId").(string)
 	userList, err := h.useCase.GetVisitors(eventId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
-
 	response.SendResponse(w, response.UserListResponse(userList))
-
 	log.Debug(message + "ended")
-
 }

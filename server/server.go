@@ -97,7 +97,7 @@ func NewApp(opts *Options) (*App, error) {
 
 	userR := userRepository.NewRepositoryClient(userGrpcConn)
 	userUC := userUseCase.NewUseCase(userR)
-	userD := userDelivery.NewDelivery(userUC, authService)
+	userD := userDelivery.NewDelivery(userUC)
 
 	eventPort := viper.GetString("event_port")
 	eventHost := viper.GetString("event_host")

@@ -13,7 +13,6 @@ import (
 const logMessage = "service:auth:delivery:http:"
 
 type Delivery struct {
-	//С большой, так как нужен будет в других функциях
 	UseCase auth.UseCase
 }
 

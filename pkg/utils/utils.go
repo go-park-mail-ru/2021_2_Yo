@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/go-redis/redis"
 	sql "github.com/jmoiron/sqlx"
 	uuid "github.com/satori/go.uuid"
@@ -15,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 const logMessage = "config:"
@@ -94,7 +96,7 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	fileNameParts := strings.Split(handler.Filename, ".")
 	fileNameParts[0] = imgUuid.String()
 	fileName := fileNameParts[0] + "." + fileNameParts[1]
-	fileExtension := filepath.Ext(fileName)
+	fileExtension := strings.ToLower(filepath.Ext(fileName))
 	switch fileExtension {
 	case ".jpg":
 	case ".jpeg":
@@ -121,6 +123,21 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	return "https://bmstusa.ru/images/" + fileName, nil
 }
 
+func GenerateCsrfToken(userId string) (string, error) {
+	message := logMessage + "CreateToken:"
+	log.Debug(message + "started")
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
+		ID:        userId,
+		ExpiresAt: jwt.At(time.Now().Add(time.Hour * 7 * 24)), //Week  P.S. Maybe Frontend should ask us
+	})
+	secretWord := os.Getenv("CSRFSECRET")
+	csrfToken, err := jwtToken.SignedString([]byte(secretWord))
+	if err != nil {
+		return "", err
+	}
+	return csrfToken, err
+}
+
 func CheckIfNoError(w *http.ResponseWriter, err error, msg string, status response.HttpStatus) bool {
 	if err != nil {
 		log.Error(msg+"err =", err)
@@ -135,11 +152,11 @@ type modifiedResponse struct {
 	StatusCode int
 }
 
-func NewModifiedResponse (w http.ResponseWriter) *modifiedResponse {
+func NewModifiedResponse(w http.ResponseWriter) *modifiedResponse {
 	return &modifiedResponse{ResponseWriter: w}
 }
 
-func(w *modifiedResponse) WriteHeader(statusCode int) {
+func (w *modifiedResponse) WriteHeader(statusCode int) {
 	w.StatusCode = statusCode
 	w.ResponseWriter.WriteHeader(statusCode)
 }

@@ -1,20 +1,18 @@
 package http
 
 import (
-	protoAuth "backend/microservice/auth/proto"
 	"backend/pkg/models"
 	"backend/pkg/response"
-	microAuth "backend/service/microservices/auth"
 	error2 "backend/service/user/error"
 	"backend/service/user/usecase"
 	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"testing"
 )
 
@@ -43,16 +41,8 @@ var getUserTests = []struct {
 
 func TestGetUser(t *testing.T) {
 	for _, test := range getUserTests {
-
-		AuthAddr := "localhost:8081"
-		grpcConnAuth, err := grpc.Dial(
-			AuthAddr,
-			grpc.WithInsecure(),
-		)
-		authClient := protoAuth.NewAuthClient(grpcConnAuth)
-		authService := microAuth.NewService(authClient)
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock, authService)
+		deliveryTest := NewDelivery(useCaseMock)
 
 		userId := test.input
 		useCaseMock.On("GetUserById", userId).Return(test.user, test.useCaseErr)
@@ -64,16 +54,9 @@ func TestGetUser(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 		userIdContext := context.WithValue(context.Background(), "userId", userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
-
-		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
-		expected := wTest.Body
-		actual := w.Body
-		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
 
-/*
 var getUserByIdTests = []struct {
 	id         int
 	input      string
@@ -99,16 +82,8 @@ var getUserByIdTests = []struct {
 
 func TestGetUserById(t *testing.T) {
 	for _, test := range getUserByIdTests {
-
-		AuthAddr := "localhost:8081"
-		grpcConnAuth, err := grpc.Dial(
-			AuthAddr,
-			grpc.WithInsecure(),
-		)
-		authClient := protoAuth.NewAuthClient(grpcConnAuth)
-		authService := microAuth.NewService(authClient)
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock, authService)
+		deliveryTest := NewDelivery(useCaseMock)
 
 		userId := test.input
 
@@ -120,12 +95,6 @@ func TestGetUserById(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
-
-		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
-		expected := wTest.Body
-		actual := w.Body
-		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
 
@@ -163,16 +132,8 @@ var updateUserInfoTests = []struct {
 
 func TestUpdateUserInfo(t *testing.T) {
 	for _, test := range updateUserInfoTests {
-
-		AuthAddr := "localhost:8081"
-		grpcConnAuth, err := grpc.Dial(
-			AuthAddr,
-			grpc.WithInsecure(),
-		)
-		authClient := protoAuth.NewAuthClient(grpcConnAuth)
-		authService := microAuth.NewService(authClient)
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock, authService)
+		deliveryTest := NewDelivery(useCaseMock)
 
 		userId := test.input
 
@@ -201,12 +162,6 @@ func TestUpdateUserInfo(t *testing.T) {
 		w := httptest.NewRecorder()
 		userIdContext := context.WithValue(context.Background(), "userId", userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
-
-		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
-		expected := wTest.Body
-		actual := w.Body
-		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
 
@@ -240,16 +195,8 @@ var updateUserPasswordTests = []struct {
 
 func TestUpdateUserPassword(t *testing.T) {
 	for _, test := range updateUserPasswordTests {
-
-		AuthAddr := "localhost:8081"
-		grpcConnAuth, err := grpc.Dial(
-			AuthAddr,
-			grpc.WithInsecure(),
-		)
-		authClient := protoAuth.NewAuthClient(grpcConnAuth)
-		authService := microAuth.NewService(authClient)
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock, authService)
+		deliveryTest := NewDelivery(useCaseMock)
 
 		userId := test.input
 
@@ -277,13 +224,161 @@ func TestUpdateUserPassword(t *testing.T) {
 		w := httptest.NewRecorder()
 		userIdContext := context.WithValue(context.Background(), "userId", userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
-
-		wTest := httptest.NewRecorder()
-		response.SendResponse(wTest, test.output)
-		expected := wTest.Body
-		actual := w.Body
-		require.Equal(t, expected, actual, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
 
-*/
+var subscribeTests = []struct {
+	id         int
+	vars       interface{}
+	userId     interface{}
+	useCaseErr error
+}{
+	{
+		1,
+		map[string]string{
+			"id": "123",
+		},
+		"1",
+		nil,
+	},
+	{
+		2,
+		map[string]string{
+			"id": "123",
+		},
+		"1",
+		errors.New("test_err"),
+	},
+}
+
+func TestVisit(t *testing.T) {
+	for _, test := range subscribeTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		deliveryTest := NewDelivery(useCaseMock)
+
+		var eId string
+		var uId string
+		vars, ok := test.vars.(map[string]string)
+		if ok {
+			eId = vars["id"]
+		}
+		userId, ok := test.userId.(string)
+		if ok {
+			uId = userId
+		}
+
+		useCaseMock.On("Subscribe", eId, uId).Return(test.useCaseErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/test", deliveryTest.Subscribe).Methods("GET")
+		req, err := http.NewRequest("GET", "/test", nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+
+		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
+		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
+		req = req.WithContext(ctxUserId)
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+	}
+}
+
+var getSubscribersTests = []struct {
+	id         int
+	userId     string
+	useCaseErr error
+}{
+	{
+		1,
+		"1",
+		nil,
+	},
+	{
+		2,
+		"1",
+		errors.New("test_err"),
+	},
+}
+
+func TestGetSubscribers(t *testing.T) {
+	for _, test := range getSubscribersTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		deliveryTest := NewDelivery(useCaseMock)
+
+		useCaseMock.On("GetSubscribers", test.userId).Return([]*models.User{}, test.useCaseErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/{id:[0-9]+}", deliveryTest.GetSubscribers).Methods("GET")
+		req, err := http.NewRequest("GET", "/"+test.userId, nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+	}
+}
+
+var getSubscribesTests = []struct {
+	id         int
+	userId     string
+	useCaseErr error
+}{
+	{
+		1,
+		"1",
+		nil,
+	},
+	{
+		2,
+		"1",
+		errors.New("test_err"),
+	},
+}
+
+func TestGetSubscribes(t *testing.T) {
+	for _, test := range getSubscribesTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		deliveryTest := NewDelivery(useCaseMock)
+
+		useCaseMock.On("GetSubscribes", test.userId).Return([]*models.User{}, test.useCaseErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/{id:[0-9]+}", deliveryTest.GetSubscribes).Methods("GET")
+		req, err := http.NewRequest("GET", "/"+test.userId, nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+	}
+}
+
+var getVisitorsTests = []struct {
+	id         int
+	eventId    string
+	useCaseErr error
+}{
+	{
+		1,
+		"1",
+		nil,
+	},
+	{
+		2,
+		"1",
+		errors.New("test_err"),
+	},
+}
+
+func TestGetVisitors(t *testing.T) {
+	for _, test := range getVisitorsTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		deliveryTest := NewDelivery(useCaseMock)
+
+		useCaseMock.On("GetVisitors", test.eventId).Return([]*models.User{}, test.useCaseErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/test", deliveryTest.GetVisitors).Methods("GET")
+		req, err := http.NewRequest("GET", "/test", nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+		w := httptest.NewRecorder()
+		eventIdCtx := context.WithValue(context.Background(), "eventId", test.eventId)
+		r.ServeHTTP(w, req.WithContext(eventIdCtx))
+	}
+}

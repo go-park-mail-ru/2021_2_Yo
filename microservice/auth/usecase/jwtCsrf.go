@@ -2,6 +2,7 @@ package usecase
 
 import (
 	protoAuth "backend/microservice/auth/proto"
+	"backend/pkg/utils"
 	"context"
 	"github.com/dgrijalva/jwt-go/v4"
 	log "github.com/sirupsen/logrus"
@@ -32,12 +33,7 @@ func parseToken(susToken string, signingKey []byte) (string, error) {
 func (s *authService) CreateToken(ctx context.Context, protoUserId *protoAuth.UserId) (*protoAuth.CSRFToken, error) {
 	message := logMessage + "CreateToken:"
 	log.Debug(message + "started")
-	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
-		ID:        protoUserId.ID,
-		ExpiresAt: jwt.At(time.Now().Add(time.Hour * 7 * 24)), //Week  P.S. Maybe Frontend should ask us
-	})
-	secretWord := os.Getenv("CSRFSECRET")
-	csrfToken, err := jwtToken.SignedString([]byte(secretWord))
+	csrfToken, err := utils.GenerateCsrfToken(protoUserId.ID)
 	if err != nil {
 		return &protoAuth.CSRFToken{}, err
 	}
