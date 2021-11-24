@@ -9,15 +9,6 @@ import (
 	"net/http"
 )
 
-func useMiddlewares(r *mux.Router, path string, handlerFunc http.HandlerFunc, middlewares ...mux.MiddlewareFunc) *mux.Router {
-	result := r.NewRoute().Subrouter()
-	result.HandleFunc(path, handlerFunc)
-	for _, mw := range middlewares {
-		result.Use(mw)
-	}
-	return result
-}
-
 func AuthHTTPEndpoints(r *mux.Router, delivery *authHttp.Delivery, middlewares *middleware.Middlewares) {
 	r.HandleFunc("/signup", delivery.SignUp)
 	r.HandleFunc("/login", delivery.SignIn)
@@ -31,11 +22,15 @@ func UserHTTPEndpoints(r *mux.Router, uDelivery *userHttp.Delivery, eDelivery *e
 	r.HandleFunc("/{id:[0-9]+}/events/created", eDelivery.GetCreatedEvents).Methods("GET")
 	r.HandleFunc("/{id:[0-9]+}/subscribers", uDelivery.GetSubscribers).Methods("GET")
 	r.HandleFunc("/{id:[0-9]+}/subscriptions", uDelivery.GetSubscribes).Methods("GET")
-	//getUserHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.GetUser)))
-	//r.Handle("", getUserHandlerFunc).Methods("GET")
-	r.Handle("", useMiddlewares(r, "", uDelivery.GetUser, mws.GetVars, mws.Auth)).Methods("GET")
-	r.Handle("/info", useMiddlewares(r, "/info", uDelivery.UpdateUserInfo, mws.GetVars, mws.Auth)).Methods("POST")
-	r.Handle("/password", useMiddlewares(r, "/password", uDelivery.UpdateUserPassword, mws.GetVars, mws.Auth)).Methods("POST")
+
+	getUserHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.GetUser)))
+	r.Handle("", getUserHandlerFunc).Methods("GET")
+
+	updateUserInfoHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.UpdateUserInfo)))
+	r.Handle("/info", updateUserInfoHandlerFunc).Methods("POST")
+
+	updateUserPasswordHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.UpdateUserPassword)))
+	r.Handle("/password", updateUserPasswordHandlerFunc).Methods("POST")
 	//
 
 	subscribeHandleFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.Subscribe)))
@@ -67,10 +62,12 @@ func EventHTTPEndpoints(r *mux.Router, delivery *eventHttp.Delivery, mws *middle
 	createEventHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.CreateEvent)))
 	r.Handle("", createEventHandlerFunc).Methods("POST")
 	//
-	r.Handle("/{id:[0-9]+}/favourite",
-		useMiddlewares(r, "/{id:[0-9]+}/favourite", delivery.Visit, mws.GetVars, mws.Auth)).Methods("POST")
-	r.Handle("/{id:[0-9]+}/favourite",
-		useMiddlewares(r, "/{id:[0-9]+}/favourite", delivery.Unvisit, mws.GetVars, mws.Auth)).Methods("DELETE")
-	r.Handle("/{id:[0-9]+}/favourite",
-		useMiddlewares(r, "/{id:[0-9]+}/favourite", delivery.IsVisited, mws.GetVars, mws.Auth)).Methods("GET")
+	visitHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.Visit)))
+	r.Handle("/{id:[0-9]+}/favourite", visitHandlerFunc).Methods("POST")
+
+	unvisitHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.Visit)))
+	r.Handle("/{id:[0-9]+}/favourite", unvisitHandlerFunc).Methods("DELETE")
+
+	isVisitedHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.Visit)))
+	r.Handle("/{id:[0-9]+}/favourite", isVisitedHandlerFunc).Methods("GET")
 }
