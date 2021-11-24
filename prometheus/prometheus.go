@@ -44,7 +44,6 @@ func NewMetricsMiddleware() *metricsMiddleware {
 func (mm *metricsMiddleware) Metrics(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sw := utils.NewModifiedResponse(w)
-		log.Info(r.URL.Path)
 		if r.URL.Path != "/metrics" {
 			mm.requestNow.With(prometheus.Labels{
 				"method": r.Method, 

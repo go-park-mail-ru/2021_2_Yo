@@ -83,7 +83,6 @@ func (m *Middlewares) Auth(next http.Handler) http.Handler {
 		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 			return
 		}
-		log.Debug(message+"cookie.value =", cookie.Value)
 		userId, err := m.authService.CheckSession(cookie.Value)
 		if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 			return
@@ -97,7 +96,6 @@ func (m *Middlewares) CSRF(next http.Handler) http.Handler {
 	message := logMessage + "CSRF:"
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gottenToken := (*r).Header.Get("X-CSRF-Token")
-		log.Info("gottenToken", gottenToken)
 		userId, err := m.authService.CheckToken(gottenToken)
 		if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
 			return
