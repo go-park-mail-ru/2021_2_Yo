@@ -345,6 +345,7 @@ func (s *Repository) Visit(ctx context.Context, in *proto.VisitRequest) (*proto.
 	query := visitQuery
 	_, err = s.db.Query(query, eventIdInt, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return &proto.Empty{}, error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
@@ -367,6 +368,7 @@ func (s *Repository) Unvisit(ctx context.Context, in *proto.VisitRequest) (*prot
 	query := unvisitQuery
 	_, err = s.db.Query(query, eventIdInt, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return &proto.Empty{}, error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
