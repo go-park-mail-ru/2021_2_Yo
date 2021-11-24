@@ -65,11 +65,12 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
 
 	url := "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address"
 	url += "?lat="+latitude+"&lon="+longitude;
-	
+	log.Info("here")
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Error(err)
 	}
+	log.Info("here")
 	req.Header.Set("Accept","application/json")
 	req.Header.Set("Authorization", "Token aaa00e3861df0b3fe38857306563ad4bee84550f")
 
@@ -78,10 +79,12 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
 	if err != nil {
 		log.Error(err)
 	}
+	log.Info("here")
 	body, err := ioutil.ReadAll(resp.Body)  
 	if err != nil {
 		log.Error(err)
 	}
+	log.Info("here")
 
 	type Data struct {
 		City string `json:"city,omittempty`
@@ -102,6 +105,7 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
 	if err != nil {
 		log.Error(err)
 	}
+	log.Info("here")
 	addr := suggestions.Suggestions[0].Value
 	city := suggestions.Suggestions[0].Data.City
 	log.Debug("Ended cityAndAddr")
