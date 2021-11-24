@@ -63,7 +63,7 @@ func MakeModelEvent(out *proto.Event) *models.Event {
 func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
 	url := "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address"
 	url += "?lat="+latitude+"&lon="+longitude;
-	
+	log.Info(url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Error(err)
