@@ -36,3 +36,11 @@ type EventResponseBody struct {
 type EventListResponseBody struct {
 	Events []EventResponseBody `json:"events"`
 }
+
+type SubscribedResponseBody struct {
+	Result bool `json:"result"`
+}
+
+type FavouriteResponseBody struct {
+	Result bool `json:"result"`
+}

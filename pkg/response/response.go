@@ -8,14 +8,6 @@ const logMessage = "response:response:"
 
 type HttpStatus int
 
-const STATUS_OK = 200
-const STATUS_ERROR = 404
-
-type BaseResponse struct {
-	Status  int    `json:"status"`
-	Message string `json:"message,omitempty"`
-}
-
 type Response struct {
 	Status  int         `json:"status"`
 	Message string      `json:"message,omitempty"`
@@ -82,5 +74,25 @@ func EventListResponse(events []*models.Event) *Response {
 		Status:  200,
 		Message: "",
 		Body:    MakeEventListResponseBody(events),
+	}
+}
+
+func SubscribedResponse(result bool) *Response {
+	return &Response{
+		Status:  200,
+		Message: "",
+		Body: models.SubscribedResponseBody{
+			Result: result,
+		},
+	}
+}
+
+func FavouriteResponse(result bool) *Response {
+	return &Response{
+		Status:  200,
+		Message: "",
+		Body: models.FavouriteResponseBody{
+			Result: result,
+		},
 	}
 }

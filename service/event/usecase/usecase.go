@@ -6,10 +6,10 @@ import (
 	"backend/pkg/models"
 	error2 "backend/service/event/error"
 	"context"
-	"strings"
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"strings"
 )
 
 const logMessage = "service:event:usecase:"
@@ -58,15 +58,15 @@ func MakeModelEvent(out *proto.Event) *models.Event {
 	}
 }
 
-func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
+func сityAndAddrByCoordinates(latitude, longitude string) (string, string) {
 	url := "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address"
-	url += "?lat="+latitude+"&lon="+longitude;
-	
+	url += "?lat=" + latitude + "&lon=" + longitude
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Error(err)
 	}
-	req.Header.Set("Accept","application/json")
+	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", "Token aaa00e3861df0b3fe38857306563ad4bee84550f")
 
 	client := &http.Client{}
@@ -74,7 +74,7 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
 	if err != nil {
 		log.Error(err)
 	}
-	body, err := ioutil.ReadAll(resp.Body)  
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Error(err)
 	}
@@ -84,9 +84,9 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
 	}
 
 	type AddrInfo struct {
-		Value string `json:"value,omittempty`
+		Value              string `json:"value,omittempty`
 		Unrestricted_value string `json:"unresticted_value,omitempty`
-		Data Data `json:"data,omitempty"`
+		Data               Data   `json:"data,omitempty"`
 	}
 
 	type Suggest struct {
@@ -100,7 +100,7 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
 	}
 	addr := suggestions.Suggestions[0].Value
 	city := suggestions.Suggestions[0].Data.City
-	
+
 	return city, addr
 }
 
@@ -120,8 +120,8 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 		e.Tag[i] = strings.ToLower(tag)
 	}
 	lat, lng := parseCoordinates(e.Geo)
-	e.City,_ = сityAndAddrByCoordinates(lat,lng)
-	
+	e.City, _ = сityAndAddrByCoordinates(lat, lng)
+
 	in := MakeProtoEvent(e)
 	res, err := a.eventRepo.CreateEvent(context.Background(), in)
 	if err != nil {
@@ -141,14 +141,14 @@ func (a *UseCase) UpdateEvent(e *models.Event, userId string) error {
 		e.Tag[i] = strings.ToLower(tag)
 	}
 	lat, lng := parseCoordinates(e.Geo)
-	e.City,_ = сityAndAddrByCoordinates(lat,lng)
+	e.City, _ = сityAndAddrByCoordinates(lat, lng)
 
 	in := &proto.UpdateEventRequest{
 		Event:  MakeProtoEvent(e),
 		UserId: userId,
 	}
 	_, err := a.eventRepo.UpdateEvent(context.Background(), in)
-	log.Debug(logMessage+"UpdateEvent:HERE")
+	log.Debug(logMessage + "UpdateEvent:HERE")
 	return err
 }
 
@@ -197,18 +197,6 @@ func (a *UseCase) GetEvents(title string, category string, tags []string) ([]*mo
 	return result, nil
 }
 
-func (a *UseCase) Visit(eventId string, userId string) error {
-	if eventId == "" || userId == "" {
-		return error2.ErrEmptyData
-	}
-	in := &proto.VisitRequest{
-		EventId: eventId,
-		UserId:  userId,
-	}
-	_, err := a.eventRepo.Visit(context.Background(), in)
-	return err
-}
-
 func (a *UseCase) GetVisitedEvents(userId string) ([]*models.Event, error) {
 	if userId == "" {
 		return nil, error2.ErrEmptyData
@@ -241,4 +229,41 @@ func (a *UseCase) GetCreatedEvents(userId string) ([]*models.Event, error) {
 		result[i] = MakeModelEvent(protoEvent)
 	}
 	return result, nil
+}
+
+func (a *UseCase) Visit(eventId string, userId string) error {
+	if eventId == "" || userId == "" {
+		return error2.ErrEmptyData
+	}
+	in := &proto.VisitRequest{
+		EventId: eventId,
+		UserId:  userId,
+	}
+	_, err := a.eventRepo.Visit(context.Background(), in)
+	return err
+}
+
+func (a *UseCase) Unvisit(eventId string, userId string) error {
+	if eventId == "" || userId == "" {
+		return error2.ErrEmptyData
+	}
+	in := &proto.VisitRequest{
+		EventId: eventId,
+		UserId:  userId,
+	}
+	_, err := a.eventRepo.Unvisit(context.Background(), in)
+	return err
+}
+
+func (a *UseCase) IsVisited(eventId string, userId string) (bool, error) {
+	if eventId == "" || userId == "" {
+		return false, error2.ErrEmptyData
+	}
+	in := &proto.VisitRequest{
+		EventId: eventId,
+		UserId:  userId,
+	}
+	out, err := a.eventRepo.IsVisited(context.Background(), in)
+	result := out.Result
+	return result, err
 }

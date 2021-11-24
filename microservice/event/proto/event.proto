@@ -61,6 +61,10 @@ message VisitRequest {
     string userId = 2;
 }
 
+message IsVisitedRequest {
+    bool Result = 1;
+}
+
 message Empty {}
 
 service Repository {
@@ -69,7 +73,9 @@ service Repository {
     rpc DeleteEvent(DeleteEventRequest) returns (Empty) {}
     rpc GetEventById(EventId) returns (Event) {}
     rpc GetEvents(GetEventsRequest) returns (Events) {}
-    rpc Visit(VisitRequest) returns (Empty) {}
     rpc GetVisitedEvents(UserId) returns (Events) {}
     rpc GetCreatedEvents(UserId) returns (Events) {}
+    rpc Visit(VisitRequest) returns (Empty) {}
+    rpc Unvisit(VisitRequest) returns (Empty) {}
+    rpc IsVisited(VisitRequest) returns (IsVisitedRequest) {}
 }

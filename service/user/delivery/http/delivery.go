@@ -104,23 +104,6 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "ended")
 }
 
-/*
-POST /user/14/subscribe
-*/
-func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "Subscribe:"
-	log.Debug(message + "started")
-	vars := r.Context().Value("vars").(map[string]string)
-	userId := r.Context().Value("userId").(string)
-	subscriptedId := vars["id"]
-	err := h.useCase.Subscribe(subscriptedId, userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
-		return
-	}
-	response.SendResponse(w, response.OkResponse())
-	log.Debug(message + "ended")
-}
-
 func (h *Delivery) GetSubscribers(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetSubscribers:"
 	log.Debug(message + "started")
@@ -147,9 +130,6 @@ func (h *Delivery) GetSubscribes(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "ended")
 }
 
-/*
-GET /events/14/visit
-*/
 func (h *Delivery) GetVisitors(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Visit:"
 	log.Debug(message + "started")
@@ -159,5 +139,47 @@ func (h *Delivery) GetVisitors(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response.SendResponse(w, response.UserListResponse(userList))
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "Subscribe:"
+	log.Debug(message + "started")
+	vars := r.Context().Value("vars").(map[string]string)
+	subscriberId := r.Context().Value("userId").(string)
+	subscribedId := vars["id"]
+	err := h.useCase.Subscribe(subscribedId, subscriberId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) Unsubscribe(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "Subscribe:"
+	log.Debug(message + "started")
+	vars := r.Context().Value("vars").(map[string]string)
+	subscriberId := r.Context().Value("userId").(string)
+	subscribedId := vars["id"]
+	err := h.useCase.Unsubscribe(subscribedId, subscriberId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) IsSubscribed(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "IsSubscribed:"
+	log.Debug(message + "started")
+	vars := r.Context().Value("vars").(map[string]string)
+	subscriberId := r.Context().Value("userId").(string)
+	subscribedId := vars["id"]
+	res, err := h.useCase.IsSubscribed(subscribedId, subscriberId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	response.SendResponse(w, response.SubscribedResponse(res))
 	log.Debug(message + "ended")
 }

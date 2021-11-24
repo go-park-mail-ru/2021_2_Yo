@@ -129,44 +129,11 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	category := vars["category"]
 	tag := vars["tags"]
 	tags := strings.Split(tag, "|")
-	//err := response.ValidateAndSanitize(title)
-	//if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-	//	return
-	//}
 	eventsList, err := h.useCase.GetEvents(title, category, tags)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
 	response.SendResponse(w, response.EventListResponse(eventsList))
-}
-
-/*
-GET /user/14/visited
-*/
-func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
-
-	message := logMessage + "Visit:"
-	log.Debug(message + "started")
-
-	vars, ok := r.Context().Value("vars").(map[string]string)
-	if !ok {
-		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
-	}
-	userId, ok := r.Context().Value("userId").(string)
-	if !ok {
-		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
-	}
-	eventId := vars["id"]
-
-	err := h.useCase.Visit(eventId, userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
-		return
-	}
-
-	response.SendResponse(w, response.OkResponse())
-
-	log.Debug(message + "ended")
-
 }
 
 func (h *Delivery) GetVisitedEvents(w http.ResponseWriter, r *http.Request) {
@@ -191,4 +158,67 @@ func (h *Delivery) GetCreatedEvents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response.SendResponse(w, response.EventListResponse(eventList))
+}
+
+func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "Visit:"
+	log.Debug(message + "started")
+	vars, ok := r.Context().Value("vars").(map[string]string)
+	if !ok {
+		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+	}
+	userId, ok := r.Context().Value("userId").(string)
+	if !ok {
+		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+	}
+	eventId := vars["id"]
+	err := h.useCase.Visit(eventId, userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) Unvisit(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "Visit:"
+	log.Debug(message + "started")
+	vars, ok := r.Context().Value("vars").(map[string]string)
+	if !ok {
+		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+	}
+	userId, ok := r.Context().Value("userId").(string)
+	if !ok {
+		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+	}
+	eventId := vars["id"]
+	err := h.useCase.Unvisit(eventId, userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
+}
+
+/*
+GET /user/14/visited
+*/
+func (h *Delivery) IsVisited(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "Visit:"
+	log.Debug(message + "started")
+	vars, ok := r.Context().Value("vars").(map[string]string)
+	if !ok {
+		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+	}
+	userId, ok := r.Context().Value("userId").(string)
+	if !ok {
+		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+	}
+	eventId := vars["id"]
+	res, err := h.useCase.IsVisited(eventId, userId)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	response.SendResponse(w, response.FavouriteResponse(res))
+	log.Debug(message + "ended")
 }

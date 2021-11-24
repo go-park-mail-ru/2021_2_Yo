@@ -2,7 +2,7 @@ syntax = "proto3";
 
 //PATH="${PATH}:${HOME}/go/bin" protoc --go_out=plugins=grpc:. *.proto
 
-option go_package = ".;userGrpc";
+option go_package = "/userGrpc";
 package userGrpc;
 
 message UserId {
@@ -28,13 +28,17 @@ message Users {
     repeated User users = 1;
 }
 
+message EventId {
+    string ID = 1;
+}
+
 message SubscribeRequest {
     string SubscribedId = 1;
     string SubscriberId = 2;
 }
 
-message EventId {
-    string ID = 1;
+message IsSubscribedRequest {
+    bool Result = 1;
 }
 
 message Empty {}
@@ -43,8 +47,10 @@ service Repository {
     rpc GetUserById(UserId) returns (User) {}
     rpc UpdateUserInfo(User) returns (Empty) {}
     rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (Empty) {}
-    rpc Subscribe(SubscribeRequest) returns (Empty) {}
     rpc GetSubscribers(UserId) returns (Users) {}
     rpc GetSubscribes(UserId) returns (Users) {}
     rpc GetVisitors(EventId) returns (Users) {}
+    rpc Subscribe(SubscribeRequest) returns (Empty) {}
+    rpc Unsubscribe(SubscribeRequest) returns (Empty) {}
+    rpc IsSubscribed(SubscribeRequest) returns (IsSubscribedRequest) {}
 }

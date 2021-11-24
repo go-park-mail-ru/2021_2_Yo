@@ -18,7 +18,8 @@ CREATE TABLE "event" (
                          viewed BIGINT not null,
                          img_url varchar(500),
                          date varchar(10) not null,
-                         geo varchar(255) not null,
+                         geo varchar(255) default '' not null,
+                         address varchar(255) default '' not null,
                          tag varchar(30)[],
                          author_id int references "user" (id) on delete cascade not null
 );
