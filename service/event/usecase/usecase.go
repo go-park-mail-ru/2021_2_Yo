@@ -78,7 +78,7 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
 	}
 	body, err := ioutil.ReadAll(resp.Body)  
 	if err != nil {
-		//handle read response error
+		log.Debug(string(body))
 	}
 
 	type Data struct {
