@@ -37,6 +37,7 @@ func MakeProtoEvent(e *models.Event) *proto.Event {
 		Tag:         e.Tag,
 		Date:        e.Date,
 		Geo:         e.Geo,
+		Address: 	 e.Address,
 		AuthorId:    e.AuthorId,
 	}
 }
@@ -54,6 +55,7 @@ func MakeModelEvent(out *proto.Event) *models.Event {
 		Tag:         out.Tag,
 		Date:        out.Date,
 		Geo:         out.Geo,
+		Address: 	 out.Address,
 		AuthorId:    out.AuthorId,
 	}
 }
@@ -120,7 +122,7 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 		e.Tag[i] = strings.ToLower(tag)
 	}
 	lat, lng := parseCoordinates(e.Geo)
-	e.City,_ = сityAndAddrByCoordinates(lat,lng)
+	e.City,e.Address = сityAndAddrByCoordinates(lat,lng)
 	
 	in := MakeProtoEvent(e)
 	res, err := a.eventRepo.CreateEvent(context.Background(), in)
@@ -141,7 +143,7 @@ func (a *UseCase) UpdateEvent(e *models.Event, userId string) error {
 		e.Tag[i] = strings.ToLower(tag)
 	}
 	lat, lng := parseCoordinates(e.Geo)
-	e.City,_ = сityAndAddrByCoordinates(lat,lng)
+	e.City,e.Address = сityAndAddrByCoordinates(lat,lng)
 
 	in := &proto.UpdateEventRequest{
 		Event:  MakeProtoEvent(e),

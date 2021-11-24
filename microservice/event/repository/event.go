@@ -20,6 +20,7 @@ type Event struct {
 	Tag         pq.StringArray `db:"tag"`
 	Date        string         `db:"date"`
 	Geo         string         `db:"geo"`
+	Address		string         `db:"address"`
 	AuthorID    int            `db:"author_id"`
 }
 
@@ -45,6 +46,7 @@ func toPostgresEvent(e *models.Event) (*Event, error) {
 		Tag:         e.Tag,
 		Date:        e.Date,
 		Geo:         e.Geo,
+		Address: 	 e.Address,
 		AuthorID:    authorIdInt,
 	}, nil
 }
@@ -62,6 +64,7 @@ func toModelEvent(e *Event) *models.Event {
 		Tag:         e.Tag,
 		Date:        e.Date,
 		Geo:         e.Geo,
+		Address: 	 e.Address,
 		AuthorId:    strconv.Itoa(e.AuthorID),
 	}
 }
@@ -79,6 +82,7 @@ func toProtoEvent(e *models.Event) *proto.Event {
 		Tag:         e.Tag,
 		Date:        e.Date,
 		Geo:         e.Geo,
+		Address: 	 e.Address,
 		AuthorId:    e.AuthorId,
 	}
 }
@@ -96,6 +100,7 @@ func fromProtoToModel(in *proto.Event) *models.Event {
 		Tag:         in.Tag,
 		Date:        in.Date,
 		Geo:         in.Geo,
+		Address: 	 in.Address,
 		AuthorId:    in.AuthorId,
 	}
 }
