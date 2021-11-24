@@ -4,8 +4,6 @@ import (
 	"backend/pkg/utils"
 	"net/http"
 	"strconv"
-	log "backend/pkg/logger"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"time"
