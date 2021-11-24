@@ -2,6 +2,7 @@ package usecase
 
 import (
 	proto "backend/microservice/user/proto"
+	log "backend/pkg/logger"
 	"backend/pkg/models"
 	"backend/pkg/utils"
 	error2 "backend/service/user/error"
@@ -163,6 +164,7 @@ func (a *UseCase) IsSubscribed(subscribedId string, subscriberId string) (bool, 
 	if subscribedId == "" || subscriberId == "" {
 		return false, error2.ErrEmptyData
 	}
+	log.Debug(subscribedId, " ", subscriberId)
 	if subscribedId == subscriberId {
 		return false, nil
 	}
