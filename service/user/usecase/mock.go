@@ -24,11 +24,6 @@ func (m *UseCaseMock) UpdateUserPassword(userId string, password string) error {
 	return args.Error(0)
 }
 
-func (m *UseCaseMock) Subscribe(subscribedId string, subscriberId string) error {
-	args := m.Called(subscribedId, subscriberId)
-	return args.Error(0)
-}
-
 func (m *UseCaseMock) GetSubscribers(userId string) ([]*models.User, error) {
 	args := m.Called(userId)
 	return args.Get(0).([]*models.User), args.Error(1)
@@ -42,4 +37,19 @@ func (m *UseCaseMock) GetSubscribes(userId string) ([]*models.User, error) {
 func (m *UseCaseMock) GetVisitors(eventId string) ([]*models.User, error) {
 	args := m.Called(eventId)
 	return args.Get(0).([]*models.User), args.Error(1)
+}
+
+func (m *UseCaseMock) Subscribe(subscribedId string, subscriberId string) error {
+	args := m.Called(subscribedId, subscriberId)
+	return args.Error(0)
+}
+
+func (m *UseCaseMock) Unsubscribe(subscribedId string, subscriberId string) error {
+	args := m.Called(subscribedId, subscriberId)
+	return args.Error(0)
+}
+
+func (m *UseCaseMock) IsSubscribed(subscribedId string, subscriberId string) (bool, error) {
+	args := m.Called(subscribedId, subscriberId)
+	return args.Get(0).(bool), args.Error(1)
 }

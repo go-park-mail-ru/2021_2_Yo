@@ -37,9 +37,12 @@ func UserHTTPEndpoints(r *mux.Router, uDelivery *userHttp.Delivery, eDelivery *e
 	r.Handle("/info", useMiddlewares(r, "/info", uDelivery.UpdateUserInfo, mws.GetVars, mws.Auth)).Methods("POST")
 	r.Handle("/password", useMiddlewares(r, "/password", uDelivery.UpdateUserPassword, mws.GetVars, mws.Auth)).Methods("POST")
 	//
-	r.Handle("/{id:[0-9]}/subscription", useMiddlewares(r, "", uDelivery.Subscribe, mws.GetVars, mws.Auth)).Methods("POST")
-	r.Handle("/{id:[0-9]}/subscription", useMiddlewares(r, "", uDelivery.Unsubscribe, mws.GetVars, mws.Auth)).Methods("DELETE")
-	r.Handle("/{id:[0-9]}/subscription", useMiddlewares(r, "", uDelivery.IsSubscribed, mws.GetVars, mws.Auth)).Methods("GET")
+	r.Handle("/{id:[0-9]}/subscription",
+		useMiddlewares(r, "/{id:[0-9]}/subscription", uDelivery.Subscribe, mws.GetVars, mws.Auth)).Methods("POST")
+	r.Handle("/{id:[0-9]}/subscription",
+		useMiddlewares(r, "/{id:[0-9]}/subscription", uDelivery.Unsubscribe, mws.GetVars, mws.Auth)).Methods("DELETE")
+	r.Handle("/{id:[0-9]}/subscription",
+		useMiddlewares(r, "/{id:[0-9]}/subscription", uDelivery.IsSubscribed, mws.GetVars, mws.Auth)).Methods("GET")
 	//
 }
 
@@ -61,7 +64,10 @@ func EventHTTPEndpoints(r *mux.Router, delivery *eventHttp.Delivery, mws *middle
 	createEventHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.CreateEvent)))
 	r.Handle("", createEventHandlerFunc).Methods("POST")
 	//
-	r.Handle("/{id:[0-9]+}/favourite", useMiddlewares(r, "", delivery.Visit, mws.GetVars, mws.Auth)).Methods("POST")
-	r.Handle("/{id:[0-9]+}/favourite", useMiddlewares(r, "", delivery.Unvisit, mws.GetVars, mws.Auth)).Methods("DELETE")
-	r.Handle("/{id:[0-9]+}/favourite", useMiddlewares(r, "", delivery.IsVisited, mws.GetVars, mws.Auth)).Methods("GET")
+	r.Handle("/{id:[0-9]+}/favourite",
+		useMiddlewares(r, "/{id:[0-9]+}/favourite", delivery.Visit, mws.GetVars, mws.Auth)).Methods("POST")
+	r.Handle("/{id:[0-9]+}/favourite",
+		useMiddlewares(r, "/{id:[0-9]+}/favourite", delivery.Unvisit, mws.GetVars, mws.Auth)).Methods("DELETE")
+	r.Handle("/{id:[0-9]+}/favourite",
+		useMiddlewares(r, "/{id:[0-9]+}/favourite", delivery.IsVisited, mws.GetVars, mws.Auth)).Methods("GET")
 }
