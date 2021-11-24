@@ -28,15 +28,12 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetUser:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	log.Debug(message+"userId =", userId)
 	foundUser, err := h.useCase.GetUserById(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	log.Debug(message+"imgUrl =", foundUser.ImgUrl)
 	CSRFToken, err := utils.GenerateCsrfToken(userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
-		log.Debug(message+"err = ", err)
 		return
 	}
 	w.Header().Set("X-CSRF-Token", CSRFToken)
@@ -60,7 +57,6 @@ func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserInfo:"
 	log.Debug(message + "started")
-	log.Debug(message+"maxMemory =", 5<<20)
 	err := r.ParseMultipartForm(5 << 20)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return

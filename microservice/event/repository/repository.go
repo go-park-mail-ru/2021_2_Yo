@@ -352,7 +352,7 @@ func (s *Repository) Visit(ctx context.Context, in *proto.VisitRequest) (*proto.
 }
 
 func (s *Repository) Unvisit(ctx context.Context, in *proto.VisitRequest) (*proto.Empty, error) {
-	message := logMessage + "Visit:"
+	message := logMessage + "Unvisit:"
 	log.Debug(message + "started")
 	eventId := in.EventId
 	userId := in.UserId
@@ -374,7 +374,7 @@ func (s *Repository) Unvisit(ctx context.Context, in *proto.VisitRequest) (*prot
 }
 
 func (s *Repository) IsVisited(ctx context.Context, in *proto.VisitRequest) (*proto.IsVisitedRequest, error) {
-	message := logMessage + "Unsubscribe:"
+	message := logMessage + "IsVisited:"
 	log.Debug(message + "started")
 	eventId := in.EventId
 	userId := in.UserId
@@ -391,6 +391,7 @@ func (s *Repository) IsVisited(ctx context.Context, in *proto.VisitRequest) (*pr
 	result := false
 	err = s.db.Get(&count, query, eventIdInt, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return &proto.IsVisitedRequest{}, error2.ErrPostgres
 	}
 	if count > 0 {

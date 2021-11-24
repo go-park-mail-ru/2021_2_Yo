@@ -252,7 +252,7 @@ func (s *Repository) Unsubscribe(ctx context.Context, in *proto.SubscribeRequest
 }
 
 func (s *Repository) IsSubscribed(ctx context.Context, in *proto.SubscribeRequest) (*proto.IsSubscribedRequest, error) {
-	message := logMessage + "Unsubscribe:"
+	message := logMessage + "IsSubscribed:"
 	log.Debug(message + "started")
 	subscribedId := in.SubscribedId
 	subscriberId := in.SubscriberId
