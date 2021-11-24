@@ -100,6 +100,8 @@ func GetEventFromRequest(r io.Reader) (*models.Event, error) {
 		Tag:         eventInput.Tag,
 		Date:        eventInput.Date,
 		Geo:         eventInput.Geo,
+		Address:	 eventInput.Address,
+		
 	}
 	return result, nil
 }
@@ -117,6 +119,7 @@ func MakeEventResponseBody(e *models.Event) models.EventResponseBody {
 		Tag:         e.Tag,
 		Date:        e.Date,
 		Geo:         e.Geo,
+		Address: 	 e.Address,
 		AuthorID:    e.AuthorId,
 	}
 }

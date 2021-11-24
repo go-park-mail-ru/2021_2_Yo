@@ -28,17 +28,17 @@ const (
 	listQuery        = `select * from "event"`
 	getEventQuery    = `select * from "event" where id = $1`
 	createEventQuery = `insert into "event" 
-		(title, description, text, city, category, viewed, img_url, date, geo, tag, author_id) 
-		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::varchar[], $11) 
+		(title, description, text, city, category, viewed, img_url, date, geo, address, tag, author_id) 
+		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::varchar[], $12) 
 		returning id`
 	updateEventQuery = `update "event" set
 		title = $1, description = $2, text = $3, city = $4, category = $5, 
-		viewed = $6, img_url = $7, date = $8, geo = $9, tag = $10 
-		where event.id = $11`
+		viewed = $6, img_url = $7, date = $8, geo = $9, address = $10, tag = $11 
+		where event.id = $12`
 	updateEventQueryWithoutImgUrl = `update "event" set
 		title = $1, description = $2, text = $3, city = $4, category = $5, 
-		viewed = $6, date = $7, geo = $8, tag = $9 
-		where event.id = $10`
+		viewed = $6, date = $7, geo = $8, address = $9, tag = $10 
+		where event.id = $11`
 	deleteEventQuery = `delete from "event" where id = $1`
 	visitedQuery     = `select e.* from "event" as e join visitor as v on v.event_id = e.id where v.user_id = $1`
 	createdQuery     = `select * from "event" where author_id = $1`
@@ -83,6 +83,7 @@ func (s *Repository) CreateEvent(ctx context.Context, in *proto.Event) (*proto.E
 		newEvent.ImgUrl,
 		newEvent.Date,
 		newEvent.Geo,
+		newEvent.Address,
 		newEvent.Tag,
 		newEvent.AuthorID)
 	if err != nil {
@@ -132,6 +133,7 @@ func (s *Repository) UpdateEvent(ctx context.Context, in *proto.UpdateEventReque
 			postgresEvent.ImgUrl,
 			postgresEvent.Date,
 			postgresEvent.Geo,
+			postgresEvent.Address,
 			postgresEvent.Tag,
 			postgresEvent.ID)
 		if err != nil {
@@ -148,6 +150,7 @@ func (s *Repository) UpdateEvent(ctx context.Context, in *proto.UpdateEventReque
 			postgresEvent.Viewed,
 			postgresEvent.Date,
 			postgresEvent.Geo,
+			postgresEvent.Address,
 			postgresEvent.Tag,
 			postgresEvent.ID)
 		if err != nil {
@@ -236,6 +239,7 @@ func (s *Repository) GetEvents(ctx context.Context, in *proto.GetEventsRequest) 
 	query += "order by viewed DESC"
 	rows, err := s.db.Queryx(query, title, category, postgresTags)
 	if err != nil {
+		log.Error(message, "err = ", err)
 		return &proto.Events{}, err
 	}
 	defer rows.Close()
@@ -244,6 +248,7 @@ func (s *Repository) GetEvents(ctx context.Context, in *proto.GetEventsRequest) 
 		var e Event
 		err := rows.StructScan(&e)
 		if err != nil {
+			log.Error(message, "err = ", err)
 			return &proto.Events{}, error2.ErrPostgres
 		}
 		modelEvent := toModelEvent(&e)

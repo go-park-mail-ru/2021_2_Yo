@@ -21,7 +21,8 @@ message Event {
     repeated string Tag = 9;
     string Date = 10;
     string Geo = 11;
-    string AuthorId = 12;
+    string Address = 12;
+    string AuthorId = 13;
 }
 
 message EventId {

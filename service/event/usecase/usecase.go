@@ -37,6 +37,7 @@ func MakeProtoEvent(e *models.Event) *proto.Event {
 		Tag:         e.Tag,
 		Date:        e.Date,
 		Geo:         e.Geo,
+		Address: 	 e.Address,
 		AuthorId:    e.AuthorId,
 	}
 }
@@ -54,14 +55,15 @@ func MakeModelEvent(out *proto.Event) *models.Event {
 		Tag:         out.Tag,
 		Date:        out.Date,
 		Geo:         out.Geo,
+		Address: 	 out.Address,
 		AuthorId:    out.AuthorId,
 	}
 }
 
 func сityAndAddrByCoordinates(latitude, longitude string) (string, string) {
 	url := "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address"
-	url += "?lat=" + latitude + "&lon=" + longitude
-
+	url += "?lat="+latitude+"&lon="+longitude;
+	log.Info(url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Error(err)
@@ -78,7 +80,6 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string) {
 	if err != nil {
 		log.Error(err)
 	}
-
 	type Data struct {
 		City string `json:"city,omittempty`
 	}
@@ -92,8 +93,8 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string) {
 	type Suggest struct {
 		Suggestions []AddrInfo `json:"suggestions,omitempty"`
 	}
-
 	suggestions := Suggest{}
+	
 	err = json.Unmarshal(body, &suggestions)
 	if err != nil {
 		log.Error(err)
@@ -106,7 +107,7 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string) {
 
 func parseCoordinates(coords string) (string, string) {
 	coordsArr := strings.Split(coords, " ")
-	lat := coordsArr[0][1:]
+	lat := coordsArr[0][1:len(coordsArr[0])-1]
 	lng := coordsArr[1][:len(coordsArr[1])-1]
 	log.Debug("x =", lat, "y =", lng)
 	return lat, lng
@@ -120,10 +121,12 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 		e.Tag[i] = strings.ToLower(tag)
 	}
 	lat, lng := parseCoordinates(e.Geo)
-	e.City, _ = сityAndAddrByCoordinates(lat, lng)
-
+	e.City,e.Address = сityAndAddrByCoordinates(lat,lng)
+	
 	in := MakeProtoEvent(e)
+	log.Info("before repo")
 	res, err := a.eventRepo.CreateEvent(context.Background(), in)
+	log.Info(res)
 	if err != nil {
 		return "", err
 	}
@@ -141,7 +144,7 @@ func (a *UseCase) UpdateEvent(e *models.Event, userId string) error {
 		e.Tag[i] = strings.ToLower(tag)
 	}
 	lat, lng := parseCoordinates(e.Geo)
-	e.City, _ = сityAndAddrByCoordinates(lat, lng)
+	e.City,e.Address = сityAndAddrByCoordinates(lat,lng)
 
 	in := &proto.UpdateEventRequest{
 		Event:  MakeProtoEvent(e),
