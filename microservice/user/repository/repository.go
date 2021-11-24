@@ -222,6 +222,7 @@ func (s *Repository) Subscribe(ctx context.Context, in *proto.SubscribeRequest) 
 	query := subscribeQuery
 	_, err = s.db.Query(query, subscribedIdInt, subscriberIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return &proto.Empty{}, error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
