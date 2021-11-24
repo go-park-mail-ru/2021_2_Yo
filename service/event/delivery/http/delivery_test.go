@@ -480,3 +480,127 @@ func TestVisit(t *testing.T) {
 		r.ServeHTTP(w, req)
 	}
 }
+
+var unvisitTests = []struct {
+	id         int
+	vars       interface{}
+	userId     interface{}
+	useCaseErr error
+}{
+	{
+		1,
+		map[string]string{
+			"id": "123",
+		},
+		"1",
+		nil,
+	},
+	{
+		2,
+		errors.New(""),
+		"2",
+		errors.New("test_err"),
+	},
+	{
+		3,
+		map[string]string{
+			"id": "123",
+		},
+		errors.New(""),
+		errors.New("test_err"),
+	},
+}
+
+func TestUnvisit(t *testing.T) {
+	for _, test := range unvisitTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		deliveryTest := NewDelivery(useCaseMock)
+
+		var eId string
+		var uId string
+		vars, ok := test.vars.(map[string]string)
+		if ok {
+			eId = vars["id"]
+		}
+		userId, ok := test.userId.(string)
+		if ok {
+			uId = userId
+		}
+
+		useCaseMock.On("Unvisit", eId, uId).Return(test.useCaseErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/test", deliveryTest.Unvisit).Methods("GET")
+		req, err := http.NewRequest("GET", "/test", nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+
+		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
+		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
+		req = req.WithContext(ctxUserId)
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+	}
+}
+
+var isVisitedTests = []struct {
+	id         int
+	vars       interface{}
+	userId     interface{}
+	useCaseErr error
+}{
+	{
+		1,
+		map[string]string{
+			"id": "123",
+		},
+		"1",
+		nil,
+	},
+	{
+		2,
+		errors.New(""),
+		"2",
+		errors.New("test_err"),
+	},
+	{
+		3,
+		map[string]string{
+			"id": "123",
+		},
+		errors.New(""),
+		errors.New("test_err"),
+	},
+}
+
+func TestIsVisited(t *testing.T) {
+	for _, test := range unvisitTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		deliveryTest := NewDelivery(useCaseMock)
+
+		var eId string
+		var uId string
+		vars, ok := test.vars.(map[string]string)
+		if ok {
+			eId = vars["id"]
+		}
+		userId, ok := test.userId.(string)
+		if ok {
+			uId = userId
+		}
+
+		useCaseMock.On("IsVisited", eId, uId).Return(true, test.useCaseErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/test", deliveryTest.IsVisited).Methods("GET")
+		req, err := http.NewRequest("GET", "/test", nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+
+		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
+		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
+		req = req.WithContext(ctxUserId)
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+	}
+}

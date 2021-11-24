@@ -56,5 +56,5 @@ func (m *UseCaseMock) Unvisit(eventId string, userId string) error {
 
 func (m *UseCaseMock) IsVisited(eventId string, userId string) (bool, error) {
 	args := m.Called(eventId, userId)
-	return args.Get(0).(bool), args.Error(0)
+	return args.Get(0).(bool), args.Error(1)
 }

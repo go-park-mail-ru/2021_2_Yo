@@ -176,7 +176,6 @@ func (h *Delivery) IsSubscribed(w http.ResponseWriter, r *http.Request) {
 	vars := r.Context().Value("vars").(map[string]string)
 	subscriberId := r.Context().Value("userId").(string)
 	subscribedId := vars["id"]
-	log.Debug(message + "subscribedId = " + subscribedId + " subscriberId = " + subscriberId)
 	res, err := h.useCase.IsSubscribed(subscribedId, subscriberId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
