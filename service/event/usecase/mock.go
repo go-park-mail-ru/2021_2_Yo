@@ -34,11 +34,6 @@ func (m *UseCaseMock) GetEvents(title string, category string, tags []string) ([
 	return args.Get(0).([]*models.Event), args.Error(1)
 }
 
-func (m *UseCaseMock) Visit(eventId string, userId string) error {
-	args := m.Called(eventId, userId)
-	return args.Error(0)
-}
-
 func (m *UseCaseMock) GetCreatedEvents(authorId string) ([]*models.Event, error) {
 	args := m.Called(authorId)
 	return args.Get(0).([]*models.Event), args.Error(1)
@@ -47,4 +42,19 @@ func (m *UseCaseMock) GetCreatedEvents(authorId string) ([]*models.Event, error)
 func (m *UseCaseMock) GetVisitedEvents(userId string) ([]*models.Event, error) {
 	args := m.Called(userId)
 	return args.Get(0).([]*models.Event), args.Error(1)
+}
+
+func (m *UseCaseMock) Visit(eventId string, userId string) error {
+	args := m.Called(eventId, userId)
+	return args.Error(0)
+}
+
+func (m *UseCaseMock) Unvisit(eventId string, userId string) error {
+	args := m.Called(eventId, userId)
+	return args.Error(0)
+}
+
+func (m *UseCaseMock) IsVisited(eventId string, userId string) (bool, error) {
+	args := m.Called(eventId, userId)
+	return args.Get(0).(bool), args.Error(0)
 }

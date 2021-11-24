@@ -163,6 +163,9 @@ func (a *UseCase) IsSubscribed(subscribedId string, subscriberId string) (bool, 
 	if subscribedId == "" || subscriberId == "" {
 		return false, error2.ErrEmptyData
 	}
+	if subscribedId == subscriberId {
+		return false, nil
+	}
 	in := &proto.SubscribeRequest{
 		SubscribedId: subscribedId,
 		SubscriberId: subscriberId,
