@@ -164,7 +164,7 @@ func (a *UseCase) IsSubscribed(subscribedId string, subscriberId string) (bool, 
 	if subscribedId == "" || subscriberId == "" {
 		return false, error2.ErrEmptyData
 	}
-	log.Debug(subscribedId, " ", subscriberId)
+	log.Debug("HEY"+subscribedId, " ", subscriberId)
 	if subscribedId == subscriberId {
 		return false, nil
 	}
