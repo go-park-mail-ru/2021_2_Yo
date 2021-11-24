@@ -40,7 +40,6 @@ func (s *UseCase) SignIn(u *models.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	userId := out.ID
 	return userId, nil
 }
