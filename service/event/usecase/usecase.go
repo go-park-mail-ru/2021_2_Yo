@@ -61,6 +61,8 @@ func MakeModelEvent(out *proto.Event) *models.Event {
 }
 
 func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
+	log.Debug("Started cityAndAddr")
+
 	url := "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address"
 	url += "?lat="+latitude+"&lon="+longitude;
 	
@@ -102,7 +104,7 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
 	}
 	addr := suggestions.Suggestions[0].Value
 	city := suggestions.Suggestions[0].Data.City
-	
+	log.Debug("Ended cityAndAddr")
 	return city, addr
 }
 
@@ -125,7 +127,9 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 	e.City,e.Address = сityAndAddrByCoordinates(lat,lng)
 	
 	in := MakeProtoEvent(e)
+	log.Info("before repo")
 	res, err := a.eventRepo.CreateEvent(context.Background(), in)
+	log.Info(res)
 	if err != nil {
 		return "", err
 	}
