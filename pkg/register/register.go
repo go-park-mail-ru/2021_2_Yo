@@ -37,12 +37,15 @@ func UserHTTPEndpoints(r *mux.Router, uDelivery *userHttp.Delivery, eDelivery *e
 	r.Handle("/info", useMiddlewares(r, "/info", uDelivery.UpdateUserInfo, mws.GetVars, mws.Auth)).Methods("POST")
 	r.Handle("/password", useMiddlewares(r, "/password", uDelivery.UpdateUserPassword, mws.GetVars, mws.Auth)).Methods("POST")
 	//
-	r.Handle("/{id:[0-9]}/subscription",
-		useMiddlewares(r, "/{id:[0-9]}/subscription", uDelivery.Subscribe, mws.GetVars, mws.Auth)).Methods("POST")
-	r.Handle("/{id:[0-9]}/subscription",
-		useMiddlewares(r, "/{id:[0-9]}/subscription", uDelivery.Unsubscribe, mws.GetVars, mws.Auth)).Methods("DELETE")
-	r.Handle("/{id:[0-9]}/subscription",
-		useMiddlewares(r, "/{id:[0-9]}/subscription", uDelivery.IsSubscribed, mws.GetVars, mws.Auth)).Methods("GET")
+
+	subscribeHandleFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.Subscribe)))
+	r.Handle("/{id:[0-9]}/subscription", subscribeHandleFunc).Methods("POST")
+
+	unsubscribeHandleFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.Unsubscribe)))
+	r.Handle("/{id:[0-9]}/subscription", unsubscribeHandleFunc).Methods("DELETE")
+
+	isSubscribedHandleFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.IsSubscribed)))
+	r.Handle("/{id:[0-9]}/subscription", isSubscribedHandleFunc).Methods("GET")
 	//
 }
 
