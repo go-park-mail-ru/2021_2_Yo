@@ -78,9 +78,9 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string)  {
 	}
 	body, err := ioutil.ReadAll(resp.Body)  
 	if err != nil {
-		log.Debug(string(body))
+		log.Error(err)
 	}
-
+	log.Debug(string(body))
 	type Data struct {
 		City string `json:"city,omittempty`
 	}
