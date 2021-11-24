@@ -114,7 +114,7 @@ func (h *Delivery) GetSubscribers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Delivery) GetSubscribes(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "GetSubscribers:"
+	message := logMessage + "GetSubscribes:"
 	log.Debug(message + "started")
 	vars := mux.Vars(r)
 	userId := vars["id"]
@@ -127,7 +127,7 @@ func (h *Delivery) GetSubscribes(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Delivery) GetVisitors(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "Visit:"
+	message := logMessage + "GetVisitors:"
 	log.Debug(message + "started")
 	eventId := r.Context().Value("eventId").(string)
 	userList, err := h.useCase.GetVisitors(eventId)
@@ -153,7 +153,7 @@ func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Delivery) Unsubscribe(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "Subscribe:"
+	message := logMessage + "Unsubscribe:"
 	log.Debug(message + "started")
 	vars := r.Context().Value("vars").(map[string]string)
 	subscriberId := r.Context().Value("userId").(string)

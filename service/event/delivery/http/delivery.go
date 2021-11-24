@@ -181,7 +181,7 @@ func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Delivery) Unvisit(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "Visit:"
+	message := logMessage + "Unvisit:"
 	log.Debug(message + "started")
 	vars, ok := r.Context().Value("vars").(map[string]string)
 	if !ok {
@@ -204,7 +204,7 @@ func (h *Delivery) Unvisit(w http.ResponseWriter, r *http.Request) {
 GET /user/14/visited
 */
 func (h *Delivery) IsVisited(w http.ResponseWriter, r *http.Request) {
-	message := logMessage + "Visit:"
+	message := logMessage + "IsVisited:"
 	log.Debug(message + "started")
 	vars, ok := r.Context().Value("vars").(map[string]string)
 	if !ok {
