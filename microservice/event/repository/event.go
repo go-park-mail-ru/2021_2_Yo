@@ -4,8 +4,9 @@ import (
 	proto "backend/microservice/event/proto"
 	"backend/pkg/models"
 	error2 "backend/service/event/error"
-	"github.com/lib/pq"
 	"strconv"
+
+	"github.com/lib/pq"
 )
 
 type Event struct {
