@@ -9,10 +9,10 @@ import (
 const logMessage = "service:session:repository:"
 
 type Repository struct {
-	db *redis.Client
+	db redis.Cmdable
 }
 
-func NewRepository(database *redis.Client) *Repository {
+func NewRepository(database redis.Cmdable) *Repository {
 	return &Repository{
 		db: database,
 	}

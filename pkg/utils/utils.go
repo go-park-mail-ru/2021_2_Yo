@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/go-redis/redis"
-	sql "github.com/jmoiron/sqlx"
+	"github.com/jmoiron/sqlx"
 	uuid "github.com/satori/go.uuid"
 	"github.com/spf13/viper"
 	"io"
@@ -44,7 +44,7 @@ func CreatePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
-func InitPostgresDB() (*sql.DB, error) {
+func InitPostgresDB() (*sqlx.DB, error) {
 	message := logMessage + "InitPostgresDB:"
 	log.Debug(message + "started")
 
@@ -57,7 +57,7 @@ func InitPostgresDB() (*sql.DB, error) {
 	connStr := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s", host, port, user, dbname, password, sslmode)
 	log.Debug(message+"connStr =", connStr)
 
-	db, err := sql.Connect("postgres", connStr)
+	db, err := sqlx.Connect("postgres", connStr)
 	if err != nil {
 		log.Error(message+"err =", err)
 		return nil, err

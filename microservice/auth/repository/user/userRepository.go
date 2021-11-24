@@ -5,9 +5,9 @@ import (
 	"backend/pkg/models"
 	error2 "backend/service/auth/error"
 	sql2 "database/sql"
-	sql "github.com/jmoiron/sqlx"
 	"strconv"
 	"strings"
+	"github.com/jmoiron/sqlx"
 )
 
 const (
@@ -17,10 +17,10 @@ const (
 )
 
 type Repository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewRepository(database *sql.DB) *Repository {
+func NewRepository(database *sqlx.DB) *Repository {
 	return &Repository{
 		db: database,
 	}
