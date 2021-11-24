@@ -383,7 +383,9 @@ func TestIsSubscribed(t *testing.T) {
 			SubscribedId: test.subscribedId,
 			SubscriberId: test.subscriberId,
 		}
-		repositoryMock.On("IsSubscribed", context.Background(), in).Return(&userGrpc.Empty{}, test.outputErr)
+		repositoryMock.On("IsSubscribed", context.Background(), in).Return(&userGrpc.IsSubscribedRequest{
+			Result: test.outputRes,
+		}, test.outputErr)
 		actualRes, actualErr := useCaseTest.IsSubscribed(test.subscribedId, test.subscriberId)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 		require.Equal(t, test.outputRes, actualRes, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")

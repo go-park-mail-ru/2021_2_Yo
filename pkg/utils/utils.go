@@ -27,11 +27,10 @@ var (
 
 func GetSecret() (string, error) {
 	message := logMessage + "getSecret:"
-	log.Debug(message + "started")
 	secret := os.Getenv("SECRET")
 	if secret == "" {
 		secret = "secret1234"
-		err := errors.New("Can't get secret from environment")
+		err := errors.New("can't get secret from environment")
 		log.Error(message+"err =", err)
 		return secret, nil
 	}
@@ -46,7 +45,6 @@ func CreatePasswordHash(password string) string {
 
 func InitPostgresDB() (*sqlx.DB, error) {
 	message := logMessage + "InitPostgresDB:"
-	log.Debug(message + "started")
 
 	user := viper.GetString("postgres_db.user")
 	password := viper.GetString("postgres_db.password")
@@ -124,8 +122,7 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 }
 
 func GenerateCsrfToken(userId string) (string, error) {
-	message := logMessage + "CreateToken:"
-	log.Debug(message + "started")
+	message := logMessage + "GenerateCsrfToken:"
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
 		ID:        userId,
 		ExpiresAt: jwt.At(time.Now().Add(time.Hour * 7 * 24)), //Week  P.S. Maybe Frontend should ask us
@@ -133,6 +130,7 @@ func GenerateCsrfToken(userId string) (string, error) {
 	secretWord := os.Getenv("CSRFSECRET")
 	csrfToken, err := jwtToken.SignedString([]byte(secretWord))
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return "", err
 	}
 	return csrfToken, err
