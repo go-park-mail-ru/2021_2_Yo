@@ -65,9 +65,9 @@ func EventHTTPEndpoints(r *mux.Router, delivery *eventHttp.Delivery, mws *middle
 	visitHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.Visit)))
 	r.Handle("/{id:[0-9]+}/favourite", visitHandlerFunc).Methods("POST")
 
-	unvisitHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.Visit)))
+	unvisitHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.Unvisit)))
 	r.Handle("/{id:[0-9]+}/favourite", unvisitHandlerFunc).Methods("DELETE")
 
-	isVisitedHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.Visit)))
+	isVisitedHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.IsVisited)))
 	r.Handle("/{id:[0-9]+}/favourite", isVisitedHandlerFunc).Methods("GET")
 }
