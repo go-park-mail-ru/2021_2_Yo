@@ -7,7 +7,7 @@ type UserResponseBody struct {
 	About    string `json:"description,omitempty" valid:"type(string),length(0|150)" san:"xss"`
 	ImgUrl   string `json:"imgUrl,omitempty" valid:"type(string)" san:"xss"`
 	Mail     string `json:"email,omitempty" valid:"email,length(0|150)" san:"xss"`
-	Password string `json:"password,omitempty" valid:"type(string),length(0|50)" san:"xss"`
+	Password string `json:"password,omitempty" valid:"type(string),length(0|150)" san:"xss"`
 }
 
 type UserListResponseBody struct {
