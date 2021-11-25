@@ -178,7 +178,7 @@ func (s *Repository) DeleteEvent(ctx context.Context, in *proto.DeleteEventReque
 	if err != nil {
 		return &proto.Empty{}, error2.ErrAtoi
 	}
-
+	log.Debug(logMessage+"DeleteEvent: eventId, userId = ",eventIdInt, " ", userIdInt)
 	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
 		return &proto.Empty{}, err

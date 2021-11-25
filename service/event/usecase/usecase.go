@@ -168,7 +168,7 @@ func (a *UseCase) UpdateEvent(e *models.Event, userId string) error {
 	return err
 }
 
-func (a *UseCase) DeleteEvent(userId string, eventID string) error {
+func (a *UseCase) DeleteEvent(eventID string, userId string) error {
 	if userId == "" || eventID == "" {
 		return error2.ErrEmptyData
 	}
