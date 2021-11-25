@@ -46,16 +46,8 @@ func UserHTTPEndpoints(r *mux.Router, uDelivery *userHttp.Delivery, eDelivery *e
 
 func EventHTTPEndpoints(r *mux.Router, delivery *eventHttp.Delivery, mws *middleware.Middlewares) {
 	//TODO: Попросить фронт заменить "query" на "title", ибо понятно, почему.
-	/*
-		r.HandleFunc("", delivery.GetEvents).Queries("query", "{query}", "category", "{category}", "tags", "{tags}").Methods("GET")
-		r.HandleFunc("", delivery.GetEvents).Queries("query", "{query}", "category", "{category}").Methods("GET")
-		r.HandleFunc("", delivery.GetEvents).Queries("query", "{query}", "tags", "{tags}").Methods("GET")
-		r.HandleFunc("", delivery.GetEvents).Queries("query", "{query}").Methods("GET")
-		r.HandleFunc("", delivery.GetEvents).Queries("category", "{category}", "tags", "{tags}").Methods("GET")
-		r.HandleFunc("", delivery.GetEvents).Queries("category", "{category}").Methods("GET")
-		r.HandleFunc("", delivery.GetEvents).Queries("tags", "{tags}").Methods("GET")
-	*/
 	r.HandleFunc("", delivery.GetEvents).Methods("GET")
+	r.HandleFunc("cities", delivery.GetCities).Methods("GET")
 	r.HandleFunc("/{id:[0-9]+}", delivery.GetEventById).Methods("GET")
 	updateEventHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.UpdateEvent)))
 	r.Handle("/{id:[0-9]+}", updateEventHandlerFunc).Methods("POST")
