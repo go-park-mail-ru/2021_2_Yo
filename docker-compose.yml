@@ -6,22 +6,64 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres-db
+      - auth
+      - event
+      - user
+
+  auth:
+    build:
+      context: ./ 
+      dockerfile: ./microservice/auth/Dockerfile
+    command: "./auth"
+    ports:
+      - "8081:8081"
+    depends_on:
       - redis-db
 
-
-  postgres-db:
-    restart: always
-    image: postgres:latest
-    environment:
-      - POSTGRES_PASSWORD=password
+  event:
+    build:
+      context: ./ 
+      dockerfile: ./microservice/event/Dockerfile
+    command: "./event"
     ports:
-      - "5432:5432"
+      - "8083:8083"
+
+  user:
+    build:
+      context: ./ 
+      dockerfile: ./microservice/user/Dockerfile
+    command: "./user"
+    ports:
+      - "8084:8084"
+  
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./prometheus:/etc/prometheus"
+
+# for remote
+#  postgres-db:
+#    restart: always
+#   image: postgres:latest
+#   environment:
+#     - POSTGRES_PASSWORD=password
+#  ports:
+#    - "5432:5432"
   
   redis-db:
     restart: always
     image: redis:latest
     ports:
-      - "6379:6379"
+      - "6380:6379"
+
+  
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
 
     
