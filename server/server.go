@@ -1,147 +1,165 @@
 package server
 
 import (
-	authDelivery "backend/auth/delivery/http"
-	authRepository "backend/auth/repository/postgres"
-	authUseCase "backend/auth/usecase"
-	"backend/csrf"
-	csrfMiddleware "backend/csrf/middleware"
-	csrfRepository "backend/csrf/repository"
-	imgRepository "backend/images/repository"
-	"backend/images"
-	_ "backend/docs"
-	eventDelivery "backend/event/delivery/http"
-	eventRepository "backend/event/repository/postgres"
-	eventUseCase "backend/event/usecase"
-	log "backend/logger"
+	log "backend/pkg/logger"
+	"backend/pkg/register"
+	"backend/pkg/utils"
+	authDelivery "backend/service/auth/delivery/http"
+	"errors"
+
+	userRepository "backend/microservice/user/proto"
+	userDelivery "backend/service/user/delivery/http"
+	userUseCase "backend/service/user/usecase"
+
+	eventRepository "backend/microservice/event/proto"
+	eventDelivery "backend/service/event/delivery/http"
+	eventUseCase "backend/service/event/usecase"
+
 	"backend/middleware"
-	"backend/session"
-	sessionMiddleware "backend/session/middleware"
-	sessionRepository "backend/session/repository"
-	"backend/utils"
 	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
-	httpSwagger "github.com/swaggo/http-swagger"
+	"github.com/spf13/viper"
+	"google.golang.org/grpc"
+
+	protoAuth "backend/microservice/auth/proto"
+	authUseCase "backend/service/auth/usecase"
+
+	"backend/prometheus"
 )
 
 const logMessage = "server:"
 
-type App struct {
-	authManager    *authDelivery.Delivery
-	eventManager   *eventDelivery.Delivery
-	sessionManager *session.Manager
-	csrfManager    *csrf.Manager
-	imgManager     *images.Manager
-	db             *sql.DB
+type Options struct {
+	LogLevel logrus.Level
+	Testing  bool
 }
 
-func NewApp(logLevel logrus.Level) (*App, error) {
-	message := logMessage + "NewApp:"
-	log.Init(logLevel)
-	log.Info(fmt.Sprintf(message+"started, log level = %s", logLevel))
+type App struct {
+	Options      *Options
+	AuthManager  *authDelivery.Delivery
+	UserManager  *userDelivery.Delivery
+	EventManager *eventDelivery.Delivery
+	db           *sql.DB
+}
 
-	secret, err := utils.GetSecret()
-	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, err
+func NewApp(opts *Options) (*App, error) {
+	if opts == nil {
+		return nil, errors.New("Unexpected NewApp error")
 	}
+	message := logMessage + "NewApp:"
+	log.Init(opts.LogLevel)
+	log.Info(fmt.Sprintf(message+"started, log level = %s", opts.LogLevel))
+
 	db, err := utils.InitPostgresDB()
 	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, err
-	}
-	redisConnSessions, err := utils.InitRedisDB("redis_db_session")
-	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, err
+		log.Error(message+"err = ", err)
+		if !opts.Testing {
+			return nil, err
+		}
 	}
 
-	redisConnCSRFTokens, err := utils.InitRedisDB("redis_db_csrf")
+	authPort := viper.GetString("auth_port")
+	authHost := viper.GetString("auth_host")
+	AuthAddr := authHost + ":" + authPort
+
+	grpcConnAuth, err := grpc.Dial(
+		AuthAddr,
+		grpc.WithInsecure(),
+	)
 	if err != nil {
-		log.Error(message+"err =", err)
-		return nil, err
+		log.Error(message+"err = ", err)
+		if !opts.Testing {
+			return nil, err
+		}
 	}
 
-	sessionR := sessionRepository.NewRepository(redisConnSessions)
-	sessionM := session.NewManager(*sessionR)
-	csrfR := csrfRepository.NewRepository(redisConnCSRFTokens)
-	csrfM := csrf.NewManager(*csrfR)
-	imgR := imgRepository.NewRepository(db)
-	imgM := images.NewManager(*imgR)
-	authR := authRepository.NewRepository(db)
-	authUC := authUseCase.NewUseCase(authR, []byte(secret))
-	authD := authDelivery.NewDelivery(authUC, *sessionM, *csrfM, *imgM)
-	eventR := eventRepository.NewRepository(db)
+	authClient := protoAuth.NewAuthClient(grpcConnAuth)
+	authService := authUseCase.NewUseCase(authClient)
+	authD := authDelivery.NewDelivery(authService)
+
+	userPort := viper.GetString("user_port")
+	userHost := viper.GetString("user_host")
+	userMicroserviceAddr := userHost + ":" + userPort
+
+	userGrpcConn, err := grpc.Dial(userMicroserviceAddr, grpc.WithInsecure())
+	if err != nil {
+		log.Error(message+"err = ", err)
+		if !opts.Testing {
+			return nil, err
+		}
+	}
+
+	userR := userRepository.NewRepositoryClient(userGrpcConn)
+	userUC := userUseCase.NewUseCase(userR)
+	userD := userDelivery.NewDelivery(userUC)
+
+	eventPort := viper.GetString("event_port")
+	eventHost := viper.GetString("event_host")
+	eventMicroserviceAddr := eventHost + ":" + eventPort
+
+	eventGrpcConn, err := grpc.Dial(eventMicroserviceAddr, grpc.WithInsecure())
+	if err != nil {
+		log.Error(message+"err = ", err)
+		if !opts.Testing {
+			return nil, err
+		}
+	}
+
+	eventR := eventRepository.NewRepositoryClient(eventGrpcConn)
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
 	return &App{
-		authManager:    authD,
-		eventManager:   eventD,
-		sessionManager: sessionM,
-		csrfManager:    csrfM,
-		imgManager:     imgM,
-		db:             db,
+		Options:      opts,
+		AuthManager:  authD,
+		UserManager:  userD,
+		EventManager: eventD,
+		db:           db,
 	}, nil
 }
 
-func options(w http.ResponseWriter, r *http.Request) {}
+func options(w http.ResponseWriter, r *http.Request) {
+	cookie, _ := r.Cookie("session_id")
+	log.Debug("options: ", cookie)
+}
 
 func newRouterWithEndpoints(app *App) *mux.Router {
-	mw := middleware.NewMiddleware()
-	sessionMW := sessionMiddleware.NewMiddleware(*app.sessionManager)
-	csrfMW := csrfMiddleware.NewMiddleware(*app.csrfManager)
-	authRouter := mux.NewRouter()
-	CSRFRouter := authRouter.Methods("POST").Subrouter()
-	authRouter.HandleFunc("/logout", app.authManager.Logout).Methods("GET")
-	authRouter.HandleFunc("/user", app.authManager.GetUser).Methods("GET")
-	authRouter.HandleFunc("/user/info", app.authManager.UpdateUserInfo).Methods("POST")
-	authRouter.HandleFunc("/user/password", app.authManager.UpdateUserPassword).Methods("POST")
-	authRouter.HandleFunc("/user/avatar",app.authManager.UpdateUserPhoto).Methods("POST")
-	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
-	authRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
-	authRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
-	CSRFRouter.HandleFunc("/user/info", app.authManager.UpdateUserInfo).Methods("POST")
-	CSRFRouter.HandleFunc("/user/password", app.authManager.UpdateUserPassword).Methods("POST")
-	CSRFRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.UpdateEvent).Methods("POST")
-	CSRFRouter.HandleFunc("/events/{id:[0-9]+}", app.eventManager.DeleteEvent).Methods("DELETE")
-	CSRFRouter.HandleFunc("/events", app.eventManager.CreateEvent).Methods("POST")
-	authRouter.Use(sessionMW.Auth)
-	authRouter.Use(mw.GetVars)
-	CSRFRouter.Use(csrfMW.CSRF)
+	mw := middleware.NewMiddlewares(app.AuthManager.UseCase)
+	mm := prometheus.NewMetricsMiddleware()
 
 	r := mux.NewRouter()
-	r.Methods("OPTIONS").HandlerFunc(options)
-	r.HandleFunc("/signup", app.authManager.SignUp).Methods("POST")
-	r.HandleFunc("/login", app.authManager.SignIn).Methods("POST")
-	r.Handle("/logout", authRouter)
-	r.Handle("/user", authRouter)
-	r.HandleFunc("/user/{id:[0-9]+}", app.authManager.GetUserById).Methods("GET")
-	r.Handle("/user/info", authRouter)
-	r.Handle("/user/password", authRouter)
-	r.HandleFunc("/events", app.eventManager.GetEventsFromAuthor).Queries("authorid", "{authorid:[0-9]+}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "category", "{category}", "tags", "{tags}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "category", "{category}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}", "tags", "{tags}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("query", "{query}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("category", "{category}", "tags", "{tags}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("category", "{category}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Queries("tags", "{tags}").Methods("GET")
-	r.HandleFunc("/events", app.eventManager.GetEvents).Methods("GET")
-	r.HandleFunc("/events/{id:[0-9]+}", app.eventManager.GetEvent).Methods("GET")
-	r.Handle("/events/{id:[0-9]+}", authRouter)
-	r.Handle("/events", authRouter).Methods("POST")
-	r.PathPrefix("/documentation").Handler(httpSwagger.WrapHandler)
-	r.Handle("/user/avatar", authRouter)
-
+	r.Use(mw.GetVars)
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
+	r.Use(mm.Metrics)
+	r.Methods("OPTIONS").HandlerFunc(options)
+
+	//TODO: Потом раскоментить и убрать то, что снизу
+	//authRouter := r.PathPrefix("/auth").Subrouter()
+	//register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)
+
+	r.HandleFunc("/auth/signup", app.AuthManager.SignUp).Methods("POST")
+	r.HandleFunc("/auth/login", app.AuthManager.SignIn).Methods("POST")
+	logoutHandlerFunc := http.HandlerFunc(app.AuthManager.Logout)
+	r.Handle("/auth/logout", mw.Auth(logoutHandlerFunc))
+
+	eventRouter := r.PathPrefix("/events").Subrouter()
+	eventRouter.Methods("POST").Subrouter().Use(mw.CSRF)
+
+	register.EventHTTPEndpoints(eventRouter, app.EventManager, mw)
+
+	userRouter := r.PathPrefix("/user").Subrouter()
+	userRouter.Methods("POST").Subrouter().Use(mw.CSRF)
+	register.UserHTTPEndpoints(userRouter, app.UserManager, app.EventManager, mw)
+
+	r.Handle("/metrics", promhttp.Handler())
 
 	return r
 }
@@ -153,15 +171,17 @@ func (app *App) Run() error {
 	message := logMessage + "Run:"
 	log.Info(message + "start")
 	r := newRouterWithEndpoints(app)
-
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = viper.GetString("bmstusa_port")
 	}
 	log.Info(message+"port =", port)
+	if app.Options.Testing {
+		port = "wrong port"
+	}
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
-		log.Error(message+"err =", err)
+		log.Error(message+"err = ", err)
 		return err
 	}
 	return nil

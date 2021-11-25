@@ -1,42 +1,37 @@
 package main
 
 import (
-	_ "backend/docs"
 	"backend/server"
+	"os"
+
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"os"
 )
 
-//@title BMSTUSA API
-//@version 1.0
-//@description TP_2021_GO TEAM YO
-// @termsOfService http://swagger.io/terms/
+func env() {
+	// loads values from .env into the system
+	if err := godotenv.Load(); err != nil {
+		log.Print("No .env file found")
+	}
+}
 
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-//@host yobmstu.herokuapp.com
-//@BasePath /
-//@schemes https
 func main() {
+	env()
 	log.Info("Main : start")
-
-	viper.AddConfigPath("configs")
+	viper.AddConfigPath("config")
 	viper.SetConfigName("config")
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Error("main:err = ", err)
 		os.Exit(1)
 	}
-
-	logLevel := log.DebugLevel
-	app, err := server.NewApp(logLevel)
+	opts := &server.Options{
+		LogLevel: log.DebugLevel,
+		Testing:  false,
+	}
+	app, err := server.NewApp(opts)
 	if err != nil {
 		log.Error("main:err = ", err)
 		os.Exit(1)

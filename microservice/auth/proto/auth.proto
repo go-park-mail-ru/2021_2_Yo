@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+//export PATH=$PATH:$HOME/go/bin
+//export PATH=$PATH:/usr/local/go/bin
+//protoc --go_out=plugins=grpc:. *.proto
+
+option go_package = "/authGrpc";
+package authGrpc;
+
+message UserId {
+    string ID = 1;
+}
+
+message SignUpRequest {
+    string Name = 1;
+    string Surname = 2;
+    string Mail = 3;
+    string Password = 4;
+}
+
+message SignInRequest {
+    string Mail = 1;
+    string Password = 2;
+}
+
+message Session {
+    string Session = 1;
+}
+
+message CSRFToken {
+    string CSRFToken = 1;
+}
+
+message Success {
+    string Ok = 1;
+}
+
+service Auth {
+    rpc SignUp (SignUpRequest) returns (UserId) {}
+    rpc SignIn (SignInRequest) returns (UserId) {}
+    rpc CreateSession (UserId) returns (Session) {}
+    rpc CheckSession (Session) returns (UserId) {}
+    rpc DeleteSession (Session) returns (Success) {}
+    rpc CreateToken (UserId) returns (CSRFToken) {}
+    rpc CheckToken (CSRFToken) returns (UserId) {}
+}

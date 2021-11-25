@@ -13,8 +13,6 @@ RUN go mod download
 
 COPY . .
 
-RUN apt-get install ca-certificates -y
-
 RUN go build 
 
 EXPOSE 8080
