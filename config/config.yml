@@ -22,8 +22,8 @@ postgres_db:
     dbname: "postgres"
     sslmode: "disable"
 
-main_host:
-    "http://127.0.0.1:3000"
-
 #main_host:
-#    "https://bmstusssa.herokuapp.com"
+#   "http://127.0.0.1:3000"
+
+main_host:
+    "https://bmstusssa.herokuapp.com"

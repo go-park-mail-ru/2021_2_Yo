@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	//authServiceModels "backend/microservice/auth/models"
+	authServiceModels "backend/microservice/auth/models"
 	protoAuth "backend/microservice/auth/proto"
 	"context"
 	"testing"
@@ -9,14 +9,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-/*
+
 func TestCreateSession(t *testing.T) {
 	sessionRepositoryMock := new(AuthSessionMock)
 	authRepositoryMock := new(AuthRepoMock)
 	useCaseTest := NewService(authRepositoryMock,sessionRepositoryMock)
-	userId := "1"
+	userId := "-1"
 	sessionData := &authServiceModels.SessionData{
-		SessionId: generateSessionId(sessionIdLength),
+		SessionId: "",
 		UserId: userId,
 		Expiration: sessionLifeTime,
 	}
@@ -27,10 +27,10 @@ func TestCreateSession(t *testing.T) {
 	}
 	protoSession, err := useCaseTest.CreateSession(ctx,protoUserId)
 
-	assert.Equal(t, len(protoSession.Session), 16)
+	assert.Equal(t, len(protoSession.Session), 0)
 	assert.NoError(t, err)
 	sessionRepositoryMock.AssertExpectations(t)
-}*/
+}
 
 
 func TestCheckSession(t *testing.T) {

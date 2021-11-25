@@ -10,18 +10,29 @@ import (
 
 func TestCreateToken(t *testing.T) {
 
-	sessionId := "1111111111111111"
-	expUserId := "1"
-
 	useCaseTest := NewService(nil,nil)
 
 	ctx := context.Background()
-	protoSession := &protoAuth.CSRFToken{
-		Session: sessionId,
+	protoUserId := &protoAuth.UserId{
+		ID: "1",
 	}
-	protoUserId, err := useCaseTest.CreateToken(ctx,protoSession)
-	userId := protoUserId.ID
-	assert.Equal(t, "1",userId)
+	_, err := useCaseTest.CreateToken(ctx,protoUserId)
 	assert.NoError(t, err)
-	sessionRepositoryMock.AssertExpectations(t)
+}
+
+func TestCheckToken(t *testing.T) {
+	useCaseTest := NewService(nil,nil)
+
+	ctx := context.Background()
+	userId := "1"
+	csrfToken, err := generateCsrfToken(userId)
+	assert.NoError(t,err)
+
+	protoCSRF := &protoAuth.CSRFToken{
+		CSRFToken: csrfToken,
+	}
+	protoUserId, err := useCaseTest.CheckToken(ctx,protoCSRF)
+
+	assert.Equal(t,"1",protoUserId.ID)
+	assert.NoError(t, err)
 }

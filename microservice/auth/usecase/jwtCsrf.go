@@ -2,13 +2,27 @@ package usecase
 
 import (
 	protoAuth "backend/microservice/auth/proto"
-	"backend/pkg/utils"
 	"context"
 	"github.com/dgrijalva/jwt-go/v4"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
 )
+
+func generateCsrfToken(userId string) (string, error) {
+	message := logMessage + "GenerateCsrfToken:"
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
+		ID:        userId,
+		ExpiresAt: jwt.At(time.Now().Add(time.Hour * 7 * 24)), //Week  P.S. Maybe Frontend should ask us
+	})
+	secretWord := os.Getenv("CSRFSECRET")
+	csrfToken, err := jwtToken.SignedString([]byte(secretWord))
+	if err != nil {
+		log.Error(message+"err = ", err)
+		return "", err
+	}
+	return csrfToken, err
+}
 
 func parseToken(susToken string, signingKey []byte) (string, error) {
 	token, err := jwt.ParseWithClaims(susToken, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
@@ -33,7 +47,7 @@ func parseToken(susToken string, signingKey []byte) (string, error) {
 func (s *authService) CreateToken(ctx context.Context, protoUserId *protoAuth.UserId) (*protoAuth.CSRFToken, error) {
 	message := logMessage + "CreateToken:"
 	log.Debug(message + "started")
-	csrfToken, err := utils.GenerateCsrfToken(protoUserId.ID)
+	csrfToken, err := generateCsrfToken(protoUserId.ID)
 	if err != nil {
 		return &protoAuth.CSRFToken{}, err
 	}
