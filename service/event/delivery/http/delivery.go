@@ -143,7 +143,7 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 		tag = q["tags"][0]
 	}
 	if len(q["city"]) > 0 {
-		category = q["city"][0]
+		city = q["city"][0]
 	}
 	if len(q["date"]) > 0 {
 		date = q["date"][0]
@@ -152,8 +152,8 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message+"title = ", title)
 	log.Debug(message+"category = ", category)
 	log.Debug(message+"city = ", city)
-	log.Debug(message+"tags = ", tags)
 	log.Debug(message+"date = ", date)
+	log.Debug(message+"tags = ", tags)
 
 	eventsList, err := h.useCase.GetEvents(title, category, city, date, tags)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
