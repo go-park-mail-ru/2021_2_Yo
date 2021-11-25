@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"math/rand"
 	"time"
+	"strconv"
 )
 
 var (
@@ -40,7 +41,10 @@ func (s *authService) CreateSession(ctx context.Context, protoUserId *protoAuth.
 		UserId:     protoUserId.ID,
 		Expiration: sessionLifeTime,
 	}
-
+	id, _ := strconv.Atoi(sessionData.UserId)
+	if id <= 0 {
+		sessionData.SessionId = ""
+	}
 	err := s.authSessionRepository.Create(sessionData)
 	if err != nil {
 		return &protoAuth.Session{}, err
