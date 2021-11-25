@@ -56,6 +56,7 @@ func (a *UseCase) GetUserById(userId string) (*models.User, error) {
 		return nil, err
 	}
 	resultUser := MakeModelUser(out)
+	resultUser.Password = ""
 	return resultUser, nil
 }
 
@@ -95,6 +96,7 @@ func (a *UseCase) GetSubscribers(userId string) ([]*models.User, error) {
 	result := make([]*models.User, len(out.Users))
 	for i, protoUser := range out.Users {
 		result[i] = MakeModelUser(protoUser)
+		result[i].Password = ""
 	}
 	return result, nil
 }
@@ -113,6 +115,7 @@ func (a *UseCase) GetSubscribes(userId string) ([]*models.User, error) {
 	result := make([]*models.User, len(out.Users))
 	for i, protoUser := range out.Users {
 		result[i] = MakeModelUser(protoUser)
+		result[i].Password = ""
 	}
 	return result, nil
 }
@@ -131,6 +134,7 @@ func (a *UseCase) GetVisitors(eventId string) ([]*models.User, error) {
 	result := make([]*models.User, len(out.Users))
 	for i, protoUser := range out.Users {
 		result[i] = MakeModelUser(protoUser)
+		result[i].Password = ""
 	}
 	return result, nil
 }
