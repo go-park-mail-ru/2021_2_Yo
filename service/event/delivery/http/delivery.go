@@ -124,16 +124,39 @@ type getEventsVars struct {
 func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetEvents:"
 	log.Debug(message + "started")
-	vars := mux.Vars(r)
-	title := vars["query"]
-	category := vars["category"]
-	tag := vars["tags"]
-	tags := strings.Split(tag, "|")
-	eventsList, err := h.useCase.GetEvents(title, category, tags)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-		return
+	log.Debug(message+"query = ", r.URL.Query())
+	q := r.URL.Query()
+
+	var title string
+	var category string
+	var city string
+	var tag string
+
+	if len(q["query"]) > 0 {
+		title = q["query"][0]
 	}
-	response.SendResponse(w, response.EventListResponse(eventsList))
+	if len(q["category"]) > 0 {
+		category = q["category"][0]
+	}
+	if len(q["tags"]) > 0 {
+		tag = q["tags"][0]
+	}
+	if len(q["city"]) > 0 {
+		category = q["city"][0]
+	}
+	tags := strings.Split(tag, "|")
+	log.Debug(message+"title = ", title)
+	log.Debug(message+"category = ", category)
+	log.Debug(message+"city = ", city)
+	log.Debug(message+"tags = ", tags)
+
+	/*
+		eventsList, err := h.useCase.GetEvents(title, category, city, tags)
+		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+			return
+		}
+		response.SendResponse(w, response.EventListResponse(eventsList))
+	*/
 }
 
 func (h *Delivery) GetVisitedEvents(w http.ResponseWriter, r *http.Request) {
