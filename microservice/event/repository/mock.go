@@ -60,3 +60,8 @@ func (m *RepositoryClientMock) IsVisited(ctx context.Context, in *proto.VisitReq
 	args := m.Called(ctx, in)
 	return args.Get(0).(*proto.IsVisitedRequest), args.Error(1)
 }
+
+func (m *RepositoryClientMock) GetCities(ctx context.Context, in *proto.Empty, opts ...grpc.CallOption) (*proto.GetCitiesRequest, error) {
+	args := m.Called(ctx, in)
+	return args.Get(0).(*proto.GetCitiesRequest), args.Error(1)
+}

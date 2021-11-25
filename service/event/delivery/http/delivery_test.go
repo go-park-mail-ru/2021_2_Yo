@@ -256,9 +256,11 @@ var getEventsTests = []struct {
 		map[string]string{
 			"query":    "testQuery",
 			"category": "testCategory",
+			"city":     "testCity",
+			"date":     "testDate",
 			"tags":     "testTags|testTags|testTags",
 		},
-		"?query=testQuery&category=testCategory&tags=testTags|testTags|testTags",
+		"?query=testQuery&category=testCategory&city=testCity&date=testDate&tags=testTags|testTags|testTags",
 		nil,
 		nil,
 	},
@@ -282,15 +284,15 @@ func TestGetEvents(t *testing.T) {
 
 		title := test.vars["query"]
 		category := test.vars["category"]
+		city := test.vars["city"]
+		date := test.vars["date"]
 		tag := test.vars["tags"]
 		tags := strings.Split(tag, "|")
 
-		useCaseMock.On("GetEvents", title, category, tags).Return(test.eventList, test.useCaseErr)
+		useCaseMock.On("GetEvents", title, category, city, date, tags).Return(test.eventList, test.useCaseErr)
 
 		r := mux.NewRouter()
-		r.HandleFunc("/events", deliveryTest.GetEvents).
-			Queries("query", "{query}", "category", "{category}", "tags", "{tags}").
-			Methods("GET")
+		r.HandleFunc("/events", deliveryTest.GetEvents).Methods("GET")
 		req, err := http.NewRequest("GET", "/events"+test.query, nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
@@ -599,6 +601,37 @@ func TestIsVisited(t *testing.T) {
 		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
 		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
 		req = req.WithContext(ctxUserId)
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+	}
+}
+
+var getCitiesTests = []struct {
+	id         int
+	useCaseErr error
+}{
+	{
+		1,
+		nil,
+	},
+	{
+		2,
+		errors.New("test_err"),
+	},
+}
+
+func TestGetCities(t *testing.T) {
+	for _, test := range unvisitTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		deliveryTest := NewDelivery(useCaseMock)
+
+		useCaseMock.On("GetCities").Return([]string{}, test.useCaseErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/test", deliveryTest.GetCities).Methods("GET")
+		req, err := http.NewRequest("GET", "/test", nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)

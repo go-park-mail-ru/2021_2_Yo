@@ -408,6 +408,8 @@ var getEventsTests = []struct {
 	id           int
 	title        string
 	category     string
+	city         string
+	date         string
 	tags         []string
 	postgresErr  error
 	outputEvents []*models.Event
@@ -417,6 +419,8 @@ var getEventsTests = []struct {
 		id:          1,
 		title:       "test",
 		category:    "test",
+		city:        "test",
+		date:        "test",
 		tags:        []string{"test"},
 		postgresErr: nil,
 		outputEvents: []*models.Event{
@@ -431,6 +435,8 @@ var getEventsTests = []struct {
 		id:          2,
 		title:       "",
 		category:    "",
+		city:        "",
+		date:        "",
 		tags:        nil,
 		postgresErr: nil,
 		outputEvents: []*models.Event{
@@ -445,6 +451,8 @@ var getEventsTests = []struct {
 		id:           3,
 		title:        "",
 		category:     "",
+		city:         "",
+		date:         "",
 		tags:         nil,
 		postgresErr:  sql2.ErrNoRows,
 		outputEvents: []*models.Event{},
@@ -475,23 +483,35 @@ func TestGetEvents(t *testing.T) {
 		} else {
 			query += `$2 = $2 and `
 		}
-		if len(postgresTags) != 0 {
-			query += `tag && $3::varchar[]`
+		if test.city != "" {
+			query += `lower(city) = lower($3) and `
 		} else {
-			query += `$3 = $3`
+			query += `$3 = $3 and `
 		}
-		query += "order by viewed DESC"
+		if test.date != "" {
+			query += `lower(date) = lower($4) and `
+		} else {
+			query += `$4 = $4 and `
+		}
+		if len(postgresTags) != 0 {
+			query += `tag && $5::varchar[]`
+		} else {
+			query += `$5 = $5`
+		}
+		query += " order by viewed DESC"
 
 		rows := sqlmock.NewRows([]string{"id"}).AddRow(1)
 
 		mock.ExpectQuery(query).
-			WithArgs(test.title, test.category, postgresTags).
+			WithArgs(test.title, test.category, test.city, test.date, postgresTags).
 			WillReturnRows(rows).
 			WillReturnError(test.postgresErr)
 
 		in := &eventGrpc.GetEventsRequest{
 			Title:    test.title,
 			Category: test.category,
+			City:     test.city,
+			Date:     test.date,
 			Tags:     test.tags,
 		}
 		out, actualErr := repositoryTest.GetEvents(context.Background(), in)
@@ -865,5 +885,42 @@ func TestIsVisited(t *testing.T) {
 		require.Equal(t, test.outputErr, actualErr)
 		actualRes := out.Result
 		require.Equal(t, test.result, actualRes)
+	}
+}
+
+var getCitiesTests = []struct {
+	id           int
+	postgresErr  error
+	outputErr    error
+	outputResult []string
+}{
+	{
+		1,
+		nil,
+		nil,
+		[]string{"test"},
+	},
+}
+
+func TestGetCities(t *testing.T) {
+	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	require.NoError(t, err, logMessage, err)
+	defer db.Close()
+	sqlxDB := sqlx.NewDb(db, "sqlmock")
+	repositoryTest := NewRepository(sqlxDB)
+
+	for _, test := range getCitiesTests {
+
+		rows := sqlmock.NewRows([]string{"city"}).AddRow("test")
+
+		mock.ExpectQuery(getCitiesQuery).
+			WillReturnRows(rows).
+			WillReturnError(test.postgresErr)
+
+		in := &eventGrpc.Empty{}
+		out, actualErr := repositoryTest.GetCities(context.Background(), in)
+		require.Equal(t, test.outputErr, actualErr)
+		actualRes := out.Cities
+		require.Equal(t, test.outputResult, actualRes)
 	}
 }

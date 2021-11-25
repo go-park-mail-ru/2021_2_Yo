@@ -421,6 +421,7 @@ func (s *Repository) GetCities(ctx context.Context, in *proto.Empty) (*proto.Get
 	query := getCitiesQuery
 	rows, err := s.db.Queryx(query)
 	if err != nil {
+		log.Error(err)
 		return &proto.GetCitiesRequest{}, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -429,6 +430,7 @@ func (s *Repository) GetCities(ctx context.Context, in *proto.Empty) (*proto.Get
 		var c string
 		err := rows.Scan(&c)
 		if err != nil {
+			log.Error(err)
 			return &proto.GetCitiesRequest{}, error2.ErrPostgres
 		}
 		resultCities = append(resultCities, c)

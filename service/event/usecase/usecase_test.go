@@ -187,6 +187,8 @@ var getEventsTests = []struct {
 	id        int
 	title     string
 	category  string
+	city      string
+	date      string
 	tags      []string
 	outputErr error
 	outputRes []*models.Event
@@ -194,11 +196,15 @@ var getEventsTests = []struct {
 	{1,
 		"test",
 		"test",
+		"test",
+		"test",
 		[]string{"test"},
 		nil,
 		[]*models.Event{},
 	},
 	{1,
+		"test",
+		"test",
 		"test",
 		"test",
 		nil,
@@ -214,10 +220,12 @@ func TestGetEvents(t *testing.T) {
 		in := &eventGrpc.GetEventsRequest{
 			Title:    test.title,
 			Category: test.category,
+			City:     test.city,
+			Date:     test.date,
 			Tags:     test.tags,
 		}
 		repositoryMock.On("GetEvents", context.Background(), in).Return(&eventGrpc.Events{}, test.outputErr)
-		actualRes, actualErr := useCaseTest.GetEvents(test.title, test.category, test.tags)
+		actualRes, actualErr := useCaseTest.GetEvents(test.title, test.category, test.city, test.date, test.tags)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 		require.Equal(t, test.outputRes, actualRes)
 	}
@@ -422,6 +430,35 @@ func TestIsVisited(t *testing.T) {
 			Result: test.outputRes,
 		}, test.outputErr)
 		actualRes, actualErr := useCaseTest.IsVisited(test.eventId, test.userId)
+		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+		require.Equal(t, test.outputRes, actualRes, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+	}
+}
+
+var getCitiesTests = []struct {
+	id        int
+	outputErr error
+	outputRes []string
+}{
+	{1,
+		nil,
+		[]string{"test"},
+	},
+	{2,
+		error2.ErrEmptyData,
+		nil,
+	},
+}
+
+func TestGetCities(t *testing.T) {
+	for _, test := range getCitiesTests {
+		repositoryMock := new(repository.RepositoryClientMock)
+		useCaseTest := NewUseCase(repositoryMock)
+		in := &eventGrpc.Empty{}
+		repositoryMock.On("GetCities", context.Background(), in).Return(&eventGrpc.GetCitiesRequest{
+			Cities: test.outputRes,
+		}, test.outputErr)
+		actualRes, actualErr := useCaseTest.GetCities()
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 		require.Equal(t, test.outputRes, actualRes, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
