@@ -198,6 +198,13 @@ var getEventsTests = []struct {
 		nil,
 		[]*models.Event{},
 	},
+	{1,
+		"test",
+		"test",
+		nil,
+		errors.New("test_err"),
+		nil,
+	},
 }
 
 func TestGetEvents(t *testing.T) {
@@ -211,6 +218,70 @@ func TestGetEvents(t *testing.T) {
 		}
 		repositoryMock.On("GetEvents", context.Background(), in).Return(&eventGrpc.Events{}, test.outputErr)
 		actualRes, actualErr := useCaseTest.GetEvents(test.title, test.category, test.tags)
+		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+		require.Equal(t, test.outputRes, actualRes)
+	}
+}
+
+var getVisitedEventsTests = []struct {
+	id        int
+	userId    string
+	outputErr error
+	outputRes []*models.Event
+}{
+	{1,
+		"test",
+		nil,
+		[]*models.Event{},
+	},
+	{1,
+		"test",
+		errors.New("test_err"),
+		nil,
+	},
+}
+
+func TestGetVisitedEvents(t *testing.T) {
+	for _, test := range getVisitedEventsTests {
+		repositoryMock := new(repository.RepositoryClientMock)
+		useCaseTest := NewUseCase(repositoryMock)
+		in := &eventGrpc.UserId{
+			ID: test.userId,
+		}
+		repositoryMock.On("GetVisitedEvents", context.Background(), in).Return(&eventGrpc.Events{}, test.outputErr)
+		actualRes, actualErr := useCaseTest.GetVisitedEvents(test.userId)
+		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+		require.Equal(t, test.outputRes, actualRes)
+	}
+}
+
+var getCreatedEventsTests = []struct {
+	id        int
+	userId    string
+	outputErr error
+	outputRes []*models.Event
+}{
+	{1,
+		"test",
+		nil,
+		[]*models.Event{},
+	},
+	{1,
+		"test",
+		errors.New("test_err"),
+		nil,
+	},
+}
+
+func TestGetCreatedEvents(t *testing.T) {
+	for _, test := range getCreatedEventsTests {
+		repositoryMock := new(repository.RepositoryClientMock)
+		useCaseTest := NewUseCase(repositoryMock)
+		in := &eventGrpc.UserId{
+			ID: test.userId,
+		}
+		repositoryMock.On("GetCreatedEvents", context.Background(), in).Return(&eventGrpc.Events{}, test.outputErr)
+		actualRes, actualErr := useCaseTest.GetVisitedEvents(test.userId)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 		require.Equal(t, test.outputRes, actualRes)
 	}

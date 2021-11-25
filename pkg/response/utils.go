@@ -44,6 +44,7 @@ func GetUserFromRequest(r io.Reader) (*models.User, error) {
 	}
 	err = ValidateAndSanitize(userInput)
 	if err != nil {
+		log.Debug("HERE, err = ",err)
 		return nil, err
 	}
 	result := &models.User{

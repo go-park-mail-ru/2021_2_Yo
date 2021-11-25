@@ -235,7 +235,9 @@ func (a *UseCase) GetCreatedEvents(userId string) ([]*models.Event, error) {
 	if userId == "" {
 		return nil, error2.ErrEmptyData
 	}
-	in := &proto.UserId{ID: userId}
+	in := &proto.UserId{
+		ID: userId,
+	}
 	out, err := a.eventRepo.GetCreatedEvents(context.Background(), in)
 	if err != nil {
 		return nil, err

@@ -50,13 +50,11 @@ const (
 func (s *Repository) checkAuthor(eventId int, userId int) error {
 	var authorId int
 	query := checkAuthorQuery
-	log.Debug(logMessage+"checkAuthor: eventId, userId = ",eventId, " ", userId)
 	err := s.db.Get(&authorId, query, eventId)
 	if err != nil {
 		log.Error(logMessage+"checkAuthor:err = ", err)
 		return error2.ErrPostgres
 	}
-	log.Debug(logMessage+"checkAuthor: authorId, userId = ",authorId, " ", userId)
 	if authorId == userId {
 		return nil
 	} else {
@@ -69,7 +67,6 @@ func (s *Repository) CreateEvent(ctx context.Context, in *proto.Event) (*proto.E
 	message := logMessage + "CreateEvent:"
 	log.Debug(message + "started")
 	e := fromProtoToModel(in)
-	log.Debug(message+"e =", e)
 	newEvent, err := toPostgresEvent(e)
 	if err != nil {
 		log.Error(message+"err 1 =", err)
