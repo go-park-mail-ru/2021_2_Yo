@@ -16,6 +16,9 @@ var (
 )
 
 func generateSessionId(n int) string {
+	if n == 0 {
+		return ""
+	}
 	b := make([]rune, n)
 	rand.Seed(time.Now().UnixNano())
 	for i := range b {
