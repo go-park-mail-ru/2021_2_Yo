@@ -131,6 +131,7 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	var category string
 	var city string
 	var tag string
+	var date string
 
 	if len(q["query"]) > 0 {
 		title = q["query"][0]
@@ -144,19 +145,21 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	if len(q["city"]) > 0 {
 		category = q["city"][0]
 	}
+	if len(q["date"]) > 0 {
+		date = q["date"][0]
+	}
 	tags := strings.Split(tag, "|")
 	log.Debug(message+"title = ", title)
 	log.Debug(message+"category = ", category)
 	log.Debug(message+"city = ", city)
 	log.Debug(message+"tags = ", tags)
+	log.Debug(message+"date = ", date)
 
-	/*
-		eventsList, err := h.useCase.GetEvents(title, category, city, tags)
-		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
-			return
-		}
-		response.SendResponse(w, response.EventListResponse(eventsList))
-	*/
+	eventsList, err := h.useCase.GetEvents(title, category, city, date, tags)
+	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		return
+	}
+	response.SendResponse(w, response.EventListResponse(eventsList))
 }
 
 func (h *Delivery) GetVisitedEvents(w http.ResponseWriter, r *http.Request) {

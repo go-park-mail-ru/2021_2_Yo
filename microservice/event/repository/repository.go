@@ -210,9 +210,11 @@ func (s *Repository) GetEventById(ctx context.Context, in *proto.EventId) (*prot
 func (s *Repository) GetEvents(ctx context.Context, in *proto.GetEventsRequest) (*proto.Events, error) {
 	message := logMessage + "GetEvents:"
 	log.Debug(message + "started")
-	tags := in.Tags
 	title := in.Title
 	category := in.Category
+	city := in.City
+	date := in.Date
+	tags := in.Tags
 	postgresTags := make(pq.StringArray, len(tags))
 	for i := range tags {
 		postgresTags[i] = tags[i]
@@ -228,13 +230,23 @@ func (s *Repository) GetEvents(ctx context.Context, in *proto.GetEventsRequest) 
 	} else {
 		query += `$2 = $2 and `
 	}
-	if len(postgresTags) != 0 {
-		query += `tag && $3::varchar[]`
+	if city != "" {
+		query += `lower(city) = lower($3) and `
 	} else {
-		query += `$3 = $3`
+		query += `$3 = $3 and `
 	}
-	query += "order by viewed DESC"
-	rows, err := s.db.Queryx(query, title, category, postgresTags)
+	if date != "" {
+		query += `lower(date) = lower($4) and `
+	} else {
+		query += `$4 = $4 and `
+	}
+	if len(postgresTags) != 0 {
+		query += `tag && $5::varchar[]`
+	} else {
+		query += `$5 = $5`
+	}
+	query += ` order by viewed DESC`
+	rows, err := s.db.Queryx(query, title, category, city, date, postgresTags)
 	if err != nil {
 		log.Error(message, "err = ", err)
 		return &proto.Events{}, err

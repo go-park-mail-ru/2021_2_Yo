@@ -193,13 +193,15 @@ func (a *UseCase) GetEventById(eventId string) (*models.Event, error) {
 	return result, nil
 }
 
-func (a *UseCase) GetEvents(title string, category string, tags []string) ([]*models.Event, error) {
+func (a *UseCase) GetEvents(title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
 	if tags != nil && tags[0] == "" {
 		tags = nil
 	}
 	in := &proto.GetEventsRequest{
 		Title:    title,
 		Category: category,
+		City:     city,
+		Date:     date,
 		Tags:     tags,
 	}
 	out, err := a.eventRepo.GetEvents(context.Background(), in)

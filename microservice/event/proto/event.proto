@@ -50,7 +50,9 @@ message DeleteEventRequest {
 message GetEventsRequest {
     string title = 1;
     string category = 2;
-    repeated string tags = 3;
+    string city = 3;
+    string date = 4;
+    repeated string tags = 5;
 }
 
 message Events {
