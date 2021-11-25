@@ -25,10 +25,12 @@ func ValidateAndSanitize(object interface{}) error {
 	}
 	err = s.Sanitize(object)
 	if err != nil {
+		log.Error("Sanitize err = ", err)
 		return ErrSanitizing
 	}
 	valid, err := govalidator.ValidateStruct(object)
 	if err != nil || !valid {
+		log.Error("Validate err = ", err)
 		return ErrValidation
 	}
 	return nil
@@ -44,7 +46,6 @@ func GetUserFromRequest(r io.Reader) (*models.User, error) {
 	}
 	err = ValidateAndSanitize(userInput)
 	if err != nil {
-		log.Debug("HERE, err = ",err)
 		return nil, err
 	}
 	result := &models.User{
