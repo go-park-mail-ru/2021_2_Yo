@@ -25,12 +25,10 @@ func ValidateAndSanitize(object interface{}) error {
 	}
 	err = s.Sanitize(object)
 	if err != nil {
-		log.Error("Sanitize err = ", err)
 		return ErrSanitizing
 	}
 	valid, err := govalidator.ValidateStruct(object)
 	if err != nil || !valid {
-		log.Error("Validate err = ", err)
 		return ErrValidation
 	}
 	return nil
