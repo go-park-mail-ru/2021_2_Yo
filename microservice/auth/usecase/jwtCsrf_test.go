@@ -1,5 +1,5 @@
 package usecase
-
+/*
 import (
 	protoAuth "backend/microservice/auth/proto"
 	"context"
@@ -25,3 +25,4 @@ func TestCreateToken(t *testing.T) {
 	assert.NoError(t, err)
 	sessionRepositoryMock.AssertExpectations(t)
 }
+*/
