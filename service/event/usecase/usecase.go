@@ -7,6 +7,7 @@ import (
 	error2 "backend/service/event/error"
 	"context"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -37,7 +38,7 @@ func MakeProtoEvent(e *models.Event) *proto.Event {
 		Tag:         e.Tag,
 		Date:        e.Date,
 		Geo:         e.Geo,
-		Address: 	 e.Address,
+		Address:     e.Address,
 		AuthorId:    e.AuthorId,
 	}
 }
@@ -55,17 +56,17 @@ func MakeModelEvent(out *proto.Event) *models.Event {
 		Tag:         out.Tag,
 		Date:        out.Date,
 		Geo:         out.Geo,
-		Address: 	 out.Address,
+		Address:     out.Address,
 		AuthorId:    out.AuthorId,
 	}
 }
 
-func сityAndAddrByCoordinates(latitude, longitude string) (string, string) {
+func cityAndAddrByCoordinates(latitude, longitude string) (string, string, error) {
 	url := "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address"
-	url += "?lat="+latitude+"&lon="+longitude;
+	url += "?lat=" + latitude + "&lon=" + longitude
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Error(err)
+		return "", "", err
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", "Token aaa00e3861df0b3fe38857306563ad4bee84550f")
@@ -73,11 +74,11 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Error(err)
+		return "", "", err
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Error(err)
+		return "", "", err
 	}
 	type Data struct {
 		City string `json:"city,omittempty`
@@ -93,22 +94,26 @@ func сityAndAddrByCoordinates(latitude, longitude string) (string, string) {
 		Suggestions []AddrInfo `json:"suggestions,omitempty"`
 	}
 	suggestions := Suggest{}
-	
+
 	err = json.Unmarshal(body, &suggestions)
 	if err != nil {
-		log.Error(err)
+		return "", "", err
 	}
+
+	if len(suggestions.Suggestions) == 0 {
+		return "", "", errors.New("can't get city and address from coordinates")
+	}
+
 	addr := suggestions.Suggestions[0].Value
 	city := suggestions.Suggestions[0].Data.City
 
-	return city, addr
+	return city, addr, nil
 }
 
 func parseCoordinates(coords string) (string, string) {
 	coordsArr := strings.Split(coords, " ")
-	lat := coordsArr[0][1:len(coordsArr[0])-1]
+	lat := coordsArr[0][1 : len(coordsArr[0])-1]
 	lng := coordsArr[1][:len(coordsArr[1])-1]
-	log.Debug("x =", lat, "y =", lng)
 	return lat, lng
 }
 
@@ -120,8 +125,16 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 		e.Tag[i] = strings.ToLower(tag)
 	}
 	lat, lng := parseCoordinates(e.Geo)
-	e.City,e.Address = сityAndAddrByCoordinates(lat,lng)
-	
+	log.Debug(lat, " ", lng)
+	var city string
+	var address string
+	city, address, err := cityAndAddrByCoordinates(lat, lng)
+	if err != nil {
+		log.Error(logMessage+"CreateEvent:err = ", err)
+	}
+	e.City = city
+	e.Address = address
+
 	in := MakeProtoEvent(e)
 	res, err := a.eventRepo.CreateEvent(context.Background(), in)
 	if err != nil {
@@ -131,23 +144,26 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 }
 
 func (a *UseCase) UpdateEvent(e *models.Event, userId string) error {
-	if e == nil || userId == "" {
-		return error2.ErrEmptyData
-	}
-	if e.ID == "" {
+	if e == nil || userId == "" || e.ID == "" {
 		return error2.ErrEmptyData
 	}
 	for i, tag := range e.Tag {
 		e.Tag[i] = strings.ToLower(tag)
 	}
 	lat, lng := parseCoordinates(e.Geo)
-	e.City,e.Address = сityAndAddrByCoordinates(lat,lng)
+	city, address, err := cityAndAddrByCoordinates(lat, lng)
+	if err != nil {
+		city = ""
+		address = ""
+	}
+	e.City = city
+	e.Address = address
 
 	in := &proto.UpdateEventRequest{
 		Event:  MakeProtoEvent(e),
 		UserId: userId,
 	}
-	_, err := a.eventRepo.UpdateEvent(context.Background(), in)
+	_, err = a.eventRepo.UpdateEvent(context.Background(), in)
 	log.Debug(logMessage + "UpdateEvent:HERE")
 	return err
 }

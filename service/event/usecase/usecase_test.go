@@ -1,9 +1,12 @@
 package usecase
 
 import (
+	eventGrpc "backend/microservice/event/proto"
+	repository "backend/microservice/event/repository"
 	"backend/pkg/models"
 	error2 "backend/service/event/error"
-	"backend/service/event/repository/mock"
+	"context"
+	"errors"
 	"github.com/stretchr/testify/require"
 	"strconv"
 	"testing"
@@ -14,34 +17,206 @@ const logTestMessage = "service:event:usecase:"
 var createEventTests = []struct {
 	id            int
 	event         *models.Event
-	userId        string
 	outputErr     error
 	outputEventId string
 }{
 	{1,
-		&models.Event{},
-		"1",
+		&models.Event{
+			AuthorId: "test",
+			Geo:      "(1.23232323, 4.3223232323)",
+			Tag:      []string{"test"},
+		},
 		nil,
-		"1",
+		"",
 	},
 	{2,
 		nil,
-		"",
 		error2.ErrEmptyData,
+		"",
+	},
+	{3,
+		&models.Event{
+			AuthorId: "test",
+			Geo:      "(1.23232323, 4.3223232323)",
+		},
+		errors.New("test_err"),
 		"",
 	},
 }
 
 func TestCreateEvent(t *testing.T) {
 	for _, test := range createEventTests {
-		repositoryMock := new(mock.RepositoryMock)
+		repositoryMock := new(repository.RepositoryClientMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		repositoryMock.On("CreateEvent", test.event).Return(test.outputEventId, test.outputErr)
-		actualEventId, actualErr := useCaseTest.CreateEvent(test.event, test.userId)
+		var in *eventGrpc.Event
+		if test.event != nil {
+			in = MakeProtoEvent(test.event)
+		}
+		repositoryMock.On("CreateEvent", context.Background(), in).Return(&eventGrpc.EventId{}, test.outputErr)
+		actualEventId, actualErr := useCaseTest.CreateEvent(test.event)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 		require.Equal(t, test.outputEventId, actualEventId, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
+
+var updateEventTests = []struct {
+	id        int
+	event     *models.Event
+	userId    string
+	outputErr error
+}{
+	{1,
+		&models.Event{
+			ID:       "test",
+			AuthorId: "test",
+			Geo:      "(1.23232323, 4.3223232323)",
+			Tag:      []string{"test"},
+		},
+		"test",
+		nil,
+	},
+	{2,
+		nil,
+		"",
+		error2.ErrEmptyData,
+	},
+	{3,
+		&models.Event{
+			ID:       "test",
+			AuthorId: "test",
+			Geo:      "(1.23232323, 4.3223232323)",
+		},
+		"test",
+		errors.New("test_err"),
+	},
+}
+
+func TestUpdateEvent(t *testing.T) {
+	for _, test := range updateEventTests {
+		repositoryMock := new(repository.RepositoryClientMock)
+		useCaseTest := NewUseCase(repositoryMock)
+		var pe *eventGrpc.Event
+		if test.event != nil {
+			pe = MakeProtoEvent(test.event)
+		}
+		in := &eventGrpc.UpdateEventRequest{
+			Event:  pe,
+			UserId: test.userId,
+		}
+		repositoryMock.On("UpdateEvent", context.Background(), in).Return(&eventGrpc.Empty{}, test.outputErr)
+		actualErr := useCaseTest.UpdateEvent(test.event, test.userId)
+		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+	}
+}
+
+var deleteEventTests = []struct {
+	id        int
+	eventId   string
+	userId    string
+	outputErr error
+}{
+	{1,
+		"test",
+		"test",
+		nil,
+	},
+	{2,
+		"",
+		"",
+		error2.ErrEmptyData,
+	},
+	{3,
+		"test",
+		"test",
+		errors.New("test_err"),
+	},
+}
+
+func TestDeleteEvent(t *testing.T) {
+	for _, test := range deleteEventTests {
+		repositoryMock := new(repository.RepositoryClientMock)
+		useCaseTest := NewUseCase(repositoryMock)
+		in := &eventGrpc.DeleteEventRequest{
+			EventId: test.eventId,
+			UserId:  test.userId,
+		}
+		repositoryMock.On("DeleteEvent", context.Background(), in).Return(&eventGrpc.Empty{}, test.outputErr)
+		actualErr := useCaseTest.DeleteEvent(test.eventId, test.userId)
+		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+	}
+}
+
+var getEventByIdTests = []struct {
+	id        int
+	eventId   string
+	outputErr error
+	outputRes *models.Event
+}{
+	{1,
+		"test",
+		nil,
+		&models.Event{},
+	},
+	{2,
+		"",
+		error2.ErrEmptyData,
+		nil,
+	},
+	{3,
+		"test",
+		errors.New("test_err"),
+		nil,
+	},
+}
+
+func TestGetEventById(t *testing.T) {
+	for _, test := range getEventByIdTests {
+		repositoryMock := new(repository.RepositoryClientMock)
+		useCaseTest := NewUseCase(repositoryMock)
+		in := &eventGrpc.EventId{
+			ID: test.eventId,
+		}
+		repositoryMock.On("GetEventById", context.Background(), in).Return(&eventGrpc.Event{}, test.outputErr)
+		actualRes, actualErr := useCaseTest.GetEventById(test.eventId)
+		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+		require.Equal(t, test.outputRes, actualRes)
+	}
+}
+
+var getEventsTests = []struct {
+	id        int
+	title     string
+	category  string
+	tags      []string
+	outputErr error
+	outputRes []*models.Event
+}{
+	{1,
+		"test",
+		"test",
+		[]string{"test"},
+		nil,
+		[]*models.Event{},
+	},
+}
+
+func TestGetEvents(t *testing.T) {
+	for _, test := range getEventsTests {
+		repositoryMock := new(repository.RepositoryClientMock)
+		useCaseTest := NewUseCase(repositoryMock)
+		in := &eventGrpc.GetEventsRequest{
+			Title:    test.title,
+			Category: test.category,
+			Tags:     test.tags,
+		}
+		repositoryMock.On("GetEvents", context.Background(), in).Return(&eventGrpc.Events{}, test.outputErr)
+		actualRes, actualErr := useCaseTest.GetEvents(test.title, test.category, test.tags)
+		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
+		require.Equal(t, test.outputRes, actualRes)
+	}
+}
+
+/*
 
 var updateEventTests = []struct {
 	id            int
@@ -272,3 +447,5 @@ func TestGetFromAuthorEvents(t *testing.T) {
 		require.Equal(t, test.outputEvents, actualEvents, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
 }
+
+*/

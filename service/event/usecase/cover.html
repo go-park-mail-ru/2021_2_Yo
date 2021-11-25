@@ -1,0 +1,452 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>usecase: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">backend/service/event/usecase/mock.go (0.0%)</option>
+				
+				<option value="file1">backend/service/event/usecase/usecase.go (46.4%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package usecase
+
+import (
+        "backend/pkg/models"
+        "github.com/stretchr/testify/mock"
+)
+
+type UseCaseMock struct {
+        mock.Mock
+}
+
+func (m *UseCaseMock) CreateEvent(e *models.Event) (string, error) <span class="cov0" title="0">{
+        args := m.Called(e)
+        return args.Get(0).(string), args.Error(1)
+}</span>
+
+func (m *UseCaseMock) UpdateEvent(e *models.Event, userId string) error <span class="cov0" title="0">{
+        args := m.Called(e, userId)
+        return args.Error(0)
+}</span>
+
+func (m *UseCaseMock) DeleteEvent(eventId string, userId string) error <span class="cov0" title="0">{
+        args := m.Called(eventId, userId)
+        return args.Error(0)
+}</span>
+
+func (m *UseCaseMock) GetEventById(eventId string) (*models.Event, error) <span class="cov0" title="0">{
+        args := m.Called(eventId)
+        return args.Get(0).(*models.Event), args.Error(1)
+}</span>
+
+func (m *UseCaseMock) GetEvents(title string, category string, tags []string) ([]*models.Event, error) <span class="cov0" title="0">{
+        args := m.Called(title, category, tags)
+        return args.Get(0).([]*models.Event), args.Error(1)
+}</span>
+
+func (m *UseCaseMock) GetCreatedEvents(authorId string) ([]*models.Event, error) <span class="cov0" title="0">{
+        args := m.Called(authorId)
+        return args.Get(0).([]*models.Event), args.Error(1)
+}</span>
+
+func (m *UseCaseMock) GetVisitedEvents(userId string) ([]*models.Event, error) <span class="cov0" title="0">{
+        args := m.Called(userId)
+        return args.Get(0).([]*models.Event), args.Error(1)
+}</span>
+
+func (m *UseCaseMock) Visit(eventId string, userId string) error <span class="cov0" title="0">{
+        args := m.Called(eventId, userId)
+        return args.Error(0)
+}</span>
+
+func (m *UseCaseMock) Unvisit(eventId string, userId string) error <span class="cov0" title="0">{
+        args := m.Called(eventId, userId)
+        return args.Error(0)
+}</span>
+
+func (m *UseCaseMock) IsVisited(eventId string, userId string) (bool, error) <span class="cov0" title="0">{
+        args := m.Called(eventId, userId)
+        return args.Get(0).(bool), args.Error(1)
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package usecase
+
+import (
+        proto "backend/microservice/event/proto"
+        log "backend/pkg/logger"
+        "backend/pkg/models"
+        error2 "backend/service/event/error"
+        "context"
+        "encoding/json"
+        "errors"
+        "io/ioutil"
+        "net/http"
+        "strings"
+)
+
+const logMessage = "service:event:usecase:"
+
+type UseCase struct {
+        eventRepo proto.RepositoryClient
+}
+
+func NewUseCase(eventRepo proto.RepositoryClient) *UseCase <span class="cov8" title="1">{
+        return &amp;UseCase{
+                eventRepo: eventRepo,
+        }
+}</span>
+
+func MakeProtoEvent(e *models.Event) *proto.Event <span class="cov8" title="1">{
+        return &amp;proto.Event{
+                ID:          e.ID,
+                Title:       e.Title,
+                Description: e.Description,
+                Text:        e.Text,
+                City:        e.City,
+                Category:    e.Category,
+                Viewed:      int32(e.Viewed),
+                ImgUrl:      e.ImgUrl,
+                Tag:         e.Tag,
+                Date:        e.Date,
+                Geo:         e.Geo,
+                Address:     e.Address,
+                AuthorId:    e.AuthorId,
+        }
+}</span>
+
+func MakeModelEvent(out *proto.Event) *models.Event <span class="cov0" title="0">{
+        return &amp;models.Event{
+                ID:          out.ID,
+                Title:       out.Title,
+                Description: out.Description,
+                Text:        out.Text,
+                City:        out.City,
+                Category:    out.Category,
+                Viewed:      int(out.Viewed),
+                ImgUrl:      out.ImgUrl,
+                Tag:         out.Tag,
+                Date:        out.Date,
+                Geo:         out.Geo,
+                Address:     out.Address,
+                AuthorId:    out.AuthorId,
+        }
+}</span>
+
+func cityAndAddrByCoordinates(latitude, longitude string) (string, string, error) <span class="cov8" title="1">{
+        url := "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address"
+        url += "?lat=" + latitude + "&amp;lon=" + longitude
+        req, err := http.NewRequest("GET", url, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", "", err
+        }</span>
+        <span class="cov8" title="1">req.Header.Set("Accept", "application/json")
+        req.Header.Set("Authorization", "Token aaa00e3861df0b3fe38857306563ad4bee84550f")
+
+        client := &amp;http.Client{}
+        resp, err := client.Do(req)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", "", err
+        }</span>
+        <span class="cov8" title="1">body, err := ioutil.ReadAll(resp.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", "", err
+        }</span>
+        <span class="cov8" title="1">type Data struct {
+                City string `json:"city,omittempty`
+        }
+
+        type AddrInfo struct {
+                Value              string `json:"value,omittempty`
+                Unrestricted_value string `json:"unresticted_value,omitempty`
+                Data               Data   `json:"data,omitempty"`
+        }
+
+        type Suggest struct {
+                Suggestions []AddrInfo `json:"suggestions,omitempty"`
+        }
+        suggestions := Suggest{}
+
+        err = json.Unmarshal(body, &amp;suggestions)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", "", err
+        }</span>
+
+        <span class="cov8" title="1">if len(suggestions.Suggestions) == 0 </span><span class="cov8" title="1">{
+                return "", "", errors.New("can't get city and address from coordinates")
+        }</span>
+
+        <span class="cov0" title="0">addr := suggestions.Suggestions[0].Value
+        city := suggestions.Suggestions[0].Data.City
+
+        return city, addr, nil</span>
+}
+
+func parseCoordinates(coords string) (string, string) <span class="cov8" title="1">{
+        coordsArr := strings.Split(coords, " ")
+        lat := coordsArr[0][1 : len(coordsArr[0])-1]
+        lng := coordsArr[1][:len(coordsArr[1])-1]
+        return lat, lng
+}</span>
+
+func (a *UseCase) CreateEvent(e *models.Event) (string, error) <span class="cov8" title="1">{
+        if e == nil || e.AuthorId == "" </span><span class="cov8" title="1">{
+                return "", error2.ErrEmptyData
+        }</span>
+        <span class="cov8" title="1">for i, tag := range e.Tag </span><span class="cov8" title="1">{
+                e.Tag[i] = strings.ToLower(tag)
+        }</span>
+        <span class="cov8" title="1">lat, lng := parseCoordinates(e.Geo)
+        log.Debug(lat, " ", lng)
+        var city string
+        var address string
+        city, address, err := cityAndAddrByCoordinates(lat, lng)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Error(logMessage+"CreateEvent:err = ", err)
+        }</span>
+        <span class="cov8" title="1">e.City = city
+        e.Address = address
+
+        in := MakeProtoEvent(e)
+        res, err := a.eventRepo.CreateEvent(context.Background(), in)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">return res.ID, nil</span>
+}
+
+func (a *UseCase) UpdateEvent(e *models.Event, userId string) error <span class="cov8" title="1">{
+        if e == nil || userId == "" || e.ID == "" </span><span class="cov8" title="1">{
+                return error2.ErrEmptyData
+        }</span>
+        <span class="cov8" title="1">for i, tag := range e.Tag </span><span class="cov8" title="1">{
+                e.Tag[i] = strings.ToLower(tag)
+        }</span>
+        <span class="cov8" title="1">lat, lng := parseCoordinates(e.Geo)
+        city, address, err := cityAndAddrByCoordinates(lat, lng)
+        if err != nil </span><span class="cov8" title="1">{
+                city = ""
+                address = ""
+        }</span>
+        <span class="cov8" title="1">e.City = city
+        e.Address = address
+
+        in := &amp;proto.UpdateEventRequest{
+                Event:  MakeProtoEvent(e),
+                UserId: userId,
+        }
+        _, err = a.eventRepo.UpdateEvent(context.Background(), in)
+        log.Debug(logMessage + "UpdateEvent:HERE")
+        return err</span>
+}
+
+func (a *UseCase) DeleteEvent(userId string, eventID string) error <span class="cov0" title="0">{
+        if userId == "" || eventID == "" </span><span class="cov0" title="0">{
+                return error2.ErrEmptyData
+        }</span>
+        <span class="cov0" title="0">in := &amp;proto.DeleteEventRequest{
+                EventId: eventID,
+                UserId:  userId,
+        }
+        _, err := a.eventRepo.DeleteEvent(context.Background(), in)
+        return err</span>
+}
+
+func (a *UseCase) GetEventById(eventId string) (*models.Event, error) <span class="cov0" title="0">{
+        if eventId == "" </span><span class="cov0" title="0">{
+                return nil, error2.ErrEmptyData
+        }</span>
+        <span class="cov0" title="0">in := &amp;proto.EventId{ID: eventId}
+        out, err := a.eventRepo.GetEventById(context.Background(), in)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">result := MakeModelEvent(out)
+        return result, nil</span>
+}
+
+func (a *UseCase) GetEvents(title string, category string, tags []string) ([]*models.Event, error) <span class="cov0" title="0">{
+        if tags != nil &amp;&amp; tags[0] == "" </span><span class="cov0" title="0">{
+                tags = nil
+        }</span>
+        <span class="cov0" title="0">in := &amp;proto.GetEventsRequest{
+                Title:    title,
+                Category: category,
+                Tags:     tags,
+        }
+        out, err := a.eventRepo.GetEvents(context.Background(), in)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">result := make([]*models.Event, len(out.Events))
+        for i, protoEvent := range out.Events </span><span class="cov0" title="0">{
+                result[i] = MakeModelEvent(protoEvent)
+        }</span>
+        <span class="cov0" title="0">return result, nil</span>
+}
+
+func (a *UseCase) GetVisitedEvents(userId string) ([]*models.Event, error) <span class="cov0" title="0">{
+        if userId == "" </span><span class="cov0" title="0">{
+                return nil, error2.ErrEmptyData
+        }</span>
+        <span class="cov0" title="0">in := &amp;proto.UserId{
+                ID: userId,
+        }
+        out, err := a.eventRepo.GetVisitedEvents(context.Background(), in)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">result := make([]*models.Event, len(out.Events))
+        for i, protoEvent := range out.Events </span><span class="cov0" title="0">{
+                result[i] = MakeModelEvent(protoEvent)
+        }</span>
+        <span class="cov0" title="0">return result, nil</span>
+}
+
+func (a *UseCase) GetCreatedEvents(userId string) ([]*models.Event, error) <span class="cov0" title="0">{
+        if userId == "" </span><span class="cov0" title="0">{
+                return nil, error2.ErrEmptyData
+        }</span>
+        <span class="cov0" title="0">in := &amp;proto.UserId{ID: userId}
+        out, err := a.eventRepo.GetCreatedEvents(context.Background(), in)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">result := make([]*models.Event, len(out.Events))
+        for i, protoEvent := range out.Events </span><span class="cov0" title="0">{
+                result[i] = MakeModelEvent(protoEvent)
+        }</span>
+        <span class="cov0" title="0">return result, nil</span>
+}
+
+func (a *UseCase) Visit(eventId string, userId string) error <span class="cov0" title="0">{
+        if eventId == "" || userId == "" </span><span class="cov0" title="0">{
+                return error2.ErrEmptyData
+        }</span>
+        <span class="cov0" title="0">in := &amp;proto.VisitRequest{
+                EventId: eventId,
+                UserId:  userId,
+        }
+        _, err := a.eventRepo.Visit(context.Background(), in)
+        return err</span>
+}
+
+func (a *UseCase) Unvisit(eventId string, userId string) error <span class="cov0" title="0">{
+        if eventId == "" || userId == "" </span><span class="cov0" title="0">{
+                return error2.ErrEmptyData
+        }</span>
+        <span class="cov0" title="0">in := &amp;proto.VisitRequest{
+                EventId: eventId,
+                UserId:  userId,
+        }
+        _, err := a.eventRepo.Unvisit(context.Background(), in)
+        return err</span>
+}
+
+func (a *UseCase) IsVisited(eventId string, userId string) (bool, error) <span class="cov0" title="0">{
+        if eventId == "" || userId == "" </span><span class="cov0" title="0">{
+                return false, error2.ErrEmptyData
+        }</span>
+        <span class="cov0" title="0">in := &amp;proto.VisitRequest{
+                EventId: eventId,
+                UserId:  userId,
+        }
+        out, err := a.eventRepo.IsVisited(context.Background(), in)
+        result := out.Result
+        return result, err</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

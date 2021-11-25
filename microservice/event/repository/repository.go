@@ -50,13 +50,17 @@ const (
 func (s *Repository) checkAuthor(eventId int, userId int) error {
 	var authorId int
 	query := checkAuthorQuery
+	log.Debug(logMessage+"checkAuthor: eventId, userId = ",eventId, " ", userId)
 	err := s.db.Get(&authorId, query, eventId)
 	if err != nil {
+		log.Error(logMessage+"checkAuthor:err = ", err)
 		return error2.ErrPostgres
 	}
+	log.Debug(logMessage+"checkAuthor: authorId, userId = ",authorId, " ", userId)
 	if authorId == userId {
 		return nil
 	} else {
+		log.Error(logMessage+"checkAuthor:err = ", error2.ErrNotAllowed)
 		return error2.ErrNotAllowed
 	}
 }
@@ -174,6 +178,7 @@ func (s *Repository) DeleteEvent(ctx context.Context, in *proto.DeleteEventReque
 	if err != nil {
 		return &proto.Empty{}, error2.ErrAtoi
 	}
+
 	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
 		return &proto.Empty{}, err
