@@ -52,13 +52,11 @@ func (s *Repository) checkAuthor(eventId int, userId int) error {
 	query := checkAuthorQuery
 	err := s.db.Get(&authorId, query, eventId)
 	if err != nil {
-		log.Error(logMessage+"checkAuthor:err = ", err)
 		return error2.ErrPostgres
 	}
 	if authorId == userId {
 		return nil
 	} else {
-		log.Error(logMessage+"checkAuthor:err = ", error2.ErrNotAllowed)
 		return error2.ErrNotAllowed
 	}
 }
@@ -175,14 +173,14 @@ func (s *Repository) DeleteEvent(ctx context.Context, in *proto.DeleteEventReque
 	if err != nil {
 		return &proto.Empty{}, error2.ErrAtoi
 	}
-	log.Debug(logMessage+"DeleteEvent: eventId, userId = ",eventIdInt, " ", userIdInt)
 	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
 		return &proto.Empty{}, err
 	}
 	query := deleteEventQuery
-	_, err = s.db.Exec(query, eventIdInt)
+	_, err = s.db.Query(query, eventIdInt)
 	if err != nil {
+		log.Error(err)
 		return &proto.Empty{}, error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
@@ -193,14 +191,11 @@ func (s *Repository) GetEventById(ctx context.Context, in *proto.EventId) (*prot
 	message := logMessage + "GetEventById:"
 	log.Debug(message + "started")
 	eventId := in.ID
-	eventIdInt, err := strconv.Atoi(eventId)
-	if err != nil {
-		return &proto.Event{}, error2.ErrAtoi
-	}
 	query := getEventQuery
 	var e Event
-	err = s.db.Get(&e, query, eventIdInt)
+	err := s.db.Get(&e, query, eventId)
 	if err != nil {
+		log.Error(err)
 		if err == sql2.ErrNoRows {
 			return &proto.Event{}, error2.ErrNoRows
 		}

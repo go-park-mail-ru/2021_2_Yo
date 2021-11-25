@@ -51,9 +51,9 @@ func (s *Repository) GetUserById(ctx context.Context, in *proto.UserId) (*proto.
 		return &proto.User{}, error2.ErrPostgres
 	}
 	modelUser := toModelUser(&user)
-	protoUser := toProtoUser(modelUser)
+	out := toProtoUser(modelUser)
 	log.Debug(message + "ended")
-	return protoUser, nil
+	return out, nil
 }
 
 func (s *Repository) UpdateUserInfo(ctx context.Context, in *proto.User) (*proto.Empty, error) {
@@ -245,6 +245,7 @@ func (s *Repository) Unsubscribe(ctx context.Context, in *proto.SubscribeRequest
 	query := unsubscribeQuery
 	_, err = s.db.Query(query, subscribedIdInt, subscriberIdInt)
 	if err != nil {
+		log.Error(err)
 		return &proto.Empty{}, error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
