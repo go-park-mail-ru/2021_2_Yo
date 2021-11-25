@@ -96,3 +96,13 @@ func FavouriteResponse(result bool) *Response {
 		},
 	}
 }
+
+func CitiesResponse(cities []string) *Response {
+	return &Response{
+		Status:  200,
+		Message: "",
+		Body: models.CitiesResponseBody{
+			Cities: cities,
+		},
+	}
+}

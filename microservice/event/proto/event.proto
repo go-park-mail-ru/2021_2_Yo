@@ -68,6 +68,10 @@ message IsVisitedRequest {
     bool Result = 1;
 }
 
+message GetCitiesRequest {
+    repeated string Cities = 1;
+}
+
 message Empty {}
 
 service Repository {
@@ -81,4 +85,5 @@ service Repository {
     rpc Visit(VisitRequest) returns (Empty) {}
     rpc Unvisit(VisitRequest) returns (Empty) {}
     rpc IsVisited(VisitRequest) returns (IsVisitedRequest) {}
+    rpc GetCities(Empty) returns (GetCitiesRequest) {}
 }

@@ -17,4 +17,6 @@ type UseCase interface {
 	Visit(eventId string, userId string) error
 	Unvisit(eventId string, userId string) error
 	IsVisited(eventId string, userId string) (bool, error)
+	//
+	GetCities() ([]string, error)
 }

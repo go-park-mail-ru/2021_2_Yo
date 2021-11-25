@@ -287,3 +287,9 @@ func (a *UseCase) IsVisited(eventId string, userId string) (bool, error) {
 	result := out.Result
 	return result, err
 }
+
+func (a *UseCase) GetCities() ([]string, error) {
+	out, err := a.eventRepo.GetCities(context.Background(), &proto.Empty{})
+	result := out.Cities
+	return result, err
+}

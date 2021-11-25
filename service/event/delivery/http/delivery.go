@@ -226,9 +226,6 @@ func (h *Delivery) Unvisit(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "ended")
 }
 
-/*
-GET /user/14/visited
-*/
 func (h *Delivery) IsVisited(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "IsVisited:"
 	log.Debug(message + "started")
@@ -246,5 +243,16 @@ func (h *Delivery) IsVisited(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response.SendResponse(w, response.FavouriteResponse(res))
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) GetCities(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetCities:"
+	log.Debug(message + "started")
+	res, err := h.useCase.GetCities()
+	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+		return
+	}
+	response.SendResponse(w, response.CitiesResponse(res))
 	log.Debug(message + "ended")
 }

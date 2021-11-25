@@ -45,6 +45,7 @@ const (
 	visitQuery       = `insert into "visitor" (event_id, user_id) values ($1, $2)`
 	unvisitQuery     = `delete from "visitor" where event_id = $1 and user_id = $2`
 	isVisitedQuery   = `select count(*) from "visitor" where event_id = $1 and user_id = $2`
+	getCitiesQuery   = `select distinct city from event`
 )
 
 func (s *Repository) checkAuthor(eventId int, userId int) error {
@@ -411,5 +412,29 @@ func (s *Repository) IsVisited(ctx context.Context, in *proto.VisitRequest) (*pr
 	log.Debug(message + "ended")
 	return &proto.IsVisitedRequest{
 		Result: result,
+	}, nil
+}
+
+func (s *Repository) GetCities(ctx context.Context, in *proto.Empty) (*proto.GetCitiesRequest, error) {
+	message := logMessage + "GetCities:"
+	log.Debug(message + "started")
+	query := getCitiesQuery
+	rows, err := s.db.Queryx(query)
+	if err != nil {
+		return &proto.GetCitiesRequest{}, error2.ErrPostgres
+	}
+	defer rows.Close()
+	var resultCities []string
+	for rows.Next() {
+		var c string
+		err := rows.Scan(&c)
+		if err != nil {
+			return &proto.GetCitiesRequest{}, error2.ErrPostgres
+		}
+		resultCities = append(resultCities, c)
+	}
+	log.Debug(message + "ended")
+	return &proto.GetCitiesRequest{
+		Cities: resultCities,
 	}, nil
 }
