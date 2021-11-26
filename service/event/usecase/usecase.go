@@ -1,11 +1,10 @@
 package usecase
 
 import (
-	proto "backend/microservice/event/proto"
 	log "backend/pkg/logger"
 	"backend/pkg/models"
+	"backend/service/event"
 	error2 "backend/service/event/error"
-	"context"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -16,48 +15,12 @@ import (
 const logMessage = "service:event:usecase:"
 
 type UseCase struct {
-	eventRepo proto.RepositoryClient
+	repository event.Repository
 }
 
-func NewUseCase(eventRepo proto.RepositoryClient) *UseCase {
+func NewUseCase(repository event.Repository) *UseCase {
 	return &UseCase{
-		eventRepo: eventRepo,
-	}
-}
-
-func MakeProtoEvent(e *models.Event) *proto.Event {
-	return &proto.Event{
-		ID:          e.ID,
-		Title:       e.Title,
-		Description: e.Description,
-		Text:        e.Text,
-		City:        e.City,
-		Category:    e.Category,
-		Viewed:      int32(e.Viewed),
-		ImgUrl:      e.ImgUrl,
-		Tag:         e.Tag,
-		Date:        e.Date,
-		Geo:         e.Geo,
-		Address:     e.Address,
-		AuthorId:    e.AuthorId,
-	}
-}
-
-func MakeModelEvent(out *proto.Event) *models.Event {
-	return &models.Event{
-		ID:          out.ID,
-		Title:       out.Title,
-		Description: out.Description,
-		Text:        out.Text,
-		City:        out.City,
-		Category:    out.Category,
-		Viewed:      int(out.Viewed),
-		ImgUrl:      out.ImgUrl,
-		Tag:         out.Tag,
-		Date:        out.Date,
-		Geo:         out.Geo,
-		Address:     out.Address,
-		AuthorId:    out.AuthorId,
+		repository: repository,
 	}
 }
 
@@ -121,175 +84,94 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 	if e == nil || e.AuthorId == "" {
 		return "", error2.ErrEmptyData
 	}
-	for i, tag := range e.Tag {
-		e.Tag[i] = strings.ToLower(tag)
-	}
 	lat, lng := parseCoordinates(e.Geo)
-	log.Debug(lat, " ", lng)
-	var city string
-	var address string
 	city, address, err := cityAndAddrByCoordinates(lat, lng)
 	if err != nil {
 		log.Error(logMessage+"CreateEvent:err = ", err)
+	} else {
+		e.City = city
+		e.Address = address
 	}
-	e.City = city
-	e.Address = address
-
-	in := MakeProtoEvent(e)
-	res, err := a.eventRepo.CreateEvent(context.Background(), in)
-	if err != nil {
-		return "", err
+	for i, tag := range e.Tag {
+		e.Tag[i] = strings.ToLower(tag)
 	}
-	return res.ID, nil
+	return a.repository.CreateEvent(e)
 }
 
 func (a *UseCase) UpdateEvent(e *models.Event, userId string) error {
 	if e == nil || userId == "" || e.ID == "" {
 		return error2.ErrEmptyData
 	}
-	for i, tag := range e.Tag {
-		e.Tag[i] = strings.ToLower(tag)
-	}
 	lat, lng := parseCoordinates(e.Geo)
 	city, address, err := cityAndAddrByCoordinates(lat, lng)
 	if err != nil {
-		city = ""
-		address = ""
+		log.Error(logMessage+"CreateEvent:err = ", err)
+	} else {
+		e.City = city
+		e.Address = address
 	}
-	e.City = city
-	e.Address = address
-
-	in := &proto.UpdateEventRequest{
-		Event:  MakeProtoEvent(e),
-		UserId: userId,
+	for i, tag := range e.Tag {
+		e.Tag[i] = strings.ToLower(tag)
 	}
-	_, err = a.eventRepo.UpdateEvent(context.Background(), in)
-	log.Debug(logMessage + "UpdateEvent:HERE")
-	return err
+	return a.repository.UpdateEvent(e, userId)
 }
 
 func (a *UseCase) DeleteEvent(eventID string, userId string) error {
 	if userId == "" || eventID == "" {
 		return error2.ErrEmptyData
 	}
-	in := &proto.DeleteEventRequest{
-		EventId: eventID,
-		UserId:  userId,
-	}
-	_, err := a.eventRepo.DeleteEvent(context.Background(), in)
-	return err
+	return a.repository.DeleteEvent(eventID, userId)
 }
 
 func (a *UseCase) GetEventById(eventId string) (*models.Event, error) {
 	if eventId == "" {
 		return nil, error2.ErrEmptyData
 	}
-	in := &proto.EventId{ID: eventId}
-	out, err := a.eventRepo.GetEventById(context.Background(), in)
-	if err != nil {
-		return nil, err
-	}
-	result := MakeModelEvent(out)
-	return result, nil
+	return a.repository.GetEventById(eventId)
 }
 
 func (a *UseCase) GetEvents(title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
 	if tags != nil && tags[0] == "" {
 		tags = nil
 	}
-	in := &proto.GetEventsRequest{
-		Title:    title,
-		Category: category,
-		City:     city,
-		Date:     date,
-		Tags:     tags,
-	}
-	out, err := a.eventRepo.GetEvents(context.Background(), in)
-	if err != nil {
-		return nil, err
-	}
-	result := make([]*models.Event, len(out.Events))
-	for i, protoEvent := range out.Events {
-		result[i] = MakeModelEvent(protoEvent)
-	}
-	return result, nil
+	return a.repository.GetEvents(title, category, city, date, tags)
 }
 
 func (a *UseCase) GetVisitedEvents(userId string) ([]*models.Event, error) {
 	if userId == "" {
 		return nil, error2.ErrEmptyData
 	}
-	in := &proto.UserId{
-		ID: userId,
-	}
-	out, err := a.eventRepo.GetVisitedEvents(context.Background(), in)
-	if err != nil {
-		return nil, err
-	}
-	result := make([]*models.Event, len(out.Events))
-	for i, protoEvent := range out.Events {
-		result[i] = MakeModelEvent(protoEvent)
-	}
-	return result, nil
+	return a.repository.GetVisitedEvents(userId)
 }
 
 func (a *UseCase) GetCreatedEvents(userId string) ([]*models.Event, error) {
 	if userId == "" {
 		return nil, error2.ErrEmptyData
 	}
-	in := &proto.UserId{
-		ID: userId,
-	}
-	out, err := a.eventRepo.GetCreatedEvents(context.Background(), in)
-	if err != nil {
-		return nil, err
-	}
-	result := make([]*models.Event, len(out.Events))
-	for i, protoEvent := range out.Events {
-		result[i] = MakeModelEvent(protoEvent)
-	}
-	return result, nil
+	return a.repository.GetCreatedEvents(userId)
 }
 
 func (a *UseCase) Visit(eventId string, userId string) error {
 	if eventId == "" || userId == "" {
 		return error2.ErrEmptyData
 	}
-	in := &proto.VisitRequest{
-		EventId: eventId,
-		UserId:  userId,
-	}
-	_, err := a.eventRepo.Visit(context.Background(), in)
-	return err
+	return a.repository.Visit(eventId, userId)
 }
 
 func (a *UseCase) Unvisit(eventId string, userId string) error {
 	if eventId == "" || userId == "" {
 		return error2.ErrEmptyData
 	}
-	in := &proto.VisitRequest{
-		EventId: eventId,
-		UserId:  userId,
-	}
-	_, err := a.eventRepo.Unvisit(context.Background(), in)
-	return err
+	return a.repository.Unvisit(eventId, userId)
 }
 
 func (a *UseCase) IsVisited(eventId string, userId string) (bool, error) {
 	if eventId == "" || userId == "" {
 		return false, error2.ErrEmptyData
 	}
-	in := &proto.VisitRequest{
-		EventId: eventId,
-		UserId:  userId,
-	}
-	out, err := a.eventRepo.IsVisited(context.Background(), in)
-	result := out.Result
-	return result, err
+	return a.repository.IsVisited(eventId, userId)
 }
 
 func (a *UseCase) GetCities() ([]string, error) {
-	out, err := a.eventRepo.GetCities(context.Background(), &proto.Empty{})
-	result := out.Cities
-	return result, err
+	return a.repository.GetCities()
 }
