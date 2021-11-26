@@ -9,3 +9,9 @@ scrape_configs:
     static_configs:
       - targets: 
         - bmstusa-app:8080
+
+  - job_name: node
+    scrape_interval: 5s
+    static_configs:
+      - targets: 
+        - node-exporter:9100

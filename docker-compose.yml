@@ -42,6 +42,8 @@ services:
       - "9090:9090"
     volumes:
       - "./prometheus:/etc/prometheus"
+    depends_on:
+      - bmstusa-app
 
 # for remote
 #  postgres-db:
@@ -58,12 +60,32 @@ services:
     ports:
       - "6380:6379"
 
+  node-exporter:
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+    ports:
+      - "9100:9100"
   
   grafana:
     image: grafana/grafana
     ports:
       - "3000:3000"
+    volumes:
+      - "./grafana.ini:/etc/grafana/grafana.ini"
+      - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
-
+      
+# Explicitly define the persistent volume for your data storage
+volumes:
+  grafana-data:
+    external: true
     
