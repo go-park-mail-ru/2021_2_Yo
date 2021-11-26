@@ -1,10 +1,11 @@
 package main
 
 import (
+	"backend/microservice/event/client"
 	proto "backend/microservice/event/proto"
-	repository "backend/microservice/event/repository"
 	log "backend/pkg/logger"
 	"backend/pkg/utils"
+	repository "backend/service/event/repository/postgres"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -46,8 +47,9 @@ func main() {
 
 	server := grpc.NewServer()
 
-	eventRepositoryService := repository.NewRepository(db)
-	proto.RegisterRepositoryServer(server, eventRepositoryService)
+	eventRepository := repository.NewRepository(db)
+	eventService := client.NewEventService(eventRepository)
+	proto.RegisterEventServiceServer(server, eventService)
 
 	log.Info("started event microservice on ", port)
 	err = server.Serve(listener)

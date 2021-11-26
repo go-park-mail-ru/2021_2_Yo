@@ -1,11 +1,9 @@
-package repository
+package postgres
 
 import (
-	proto "backend/microservice/user/proto"
 	log "backend/pkg/logger"
 	"backend/pkg/models"
 	error2 "backend/service/user/error"
-	"context"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
 	"strconv"
@@ -31,94 +29,96 @@ type Repository struct {
 	db *sql.DB
 }
 
-func NewRepository(database *sql.DB) *Repository {
+func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
-		db: database,
+		db: db,
 	}
 }
 
-func (s *Repository) GetUserById(ctx context.Context, in *proto.UserId) (*proto.User, error) {
+/*
+	GetUserById(userId string) (*models.User, error)
+	///////
+	UpdateUserInfo(user *models.User) error
+	UpdateUserPassword(userId string, password string) error
+	///////
+	GetSubscribers(userId string) ([]*models.User, error)
+	GetSubscribes(userId string) ([]*models.User, error)
+	GetVisitors(eventId string) ([]*models.User, error)
+	///////
+	Subscribe(subscribedId string, subscriberId string) error
+	Unsubscribe(subscribedId string, subscriberId string) error
+	IsSubscribed(subscribedId string, subscriberId string) (bool, error)
+*/
+
+func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	message := logMessage + "GetUserById:"
 	log.Debug(message + "started")
-	userId := in.ID
 	query := getUserByIdQuery
 	user := User{}
 	err := s.db.Get(&user, query, userId)
 	if err != nil {
 		if err == sql2.ErrNoRows {
-			return &proto.User{}, error2.ErrUserNotFound
+			return nil, error2.ErrUserNotFound
 		}
-		return &proto.User{}, error2.ErrPostgres
+		return nil, error2.ErrPostgres
 	}
 	modelUser := toModelUser(&user)
-	out := toProtoUser(modelUser)
 	log.Debug(message + "ended")
-	return out, nil
+	return modelUser, nil
 }
 
-func (s *Repository) UpdateUserInfo(ctx context.Context, in *proto.User) (*proto.Empty, error) {
+func (s *Repository) UpdateUserInfo(u *models.User) error {
 	message := logMessage + "UpdateUserInfo:"
 	log.Debug(message + "started")
-	postgresUser, err := toPostgresUser(&models.User{
-		ID:       in.ID,
-		Name:     in.Name,
-		Surname:  in.Surname,
-		Mail:     in.Mail,
-		Password: in.Password,
-		About:    in.About,
-		ImgUrl:   in.ImgUrl,
-	})
+	postgresUser, err := toPostgresUser(u)
 	if err != nil {
-		return &proto.Empty{}, err
+		return err
 	}
 	var query string
 	if postgresUser.ImgUrl == "" {
 		query = updateUserInfoQueryWithoutImgUrl
 		_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ID)
 		if err != nil {
-			return &proto.Empty{}, error2.ErrPostgres
+			return error2.ErrPostgres
 		}
 	} else {
 		query = updateUserInfoQuery
 		_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
 		if err != nil {
-			return &proto.Empty{}, error2.ErrPostgres
+			return error2.ErrPostgres
 		}
 	}
 	log.Debug(message + "ended")
-	return &proto.Empty{}, nil
+	return nil
 }
 
-func (s *Repository) UpdateUserPassword(ctx context.Context, in *proto.UpdateUserPasswordRequest) (*proto.Empty, error) {
+func (s *Repository) UpdateUserPassword(userId string, password string) error {
 	message := logMessage + "UpdateUserPassword:"
 	log.Debug(message + "started")
-	userId := in.ID
-	password := in.Password
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return &proto.Empty{}, error2.ErrAtoi
+		return error2.ErrAtoi
 	}
 	query := updateUserPasswordQuery
 	_, err = s.db.Query(query, password, userIdInt)
 	if err != nil {
-		return &proto.Empty{}, error2.ErrPostgres
+		return error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
-	return &proto.Empty{}, nil
+	return nil
 }
 
-func (s *Repository) GetSubscribers(ctx context.Context, in *proto.UserId) (*proto.Users, error) {
+func (s *Repository) GetSubscribers(userId string) ([]*models.User, error) {
 	message := logMessage + "GetSubscribers:"
 	log.Debug(message + "started")
-	userId := in.ID
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return &proto.Users{}, error2.ErrAtoi
+		return nil, error2.ErrAtoi
 	}
 	query := getSubscribersQuery
 	rows, err := s.db.Queryx(query, userIdInt)
 	if err != nil {
-		return &proto.Users{}, error2.ErrPostgres
+		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
 	var resultUsers []*models.User
@@ -126,32 +126,26 @@ func (s *Repository) GetSubscribers(ctx context.Context, in *proto.UserId) (*pro
 		var u User
 		err := rows.StructScan(&u)
 		if err != nil {
-			return &proto.Users{}, error2.ErrPostgres
+			return nil, error2.ErrPostgres
 		}
 		modelUser := toModelUser(&u)
 		resultUsers = append(resultUsers, modelUser)
 	}
-	outUsers := make([]*proto.User, len(resultUsers))
-	for i, event := range resultUsers {
-		outUsers[i] = toProtoUser(event)
-	}
-	out := &proto.Users{Users: outUsers}
 	log.Debug(message + "ended")
-	return out, nil
+	return resultUsers, nil
 }
 
-func (s *Repository) GetSubscribes(ctx context.Context, in *proto.UserId) (*proto.Users, error) {
+func (s *Repository) GetSubscribes(userId string) ([]*models.User, error) {
 	message := logMessage + "GetSubscribes:"
 	log.Debug(message + "started")
-	userId := in.ID
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
-		return &proto.Users{}, error2.ErrAtoi
+		return nil, error2.ErrAtoi
 	}
 	query := getSubscribesQuery
 	rows, err := s.db.Queryx(query, userIdInt)
 	if err != nil {
-		return &proto.Users{}, error2.ErrPostgres
+		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
 	var resultUsers []*models.User
@@ -159,32 +153,26 @@ func (s *Repository) GetSubscribes(ctx context.Context, in *proto.UserId) (*prot
 		var u User
 		err := rows.StructScan(&u)
 		if err != nil {
-			return &proto.Users{}, error2.ErrPostgres
+			return nil, error2.ErrPostgres
 		}
 		modelUser := toModelUser(&u)
 		resultUsers = append(resultUsers, modelUser)
 	}
-	outUsers := make([]*proto.User, len(resultUsers))
-	for i, event := range resultUsers {
-		outUsers[i] = toProtoUser(event)
-	}
-	out := &proto.Users{Users: outUsers}
 	log.Debug(message + "ended")
-	return out, nil
+	return resultUsers, nil
 }
 
-func (s *Repository) GetVisitors(ctx context.Context, in *proto.EventId) (*proto.Users, error) {
+func (s *Repository) GetVisitors(eventId string) ([]*models.User, error) {
 	message := logMessage + "GetVisitors:"
 	log.Debug(message + "started")
-	eventId := in.ID
 	eventIdInt, err := strconv.Atoi(eventId)
 	if err != nil {
-		return &proto.Users{}, error2.ErrAtoi
+		return nil, error2.ErrAtoi
 	}
 	query := getVisitorsQuery
 	rows, err := s.db.Queryx(query, eventIdInt)
 	if err != nil {
-		return &proto.Users{}, error2.ErrPostgres
+		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
 	var resultUsers []*models.User
@@ -192,91 +180,78 @@ func (s *Repository) GetVisitors(ctx context.Context, in *proto.EventId) (*proto
 		var u User
 		err := rows.StructScan(&u)
 		if err != nil {
-			return &proto.Users{}, error2.ErrPostgres
+			return nil, error2.ErrPostgres
 		}
 		modelUser := toModelUser(&u)
 		resultUsers = append(resultUsers, modelUser)
 	}
-	outUsers := make([]*proto.User, len(resultUsers))
-	for i, event := range resultUsers {
-		outUsers[i] = toProtoUser(event)
-	}
-	out := &proto.Users{Users: outUsers}
 	log.Debug(message + "ended")
-	return out, nil
+	return resultUsers, nil
 }
 
-func (s *Repository) Subscribe(ctx context.Context, in *proto.SubscribeRequest) (*proto.Empty, error) {
+func (s *Repository) Subscribe(subscribedId string, subscriberId string) error {
 	message := logMessage + "Subscribe:"
 	log.Debug(message + "started")
-	subscribedId := in.SubscribedId
-	subscriberId := in.SubscriberId
 	subscribedIdInt, err := strconv.Atoi(subscribedId)
 	if err != nil {
-		return &proto.Empty{}, error2.ErrAtoi
+		return error2.ErrAtoi
 	}
 	subscriberIdInt, err := strconv.Atoi(subscriberId)
 	if err != nil {
-		return &proto.Empty{}, error2.ErrAtoi
+		return error2.ErrAtoi
 	}
 	query := subscribeQuery
 	_, err = s.db.Query(query, subscribedIdInt, subscriberIdInt)
 	if err != nil {
 		log.Error(message+"err = ", err)
-		return &proto.Empty{}, error2.ErrPostgres
+		return error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
-	return &proto.Empty{}, nil
+	return nil
 }
 
-func (s *Repository) Unsubscribe(ctx context.Context, in *proto.SubscribeRequest) (*proto.Empty, error) {
+func (s *Repository) Unsubscribe(subscribedId string, subscriberId string) error {
 	message := logMessage + "Unsubscribe:"
 	log.Debug(message + "started")
-	subscribedId := in.SubscribedId
-	subscriberId := in.SubscriberId
 	subscribedIdInt, err := strconv.Atoi(subscribedId)
 	if err != nil {
-		return &proto.Empty{}, error2.ErrAtoi
+		return error2.ErrAtoi
 	}
 	subscriberIdInt, err := strconv.Atoi(subscriberId)
 	if err != nil {
-		return &proto.Empty{}, error2.ErrAtoi
+		return error2.ErrAtoi
 	}
 	query := unsubscribeQuery
 	_, err = s.db.Query(query, subscribedIdInt, subscriberIdInt)
 	if err != nil {
 		log.Error(err)
-		return &proto.Empty{}, error2.ErrPostgres
+		return error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
-	return &proto.Empty{}, nil
+	return nil
 }
 
-func (s *Repository) IsSubscribed(ctx context.Context, in *proto.SubscribeRequest) (*proto.IsSubscribedRequest, error) {
+func (s *Repository) IsSubscribed(subscribedId string, subscriberId string) (bool, error) {
 	message := logMessage + "IsSubscribed:"
 	log.Debug(message + "started")
-	subscribedId := in.SubscribedId
-	subscriberId := in.SubscriberId
 	subscribedIdInt, err := strconv.Atoi(subscribedId)
 	if err != nil {
-		return &proto.IsSubscribedRequest{}, error2.ErrAtoi
+		return false, error2.ErrAtoi
 	}
 	subscriberIdInt, err := strconv.Atoi(subscriberId)
 	if err != nil {
-		return &proto.IsSubscribedRequest{}, error2.ErrAtoi
+		return false, error2.ErrAtoi
 	}
 	query := isSubscribedQuery
 	var count int
 	result := false
 	err = s.db.Get(&count, query, subscribedIdInt, subscriberIdInt)
 	if err != nil {
-		return &proto.IsSubscribedRequest{}, error2.ErrPostgres
+		return false, error2.ErrPostgres
 	}
 	if count > 0 {
 		result = true
 	}
 	log.Debug(message + "ended")
-	return &proto.IsSubscribedRequest{
-		Result: result,
-	}, nil
+	return result, nil
 }

@@ -43,7 +43,7 @@ message IsSubscribedRequest {
 
 message Empty {}
 
-service Repository {
+service UserService {
     rpc GetUserById(UserId) returns (User) {}
     rpc UpdateUserInfo(User) returns (Empty) {}
     rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (Empty) {}

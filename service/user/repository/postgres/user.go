@@ -1,7 +1,6 @@
-package repository
+package postgres
 
 import (
-	proto "backend/microservice/user/proto"
 	"backend/pkg/models"
 	error2 "backend/service/user/error"
 	"strconv"
@@ -42,18 +41,6 @@ func toPostgresUser(u *models.User) (*User, error) {
 func toModelUser(u *User) *models.User {
 	return &models.User{
 		ID:       strconv.Itoa(u.ID),
-		Name:     u.Name,
-		Surname:  u.Surname,
-		Mail:     u.Mail,
-		Password: u.Password,
-		About:    u.About,
-		ImgUrl:   u.ImgUrl,
-	}
-}
-
-func toProtoUser(u *models.User) *proto.User {
-	return &proto.User{
-		ID:       u.ID,
 		Name:     u.Name,
 		Surname:  u.Surname,
 		Mail:     u.Mail,

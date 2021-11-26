@@ -74,7 +74,7 @@ message GetCitiesRequest {
 
 message Empty {}
 
-service Repository {
+service EventService {
     rpc CreateEvent(Event) returns (EventId) {}
     rpc UpdateEvent(UpdateEventRequest) returns (Empty) {}
     rpc DeleteEvent(DeleteEventRequest) returns (Empty) {}

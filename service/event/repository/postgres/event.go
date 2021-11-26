@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"backend/pkg/models"
+	error2 "backend/service/event/error"
 	"github.com/lib/pq"
 	"strconv"
 )

@@ -268,61 +268,6 @@ func (x *Users) GetUsers() []*User {
 	return nil
 }
 
-type SubscribeRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	SubscribedId string `protobuf:"bytes,1,opt,name=SubscribedId,proto3" json:"SubscribedId,omitempty"`
-	SubscriberId string `protobuf:"bytes,2,opt,name=SubscriberId,proto3" json:"SubscriberId,omitempty"`
-}
-
-func (x *SubscribeRequest) Reset() {
-	*x = SubscribeRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_user_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *SubscribeRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SubscribeRequest) ProtoMessage() {}
-
-func (x *SubscribeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SubscribeRequest.ProtoReflect.Descriptor instead.
-func (*SubscribeRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *SubscribeRequest) GetSubscribedId() string {
-	if x != nil {
-		return x.SubscribedId
-	}
-	return ""
-}
-
-func (x *SubscribeRequest) GetSubscriberId() string {
-	if x != nil {
-		return x.SubscriberId
-	}
-	return ""
-}
-
 type EventId struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -334,7 +279,7 @@ type EventId struct {
 func (x *EventId) Reset() {
 	*x = EventId{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_user_proto_msgTypes[5]
+		mi := &file_user_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -347,7 +292,7 @@ func (x *EventId) String() string {
 func (*EventId) ProtoMessage() {}
 
 func (x *EventId) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[5]
+	mi := &file_user_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -360,12 +305,67 @@ func (x *EventId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EventId.ProtoReflect.Descriptor instead.
 func (*EventId) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{5}
+	return file_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *EventId) GetID() string {
 	if x != nil {
 		return x.ID
+	}
+	return ""
+}
+
+type SubscribeRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SubscribedId string `protobuf:"bytes,1,opt,name=SubscribedId,proto3" json:"SubscribedId,omitempty"`
+	SubscriberId string `protobuf:"bytes,2,opt,name=SubscriberId,proto3" json:"SubscriberId,omitempty"`
+}
+
+func (x *SubscribeRequest) Reset() {
+	*x = SubscribeRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_user_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SubscribeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubscribeRequest) ProtoMessage() {}
+
+func (x *SubscribeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubscribeRequest.ProtoReflect.Descriptor instead.
+func (*SubscribeRequest) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *SubscribeRequest) GetSubscribedId() string {
+	if x != nil {
+		return x.SubscribedId
+	}
+	return ""
+}
+
+func (x *SubscribeRequest) GetSubscriberId() string {
+	if x != nil {
+		return x.SubscriberId
 	}
 	return ""
 }
@@ -478,54 +478,54 @@ var file_user_proto_rawDesc = []byte{
 	0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x49, 0x6d, 0x67, 0x55, 0x72, 0x6c, 0x22, 0x2d,
 	0x0a, 0x05, 0x55, 0x73, 0x65, 0x72, 0x73, 0x12, 0x24, 0x0a, 0x05, 0x75, 0x73, 0x65, 0x72, 0x73,
 	0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70,
-	0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x52, 0x05, 0x75, 0x73, 0x65, 0x72, 0x73, 0x22, 0x5a, 0x0a,
-	0x10, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x22, 0x0a, 0x0c, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x64, 0x49,
-	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69,
-	0x62, 0x65, 0x64, 0x49, 0x64, 0x12, 0x22, 0x0a, 0x0c, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69,
-	0x62, 0x65, 0x72, 0x49, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x53, 0x75, 0x62,
-	0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x72, 0x49, 0x64, 0x22, 0x19, 0x0a, 0x07, 0x45, 0x76, 0x65,
-	0x6e, 0x74, 0x49, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x02, 0x49, 0x44, 0x22, 0x2d, 0x0a, 0x13, 0x49, 0x73, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72,
+	0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x52, 0x05, 0x75, 0x73, 0x65, 0x72, 0x73, 0x22, 0x19, 0x0a,
+	0x07, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x49, 0x44, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x49, 0x44, 0x22, 0x5a, 0x0a, 0x10, 0x53, 0x75, 0x62, 0x73,
+	0x63, 0x72, 0x69, 0x62, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x22, 0x0a, 0x0c,
+	0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x64, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x0c, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x64, 0x49, 0x64,
+	0x12, 0x22, 0x0a, 0x0c, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x72, 0x49, 0x64,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62,
+	0x65, 0x72, 0x49, 0x64, 0x22, 0x2d, 0x0a, 0x13, 0x49, 0x73, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72,
 	0x69, 0x62, 0x65, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x52,
 	0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x06, 0x52, 0x65, 0x73,
-	0x75, 0x6c, 0x74, 0x22, 0x07, 0x0a, 0x05, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x32, 0xab, 0x04, 0x0a,
-	0x0a, 0x52, 0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x6f, 0x72, 0x79, 0x12, 0x31, 0x0a, 0x0b, 0x47,
-	0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x42, 0x79, 0x49, 0x64, 0x12, 0x10, 0x2e, 0x75, 0x73, 0x65,
-	0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x1a, 0x0e, 0x2e, 0x75,
-	0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x22, 0x00, 0x12, 0x33,
-	0x0a, 0x0e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f,
-	0x12, 0x0e, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72,
-	0x1a, 0x0f, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74,
-	0x79, 0x22, 0x00, 0x12, 0x4c, 0x0a, 0x12, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65,
-	0x72, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x12, 0x23, 0x2e, 0x75, 0x73, 0x65, 0x72,
-	0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x50,
-	0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0f,
-	0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22,
-	0x00, 0x12, 0x35, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62,
-	0x65, 0x72, 0x73, 0x12, 0x10, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55,
-	0x73, 0x65, 0x72, 0x49, 0x64, 0x1a, 0x0f, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63,
-	0x2e, 0x55, 0x73, 0x65, 0x72, 0x73, 0x22, 0x00, 0x12, 0x34, 0x0a, 0x0d, 0x47, 0x65, 0x74, 0x53,
-	0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x73, 0x12, 0x10, 0x2e, 0x75, 0x73, 0x65, 0x72,
-	0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x1a, 0x0f, 0x2e, 0x75, 0x73,
-	0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x73, 0x22, 0x00, 0x12, 0x33,
-	0x0a, 0x0b, 0x47, 0x65, 0x74, 0x56, 0x69, 0x73, 0x69, 0x74, 0x6f, 0x72, 0x73, 0x12, 0x11, 0x2e,
-	0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x49, 0x64,
-	0x1a, 0x0f, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72,
-	0x73, 0x22, 0x00, 0x12, 0x3a, 0x0a, 0x09, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65,
-	0x12, 0x1a, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x53, 0x75, 0x62, 0x73,
-	0x63, 0x72, 0x69, 0x62, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0f, 0x2e, 0x75,
-	0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12,
-	0x3c, 0x0a, 0x0b, 0x55, 0x6e, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x12, 0x1a,
+	0x75, 0x6c, 0x74, 0x22, 0x07, 0x0a, 0x05, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x32, 0xac, 0x04, 0x0a,
+	0x0b, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x31, 0x0a, 0x0b,
+	0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x42, 0x79, 0x49, 0x64, 0x12, 0x10, 0x2e, 0x75, 0x73,
+	0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x1a, 0x0e, 0x2e,
+	0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x22, 0x00, 0x12,
+	0x33, 0x0a, 0x0e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x66,
+	0x6f, 0x12, 0x0e, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65,
+	0x72, 0x1a, 0x0f, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70,
+	0x74, 0x79, 0x22, 0x00, 0x12, 0x4c, 0x0a, 0x12, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73,
+	0x65, 0x72, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x12, 0x23, 0x2e, 0x75, 0x73, 0x65,
+	0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72,
+	0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x0f, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79,
+	0x22, 0x00, 0x12, 0x35, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69,
+	0x62, 0x65, 0x72, 0x73, 0x12, 0x10, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e,
+	0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x1a, 0x0f, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70,
+	0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x73, 0x22, 0x00, 0x12, 0x34, 0x0a, 0x0d, 0x47, 0x65, 0x74,
+	0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x73, 0x12, 0x10, 0x2e, 0x75, 0x73, 0x65,
+	0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x1a, 0x0f, 0x2e, 0x75,
+	0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x73, 0x22, 0x00, 0x12,
+	0x33, 0x0a, 0x0b, 0x47, 0x65, 0x74, 0x56, 0x69, 0x73, 0x69, 0x74, 0x6f, 0x72, 0x73, 0x12, 0x11,
+	0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x49,
+	0x64, 0x1a, 0x0f, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65,
+	0x72, 0x73, 0x22, 0x00, 0x12, 0x3a, 0x0a, 0x09, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62,
+	0x65, 0x12, 0x1a, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x53, 0x75, 0x62,
+	0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0f, 0x2e,
+	0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00,
+	0x12, 0x3c, 0x0a, 0x0b, 0x55, 0x6e, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x12,
+	0x1a, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x53, 0x75, 0x62, 0x73, 0x63,
+	0x72, 0x69, 0x62, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0f, 0x2e, 0x75, 0x73,
+	0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x4b,
+	0x0a, 0x0c, 0x49, 0x73, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x64, 0x12, 0x1a,
 	0x2e, 0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72,
-	0x69, 0x62, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0f, 0x2e, 0x75, 0x73, 0x65,
-	0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x4b, 0x0a,
-	0x0c, 0x49, 0x73, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x64, 0x12, 0x1a, 0x2e,
-	0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69,
-	0x62, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e, 0x75, 0x73, 0x65, 0x72,
-	0x47, 0x72, 0x70, 0x63, 0x2e, 0x49, 0x73, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65,
-	0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x00, 0x42, 0x0b, 0x5a, 0x09, 0x2f, 0x75,
-	0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x69, 0x62, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e, 0x75, 0x73, 0x65,
+	0x72, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x49, 0x73, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62,
+	0x65, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x00, 0x42, 0x0b, 0x5a, 0x09, 0x2f,
+	0x75, 0x73, 0x65, 0x72, 0x47, 0x72, 0x70, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -546,31 +546,31 @@ var file_user_proto_goTypes = []interface{}{
 	(*UpdateUserPasswordRequest)(nil), // 1: userGrpc.UpdateUserPasswordRequest
 	(*User)(nil),                      // 2: userGrpc.User
 	(*Users)(nil),                     // 3: userGrpc.Users
-	(*SubscribeRequest)(nil),          // 4: userGrpc.SubscribeRequest
-	(*EventId)(nil),                   // 5: userGrpc.EventId
+	(*EventId)(nil),                   // 4: userGrpc.EventId
+	(*SubscribeRequest)(nil),          // 5: userGrpc.SubscribeRequest
 	(*IsSubscribedRequest)(nil),       // 6: userGrpc.IsSubscribedRequest
 	(*Empty)(nil),                     // 7: userGrpc.Empty
 }
 var file_user_proto_depIdxs = []int32{
 	2,  // 0: userGrpc.Users.users:type_name -> userGrpc.User
-	0,  // 1: userGrpc.Repository.GetUserById:input_type -> userGrpc.UserId
-	2,  // 2: userGrpc.Repository.UpdateUserInfo:input_type -> userGrpc.User
-	1,  // 3: userGrpc.Repository.UpdateUserPassword:input_type -> userGrpc.UpdateUserPasswordRequest
-	0,  // 4: userGrpc.Repository.GetSubscribers:input_type -> userGrpc.UserId
-	0,  // 5: userGrpc.Repository.GetSubscribes:input_type -> userGrpc.UserId
-	5,  // 6: userGrpc.Repository.GetVisitors:input_type -> userGrpc.EventId
-	4,  // 7: userGrpc.Repository.Subscribe:input_type -> userGrpc.SubscribeRequest
-	4,  // 8: userGrpc.Repository.Unsubscribe:input_type -> userGrpc.SubscribeRequest
-	4,  // 9: userGrpc.Repository.IsSubscribed:input_type -> userGrpc.SubscribeRequest
-	2,  // 10: userGrpc.Repository.GetUserById:output_type -> userGrpc.User
-	7,  // 11: userGrpc.Repository.UpdateUserInfo:output_type -> userGrpc.Empty
-	7,  // 12: userGrpc.Repository.UpdateUserPassword:output_type -> userGrpc.Empty
-	3,  // 13: userGrpc.Repository.GetSubscribers:output_type -> userGrpc.Users
-	3,  // 14: userGrpc.Repository.GetSubscribes:output_type -> userGrpc.Users
-	3,  // 15: userGrpc.Repository.GetVisitors:output_type -> userGrpc.Users
-	7,  // 16: userGrpc.Repository.Subscribe:output_type -> userGrpc.Empty
-	7,  // 17: userGrpc.Repository.Unsubscribe:output_type -> userGrpc.Empty
-	6,  // 18: userGrpc.Repository.IsSubscribed:output_type -> userGrpc.IsSubscribedRequest
+	0,  // 1: userGrpc.UserService.GetUserById:input_type -> userGrpc.UserId
+	2,  // 2: userGrpc.UserService.UpdateUserInfo:input_type -> userGrpc.User
+	1,  // 3: userGrpc.UserService.UpdateUserPassword:input_type -> userGrpc.UpdateUserPasswordRequest
+	0,  // 4: userGrpc.UserService.GetSubscribers:input_type -> userGrpc.UserId
+	0,  // 5: userGrpc.UserService.GetSubscribes:input_type -> userGrpc.UserId
+	4,  // 6: userGrpc.UserService.GetVisitors:input_type -> userGrpc.EventId
+	5,  // 7: userGrpc.UserService.Subscribe:input_type -> userGrpc.SubscribeRequest
+	5,  // 8: userGrpc.UserService.Unsubscribe:input_type -> userGrpc.SubscribeRequest
+	5,  // 9: userGrpc.UserService.IsSubscribed:input_type -> userGrpc.SubscribeRequest
+	2,  // 10: userGrpc.UserService.GetUserById:output_type -> userGrpc.User
+	7,  // 11: userGrpc.UserService.UpdateUserInfo:output_type -> userGrpc.Empty
+	7,  // 12: userGrpc.UserService.UpdateUserPassword:output_type -> userGrpc.Empty
+	3,  // 13: userGrpc.UserService.GetSubscribers:output_type -> userGrpc.Users
+	3,  // 14: userGrpc.UserService.GetSubscribes:output_type -> userGrpc.Users
+	3,  // 15: userGrpc.UserService.GetVisitors:output_type -> userGrpc.Users
+	7,  // 16: userGrpc.UserService.Subscribe:output_type -> userGrpc.Empty
+	7,  // 17: userGrpc.UserService.Unsubscribe:output_type -> userGrpc.Empty
+	6,  // 18: userGrpc.UserService.IsSubscribed:output_type -> userGrpc.IsSubscribedRequest
 	10, // [10:19] is the sub-list for method output_type
 	1,  // [1:10] is the sub-list for method input_type
 	1,  // [1:1] is the sub-list for extension type_name
@@ -633,7 +633,7 @@ func file_user_proto_init() {
 			}
 		}
 		file_user_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SubscribeRequest); i {
+			switch v := v.(*EventId); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -645,7 +645,7 @@ func file_user_proto_init() {
 			}
 		}
 		file_user_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EventId); i {
+			switch v := v.(*SubscribeRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -709,10 +709,10 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// RepositoryClient is the client API for Repository service.
+// UserServiceClient is the client API for UserService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type RepositoryClient interface {
+type UserServiceClient interface {
 	GetUserById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error)
 	UpdateUserInfo(ctx context.Context, in *User, opts ...grpc.CallOption) (*Empty, error)
 	UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*Empty, error)
@@ -724,97 +724,97 @@ type RepositoryClient interface {
 	IsSubscribed(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (*IsSubscribedRequest, error)
 }
 
-type repositoryClient struct {
+type userServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewRepositoryClient(cc grpc.ClientConnInterface) RepositoryClient {
-	return &repositoryClient{cc}
+func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
+	return &userServiceClient{cc}
 }
 
-func (c *repositoryClient) GetUserById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error) {
+func (c *userServiceClient) GetUserById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/userGrpc.Repository/GetUserById", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userGrpc.UserService/GetUserById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) UpdateUserInfo(ctx context.Context, in *User, opts ...grpc.CallOption) (*Empty, error) {
+func (c *userServiceClient) UpdateUserInfo(ctx context.Context, in *User, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/userGrpc.Repository/UpdateUserInfo", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userGrpc.UserService/UpdateUserInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *userServiceClient) UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/userGrpc.Repository/UpdateUserPassword", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userGrpc.UserService/UpdateUserPassword", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) GetSubscribers(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Users, error) {
+func (c *userServiceClient) GetSubscribers(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Users, error) {
 	out := new(Users)
-	err := c.cc.Invoke(ctx, "/userGrpc.Repository/GetSubscribers", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userGrpc.UserService/GetSubscribers", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) GetSubscribes(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Users, error) {
+func (c *userServiceClient) GetSubscribes(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Users, error) {
 	out := new(Users)
-	err := c.cc.Invoke(ctx, "/userGrpc.Repository/GetSubscribes", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userGrpc.UserService/GetSubscribes", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) GetVisitors(ctx context.Context, in *EventId, opts ...grpc.CallOption) (*Users, error) {
+func (c *userServiceClient) GetVisitors(ctx context.Context, in *EventId, opts ...grpc.CallOption) (*Users, error) {
 	out := new(Users)
-	err := c.cc.Invoke(ctx, "/userGrpc.Repository/GetVisitors", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userGrpc.UserService/GetVisitors", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) Subscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *userServiceClient) Subscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/userGrpc.Repository/Subscribe", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userGrpc.UserService/Subscribe", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) Unsubscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *userServiceClient) Unsubscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/userGrpc.Repository/Unsubscribe", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userGrpc.UserService/Unsubscribe", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) IsSubscribed(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (*IsSubscribedRequest, error) {
+func (c *userServiceClient) IsSubscribed(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (*IsSubscribedRequest, error) {
 	out := new(IsSubscribedRequest)
-	err := c.cc.Invoke(ctx, "/userGrpc.Repository/IsSubscribed", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userGrpc.UserService/IsSubscribed", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// RepositoryServer is the server API for Repository service.
-type RepositoryServer interface {
+// UserServiceServer is the server API for UserService service.
+type UserServiceServer interface {
 	GetUserById(context.Context, *UserId) (*User, error)
 	UpdateUserInfo(context.Context, *User) (*Empty, error)
 	UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*Empty, error)
@@ -826,243 +826,243 @@ type RepositoryServer interface {
 	IsSubscribed(context.Context, *SubscribeRequest) (*IsSubscribedRequest, error)
 }
 
-// UnimplementedRepositoryServer can be embedded to have forward compatible implementations.
-type UnimplementedRepositoryServer struct {
+// UnimplementedUserServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedUserServiceServer struct {
 }
 
-func (*UnimplementedRepositoryServer) GetUserById(context.Context, *UserId) (*User, error) {
+func (*UnimplementedUserServiceServer) GetUserById(context.Context, *UserId) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
 }
-func (*UnimplementedRepositoryServer) UpdateUserInfo(context.Context, *User) (*Empty, error) {
+func (*UnimplementedUserServiceServer) UpdateUserInfo(context.Context, *User) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserInfo not implemented")
 }
-func (*UnimplementedRepositoryServer) UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*Empty, error) {
+func (*UnimplementedUserServiceServer) UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserPassword not implemented")
 }
-func (*UnimplementedRepositoryServer) GetSubscribers(context.Context, *UserId) (*Users, error) {
+func (*UnimplementedUserServiceServer) GetSubscribers(context.Context, *UserId) (*Users, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSubscribers not implemented")
 }
-func (*UnimplementedRepositoryServer) GetSubscribes(context.Context, *UserId) (*Users, error) {
+func (*UnimplementedUserServiceServer) GetSubscribes(context.Context, *UserId) (*Users, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSubscribes not implemented")
 }
-func (*UnimplementedRepositoryServer) GetVisitors(context.Context, *EventId) (*Users, error) {
+func (*UnimplementedUserServiceServer) GetVisitors(context.Context, *EventId) (*Users, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetVisitors not implemented")
 }
-func (*UnimplementedRepositoryServer) Subscribe(context.Context, *SubscribeRequest) (*Empty, error) {
+func (*UnimplementedUserServiceServer) Subscribe(context.Context, *SubscribeRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Subscribe not implemented")
 }
-func (*UnimplementedRepositoryServer) Unsubscribe(context.Context, *SubscribeRequest) (*Empty, error) {
+func (*UnimplementedUserServiceServer) Unsubscribe(context.Context, *SubscribeRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Unsubscribe not implemented")
 }
-func (*UnimplementedRepositoryServer) IsSubscribed(context.Context, *SubscribeRequest) (*IsSubscribedRequest, error) {
+func (*UnimplementedUserServiceServer) IsSubscribed(context.Context, *SubscribeRequest) (*IsSubscribedRequest, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsSubscribed not implemented")
 }
 
-func RegisterRepositoryServer(s *grpc.Server, srv RepositoryServer) {
-	s.RegisterService(&_Repository_serviceDesc, srv)
+func RegisterUserServiceServer(s *grpc.Server, srv UserServiceServer) {
+	s.RegisterService(&_UserService_serviceDesc, srv)
 }
 
-func _Repository_GetUserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_GetUserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).GetUserById(ctx, in)
+		return srv.(UserServiceServer).GetUserById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userGrpc.Repository/GetUserById",
+		FullMethod: "/userGrpc.UserService/GetUserById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).GetUserById(ctx, req.(*UserId))
+		return srv.(UserServiceServer).GetUserById(ctx, req.(*UserId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_UpdateUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_UpdateUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(User)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).UpdateUserInfo(ctx, in)
+		return srv.(UserServiceServer).UpdateUserInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userGrpc.Repository/UpdateUserInfo",
+		FullMethod: "/userGrpc.UserService/UpdateUserInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).UpdateUserInfo(ctx, req.(*User))
+		return srv.(UserServiceServer).UpdateUserInfo(ctx, req.(*User))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_UpdateUserPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_UpdateUserPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserPasswordRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).UpdateUserPassword(ctx, in)
+		return srv.(UserServiceServer).UpdateUserPassword(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userGrpc.Repository/UpdateUserPassword",
+		FullMethod: "/userGrpc.UserService/UpdateUserPassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).UpdateUserPassword(ctx, req.(*UpdateUserPasswordRequest))
+		return srv.(UserServiceServer).UpdateUserPassword(ctx, req.(*UpdateUserPasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_GetSubscribers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_GetSubscribers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).GetSubscribers(ctx, in)
+		return srv.(UserServiceServer).GetSubscribers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userGrpc.Repository/GetSubscribers",
+		FullMethod: "/userGrpc.UserService/GetSubscribers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).GetSubscribers(ctx, req.(*UserId))
+		return srv.(UserServiceServer).GetSubscribers(ctx, req.(*UserId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_GetSubscribes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_GetSubscribes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).GetSubscribes(ctx, in)
+		return srv.(UserServiceServer).GetSubscribes(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userGrpc.Repository/GetSubscribes",
+		FullMethod: "/userGrpc.UserService/GetSubscribes",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).GetSubscribes(ctx, req.(*UserId))
+		return srv.(UserServiceServer).GetSubscribes(ctx, req.(*UserId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_GetVisitors_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_GetVisitors_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EventId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).GetVisitors(ctx, in)
+		return srv.(UserServiceServer).GetVisitors(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userGrpc.Repository/GetVisitors",
+		FullMethod: "/userGrpc.UserService/GetVisitors",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).GetVisitors(ctx, req.(*EventId))
+		return srv.(UserServiceServer).GetVisitors(ctx, req.(*EventId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_Subscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_Subscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SubscribeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).Subscribe(ctx, in)
+		return srv.(UserServiceServer).Subscribe(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userGrpc.Repository/Subscribe",
+		FullMethod: "/userGrpc.UserService/Subscribe",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).Subscribe(ctx, req.(*SubscribeRequest))
+		return srv.(UserServiceServer).Subscribe(ctx, req.(*SubscribeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_Unsubscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_Unsubscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SubscribeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).Unsubscribe(ctx, in)
+		return srv.(UserServiceServer).Unsubscribe(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userGrpc.Repository/Unsubscribe",
+		FullMethod: "/userGrpc.UserService/Unsubscribe",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).Unsubscribe(ctx, req.(*SubscribeRequest))
+		return srv.(UserServiceServer).Unsubscribe(ctx, req.(*SubscribeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_IsSubscribed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_IsSubscribed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SubscribeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).IsSubscribed(ctx, in)
+		return srv.(UserServiceServer).IsSubscribed(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userGrpc.Repository/IsSubscribed",
+		FullMethod: "/userGrpc.UserService/IsSubscribed",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).IsSubscribed(ctx, req.(*SubscribeRequest))
+		return srv.(UserServiceServer).IsSubscribed(ctx, req.(*SubscribeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Repository_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "userGrpc.Repository",
-	HandlerType: (*RepositoryServer)(nil),
+var _UserService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "userGrpc.UserService",
+	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetUserById",
-			Handler:    _Repository_GetUserById_Handler,
+			Handler:    _UserService_GetUserById_Handler,
 		},
 		{
 			MethodName: "UpdateUserInfo",
-			Handler:    _Repository_UpdateUserInfo_Handler,
+			Handler:    _UserService_UpdateUserInfo_Handler,
 		},
 		{
 			MethodName: "UpdateUserPassword",
-			Handler:    _Repository_UpdateUserPassword_Handler,
+			Handler:    _UserService_UpdateUserPassword_Handler,
 		},
 		{
 			MethodName: "GetSubscribers",
-			Handler:    _Repository_GetSubscribers_Handler,
+			Handler:    _UserService_GetSubscribers_Handler,
 		},
 		{
 			MethodName: "GetSubscribes",
-			Handler:    _Repository_GetSubscribes_Handler,
+			Handler:    _UserService_GetSubscribes_Handler,
 		},
 		{
 			MethodName: "GetVisitors",
-			Handler:    _Repository_GetVisitors_Handler,
+			Handler:    _UserService_GetVisitors_Handler,
 		},
 		{
 			MethodName: "Subscribe",
-			Handler:    _Repository_Subscribe_Handler,
+			Handler:    _UserService_Subscribe_Handler,
 		},
 		{
 			MethodName: "Unsubscribe",
-			Handler:    _Repository_Unsubscribe_Handler,
+			Handler:    _UserService_Unsubscribe_Handler,
 		},
 		{
 			MethodName: "IsSubscribed",
-			Handler:    _Repository_IsSubscribed_Handler,
+			Handler:    _UserService_IsSubscribed_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

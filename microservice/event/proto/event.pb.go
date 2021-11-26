@@ -791,51 +791,51 @@ var file_event_proto_rawDesc = []byte{
 	0x22, 0x2a, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x43, 0x69, 0x74, 0x69, 0x65, 0x73, 0x52, 0x65, 0x71,
 	0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x43, 0x69, 0x74, 0x69, 0x65, 0x73, 0x18, 0x01,
 	0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x43, 0x69, 0x74, 0x69, 0x65, 0x73, 0x22, 0x07, 0x0a, 0x05,
-	0x45, 0x6d, 0x70, 0x74, 0x79, 0x32, 0xa7, 0x05, 0x0a, 0x0a, 0x52, 0x65, 0x70, 0x6f, 0x73, 0x69,
-	0x74, 0x6f, 0x72, 0x79, 0x12, 0x35, 0x0a, 0x0b, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x45, 0x76,
-	0x65, 0x6e, 0x74, 0x12, 0x10, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e,
-	0x45, 0x76, 0x65, 0x6e, 0x74, 0x1a, 0x12, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70,
-	0x63, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x22, 0x00, 0x12, 0x40, 0x0a, 0x0b, 0x55,
-	0x70, 0x64, 0x61, 0x74, 0x65, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x1d, 0x2e, 0x65, 0x76, 0x65,
-	0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x45, 0x76, 0x65,
-	0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x10, 0x2e, 0x65, 0x76, 0x65, 0x6e,
-	0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x40, 0x0a,
-	0x0b, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x1d, 0x2e, 0x65,
-	0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x45,
+	0x45, 0x6d, 0x70, 0x74, 0x79, 0x32, 0xa9, 0x05, 0x0a, 0x0c, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x53,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x35, 0x0a, 0x0b, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x10, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70,
+	0x63, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x1a, 0x12, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47,
+	0x72, 0x70, 0x63, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x22, 0x00, 0x12, 0x40, 0x0a,
+	0x0b, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x1d, 0x2e, 0x65,
+	0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x45,
 	0x76, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x10, 0x2e, 0x65, 0x76,
 	0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12,
-	0x36, 0x0a, 0x0c, 0x47, 0x65, 0x74, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x42, 0x79, 0x49, 0x64, 0x12,
-	0x12, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x76, 0x65, 0x6e,
-	0x74, 0x49, 0x64, 0x1a, 0x10, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e,
-	0x45, 0x76, 0x65, 0x6e, 0x74, 0x22, 0x00, 0x12, 0x3d, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x45, 0x76,
-	0x65, 0x6e, 0x74, 0x73, 0x12, 0x1b, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63,
-	0x2e, 0x47, 0x65, 0x74, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x11, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x76,
-	0x65, 0x6e, 0x74, 0x73, 0x22, 0x00, 0x12, 0x3a, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x56, 0x69, 0x73,
-	0x69, 0x74, 0x65, 0x64, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x11, 0x2e, 0x65, 0x76, 0x65,
-	0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x1a, 0x11, 0x2e,
-	0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73,
-	0x22, 0x00, 0x12, 0x3a, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64,
-	0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x11, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72,
-	0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x1a, 0x11, 0x2e, 0x65, 0x76, 0x65, 0x6e,
-	0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x22, 0x00, 0x12, 0x34,
-	0x0a, 0x05, 0x56, 0x69, 0x73, 0x69, 0x74, 0x12, 0x17, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47,
-	0x72, 0x70, 0x63, 0x2e, 0x56, 0x69, 0x73, 0x69, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x1a, 0x10, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70,
-	0x74, 0x79, 0x22, 0x00, 0x12, 0x36, 0x0a, 0x07, 0x55, 0x6e, 0x76, 0x69, 0x73, 0x69, 0x74, 0x12,
-	0x17, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x56, 0x69, 0x73, 0x69,
-	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x10, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74,
-	0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x43, 0x0a, 0x09,
-	0x49, 0x73, 0x56, 0x69, 0x73, 0x69, 0x74, 0x65, 0x64, 0x12, 0x17, 0x2e, 0x65, 0x76, 0x65, 0x6e,
+	0x40, 0x0a, 0x0b, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x1d,
+	0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74,
+	0x65, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x10, 0x2e,
+	0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22,
+	0x00, 0x12, 0x36, 0x0a, 0x0c, 0x47, 0x65, 0x74, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x42, 0x79, 0x49,
+	0x64, 0x12, 0x12, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x76,
+	0x65, 0x6e, 0x74, 0x49, 0x64, 0x1a, 0x10, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70,
+	0x63, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x22, 0x00, 0x12, 0x3d, 0x0a, 0x09, 0x47, 0x65, 0x74,
+	0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x1b, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72,
+	0x70, 0x63, 0x2e, 0x47, 0x65, 0x74, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x11, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e,
+	0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x22, 0x00, 0x12, 0x3a, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x56,
+	0x69, 0x73, 0x69, 0x74, 0x65, 0x64, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x11, 0x2e, 0x65,
+	0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x1a,
+	0x11, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x76, 0x65, 0x6e,
+	0x74, 0x73, 0x22, 0x00, 0x12, 0x3a, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x43, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x64, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x11, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74,
+	0x47, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x1a, 0x11, 0x2e, 0x65, 0x76,
+	0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x22, 0x00,
+	0x12, 0x34, 0x0a, 0x05, 0x56, 0x69, 0x73, 0x69, 0x74, 0x12, 0x17, 0x2e, 0x65, 0x76, 0x65, 0x6e,
 	0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x56, 0x69, 0x73, 0x69, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x49,
-	0x73, 0x56, 0x69, 0x73, 0x69, 0x74, 0x65, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22,
-	0x00, 0x12, 0x3c, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x43, 0x69, 0x74, 0x69, 0x65, 0x73, 0x12, 0x10,
-	0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79,
-	0x1a, 0x1b, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x47, 0x65, 0x74,
-	0x43, 0x69, 0x74, 0x69, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x00, 0x42,
-	0x0c, 0x5a, 0x0a, 0x2f, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x73, 0x74, 0x1a, 0x10, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45,
+	0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x36, 0x0a, 0x07, 0x55, 0x6e, 0x76, 0x69, 0x73, 0x69,
+	0x74, 0x12, 0x17, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x56, 0x69,
+	0x73, 0x69, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x10, 0x2e, 0x65, 0x76, 0x65,
+	0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x43,
+	0x0a, 0x09, 0x49, 0x73, 0x56, 0x69, 0x73, 0x69, 0x74, 0x65, 0x64, 0x12, 0x17, 0x2e, 0x65, 0x76,
+	0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x56, 0x69, 0x73, 0x69, 0x74, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63,
+	0x2e, 0x49, 0x73, 0x56, 0x69, 0x73, 0x69, 0x74, 0x65, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x22, 0x00, 0x12, 0x3c, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x43, 0x69, 0x74, 0x69, 0x65, 0x73,
+	0x12, 0x10, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x45, 0x6d, 0x70,
+	0x74, 0x79, 0x1a, 0x1b, 0x2e, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x2e, 0x47,
+	0x65, 0x74, 0x43, 0x69, 0x74, 0x69, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22,
+	0x00, 0x42, 0x0c, 0x5a, 0x0a, 0x2f, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x70, 0x63, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -868,28 +868,28 @@ var file_event_proto_goTypes = []interface{}{
 var file_event_proto_depIdxs = []int32{
 	0,  // 0: eventGrpc.UpdateEventRequest.event:type_name -> eventGrpc.Event
 	0,  // 1: eventGrpc.Events.events:type_name -> eventGrpc.Event
-	0,  // 2: eventGrpc.Repository.CreateEvent:input_type -> eventGrpc.Event
-	4,  // 3: eventGrpc.Repository.UpdateEvent:input_type -> eventGrpc.UpdateEventRequest
-	5,  // 4: eventGrpc.Repository.DeleteEvent:input_type -> eventGrpc.DeleteEventRequest
-	1,  // 5: eventGrpc.Repository.GetEventById:input_type -> eventGrpc.EventId
-	6,  // 6: eventGrpc.Repository.GetEvents:input_type -> eventGrpc.GetEventsRequest
-	3,  // 7: eventGrpc.Repository.GetVisitedEvents:input_type -> eventGrpc.UserId
-	3,  // 8: eventGrpc.Repository.GetCreatedEvents:input_type -> eventGrpc.UserId
-	8,  // 9: eventGrpc.Repository.Visit:input_type -> eventGrpc.VisitRequest
-	8,  // 10: eventGrpc.Repository.Unvisit:input_type -> eventGrpc.VisitRequest
-	8,  // 11: eventGrpc.Repository.IsVisited:input_type -> eventGrpc.VisitRequest
-	11, // 12: eventGrpc.Repository.GetCities:input_type -> eventGrpc.Empty
-	1,  // 13: eventGrpc.Repository.CreateEvent:output_type -> eventGrpc.EventId
-	11, // 14: eventGrpc.Repository.UpdateEvent:output_type -> eventGrpc.Empty
-	11, // 15: eventGrpc.Repository.DeleteEvent:output_type -> eventGrpc.Empty
-	0,  // 16: eventGrpc.Repository.GetEventById:output_type -> eventGrpc.Event
-	7,  // 17: eventGrpc.Repository.GetEvents:output_type -> eventGrpc.Events
-	7,  // 18: eventGrpc.Repository.GetVisitedEvents:output_type -> eventGrpc.Events
-	7,  // 19: eventGrpc.Repository.GetCreatedEvents:output_type -> eventGrpc.Events
-	11, // 20: eventGrpc.Repository.Visit:output_type -> eventGrpc.Empty
-	11, // 21: eventGrpc.Repository.Unvisit:output_type -> eventGrpc.Empty
-	9,  // 22: eventGrpc.Repository.IsVisited:output_type -> eventGrpc.IsVisitedRequest
-	10, // 23: eventGrpc.Repository.GetCities:output_type -> eventGrpc.GetCitiesRequest
+	0,  // 2: eventGrpc.EventService.CreateEvent:input_type -> eventGrpc.Event
+	4,  // 3: eventGrpc.EventService.UpdateEvent:input_type -> eventGrpc.UpdateEventRequest
+	5,  // 4: eventGrpc.EventService.DeleteEvent:input_type -> eventGrpc.DeleteEventRequest
+	1,  // 5: eventGrpc.EventService.GetEventById:input_type -> eventGrpc.EventId
+	6,  // 6: eventGrpc.EventService.GetEvents:input_type -> eventGrpc.GetEventsRequest
+	3,  // 7: eventGrpc.EventService.GetVisitedEvents:input_type -> eventGrpc.UserId
+	3,  // 8: eventGrpc.EventService.GetCreatedEvents:input_type -> eventGrpc.UserId
+	8,  // 9: eventGrpc.EventService.Visit:input_type -> eventGrpc.VisitRequest
+	8,  // 10: eventGrpc.EventService.Unvisit:input_type -> eventGrpc.VisitRequest
+	8,  // 11: eventGrpc.EventService.IsVisited:input_type -> eventGrpc.VisitRequest
+	11, // 12: eventGrpc.EventService.GetCities:input_type -> eventGrpc.Empty
+	1,  // 13: eventGrpc.EventService.CreateEvent:output_type -> eventGrpc.EventId
+	11, // 14: eventGrpc.EventService.UpdateEvent:output_type -> eventGrpc.Empty
+	11, // 15: eventGrpc.EventService.DeleteEvent:output_type -> eventGrpc.Empty
+	0,  // 16: eventGrpc.EventService.GetEventById:output_type -> eventGrpc.Event
+	7,  // 17: eventGrpc.EventService.GetEvents:output_type -> eventGrpc.Events
+	7,  // 18: eventGrpc.EventService.GetVisitedEvents:output_type -> eventGrpc.Events
+	7,  // 19: eventGrpc.EventService.GetCreatedEvents:output_type -> eventGrpc.Events
+	11, // 20: eventGrpc.EventService.Visit:output_type -> eventGrpc.Empty
+	11, // 21: eventGrpc.EventService.Unvisit:output_type -> eventGrpc.Empty
+	9,  // 22: eventGrpc.EventService.IsVisited:output_type -> eventGrpc.IsVisitedRequest
+	10, // 23: eventGrpc.EventService.GetCities:output_type -> eventGrpc.GetCitiesRequest
 	13, // [13:24] is the sub-list for method output_type
 	2,  // [2:13] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name
@@ -1076,10 +1076,10 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// RepositoryClient is the client API for Repository service.
+// EventServiceClient is the client API for EventService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type RepositoryClient interface {
+type EventServiceClient interface {
 	CreateEvent(ctx context.Context, in *Event, opts ...grpc.CallOption) (*EventId, error)
 	UpdateEvent(ctx context.Context, in *UpdateEventRequest, opts ...grpc.CallOption) (*Empty, error)
 	DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*Empty, error)
@@ -1093,115 +1093,115 @@ type RepositoryClient interface {
 	GetCities(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetCitiesRequest, error)
 }
 
-type repositoryClient struct {
+type eventServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewRepositoryClient(cc grpc.ClientConnInterface) RepositoryClient {
-	return &repositoryClient{cc}
+func NewEventServiceClient(cc grpc.ClientConnInterface) EventServiceClient {
+	return &eventServiceClient{cc}
 }
 
-func (c *repositoryClient) CreateEvent(ctx context.Context, in *Event, opts ...grpc.CallOption) (*EventId, error) {
+func (c *eventServiceClient) CreateEvent(ctx context.Context, in *Event, opts ...grpc.CallOption) (*EventId, error) {
 	out := new(EventId)
-	err := c.cc.Invoke(ctx, "/eventGrpc.Repository/CreateEvent", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/eventGrpc.EventService/CreateEvent", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) UpdateEvent(ctx context.Context, in *UpdateEventRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *eventServiceClient) UpdateEvent(ctx context.Context, in *UpdateEventRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/eventGrpc.Repository/UpdateEvent", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/eventGrpc.EventService/UpdateEvent", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *eventServiceClient) DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/eventGrpc.Repository/DeleteEvent", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/eventGrpc.EventService/DeleteEvent", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) GetEventById(ctx context.Context, in *EventId, opts ...grpc.CallOption) (*Event, error) {
+func (c *eventServiceClient) GetEventById(ctx context.Context, in *EventId, opts ...grpc.CallOption) (*Event, error) {
 	out := new(Event)
-	err := c.cc.Invoke(ctx, "/eventGrpc.Repository/GetEventById", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/eventGrpc.EventService/GetEventById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) GetEvents(ctx context.Context, in *GetEventsRequest, opts ...grpc.CallOption) (*Events, error) {
+func (c *eventServiceClient) GetEvents(ctx context.Context, in *GetEventsRequest, opts ...grpc.CallOption) (*Events, error) {
 	out := new(Events)
-	err := c.cc.Invoke(ctx, "/eventGrpc.Repository/GetEvents", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/eventGrpc.EventService/GetEvents", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) GetVisitedEvents(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Events, error) {
+func (c *eventServiceClient) GetVisitedEvents(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Events, error) {
 	out := new(Events)
-	err := c.cc.Invoke(ctx, "/eventGrpc.Repository/GetVisitedEvents", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/eventGrpc.EventService/GetVisitedEvents", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) GetCreatedEvents(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Events, error) {
+func (c *eventServiceClient) GetCreatedEvents(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Events, error) {
 	out := new(Events)
-	err := c.cc.Invoke(ctx, "/eventGrpc.Repository/GetCreatedEvents", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/eventGrpc.EventService/GetCreatedEvents", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) Visit(ctx context.Context, in *VisitRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *eventServiceClient) Visit(ctx context.Context, in *VisitRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/eventGrpc.Repository/Visit", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/eventGrpc.EventService/Visit", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) Unvisit(ctx context.Context, in *VisitRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *eventServiceClient) Unvisit(ctx context.Context, in *VisitRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/eventGrpc.Repository/Unvisit", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/eventGrpc.EventService/Unvisit", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) IsVisited(ctx context.Context, in *VisitRequest, opts ...grpc.CallOption) (*IsVisitedRequest, error) {
+func (c *eventServiceClient) IsVisited(ctx context.Context, in *VisitRequest, opts ...grpc.CallOption) (*IsVisitedRequest, error) {
 	out := new(IsVisitedRequest)
-	err := c.cc.Invoke(ctx, "/eventGrpc.Repository/IsVisited", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/eventGrpc.EventService/IsVisited", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *repositoryClient) GetCities(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetCitiesRequest, error) {
+func (c *eventServiceClient) GetCities(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetCitiesRequest, error) {
 	out := new(GetCitiesRequest)
-	err := c.cc.Invoke(ctx, "/eventGrpc.Repository/GetCities", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/eventGrpc.EventService/GetCities", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// RepositoryServer is the server API for Repository service.
-type RepositoryServer interface {
+// EventServiceServer is the server API for EventService service.
+type EventServiceServer interface {
 	CreateEvent(context.Context, *Event) (*EventId, error)
 	UpdateEvent(context.Context, *UpdateEventRequest) (*Empty, error)
 	DeleteEvent(context.Context, *DeleteEventRequest) (*Empty, error)
@@ -1215,293 +1215,293 @@ type RepositoryServer interface {
 	GetCities(context.Context, *Empty) (*GetCitiesRequest, error)
 }
 
-// UnimplementedRepositoryServer can be embedded to have forward compatible implementations.
-type UnimplementedRepositoryServer struct {
+// UnimplementedEventServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedEventServiceServer struct {
 }
 
-func (*UnimplementedRepositoryServer) CreateEvent(context.Context, *Event) (*EventId, error) {
+func (*UnimplementedEventServiceServer) CreateEvent(context.Context, *Event) (*EventId, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateEvent not implemented")
 }
-func (*UnimplementedRepositoryServer) UpdateEvent(context.Context, *UpdateEventRequest) (*Empty, error) {
+func (*UnimplementedEventServiceServer) UpdateEvent(context.Context, *UpdateEventRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateEvent not implemented")
 }
-func (*UnimplementedRepositoryServer) DeleteEvent(context.Context, *DeleteEventRequest) (*Empty, error) {
+func (*UnimplementedEventServiceServer) DeleteEvent(context.Context, *DeleteEventRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteEvent not implemented")
 }
-func (*UnimplementedRepositoryServer) GetEventById(context.Context, *EventId) (*Event, error) {
+func (*UnimplementedEventServiceServer) GetEventById(context.Context, *EventId) (*Event, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEventById not implemented")
 }
-func (*UnimplementedRepositoryServer) GetEvents(context.Context, *GetEventsRequest) (*Events, error) {
+func (*UnimplementedEventServiceServer) GetEvents(context.Context, *GetEventsRequest) (*Events, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEvents not implemented")
 }
-func (*UnimplementedRepositoryServer) GetVisitedEvents(context.Context, *UserId) (*Events, error) {
+func (*UnimplementedEventServiceServer) GetVisitedEvents(context.Context, *UserId) (*Events, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetVisitedEvents not implemented")
 }
-func (*UnimplementedRepositoryServer) GetCreatedEvents(context.Context, *UserId) (*Events, error) {
+func (*UnimplementedEventServiceServer) GetCreatedEvents(context.Context, *UserId) (*Events, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCreatedEvents not implemented")
 }
-func (*UnimplementedRepositoryServer) Visit(context.Context, *VisitRequest) (*Empty, error) {
+func (*UnimplementedEventServiceServer) Visit(context.Context, *VisitRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Visit not implemented")
 }
-func (*UnimplementedRepositoryServer) Unvisit(context.Context, *VisitRequest) (*Empty, error) {
+func (*UnimplementedEventServiceServer) Unvisit(context.Context, *VisitRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Unvisit not implemented")
 }
-func (*UnimplementedRepositoryServer) IsVisited(context.Context, *VisitRequest) (*IsVisitedRequest, error) {
+func (*UnimplementedEventServiceServer) IsVisited(context.Context, *VisitRequest) (*IsVisitedRequest, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsVisited not implemented")
 }
-func (*UnimplementedRepositoryServer) GetCities(context.Context, *Empty) (*GetCitiesRequest, error) {
+func (*UnimplementedEventServiceServer) GetCities(context.Context, *Empty) (*GetCitiesRequest, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCities not implemented")
 }
 
-func RegisterRepositoryServer(s *grpc.Server, srv RepositoryServer) {
-	s.RegisterService(&_Repository_serviceDesc, srv)
+func RegisterEventServiceServer(s *grpc.Server, srv EventServiceServer) {
+	s.RegisterService(&_EventService_serviceDesc, srv)
 }
 
-func _Repository_CreateEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EventService_CreateEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Event)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).CreateEvent(ctx, in)
+		return srv.(EventServiceServer).CreateEvent(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/eventGrpc.Repository/CreateEvent",
+		FullMethod: "/eventGrpc.EventService/CreateEvent",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).CreateEvent(ctx, req.(*Event))
+		return srv.(EventServiceServer).CreateEvent(ctx, req.(*Event))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_UpdateEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EventService_UpdateEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateEventRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).UpdateEvent(ctx, in)
+		return srv.(EventServiceServer).UpdateEvent(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/eventGrpc.Repository/UpdateEvent",
+		FullMethod: "/eventGrpc.EventService/UpdateEvent",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).UpdateEvent(ctx, req.(*UpdateEventRequest))
+		return srv.(EventServiceServer).UpdateEvent(ctx, req.(*UpdateEventRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_DeleteEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EventService_DeleteEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteEventRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).DeleteEvent(ctx, in)
+		return srv.(EventServiceServer).DeleteEvent(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/eventGrpc.Repository/DeleteEvent",
+		FullMethod: "/eventGrpc.EventService/DeleteEvent",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).DeleteEvent(ctx, req.(*DeleteEventRequest))
+		return srv.(EventServiceServer).DeleteEvent(ctx, req.(*DeleteEventRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_GetEventById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EventService_GetEventById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EventId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).GetEventById(ctx, in)
+		return srv.(EventServiceServer).GetEventById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/eventGrpc.Repository/GetEventById",
+		FullMethod: "/eventGrpc.EventService/GetEventById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).GetEventById(ctx, req.(*EventId))
+		return srv.(EventServiceServer).GetEventById(ctx, req.(*EventId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_GetEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EventService_GetEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetEventsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).GetEvents(ctx, in)
+		return srv.(EventServiceServer).GetEvents(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/eventGrpc.Repository/GetEvents",
+		FullMethod: "/eventGrpc.EventService/GetEvents",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).GetEvents(ctx, req.(*GetEventsRequest))
+		return srv.(EventServiceServer).GetEvents(ctx, req.(*GetEventsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_GetVisitedEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EventService_GetVisitedEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).GetVisitedEvents(ctx, in)
+		return srv.(EventServiceServer).GetVisitedEvents(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/eventGrpc.Repository/GetVisitedEvents",
+		FullMethod: "/eventGrpc.EventService/GetVisitedEvents",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).GetVisitedEvents(ctx, req.(*UserId))
+		return srv.(EventServiceServer).GetVisitedEvents(ctx, req.(*UserId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_GetCreatedEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EventService_GetCreatedEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).GetCreatedEvents(ctx, in)
+		return srv.(EventServiceServer).GetCreatedEvents(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/eventGrpc.Repository/GetCreatedEvents",
+		FullMethod: "/eventGrpc.EventService/GetCreatedEvents",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).GetCreatedEvents(ctx, req.(*UserId))
+		return srv.(EventServiceServer).GetCreatedEvents(ctx, req.(*UserId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_Visit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EventService_Visit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(VisitRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).Visit(ctx, in)
+		return srv.(EventServiceServer).Visit(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/eventGrpc.Repository/Visit",
+		FullMethod: "/eventGrpc.EventService/Visit",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).Visit(ctx, req.(*VisitRequest))
+		return srv.(EventServiceServer).Visit(ctx, req.(*VisitRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_Unvisit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EventService_Unvisit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(VisitRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).Unvisit(ctx, in)
+		return srv.(EventServiceServer).Unvisit(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/eventGrpc.Repository/Unvisit",
+		FullMethod: "/eventGrpc.EventService/Unvisit",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).Unvisit(ctx, req.(*VisitRequest))
+		return srv.(EventServiceServer).Unvisit(ctx, req.(*VisitRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_IsVisited_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EventService_IsVisited_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(VisitRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).IsVisited(ctx, in)
+		return srv.(EventServiceServer).IsVisited(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/eventGrpc.Repository/IsVisited",
+		FullMethod: "/eventGrpc.EventService/IsVisited",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).IsVisited(ctx, req.(*VisitRequest))
+		return srv.(EventServiceServer).IsVisited(ctx, req.(*VisitRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Repository_GetCities_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EventService_GetCities_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RepositoryServer).GetCities(ctx, in)
+		return srv.(EventServiceServer).GetCities(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/eventGrpc.Repository/GetCities",
+		FullMethod: "/eventGrpc.EventService/GetCities",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RepositoryServer).GetCities(ctx, req.(*Empty))
+		return srv.(EventServiceServer).GetCities(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Repository_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "eventGrpc.Repository",
-	HandlerType: (*RepositoryServer)(nil),
+var _EventService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "eventGrpc.EventService",
+	HandlerType: (*EventServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateEvent",
-			Handler:    _Repository_CreateEvent_Handler,
+			Handler:    _EventService_CreateEvent_Handler,
 		},
 		{
 			MethodName: "UpdateEvent",
-			Handler:    _Repository_UpdateEvent_Handler,
+			Handler:    _EventService_UpdateEvent_Handler,
 		},
 		{
 			MethodName: "DeleteEvent",
-			Handler:    _Repository_DeleteEvent_Handler,
+			Handler:    _EventService_DeleteEvent_Handler,
 		},
 		{
 			MethodName: "GetEventById",
-			Handler:    _Repository_GetEventById_Handler,
+			Handler:    _EventService_GetEventById_Handler,
 		},
 		{
 			MethodName: "GetEvents",
-			Handler:    _Repository_GetEvents_Handler,
+			Handler:    _EventService_GetEvents_Handler,
 		},
 		{
 			MethodName: "GetVisitedEvents",
-			Handler:    _Repository_GetVisitedEvents_Handler,
+			Handler:    _EventService_GetVisitedEvents_Handler,
 		},
 		{
 			MethodName: "GetCreatedEvents",
-			Handler:    _Repository_GetCreatedEvents_Handler,
+			Handler:    _EventService_GetCreatedEvents_Handler,
 		},
 		{
 			MethodName: "Visit",
-			Handler:    _Repository_Visit_Handler,
+			Handler:    _EventService_Visit_Handler,
 		},
 		{
 			MethodName: "Unvisit",
-			Handler:    _Repository_Unvisit_Handler,
+			Handler:    _EventService_Unvisit_Handler,
 		},
 		{
 			MethodName: "IsVisited",
-			Handler:    _Repository_IsVisited_Handler,
+			Handler:    _EventService_IsVisited_Handler,
 		},
 		{
 			MethodName: "GetCities",
-			Handler:    _Repository_GetCities_Handler,
+			Handler:    _EventService_GetCities_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

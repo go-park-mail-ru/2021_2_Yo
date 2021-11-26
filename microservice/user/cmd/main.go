@@ -1,10 +1,11 @@
 package main
 
 import (
+	"backend/microservice/user/client"
 	proto "backend/microservice/user/proto"
-	"backend/microservice/user/repository"
 	log "backend/pkg/logger"
 	"backend/pkg/utils"
+	"backend/service/user/repository/postgres"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -45,8 +46,9 @@ func main() {
 
 	server := grpc.NewServer()
 
-	userRepositoryService := repository.NewRepository(db)
-	proto.RegisterRepositoryServer(server, userRepositoryService)
+	userRepository := postgres.NewRepository(db)
+	userClient := client.NewUserService(userRepository)
+	proto.RegisterUserServiceServer(server, userClient)
 
 	log.Info("started user microservice on ", port)
 	err = server.Serve(listener)

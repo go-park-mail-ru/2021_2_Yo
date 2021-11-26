@@ -5,6 +5,8 @@ import (
 	"backend/pkg/register"
 	"backend/pkg/utils"
 	authDelivery "backend/service/auth/delivery/http"
+	grpc3 "backend/service/event/repository/grpc"
+	grpc2 "backend/service/user/repository/grpc"
 	"errors"
 
 	userRepository "backend/microservice/user/proto"
@@ -95,7 +97,8 @@ func NewApp(opts *Options) (*App, error) {
 		}
 	}
 
-	userR := userRepository.NewRepositoryClient(userGrpcConn)
+	userRClient := userRepository.NewUserServiceClient(userGrpcConn)
+	userR := grpc2.NewRepository(userRClient)
 	userUC := userUseCase.NewUseCase(userR)
 	userD := userDelivery.NewDelivery(userUC)
 
@@ -111,7 +114,8 @@ func NewApp(opts *Options) (*App, error) {
 		}
 	}
 
-	eventR := eventRepository.NewRepositoryClient(eventGrpcConn)
+	eventRClient := eventRepository.NewEventServiceClient(eventGrpcConn)
+	eventR := grpc3.NewRepository(eventRClient)
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
