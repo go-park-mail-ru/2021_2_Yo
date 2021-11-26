@@ -2,11 +2,11 @@ package user
 
 import (
 	"backend/pkg/models"
-	"testing"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 var createUserTests = []struct {

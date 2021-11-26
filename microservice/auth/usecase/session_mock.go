@@ -1,15 +1,15 @@
 package usecase
 
 import (
-	"github.com/stretchr/testify/mock"
 	authServiceModels "backend/microservice/auth/models"
+	"github.com/stretchr/testify/mock"
 )
 
 type AuthSessionMock struct {
 	mock.Mock
 }
 
-func (m *AuthSessionMock) Create(data *authServiceModels.SessionData) (error) {
+func (m *AuthSessionMock) Create(data *authServiceModels.SessionData) error {
 	args := m.Called(data)
 	return args.Error(0)
 }
@@ -19,7 +19,7 @@ func (m *AuthSessionMock) Check(sessionId string) (string, error) {
 	return args.String(0), args.Error(1)
 }
 
-func (m *AuthSessionMock) Delete(sessionId string) (error) {
+func (m *AuthSessionMock) Delete(sessionId string) error {
 	args := m.Called(sessionId)
 	return args.Error(0)
 }

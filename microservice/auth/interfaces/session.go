@@ -5,9 +5,7 @@ import (
 )
 
 type SessionRepository interface {
-	Create(data *authServiceModels.SessionData) error 
+	Create(data *authServiceModels.SessionData) error
 	Check(sessionId string) (string, error)
 	Delete(sessionId string) error
 }
-
-

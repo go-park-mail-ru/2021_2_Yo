@@ -25,13 +25,13 @@ func TestCreate(t *testing.T) {
 
 	mock := redismock.NewNiceMock(client)
 
-	mock.On("Set", key, val, exp).Return(redis.NewStatusResult("",nil))
+	mock.On("Set", key, val, exp).Return(redis.NewStatusResult("", nil))
 
 	r := NewRepository(mock)
 
 	data := &authServiceModels.SessionData{
-		SessionId: key,
-		UserId: val,
+		SessionId:  key,
+		UserId:     val,
 		Expiration: exp,
 	}
 
@@ -51,8 +51,8 @@ func TestCheck(t *testing.T) {
 func TestDelete(t *testing.T) {
 	mock := redismock.NewNiceMock(client)
 	keys := []string{key}
-	mock.On("Del",keys).Return(redis.NewIntResult(0,nil))
-	
+	mock.On("Del", keys).Return(redis.NewIntResult(0, nil))
+
 	r := NewRepository(mock)
 
 	err := r.Delete(key)

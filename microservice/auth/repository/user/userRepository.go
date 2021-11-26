@@ -5,9 +5,9 @@ import (
 	"backend/pkg/models"
 	error2 "backend/service/auth/error"
 	sql2 "database/sql"
+	"github.com/jmoiron/sqlx"
 	"strconv"
 	"strings"
-	"github.com/jmoiron/sqlx"
 )
 
 const (

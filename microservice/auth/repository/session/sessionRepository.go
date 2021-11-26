@@ -1,8 +1,8 @@
 package session
 
 import (
-	log "backend/pkg/logger"
 	authServiceModels "backend/microservice/auth/models"
+	log "backend/pkg/logger"
 	"github.com/go-redis/redis"
 )
 

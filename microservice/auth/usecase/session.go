@@ -7,8 +7,8 @@ import (
 	"errors"
 	log "github.com/sirupsen/logrus"
 	"math/rand"
-	"time"
 	"strconv"
+	"time"
 )
 
 var (
