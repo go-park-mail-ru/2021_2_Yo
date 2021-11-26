@@ -45,7 +45,9 @@ func MakeModelUser(u *proto.User) *models.User {
 }
 
 func (a *Repository) GetUserById(userId string) (*models.User, error) {
-	in := &proto.UserId{ID: userId}
+	in := &proto.UserId{
+		ID: userId,
+	}
 	out, err := a.client.GetUserById(context.Background(), in)
 	result := MakeModelUser(out)
 	return result, err

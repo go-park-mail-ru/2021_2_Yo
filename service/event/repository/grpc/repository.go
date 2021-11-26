@@ -64,8 +64,8 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 
 func (s *Repository) DeleteEvent(eventId string, userId string) error {
 	in := &eventGrpc.DeleteEventRequest{
-		EventId: "",
-		UserId:  "",
+		EventId: eventId,
+		UserId:  userId,
 	}
 	out, err := s.client.DeleteEvent(context.Background(), in)
 	_ = out
@@ -74,7 +74,7 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 
 func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 	in := &eventGrpc.EventId{
-		ID: "",
+		ID: eventId,
 	}
 	out, err := s.client.GetEventById(context.Background(), in)
 	if err != nil {
@@ -100,10 +100,10 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 
 func (s *Repository) GetEvents(title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
 	in := &eventGrpc.GetEventsRequest{
-		Title:    "",
-		Category: "",
-		City:     "",
-		Date:     "",
+		Title:    title,
+		Category: category,
+		City:     city,
+		Date:     date,
 		Tags:     nil,
 	}
 	out, err := s.client.GetEvents(context.Background(), in)
@@ -133,7 +133,7 @@ func (s *Repository) GetEvents(title string, category string, city string, date 
 
 func (s *Repository) GetVisitedEvents(userId string) ([]*models.Event, error) {
 	in := &eventGrpc.UserId{
-		ID: "",
+		ID: userId,
 	}
 	out, err := s.client.GetVisitedEvents(context.Background(), in)
 	if err != nil {
@@ -162,7 +162,7 @@ func (s *Repository) GetVisitedEvents(userId string) ([]*models.Event, error) {
 
 func (s *Repository) GetCreatedEvents(authorId string) ([]*models.Event, error) {
 	in := &eventGrpc.UserId{
-		ID: "",
+		ID: authorId,
 	}
 	out, err := s.client.GetCreatedEvents(context.Background(), in)
 	if err != nil {
@@ -191,8 +191,8 @@ func (s *Repository) GetCreatedEvents(authorId string) ([]*models.Event, error) 
 
 func (s *Repository) Visit(eventId string, userId string) error {
 	in := &eventGrpc.VisitRequest{
-		EventId: "",
-		UserId:  "",
+		EventId: eventId,
+		UserId:  userId,
 	}
 	out, err := s.client.Visit(context.Background(), in)
 	_ = out
@@ -201,8 +201,8 @@ func (s *Repository) Visit(eventId string, userId string) error {
 
 func (s *Repository) Unvisit(eventId string, userId string) error {
 	in := &eventGrpc.VisitRequest{
-		EventId: "",
-		UserId:  "",
+		EventId: eventId,
+		UserId:  userId,
 	}
 	out, err := s.client.Unvisit(context.Background(), in)
 	_ = out
@@ -211,8 +211,8 @@ func (s *Repository) Unvisit(eventId string, userId string) error {
 
 func (s *Repository) IsVisited(eventId string, userId string) (bool, error) {
 	in := &eventGrpc.VisitRequest{
-		EventId: "",
-		UserId:  "",
+		EventId: eventId,
+		UserId:  userId,
 	}
 	out, err := s.client.IsVisited(context.Background(), in)
 	result := out.Result

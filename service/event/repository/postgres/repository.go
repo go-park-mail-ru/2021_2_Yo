@@ -21,7 +21,7 @@ func NewRepository(database *sql.DB) *Repository {
 }
 
 const (
-	logMessage       = "microservice:event:repository:"
+	logMessage       = "service:event:repository:postgres:"
 	checkAuthorQuery = `select author_id from "event" where id = $1`
 	listQuery        = `select * from "event"`
 	getEventQuery    = `select * from "event" where id = $1`
@@ -185,7 +185,11 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 	log.Debug(message + "started")
 	query := getEventQuery
 	var e Event
-	err := s.db.Get(&e, query, eventId)
+	eventIdInt, err := strconv.Atoi(eventId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+	err = s.db.Get(&e, query, eventIdInt)
 	if err != nil {
 		log.Error(err)
 		if err == sql2.ErrNoRows {
