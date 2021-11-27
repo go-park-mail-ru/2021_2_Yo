@@ -104,7 +104,7 @@ func (s *Repository) GetEvents(title string, category string, city string, date 
 		Category: category,
 		City:     city,
 		Date:     date,
-		Tags:     nil,
+		Tags:     tags,
 	}
 	out, err := s.client.GetEvents(context.Background(), in)
 	if err != nil {
