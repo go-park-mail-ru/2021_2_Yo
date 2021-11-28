@@ -5,6 +5,7 @@ import (
 	"backend/pkg/utils"
 	"backend/service/user"
 	error2 "backend/service/user/error"
+	log "backend/pkg/logger"
 )
 
 const logMessage = "service:user:usecase:"
@@ -23,7 +24,9 @@ func (a *UseCase) GetUserById(userId string) (*models.User, error) {
 	if userId == "" {
 		return nil, error2.ErrEmptyData
 	}
+	log.Debug(logMessage+"GetUserById:userId = ",userId)
 	resultUser, err := a.repository.GetUserById(userId)
+	log.Debug(logMessage+"GetUserById:resultUser = ",resultUser)
 	if err != nil {
 		return nil, err
 	}
