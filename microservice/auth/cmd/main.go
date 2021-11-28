@@ -53,7 +53,6 @@ func main() {
 
 	log.Info(redisDB)
 	log.Info(response)
-	//Попробую 8081
 	authListener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Error(err)
