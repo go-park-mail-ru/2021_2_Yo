@@ -49,6 +49,9 @@ func (a *Repository) GetUserById(userId string) (*models.User, error) {
 		ID: userId,
 	}
 	out, err := a.client.GetUserById(context.Background(), in)
+	if err != nil {
+		return nil, err
+	}
 	result := MakeModelUser(out)
 	return result, err
 }
@@ -138,6 +141,9 @@ func (a *Repository) IsSubscribed(subscribedId string, subscriberId string) (boo
 		SubscriberId: subscriberId,
 	}
 	out, err := a.client.IsSubscribed(context.Background(), in)
+	if err != nil {
+		return false, err
+	}
 	result := out.Result
 	return result, err
 }
