@@ -4,7 +4,10 @@ import (
 	protoAuth "backend/microservice/auth/proto"
 	"backend/pkg/models"
 	"context"
+	log "backend/pkg/logger"
 )
+
+const logMessage = "service:auth:usecase:"
 
 type UseCase struct {
 	client protoAuth.AuthClient
@@ -17,17 +20,21 @@ func NewUseCase(authService protoAuth.AuthClient) *UseCase {
 }
 
 func (s *UseCase) SignUp(u *models.User) (string, error) {
+	log.Debug(logMessage+"SignUp:started")
 	in := &protoAuth.SignUpRequest{
 		Name:     u.Name,
 		Surname:  u.Surname,
 		Mail:     u.Mail,
 		Password: u.Password,
 	}
+	log.Debug(logMessage+"SignUp:in = ",in)
 	out, err := s.client.SignUp(context.Background(), in)
 	if err != nil {
 		return "", err
 	}
+	log.Debug(logMessage+"SignUp:out = ",out)
 	userId := out.ID
+	log.Debug(logMessage+"SignUp:ended")
 	return userId, nil
 }
 

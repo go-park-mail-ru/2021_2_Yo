@@ -24,5 +24,4 @@ func SendEmail(theme, message string, recievers []string) {
 		log.Error(err)
 		return
 	}
-	log.Info("Check email")
 }

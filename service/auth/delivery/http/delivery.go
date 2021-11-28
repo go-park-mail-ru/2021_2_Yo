@@ -67,7 +67,6 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
-	log.Info(CSRFToken)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
 	email.SendEmail("Подтвержение регистрации", "Вы успешно зарегистрировались на BMSTUSA!", []string{u.Mail})
