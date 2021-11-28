@@ -37,8 +37,6 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Debug(message+"eventFromRequest =", eventFromRequest)
-
 	imgUrl, err := utils.SaveImageFromRequest(r, "file")
 	if err == utils.ErrFileExt {
 		utils.CheckIfNoError(&w, err, message, http.StatusBadRequest)
@@ -47,7 +45,6 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		eventFromRequest.ImgUrl = imgUrl
 	}
-	log.Debug(message+"eventFromRequest.ImgUrl = ", eventFromRequest.ImgUrl)
 	eventFromRequest.AuthorId = userId
 	eventID, err := h.useCase.CreateEvent(eventFromRequest)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
@@ -112,7 +109,6 @@ func (h *Delivery) GetEventById(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
-	log.Debug("delivery:getEvent:resultEvent.authorId = ", resultEvent.AuthorId)
 	response.SendResponse(w, response.EventResponse(resultEvent))
 }
 
@@ -125,7 +121,6 @@ type getEventsVars struct {
 func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetEvents:"
 	log.Debug(message + "started")
-	log.Debug(message+"query = ", r.URL.Query())
 	q := r.URL.Query()
 
 	var title string
@@ -150,11 +145,6 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 		date = q["date"][0]
 	}
 	tags := strings.Split(tag, "|")
-	log.Debug(message+"title = ", title)
-	log.Debug(message+"category = ", category)
-	log.Debug(message+"city = ", city)
-	log.Debug(message+"date = ", date)
-	log.Debug(message+"tags = ", tags)
 
 	eventsList, err := h.useCase.GetEvents(title, category, city, date, tags)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {

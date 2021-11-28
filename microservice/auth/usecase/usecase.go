@@ -30,8 +30,6 @@ func (s *authService) SignUp(ctx context.Context, in *protoAuth.SignUpRequest) (
 	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
 
-	log.Debug(message+"in = ", in)
-
 	newUser := models.User{
 		Name:     in.Name,
 		Surname:  in.Surname,
@@ -51,8 +49,6 @@ func (s *authService) SignUp(ctx context.Context, in *protoAuth.SignUpRequest) (
 func (s *authService) SignIn(ctx context.Context, in *protoAuth.SignInRequest) (*protoAuth.UserId, error) {
 	message := logMessage + "SignIn:"
 	log.Debug(message + "started")
-
-	log.Debug(message+"in = ", in)
 
 	u, err := s.authUserRepository.GetUser(in.Mail, utils.CreatePasswordHash(in.Password))
 	if err != nil {

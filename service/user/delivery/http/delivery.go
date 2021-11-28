@@ -46,9 +46,7 @@ func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	vars := mux.Vars(r)
 	userId := vars["id"]
-	log.Debug(message + "userId = ", userId)
 	foundUser, err := h.useCase.GetUserById(userId)
-	log.Debug(message + "foundUser = ", userId)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

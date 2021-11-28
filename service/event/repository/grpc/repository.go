@@ -2,7 +2,6 @@ package grpc
 
 import (
 	eventGrpc "backend/microservice/event/proto"
-	log "backend/pkg/logger"
 	"backend/pkg/models"
 	"context"
 )
@@ -35,7 +34,6 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		Address:     e.Address,
 		AuthorId:    e.AuthorId,
 	}
-	log.Debug(logMessage+"CreateEvent:in.ImgUrl = ", in.ImgUrl)
 	out, err := s.client.CreateEvent(context.Background(), in)
 	eventId := out.ID
 	return eventId, err

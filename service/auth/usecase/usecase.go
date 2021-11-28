@@ -27,12 +27,10 @@ func (s *UseCase) SignUp(u *models.User) (string, error) {
 		Mail:     u.Mail,
 		Password: u.Password,
 	}
-	log.Debug(logMessage+"SignUp:in = ",in)
 	out, err := s.client.SignUp(context.Background(), in)
 	if err != nil {
 		return "", err
 	}
-	log.Debug(logMessage+"SignUp:out = ",out)
 	userId := out.ID
 	log.Debug(logMessage+"SignUp:ended")
 	return userId, nil

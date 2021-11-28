@@ -129,8 +129,6 @@ func NewApp(opts *Options) (*App, error) {
 }
 
 func options(w http.ResponseWriter, r *http.Request) {
-	cookie, _ := r.Cookie("session_id")
-	log.Debug("options: ", cookie)
 }
 
 func newRouterWithEndpoints(app *App) *mux.Router {
