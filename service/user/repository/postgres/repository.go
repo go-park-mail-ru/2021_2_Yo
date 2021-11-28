@@ -69,7 +69,9 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 		}
 		return nil, error2.ErrPostgres
 	}
+	log.Debug(message+"HERE 3")
 	log.Debug(message + "user = ", user)
+	log.Debug(message+"HERE 4")
 	modelUser := toModelUser(user)
 	log.Debug(message + "modelUser = ", modelUser)
 	log.Debug(message + "ended")
