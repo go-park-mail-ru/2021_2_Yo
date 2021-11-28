@@ -47,6 +47,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		eventFromRequest.ImgUrl = imgUrl
 	}
+	log.Debug(message+"eventFromRequest.ImgUrl = ", eventFromRequest.ImgUrl)
 	eventFromRequest.AuthorId = userId
 	eventID, err := h.useCase.CreateEvent(eventFromRequest)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {

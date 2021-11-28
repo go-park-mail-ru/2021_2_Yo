@@ -67,6 +67,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	log.Debug(message+"newEvent.ImgUrl = ", newEvent.ImgUrl)
 	var eventId int
 	query := createEventQuery
 	err = s.db.Get(

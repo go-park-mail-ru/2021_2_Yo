@@ -95,6 +95,7 @@ func (a *UseCase) CreateEvent(e *models.Event) (string, error) {
 	for i, tag := range e.Tag {
 		e.Tag[i] = strings.ToLower(tag)
 	}
+	log.Debug(logMessage+"CreateEvent:e.ImgUrl = ", e.ImgUrl)
 	return a.repository.CreateEvent(e)
 }
 

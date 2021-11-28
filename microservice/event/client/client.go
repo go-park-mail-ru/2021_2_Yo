@@ -2,10 +2,13 @@ package client
 
 import (
 	proto "backend/microservice/event/proto"
+	log "backend/pkg/logger"
 	"backend/pkg/models"
 	"backend/service/event"
 	"context"
 )
+
+const logMessage = "microservice:event:client:"
 
 type EventService struct {
 	repository event.Repository
@@ -71,6 +74,7 @@ func MakeModelEvent(out *proto.Event) *models.Event {
 
 func (c *EventService) CreateEvent(ctx context.Context, in *proto.Event) (*proto.EventId, error) {
 	modelEvent := MakeModelEvent(in)
+	log.Debug(logMessage+"CreateEvent:modelEvent.ImgUrl = ", modelEvent.ImgUrl)
 	eventId, err := c.repository.CreateEvent(modelEvent)
 	out := &proto.EventId{
 		ID: eventId,
