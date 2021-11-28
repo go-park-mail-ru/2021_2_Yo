@@ -53,6 +53,7 @@ func NewRepository(db *sql.DB) *Repository {
 func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	message := logMessage + "GetUserById:"
 	log.Debug(message + "started")
+	log.Debug(message + "userId = ", userId)
 	query := getUserByIdQuery
 	user := User{}
 	err := s.db.Get(&user, query, userId)
@@ -63,6 +64,7 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 		return nil, error2.ErrPostgres
 	}
 	modelUser := toModelUser(&user)
+	log.Debug(message + "modelUser = ", modelUser)
 	log.Debug(message + "ended")
 	return modelUser, nil
 }
