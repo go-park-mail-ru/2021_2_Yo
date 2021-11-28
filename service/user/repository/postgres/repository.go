@@ -55,15 +55,16 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	log.Debug(message + "started")
 	log.Debug(message + "userId = ", userId)
 	query := getUserByIdQuery
-	user := User{}
-	err := s.db.Get(&user, query, userId)
+	user := &User{}
+	err := s.db.Get(user, query, userId)
 	if err != nil {
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrUserNotFound
 		}
 		return nil, error2.ErrPostgres
 	}
-	modelUser := toModelUser(&user)
+	log.Debug(message + "user = ", user)
+	modelUser := toModelUser(user)
 	log.Debug(message + "modelUser = ", modelUser)
 	log.Debug(message + "ended")
 	return modelUser, nil
