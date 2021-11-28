@@ -21,11 +21,12 @@ func NewRepository(database *sql.DB) *Repository {
 }
 
 const (
-	logMessage       = "service:event:repository:postgres:"
-	checkAuthorQuery = `select author_id from "event" where id = $1`
-	listQuery        = `select * from "event"`
-	getEventQuery    = `select * from "event" where id = $1`
-	createEventQuery = `insert into "event" 
+	logMessage          = "service:event:repository:postgres:"
+	checkAuthorQuery    = `select author_id from "event" where id = $1`
+	listQuery           = `select * from "event"`
+	incrementEventViews = `update "event" set viewed = viewed + 1 where event.id = $1`
+	getEventQuery       = `select * from "event" where id = $1`
+	createEventQuery    = `insert into "event" 
 		(title, description, text, city, category, viewed, img_url, date, geo, address, tag, author_id) 
 		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::varchar[], $12) 
 		returning id`
@@ -184,12 +185,15 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 	message := logMessage + "GetEventById:"
 	log.Debug(message + "started")
-	query := getEventQuery
+	var query string
 	var e Event
 	eventIdInt, err := strconv.Atoi(eventId)
 	if err != nil {
 		return nil, error2.ErrAtoi
 	}
+	query = incrementEventViews
+	s.db.Query(query, eventIdInt)
+	query = getEventQuery
 	err = s.db.Get(&e, query, eventIdInt)
 	if err != nil {
 		log.Error(err)
