@@ -64,6 +64,7 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	err = s.db.Get(user, query, userIdInt)
 	log.Debug(message+"HERE 2")
 	if err != nil {
+		log.Debug(message+"err = ",err)
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrUserNotFound
 		}
