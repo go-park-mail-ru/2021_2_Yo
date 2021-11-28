@@ -134,10 +134,8 @@ func (a *UseCase) GetEvents(title string, category string, city string, date str
 	if tags != nil && tags[0] == "" {
 		tags = nil
 	}
-	if tags != nil {
-		for i, tag := range tags {
-			tags[i] = strings.ToLower(tag)
-		}
+	for i, tag := range tags {
+		tags[i] = strings.ToLower(tag)
 	}
 	return a.repository.GetEvents(title, category, city, date, tags)
 }
