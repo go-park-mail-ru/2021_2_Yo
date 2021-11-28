@@ -145,6 +145,7 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 		date = q["date"][0]
 	}
 	tags := strings.Split(tag, "|")
+	log.Debug(message+"tags = ", tags)
 
 	eventsList, err := h.useCase.GetEvents(title, category, city, date, tags)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
