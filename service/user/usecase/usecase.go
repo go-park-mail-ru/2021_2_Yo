@@ -99,7 +99,7 @@ func (a *UseCase) Unsubscribe(subscribedId string, subscriberId string) error {
 	if subscribedId == "" || subscriberId == "" {
 		return error2.ErrEmptyData
 	}
-	return a.repository.Subscribe(subscribedId, subscriberId)
+	return a.repository.Unsubscribe(subscribedId, subscriberId)
 }
 
 func (a *UseCase) IsSubscribed(subscribedId string, subscriberId string) (bool, error) {
