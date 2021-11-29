@@ -3,6 +3,8 @@ services:
   bmstusa-app:
     build: "./"
     command: ./backend
+    volumes:
+      - images-storage:/static/images
     ports:
       - "8080:8080"
     depends_on:
@@ -79,7 +81,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - "./grafana.ini:/etc/grafana/grafana.ini"
+    #  - "./grafana.ini:/etc/grafana/grafana.ini"
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
@@ -87,5 +89,7 @@ services:
 # Explicitly define the persistent volume for your data storage
 volumes:
   grafana-data:
+    external: true
+  images-storage:
     external: true
     
