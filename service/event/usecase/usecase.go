@@ -130,7 +130,7 @@ func (a *UseCase) GetEventById(eventId string) (*models.Event, error) {
 	return a.repository.GetEventById(eventId)
 }
 
-func (a *UseCase) GetEvents(title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
+func (a *UseCase) GetEvents(userId string, title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
 	if tags != nil && tags[0] == "" {
 		tags = nil
 	}
@@ -138,7 +138,7 @@ func (a *UseCase) GetEvents(title string, category string, city string, date str
 		tags[i] = strings.ToLower(tag)
 	}
 	log.Debug(logMessage+"GetEvents:tags = ", tags)
-	return a.repository.GetEvents(title, category, city, date, tags)
+	return a.repository.GetEvents(userId, title, category, city, date, tags)
 }
 
 func (a *UseCase) GetVisitedEvents(userId string) ([]*models.Event, error) {

@@ -206,6 +206,7 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 	return resultEvent, nil
 }
 
+/*
 func (s *Repository) GetEvents(title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
 	message := logMessage + "GetEvents:"
 	log.Debug(message + "started")
@@ -241,6 +242,110 @@ func (s *Repository) GetEvents(title string, category string, city string, date 
 	}
 	query += ` order by viewed DESC`
 	rows, err := s.db.Queryx(query, title, category, city, date, postgresTags)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var resultEvents []*models.Event
+	for rows.Next() {
+		var e Event
+		err := rows.StructScan(&e)
+		if err != nil {
+			log.Error(message, "err = ", err)
+			return nil, error2.ErrPostgres
+		}
+		modelEvent := toModelEvent(&e)
+		resultEvents = append(resultEvents, modelEvent)
+	}
+	log.Debug(message + "ended")
+	return resultEvents, nil
+}
+*/
+
+/*
+select e.*, count(v) from event as e
+    left join
+    visitor v on
+        e.id = v.event_id
+            and
+        v.user_id = 0
+group by e.id,
+         e.title,
+         e.description,
+         e.text,
+         e.city,
+         e.category,
+         e.viewed,
+         e.img_url,
+         e.date,
+         e.geo,
+         e.address,
+         e.tag,
+         e.author_id;
+*/
+
+func (s *Repository) GetEvents(userId string, title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
+	message := logMessage + "GetEvents:"
+	log.Debug(message + "started")
+	postgresTags := make(pq.StringArray, len(tags))
+
+	var userIdInt int
+
+	for i := range tags {
+		postgresTags[i] = tags[i]
+	}
+	query := `select e.*, count(v) from event as e
+				left join visitor as v on e.id = v.event_id and `
+	query += `v.user_id = $1 `
+	if userId == "" {
+		userIdInt = 0
+	} else {
+		userIdInt1, err := strconv.Atoi(userId)
+		if err != nil {
+			return nil, error2.ErrAtoi
+		}
+		userIdInt = userIdInt1
+	}
+	if title != "" {
+		query += `where lower(title) ~ lower($2) and `
+	} else {
+		query += `where $2 = $2 and `
+	}
+	if category != "" {
+		query += `lower(category) = lower($3) and `
+	} else {
+		query += `$3 = $3 and `
+	}
+	if city != "" {
+		query += `lower(city) = lower($4) and `
+	} else {
+		query += `$4 = $4 and `
+	}
+	if date != "" {
+		query += `lower(date) = lower($5) and `
+	} else {
+		query += `$5 = $5 and `
+	}
+	if len(postgresTags) != 0 {
+		query += `tag && $6::varchar[] `
+	} else {
+		query += `$6 = $6 `
+	}
+	query += `group by e.id,
+         e.title,
+         e.description,
+         e.text,
+         e.city,
+         e.category,
+         e.viewed,
+         e.img_url,
+         e.date,
+         e.geo,
+         e.address,
+         e.tag,
+         e.author_id 
+         order by viewed DESC`
+	rows, err := s.db.Queryx(query, userIdInt, title, category, city, date, postgresTags)
 	if err != nil {
 		return nil, err
 	}

@@ -23,6 +23,7 @@ message Event {
     string Geo = 11;
     string Address = 12;
     string AuthorId = 13;
+    bool IsVisited = 14;
 }
 
 message EventId {
@@ -48,11 +49,12 @@ message DeleteEventRequest {
 }
 
 message GetEventsRequest {
-    string title = 1;
-    string category = 2;
-    string city = 3;
-    string date = 4;
-    repeated string tags = 5;
+    string userId = 1;
+    string title = 2;
+    string category = 3;
+    string city = 4;
+    string date = 5;
+    repeated string tags = 6;
 }
 
 message Events {

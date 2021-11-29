@@ -123,12 +123,16 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	q := r.URL.Query()
 
+	var userId string
 	var title string
 	var category string
 	var city string
 	var tag string
 	var date string
 
+	if len(q["userId"]) > 0 {
+		userId = q["userId"][0]
+	}
 	if len(q["query"]) > 0 {
 		title = q["query"][0]
 	}
@@ -147,7 +151,7 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	tags := strings.Split(tag, "|")
 	log.Debug(message+"tags = ", tags)
 
-	eventsList, err := h.useCase.GetEvents(title, category, city, date, tags)
+	eventsList, err := h.useCase.GetEvents(userId, title, category, city, date, tags)
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}

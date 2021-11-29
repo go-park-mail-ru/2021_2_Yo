@@ -37,6 +37,7 @@ func MakeProtoEvent(e *models.Event) *proto.Event {
 		Geo:         e.Geo,
 		Address:     e.Address,
 		AuthorId:    e.AuthorId,
+		IsVisited:   e.IsVisited,
 	}
 }
 
@@ -68,6 +69,7 @@ func MakeModelEvent(out *proto.Event) *models.Event {
 		Geo:         out.Geo,
 		Address:     out.Address,
 		AuthorId:    out.AuthorId,
+		IsVisited:   out.IsVisited,
 	}
 }
 
@@ -104,12 +106,13 @@ func (c *EventService) GetEventById(ctx context.Context, in *proto.EventId) (*pr
 }
 
 func (c *EventService) GetEvents(ctx context.Context, in *proto.GetEventsRequest) (*proto.Events, error) {
+	userId := in.UserId
 	title := in.Title
 	category := in.Category
 	city := in.City
 	date := in.Date
 	tags := in.Tags
-	modelEvents, err := c.repository.GetEvents(title, category, city, date, tags)
+	modelEvents, err := c.repository.GetEvents(userId, title, category, city, date, tags)
 	out := MakeProtoEvents(modelEvents)
 	return out, err
 }

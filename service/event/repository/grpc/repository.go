@@ -100,8 +100,9 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 	return result, err
 }
 
-func (s *Repository) GetEvents(title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
+func (s *Repository) GetEvents(userId string, title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
 	in := &eventGrpc.GetEventsRequest{
+		UserId:   userId,
 		Title:    title,
 		Category: category,
 		City:     city,
@@ -128,6 +129,7 @@ func (s *Repository) GetEvents(title string, category string, city string, date 
 			Geo:         protoEvent.Geo,
 			Address:     protoEvent.Address,
 			AuthorId:    protoEvent.AuthorId,
+			IsVisited:   protoEvent.IsVisited,
 		}
 	}
 	return result, err
