@@ -53,7 +53,6 @@ func InitPostgresDB() (*sqlx.DB, error) {
 	dbname := viper.GetString("postgres_db.dbname")
 	sslmode := viper.GetString("postgres_db.sslmode")
 	connStr := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s", host, port, user, dbname, password, sslmode)
-	log.Debug(message+"connStr =", connStr)
 
 	db, err := sqlx.Connect("postgres", connStr)
 	if err != nil {
@@ -65,8 +64,6 @@ func InitPostgresDB() (*sqlx.DB, error) {
 }
 
 func InitRedisDB(dbConfName string) (*redis.Client, error) {
-	message := logMessage + "InitRedisDB:"
-	log.Debug(message + "started")
 
 	addr := viper.GetString(dbConfName + ".addr")
 	dbId := viper.GetInt(dbConfName + ".db_id")
@@ -117,7 +114,6 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	log.Debug(message+"imgUrl =", "https://bmstusa.ru/images/"+fileName)
 	return "https://bmstusa.ru/images/" + fileName, nil
 }
 

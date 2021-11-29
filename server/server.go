@@ -1,6 +1,7 @@
 package server
 
 import (
+	eventGrpc "backend/microservice/event/proto"
 	log "backend/pkg/logger"
 	"backend/pkg/register"
 	"backend/pkg/utils"
@@ -13,7 +14,6 @@ import (
 	userDelivery "backend/service/user/delivery/http"
 	userUseCase "backend/service/user/usecase"
 
-	eventRepository "backend/microservice/event/proto"
 	eventDelivery "backend/service/event/delivery/http"
 	eventUseCase "backend/service/event/usecase"
 
@@ -114,8 +114,9 @@ func NewApp(opts *Options) (*App, error) {
 		}
 	}
 
-	eventRClient := eventRepository.NewEventServiceClient(eventGrpcConn)
+	eventRClient := eventGrpc.NewEventServiceClient(eventGrpcConn)
 	eventR := grpc3.NewRepository(eventRClient)
+
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 

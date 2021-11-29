@@ -120,6 +120,7 @@ func MakeEventResponseBody(e *models.Event) models.EventResponseBody {
 		Geo:         e.Geo,
 		Address:     e.Address,
 		AuthorID:    e.AuthorId,
+		IsVisited:   e.IsVisited,
 	}
 }
 

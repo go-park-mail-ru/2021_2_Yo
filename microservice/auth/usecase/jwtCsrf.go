@@ -45,8 +45,6 @@ func parseToken(susToken string, signingKey []byte) (string, error) {
 }
 
 func (s *authService) CreateToken(ctx context.Context, protoUserId *protoAuth.UserId) (*protoAuth.CSRFToken, error) {
-	message := logMessage + "CreateToken:"
-	log.Debug(message + "started")
 	csrfToken, err := generateCsrfToken(protoUserId.ID)
 	if err != nil {
 		return &protoAuth.CSRFToken{}, err
@@ -58,8 +56,6 @@ func (s *authService) CreateToken(ctx context.Context, protoUserId *protoAuth.Us
 }
 
 func (s *authService) CheckToken(ctx context.Context, protoToken *protoAuth.CSRFToken) (*protoAuth.UserId, error) {
-	message := logMessage + "CheckToken:"
-	log.Debug(message + "started")
 	secretWord := os.Getenv("CSRFSECRET")
 	susToken := protoToken.CSRFToken
 	userId, err := parseToken(susToken, []byte(secretWord))

@@ -21,6 +21,7 @@ type Event struct {
 	Geo         string         `db:"geo"`
 	Address     string         `db:"address"`
 	AuthorID    int            `db:"author_id"`
+	IsVisited   int            `db:"count"`
 }
 
 func toPostgresEvent(e *models.Event) (*Event, error) {
@@ -51,6 +52,10 @@ func toPostgresEvent(e *models.Event) (*Event, error) {
 }
 
 func toModelEvent(e *Event) *models.Event {
+	isVisited := false
+	if e.IsVisited > 0 {
+		isVisited = true
+	}
 	return &models.Event{
 		ID:          strconv.Itoa(e.ID),
 		Title:       e.Title,
@@ -65,5 +70,6 @@ func toModelEvent(e *Event) *models.Event {
 		Geo:         e.Geo,
 		Address:     e.Address,
 		AuthorId:    strconv.Itoa(e.AuthorID),
+		IsVisited:   isVisited,
 	}
 }

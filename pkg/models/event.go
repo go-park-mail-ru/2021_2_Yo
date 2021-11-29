@@ -14,4 +14,5 @@ type Event struct {
 	Geo         string
 	Address     string
 	AuthorId    string
+	IsVisited   bool
 }
