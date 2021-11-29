@@ -137,7 +137,6 @@ func (a *UseCase) GetEvents(userId string, title string, category string, city s
 	for i, tag := range tags {
 		tags[i] = strings.ToLower(tag)
 	}
-	log.Debug(logMessage+"GetEvents:tags = ", tags)
 	return a.repository.GetEvents(userId, title, category, city, date, tags)
 }
 

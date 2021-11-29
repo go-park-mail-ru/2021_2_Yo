@@ -5,7 +5,6 @@ import (
 	protoAuth "backend/microservice/auth/proto"
 	"context"
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"math/rand"
 	"strconv"
 	"time"
@@ -34,8 +33,6 @@ const (
 )
 
 func (s *authService) CreateSession(ctx context.Context, protoUserId *protoAuth.UserId) (*protoAuth.Session, error) {
-	message := logMessage + "CreateSession:"
-	log.Debug(message + "started")
 	sessionData := &authServiceModels.SessionData{
 		SessionId:  generateSessionId(sessionIdLength),
 		UserId:     protoUserId.ID,
@@ -56,8 +53,6 @@ func (s *authService) CreateSession(ctx context.Context, protoUserId *protoAuth.
 }
 
 func (s *authService) CheckSession(ctx context.Context, protoSession *protoAuth.Session) (*protoAuth.UserId, error) {
-	message := logMessage + "CheckSession:"
-	log.Debug(message + "started")
 	sessionId := protoSession.Session
 	if sessionId == "" {
 		return &protoAuth.UserId{}, ErrEmptySessionId
@@ -73,8 +68,6 @@ func (s *authService) CheckSession(ctx context.Context, protoSession *protoAuth.
 }
 
 func (s *authService) DeleteSession(ctx context.Context, protoSession *protoAuth.Session) (*protoAuth.Success, error) {
-	message := logMessage + "DeleteSession:"
-	log.Debug(message + "started")
 	err := s.authSessionRepository.Delete(protoSession.Session)
 	if err != nil {
 		return &protoAuth.Success{}, err
