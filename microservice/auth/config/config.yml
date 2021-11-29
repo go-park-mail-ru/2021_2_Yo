@@ -10,6 +10,6 @@ postgres_db:
 
 
 redis_db_session:
-    addr: "redis-db:6379"
-    #addr: "localhost:6379"
+    #addr: "redis-db:6379"
+    addr: "localhost:6379"
     db_id: 0
