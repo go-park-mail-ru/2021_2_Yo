@@ -6,8 +6,6 @@ import (
 	"backend/pkg/models"
 	"backend/pkg/utils"
 	"context"
-
-	log "github.com/sirupsen/logrus"
 )
 
 const (
