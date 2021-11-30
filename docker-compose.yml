@@ -99,4 +99,4 @@ volumes:
     driver_opts:       
       o: bind       
       type: none       
-      device: /home/static/images
+      device: /home/ubuntu/static/images
