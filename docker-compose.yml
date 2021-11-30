@@ -92,4 +92,8 @@ volumes:
     external: true
   images-storage:
     external: true
-    
+    driver: local    
+    driver_opts:       
+      o: bind       
+      type: none       
+      device: /home/static/images
