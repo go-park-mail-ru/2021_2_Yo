@@ -25,20 +25,20 @@ services:
   event:
     build:
       context: ./ 
-      volumes:
-      - images-storage:/app/static/images
       dockerfile: ./microservice/event/Dockerfile
     command: "./event"
+    volumes:
+      - images-storage:/app/static/images
     ports:
       - "8083:8083"
 
   user:
     build:
       context: ./ 
-      volumes:
-      - images-storage:/app/static/images
       dockerfile: ./microservice/user/Dockerfile
     command: "./user"
+    volumes:
+      - images-storage:/app/static/images
     ports:
       - "8084:8084"
   
