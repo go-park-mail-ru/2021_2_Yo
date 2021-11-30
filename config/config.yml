@@ -1,16 +1,16 @@
 bmstusa_port: "8080"
 
 auth_port: "8081"
-#auth_host: "auth"
-auth_host: "localhost"
+auth_host: "auth"
+#auth_host: "localhost"
 
 user_port: "8084"
-#user_host: "user"
-user_host: "localhost"
+user_host: "user"
+#user_host: "localhost"
 
 event_port: "8083"
-#event_host: "event"
-event_host: "localhost"
+event_host: "event"
+#event_host: "localhost"
 
 postgres_db:
     user: "postgres"
@@ -23,7 +23,7 @@ postgres_db:
     sslmode: "disable"
 
 main_host:
-    #"http://127.0.0.1:3000"
-    "https://bmstusssa.herokuapp.com"
+    "http://127.0.0.1:3000"
+    #"https://bmstusssa.herokuapp.com"
 
 
