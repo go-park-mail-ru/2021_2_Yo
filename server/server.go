@@ -1,13 +1,12 @@
 package server
 
 import (
-	//eventGrpc "backend/microservice/event/proto"
+	eventGrpc "backend/microservice/event/proto"
 	log "backend/pkg/logger"
 	"backend/pkg/register"
 	"backend/pkg/utils"
 	authDelivery "backend/service/auth/delivery/http"
-//	grpc3 "backend/service/event/repository/grpc"
-	//"backend/service/event/repository/postgres"
+	grpc3 "backend/service/event/repository/grpc"
 	grpc2 "backend/service/user/repository/grpc"
 	"errors"
 
@@ -34,7 +33,6 @@ import (
 	authUseCase "backend/service/auth/usecase"
 
 	"backend/prometheus"
-	postgres "backend/service/event/repository/postgres"
 )
 
 const logMessage = "server:"
@@ -104,7 +102,6 @@ func NewApp(opts *Options) (*App, error) {
 	userUC := userUseCase.NewUseCase(userR)
 	userD := userDelivery.NewDelivery(userUC)
 
-	/*
 	eventPort := viper.GetString("event_port")
 	eventHost := viper.GetString("event_host")
 	eventMicroserviceAddr := eventHost + ":" + eventPort
@@ -119,8 +116,6 @@ func NewApp(opts *Options) (*App, error) {
 
 	eventRClient := eventGrpc.NewEventServiceClient(eventGrpcConn)
 	eventR := grpc3.NewRepository(eventRClient)
-	*/
-	eventR := postgres.NewRepository(db)
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
