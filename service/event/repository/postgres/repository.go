@@ -322,7 +322,7 @@ func (s *Repository) GetEvents(userId string, title string, category string, cit
 		query += `$4 = $4 and `
 	}
 	if date != "" {
-		query += `lower(date) = lower($5) and `
+		query += `lower(e.date) = lower($5) and `
 	} else {
 		query += `$5 = $5 and `
 	}

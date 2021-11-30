@@ -116,7 +116,6 @@ func NewApp(opts *Options) (*App, error) {
 
 	eventRClient := eventGrpc.NewEventServiceClient(eventGrpcConn)
 	eventR := grpc3.NewRepository(eventRClient)
-
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
