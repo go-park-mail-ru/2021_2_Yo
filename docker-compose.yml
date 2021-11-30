@@ -25,6 +25,8 @@ services:
   event:
     build:
       context: ./ 
+      volumes:
+      - images-storage:/app/static/images
       dockerfile: ./microservice/event/Dockerfile
     command: "./event"
     ports:
@@ -33,6 +35,8 @@ services:
   user:
     build:
       context: ./ 
+      volumes:
+      - images-storage:/app/static/images
       dockerfile: ./microservice/user/Dockerfile
     command: "./user"
     ports:
@@ -91,7 +95,6 @@ volumes:
   grafana-data:
     external: true
   images-storage:
-    external: true
     driver: local    
     driver_opts:       
       o: bind       
