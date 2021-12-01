@@ -34,13 +34,13 @@ func UserHTTPEndpoints(r *mux.Router, uDelivery *userHttp.Delivery, eDelivery *e
 	//
 
 	subscribeHandleFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.Subscribe)))
-	r.Handle("/{id:[0-9]}/subscription", subscribeHandleFunc).Methods("POST")
+	r.Handle("/{id:[0-9]+}/subscription", subscribeHandleFunc).Methods("POST")
 
 	unsubscribeHandleFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.Unsubscribe)))
-	r.Handle("/{id:[0-9]}/subscription", unsubscribeHandleFunc).Methods("DELETE")
+	r.Handle("/{id:[0-9]+}/subscription", unsubscribeHandleFunc).Methods("DELETE")
 
 	isSubscribedHandleFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.IsSubscribed)))
-	r.Handle("/{id:[0-9]}/subscription", isSubscribedHandleFunc).Methods("GET")
+	r.Handle("/{id:[0-9]+}/subscription", isSubscribedHandleFunc).Methods("GET")
 	//
 }
 
