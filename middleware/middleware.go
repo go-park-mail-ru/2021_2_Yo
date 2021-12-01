@@ -43,6 +43,7 @@ func (m *Middlewares) CORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
 		isAllowed := false
+		log.Debug("ORIGIN = ", origin)
 		for _, o := range allowedOrigins {
 			if origin == o {
 				isAllowed = true
