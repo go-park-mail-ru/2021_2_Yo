@@ -43,6 +43,7 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	if err != nil {
 		return nil, error2.ErrAtoi
 	}
+	log.Debug(message+"userIdInt = ", userIdInt)
 	query := getUserByIdQuery
 	err = s.db.Get(&u, query, userIdInt)
 	log.Debug(message+"err = ", err)
