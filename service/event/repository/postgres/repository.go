@@ -111,7 +111,7 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 		return err
 	}
 	postgresEvent, err := toPostgresEvent(e)
-	//log.Debug(message+"postgresEvent.Viewed = ", postgresEvent.Viewed)
+	log.Debug(message+"postgresEvent.Viewed = ", postgresEvent.Viewed)
 	if err != nil {
 		return err
 	}

@@ -43,17 +43,14 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	if err != nil {
 		return nil, error2.ErrAtoi
 	}
-	log.Debug(message+"userIdInt = ", userIdInt)
 	query := getUserByIdQuery
 	err = s.db.Get(&u, query, userIdInt)
-	log.Debug(message+"err = ", err)
 	if err != nil {
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrUserNotFound
 		}
 		return nil, error2.ErrPostgres
 	}
-	log.Debug(message+"u = ", u)
 	modelUser := toModelUser(&u)
 	log.Debug(message + "ended")
 	return modelUser, nil
