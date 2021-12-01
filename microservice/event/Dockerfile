@@ -9,9 +9,9 @@ WORKDIR /app
 COPY go.mod .
 COPY go.sum .
 
-RUN go mod download
-
 COPY . .
+
+RUN go mod download
 
 RUN cd microservice/event/cmd && go build -o event
 
