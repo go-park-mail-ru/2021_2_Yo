@@ -26,4 +26,8 @@ main_host:
     "http://127.0.0.1:3000"
     #"https://bmstusssa.herokuapp.com"
 
+img_path:
+    #"home/ubuntu/static/images"
+    "app/static/images"
+
 

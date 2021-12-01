@@ -106,7 +106,8 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	default:
 		return "", ErrFileExt
 	}
-	dst, err := os.Create(filepath.Join("/home/ubuntu/go/2021_2_Yo/static/images", filepath.Base(fileName)))
+	imgPath := viper.GetString("img_path")
+	dst, err := os.Create(filepath.Join(imgPath, filepath.Base(fileName)))
 	if err != nil {
 		return "", err
 	}
