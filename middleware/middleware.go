@@ -7,12 +7,13 @@ import (
 	"backend/service/auth"
 	"context"
 	"github.com/gorilla/mux"
-	"github.com/spf13/viper"
 	"net/http"
 	"time"
 )
 
 const logMessage = "middleware:"
+
+var allowedOrigins = []string{"http://127.0.0.1:3000", "https://bmstusssa.herokuapp.com"}
 
 type Middlewares struct {
 	authService auth.UseCase
@@ -40,8 +41,19 @@ func (m *Middlewares) Recovery(next http.Handler) http.Handler {
 
 func (m *Middlewares) CORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		mainHost := viper.GetString("main_host")
-		w.Header().Set("Access-Control-Allow-Origin", mainHost)
+		origin := r.Header.Get("Origin")
+		isAllowed := false
+		for _, o := range allowedOrigins {
+			if origin == o {
+				isAllowed = true
+				break
+			}
+		}
+		if !isAllowed {
+			return
+		}
+		//mainHost := viper.GetString("main_host")
+		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Headers",
 			"Accept,Content-Type,Content-Length,Accept-Encoding,X-CSRF-Token,Authorization")
