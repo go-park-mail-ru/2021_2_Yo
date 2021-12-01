@@ -90,7 +90,7 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	defer file.Close()
 	imgUuid := uuid.NewV4()
 	fileNameParts := strings.Split(handler.Filename, ".")
-	fileNameParts[0] = imgUuid.String()
+	fileNameParts[0] = fileNameParts[0] + imgUuid.String()
 	fileName := fileNameParts[0] + "." + fileNameParts[1]
 	fileExtension := strings.ToLower(filepath.Ext(fileName))
 	switch fileExtension {

@@ -27,7 +27,7 @@ main_host:
     #"https://bmstusssa.herokuapp.com"
 
 img_path:
-    #"home/ubuntu/static/images"
-    "app/static/images"
+    #"/home/ubuntu/static/images"
+    "/app/static/images"
 
 
