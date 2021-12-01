@@ -168,13 +168,16 @@ func refactorError(err error) error {
 	if strings.Contains(errStr, "Error while dialing dial tcp") {
 		return error2.ErrInternal
 	}
+	if strings.Contains(errStr, "session was not found") {
+		return error2.ErrSessionNotFound
+	}
 	return err
 }
 
 func CheckIfNoError(w *http.ResponseWriter, err error, msg string, status response.HttpStatus) bool {
 	errRefactored := refactorError(err)
 	if err != nil {
-		log.Error(msg+"err =", err)
+		log.Error(msg+"err = ", errRefactored)
 		response.SendResponse(*w, response.ErrorResponse(errRefactored.Error()))
 		return false
 	}

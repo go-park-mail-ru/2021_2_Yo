@@ -7,12 +7,14 @@ import (
 	"errors"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 )
 
 var (
-	ErrEmptySessionId = errors.New("session id is empty")
-	letterRunes       = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	ErrEmptySessionId  = errors.New("session id is empty")
+	ErrSessionNotFound = errors.New("session was not found")
+	letterRunes        = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 )
 
 func generateSessionId(n int) string {
@@ -59,6 +61,9 @@ func (s *authService) CheckSession(ctx context.Context, protoSession *protoAuth.
 	}
 	userId, err := s.authSessionRepository.Check(sessionId)
 	if err != nil {
+		if strings.Contains(err.Error(), "redis: nil") {
+			return &protoAuth.UserId{}, ErrSessionNotFound
+		}
 		return &protoAuth.UserId{}, err
 	}
 	response := &protoAuth.UserId{

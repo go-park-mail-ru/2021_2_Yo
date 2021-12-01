@@ -30,7 +30,7 @@ func (m *Middlewares) Recovery(next http.Handler) http.Handler {
 		defer func() {
 			err := recover()
 			if err != nil {
-				log.Error(message+"err =", err)
+				log.Error(message+"err = ", err)
 				response.SendResponse(w, response.ErrorResponse("Internal server error"))
 			}
 		}()
