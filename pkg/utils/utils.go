@@ -138,9 +138,6 @@ func refactorError(err error) error {
 		return nil
 	}
 	errStr := err.Error()
-	if strings.Contains(errStr, "redis: nil") {
-		return error2.ErrAuthService
-	}
 	if strings.Contains(errStr, "user already exists") {
 		return error2.ErrUserExists
 	}
