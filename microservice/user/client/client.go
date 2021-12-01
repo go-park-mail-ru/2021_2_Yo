@@ -57,6 +57,9 @@ func MakeProtoUsers(u []*models.User) *proto.Users {
 func (c *UserService) GetUserById(ctx context.Context, in *proto.UserId) (*proto.User, error) {
 	userId := in.ID
 	modelUser, err := c.repository.GetUserById(userId)
+	if err != nil {
+		return &proto.User{}, err
+	}
 	out := MakeProtoUser(modelUser)
 	return out, err
 }
