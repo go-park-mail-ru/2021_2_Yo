@@ -12,5 +12,6 @@ var (
 	ErrCookie       = errors.New("Ошибка с получением cookie")
 	ErrUserExists   = errors.New("Польхователь уже зарегистрирован")
 	ErrAuthService  = errors.New("Проблема на сервисе авторизации")
+	ErrInternal     = errors.New("Проблема на стороне сервера")
 	//ErrNotAuthorised = errors.New("Пользователь не авторизован")
 )

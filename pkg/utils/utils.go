@@ -165,6 +165,9 @@ func refactorError(err error) error {
 	if strings.Contains(errStr, "no rows in a query result") {
 		return error2.ErrNoRows
 	}
+	if strings.Contains(errStr, "Error while dialing dial tcp") {
+		return error2.ErrInternal
+	}
 	return err
 }
 
