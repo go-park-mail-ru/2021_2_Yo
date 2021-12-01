@@ -38,23 +38,20 @@ func NewRepository(db *sql.DB) *Repository {
 func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	message := logMessage + "GetUserById:"
 	log.Debug(message + "started")
-	query := getUserByIdQuery
-	user := &User{}
+	var u User
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
 		return nil, error2.ErrAtoi
 	}
-	err = s.db.Get(user, query, userIdInt)
+	query := getUserByIdQuery
+	err = s.db.Get(&u, query, userIdInt)
 	if err != nil {
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrUserNotFound
 		}
 		return nil, error2.ErrPostgres
 	}
-	if user == nil {
-		return nil, error2.ErrUserNotFound
-	}
-	modelUser := toModelUser(user)
+	modelUser := toModelUser(&u)
 	log.Debug(message + "ended")
 	return modelUser, nil
 }

@@ -201,9 +201,9 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 		}
 		return nil, error2.ErrPostgres
 	}
-	resultEvent := toModelEvent(&e)
+	modelEvent := toModelEvent(&e)
 	log.Debug(message + "ended")
-	return resultEvent, nil
+	return modelEvent, nil
 }
 
 func (s *Repository) GetEvents(userId string, title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
