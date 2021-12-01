@@ -1,6 +1,7 @@
 package utils
 
 import (
+	error2 "backend/pkg/error"
 	log "backend/pkg/logger"
 	"backend/pkg/response"
 	"crypto/sha256"
@@ -132,10 +133,46 @@ func GenerateCsrfToken(userId string) (string, error) {
 	return csrfToken, err
 }
 
+func refactorError(err error) error {
+	if err == nil {
+		return nil
+	}
+	errStr := err.Error()
+	if strings.Contains(errStr, "redis: nil") {
+		return error2.ErrAuthService
+	}
+	if strings.Contains(errStr, "user already exists") {
+		return error2.ErrUserExists
+	}
+	if strings.Contains(errStr, "user not found") {
+		return error2.ErrUserNotFound
+	}
+	if strings.Contains(errStr, "internal DB server error") {
+		return error2.ErrPostgres
+	}
+	if strings.Contains(errStr, "cookie") {
+		return error2.ErrCookie
+	}
+	if strings.Contains(errStr, "required data is empty") {
+		return error2.ErrEmptyData
+	}
+	if strings.Contains(errStr, "cant cast string to int") {
+		return error2.ErrAtoi
+	}
+	if strings.Contains(errStr, "user is not allowed to do this") {
+		return error2.ErrNotAllowed
+	}
+	if strings.Contains(errStr, "no rows in a query result") {
+		return error2.ErrNoRows
+	}
+	return err
+}
+
 func CheckIfNoError(w *http.ResponseWriter, err error, msg string, status response.HttpStatus) bool {
+	errRefactored := refactorError(err)
 	if err != nil {
 		log.Error(msg+"err =", err)
-		response.SendResponse(*w, response.ErrorResponse(err.Error()))
+		response.SendResponse(*w, response.ErrorResponse(errRefactored.Error()))
 		return false
 	}
 	return true
