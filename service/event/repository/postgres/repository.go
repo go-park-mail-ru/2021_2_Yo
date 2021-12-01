@@ -35,9 +35,9 @@ const (
 		img_url = $6, date = $7, geo = $8, address = $9, tag = $10
 		where event.id = $11`
 	updateEventQueryWithoutImgUrl = `update "event" set
-		title = $1, description = $2, text = $3, city = $4, category = $5, 
-		viewed = $6, date = $7, geo = $8, address = $9, tag = $10 
-		where event.id = $11`
+		title = $1, description = $2, text = $3, city = $4, category = $5,
+		date = $6, geo = $7, address = $8, tag = $9 
+		where event.id = $10`
 	deleteEventQuery = `delete from "event" where id = $1`
 	visitedQuery     = `select e.* from "event" as e join visitor as v on v.event_id = e.id where v.user_id = $1`
 	createdQuery     = `select * from "event" where author_id = $1`
