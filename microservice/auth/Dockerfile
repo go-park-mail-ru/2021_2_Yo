@@ -9,9 +9,9 @@ WORKDIR /app
 COPY go.mod .
 COPY go.sum .
 
-COPY . .
-
 RUN go mod download
+
+COPY . .
 
 RUN cd microservice/auth/cmd && go build -o auth
 
