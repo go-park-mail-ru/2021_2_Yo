@@ -111,6 +111,7 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 		return err
 	}
 	postgresEvent, err := toPostgresEvent(e)
+	//log.Debug(message+"postgresEvent.Viewed = ", postgresEvent.Viewed)
 	if err != nil {
 		return err
 	}
@@ -205,84 +206,6 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 	log.Debug(message + "ended")
 	return resultEvent, nil
 }
-
-/*
-func (s *Repository) GetEvents(title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
-	message := logMessage + "GetEvents:"
-	log.Debug(message + "started")
-	postgresTags := make(pq.StringArray, len(tags))
-	for i := range tags {
-		postgresTags[i] = tags[i]
-	}
-	query := listQuery + " "
-	if title != "" {
-		query += `where lower(title) ~ lower($1) and `
-	} else {
-		query += `where $1 = $1 and `
-	}
-	if category != "" {
-		query += `lower(category) = lower($2) and `
-	} else {
-		query += `$2 = $2 and `
-	}
-	if city != "" {
-		query += `lower(city) = lower($3) and `
-	} else {
-		query += `$3 = $3 and `
-	}
-	if date != "" {
-		query += `lower(date) = lower($4) and `
-	} else {
-		query += `$4 = $4 and `
-	}
-	if len(postgresTags) != 0 {
-		query += `tag && $5::varchar[]`
-	} else {
-		query += `$5 = $5`
-	}
-	query += ` order by viewed DESC`
-	rows, err := s.db.Queryx(query, title, category, city, date, postgresTags)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var resultEvents []*models.Event
-	for rows.Next() {
-		var e Event
-		err := rows.StructScan(&e)
-		if err != nil {
-			log.Error(message, "err = ", err)
-			return nil, error2.ErrPostgres
-		}
-		modelEvent := toModelEvent(&e)
-		resultEvents = append(resultEvents, modelEvent)
-	}
-	log.Debug(message + "ended")
-	return resultEvents, nil
-}
-*/
-
-/*
-select e.*, count(v) from event as e
-    left join
-    visitor v on
-        e.id = v.event_id
-            and
-        v.user_id = 0
-group by e.id,
-         e.title,
-         e.description,
-         e.text,
-         e.city,
-         e.category,
-         e.viewed,
-         e.img_url,
-         e.date,
-         e.geo,
-         e.address,
-         e.tag,
-         e.author_id;
-*/
 
 func (s *Repository) GetEvents(userId string, title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
 	message := logMessage + "GetEvents:"
