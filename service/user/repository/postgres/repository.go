@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	logMessage                       = "microservice:user:repository:"
+	logMessage                       = "service:user:repository:postgres:"
 	getUserByIdQuery                 = `select * from "user" where id = $1`
 	updateUserInfoQueryWithoutImgUrl = `update "user" set name = $1, surname = $2, about = $3 where id = $4`
 	updateUserInfoQuery              = `update "user" set name = $1, surname = $2, about = $3, img_url = $4 where id = $5`
@@ -35,21 +35,6 @@ func NewRepository(db *sql.DB) *Repository {
 	}
 }
 
-/*
-	GetUserById(userId string) (*models.User, error)
-	///////
-	UpdateUserInfo(user *models.User) error
-	UpdateUserPassword(userId string, password string) error
-	///////
-	GetSubscribers(userId string) ([]*models.User, error)
-	GetSubscribes(userId string) ([]*models.User, error)
-	GetVisitors(eventId string) ([]*models.User, error)
-	///////
-	Subscribe(subscribedId string, subscriberId string) error
-	Unsubscribe(subscribedId string, subscriberId string) error
-	IsSubscribed(subscribedId string, subscriberId string) (bool, error)
-*/
-
 func (s *Repository) GetUserById(userId string) (*models.User, error) {
 	message := logMessage + "GetUserById:"
 	log.Debug(message + "started")
@@ -65,6 +50,9 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 			return nil, error2.ErrUserNotFound
 		}
 		return nil, error2.ErrPostgres
+	}
+	if user == nil {
+		return nil, error2.ErrUserNotFound
 	}
 	modelUser := toModelUser(user)
 	log.Debug(message + "ended")

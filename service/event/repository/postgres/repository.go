@@ -196,7 +196,6 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 	query = getEventQuery
 	err = s.db.Get(&e, query, eventIdInt)
 	if err != nil {
-		log.Error(err)
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrNoRows
 		}
