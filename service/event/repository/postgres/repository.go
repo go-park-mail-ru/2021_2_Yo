@@ -31,9 +31,9 @@ const (
 		values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::varchar[], $12) 
 		returning id`
 	updateEventQuery = `update "event" set
-		title = $1, description = $2, text = $3, city = $4, category = $5, 
-		viewed = $6, img_url = $7, date = $8, geo = $9, address = $10, tag = $11 
-		where event.id = $12`
+		title = $1, description = $2, text = $3, city = $4, category = $5,
+		img_url = $6, date = $7, geo = $8, address = $9, tag = $10
+		where event.id = $11`
 	updateEventQueryWithoutImgUrl = `update "event" set
 		title = $1, description = $2, text = $3, city = $4, category = $5, 
 		viewed = $6, date = $7, geo = $8, address = $9, tag = $10 
@@ -111,7 +111,6 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 		return err
 	}
 	postgresEvent, err := toPostgresEvent(e)
-	log.Debug(message+"postgresEvent.Viewed = ", postgresEvent.Viewed)
 	if err != nil {
 		return err
 	}
@@ -125,7 +124,6 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 			postgresEvent.Text,
 			postgresEvent.City,
 			postgresEvent.Category,
-			postgresEvent.Viewed,
 			postgresEvent.ImgUrl,
 			postgresEvent.Date,
 			postgresEvent.Geo,
@@ -143,7 +141,6 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 			postgresEvent.Text,
 			postgresEvent.City,
 			postgresEvent.Category,
-			postgresEvent.Viewed,
 			postgresEvent.Date,
 			postgresEvent.Geo,
 			postgresEvent.Address,
