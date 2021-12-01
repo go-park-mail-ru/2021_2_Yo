@@ -147,6 +147,7 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 			postgresEvent.Tag,
 			postgresEvent.ID)
 		if err != nil {
+			log.Debug(message+"err = ", err)
 			return error2.ErrPostgres
 		}
 	}
