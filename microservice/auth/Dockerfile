@@ -11,7 +11,14 @@ COPY go.sum .
 
 RUN go mod download
 
-COPY . .
+COPY config .
+COPY microservice .
+COPY middleware .
+COPY pkg .
+COPY prometheus .
+COPY server .
+COPY service .
+COPY main.go .
 
 RUN cd microservice/auth/cmd && go build -o auth
 
