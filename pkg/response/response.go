@@ -30,7 +30,7 @@ func OkResponse() *Response {
 
 func ErrorResponse(errorMessage string, status HttpStatus) *Response {
 	return &Response{
-		Status:  200,
+		Status:  404,
 		Message: errorMessage,
 		Body:    status,
 	}
