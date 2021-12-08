@@ -28,10 +28,11 @@ func OkResponse() *Response {
 	}
 }
 
-func ErrorResponse(errorMessage string) *Response {
+func ErrorResponse(errorMessage string, status HttpStatus) *Response {
 	return &Response{
-		Status:  404,
+		Status:  200,
 		Message: errorMessage,
+		Body:    status,
 	}
 }
 

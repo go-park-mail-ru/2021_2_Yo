@@ -3,7 +3,6 @@ package http
 import (
 	log "backend/pkg/logger"
 	"backend/pkg/response"
-	"backend/pkg/utils"
 	"backend/service/auth"
 	error2 "backend/service/auth/error"
 	"backend/service/email"
@@ -50,19 +49,19 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
 	u, err := response.GetUserFromRequest(r.Body)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	userId, err := h.UseCase.SignUp(u)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	sessionId, err := h.UseCase.CreateSession(userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	CSRFToken, err := h.UseCase.CreateToken(userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
@@ -76,19 +75,19 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignIn:"
 	log.Debug(message + "started")
 	u, err := response.GetUserFromRequest(r.Body)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	userId, err := h.UseCase.SignIn(u)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	sessionId, err := h.UseCase.CreateSession(userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	CSRFToken, err := h.UseCase.CreateToken(userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
@@ -105,11 +104,11 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		err = error2.ErrCookie
 	}
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	err = h.UseCase.DeleteSession(cookie.Value)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	response.SendResponse(w, response.OkResponse())

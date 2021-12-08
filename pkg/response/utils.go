@@ -1,6 +1,7 @@
 package response
 
 import (
+	error2 "backend/pkg/error"
 	log "backend/pkg/logger"
 	"backend/pkg/models"
 	"encoding/json"
@@ -9,6 +10,7 @@ import (
 	"github.com/go-sanitize/sanitize"
 	"io"
 	"net/http"
+	"strings"
 )
 
 var (
@@ -143,4 +145,52 @@ func SendResponse(w http.ResponseWriter, response interface{}) {
 		return
 	}
 	w.Write(b)
+}
+
+func refactorError(err error) (error, HttpStatus) {
+	if err == nil {
+		return nil, 200
+	}
+	errStr := err.Error()
+	if strings.Contains(errStr, "user already exists") {
+		return error2.ErrUserExists, http.StatusConflict
+	}
+	if strings.Contains(errStr, "user not found") {
+		return error2.ErrUserNotFound, http.StatusNotFound
+	}
+	if strings.Contains(errStr, "internal DB server error") {
+		return error2.ErrPostgres, http.StatusInternalServerError
+	}
+	if strings.Contains(errStr, "cookie") {
+		return error2.ErrCookie, http.StatusUnauthorized
+	}
+	if strings.Contains(errStr, "required data is empty") {
+		return error2.ErrEmptyData, http.StatusBadRequest
+	}
+	if strings.Contains(errStr, "cant cast string to int") {
+		return error2.ErrAtoi, http.StatusBadRequest
+	}
+	if strings.Contains(errStr, "user is not allowed to do this") {
+		return error2.ErrNotAllowed, http.StatusForbidden
+	}
+	if strings.Contains(errStr, "no rows in a query result") {
+		return error2.ErrNoRows, http.StatusOK
+	}
+	if strings.Contains(errStr, "Error while dialing dial tcp") {
+		return error2.ErrInternal, http.StatusInternalServerError
+	}
+	if strings.Contains(errStr, "session was not found") {
+		return error2.ErrSessionNotFound, http.StatusUnauthorized
+	}
+	return err, http.StatusBadRequest
+}
+
+func CheckIfNoError(w *http.ResponseWriter, err error, msg string) bool {
+	errRefactored, status := refactorError(err)
+	if err != nil {
+		log.Error(msg+"err = ", errRefactored)
+		SendResponse(*w, ErrorResponse(errRefactored.Error(), status))
+		return false
+	}
+	return true
 }

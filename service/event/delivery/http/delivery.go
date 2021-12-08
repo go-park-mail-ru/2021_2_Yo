@@ -6,9 +6,10 @@ import (
 	"backend/pkg/utils"
 	"backend/service/event"
 	"errors"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 const logMessage = "service:event:delivery:http:"
@@ -28,18 +29,18 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
 	err := r.ParseMultipartForm(5 << 20)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	eventReader := strings.NewReader(r.FormValue("json"))
 	eventFromRequest, err := response.GetEventFromRequest(eventReader)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 
 	imgUrl, err := utils.SaveImageFromRequest(r, "file")
 	if err == utils.ErrFileExt {
-		utils.CheckIfNoError(&w, err, message, http.StatusBadRequest)
+		response.CheckIfNoError(&w, err, message)
 		return
 	}
 	if err == nil {
@@ -47,7 +48,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 	eventFromRequest.AuthorId = userId
 	eventID, err := h.useCase.CreateEvent(eventFromRequest)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	response.SendResponse(w, response.EventIdResponse(eventID))
@@ -61,17 +62,17 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	eventId := vars["id"]
 	userId := r.Context().Value("userId").(string)
 	err := r.ParseMultipartForm(5 << 20)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	eventReader := strings.NewReader(r.FormValue("json"))
 	eventFromRequest, err := response.GetEventFromRequest(eventReader)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	imgUrl, err := utils.SaveImageFromRequest(r, "file")
 	if err == utils.ErrFileExt {
-		utils.CheckIfNoError(&w, err, message, http.StatusBadRequest)
+		response.CheckIfNoError(&w, err, message)
 		return
 	}
 	if err == nil {
@@ -79,7 +80,7 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 	eventFromRequest.ID = eventId
 	err = h.useCase.UpdateEvent(eventFromRequest, userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	response.SendResponse(w, response.OkResponse())
@@ -93,7 +94,7 @@ func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	eventId := vars["id"]
 	userId := r.Context().Value("userId").(string)
 	err := h.useCase.DeleteEvent(eventId, userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	response.SendResponse(w, response.OkResponse())
@@ -106,7 +107,7 @@ func (h *Delivery) GetEventById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	eventId := vars["id"]
 	resultEvent, err := h.useCase.GetEventById(eventId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	response.SendResponse(w, response.EventResponse(resultEvent))
@@ -151,7 +152,7 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	tags := strings.Split(tag, "|")
 
 	eventsList, err := h.useCase.GetEvents(userId, title, category, city, date, tags)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	response.SendResponse(w, response.EventListResponse(eventsList))
@@ -163,7 +164,7 @@ func (h *Delivery) GetVisitedEvents(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["id"]
 	eventList, err := h.useCase.GetVisitedEvents(userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	response.SendResponse(w, response.EventListResponse(eventList))
@@ -175,7 +176,7 @@ func (h *Delivery) GetCreatedEvents(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["id"]
 	eventList, err := h.useCase.GetCreatedEvents(userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	response.SendResponse(w, response.EventListResponse(eventList))
@@ -186,15 +187,15 @@ func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	vars, ok := r.Context().Value("vars").(map[string]string)
 	if !ok {
-		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+		response.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
 	userId, ok := r.Context().Value("userId").(string)
 	if !ok {
-		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+		response.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
 	eventId := vars["id"]
 	err := h.useCase.Visit(eventId, userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	response.SendResponse(w, response.OkResponse())
@@ -206,15 +207,15 @@ func (h *Delivery) Unvisit(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	vars, ok := r.Context().Value("vars").(map[string]string)
 	if !ok {
-		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+		response.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
 	userId, ok := r.Context().Value("userId").(string)
 	if !ok {
-		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+		response.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
 	eventId := vars["id"]
 	err := h.useCase.Unvisit(eventId, userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	response.SendResponse(w, response.OkResponse())
@@ -226,15 +227,15 @@ func (h *Delivery) IsVisited(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	vars, ok := r.Context().Value("vars").(map[string]string)
 	if !ok {
-		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+		response.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
 	userId, ok := r.Context().Value("userId").(string)
 	if !ok {
-		utils.CheckIfNoError(&w, errors.New("type casting error"), message, http.StatusInternalServerError)
+		response.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
 	eventId := vars["id"]
 	res, err := h.useCase.IsVisited(eventId, userId)
-	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	response.SendResponse(w, response.FavouriteResponse(res))
@@ -245,7 +246,7 @@ func (h *Delivery) GetCities(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetCities:"
 	log.Debug(message + "started")
 	res, err := h.useCase.GetCities()
-	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	response.SendResponse(w, response.CitiesResponse(res))
