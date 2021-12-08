@@ -174,7 +174,7 @@ func refactorError(err error) (error, HttpStatus) {
 		return error2.ErrNotAllowed, http.StatusForbidden
 	}
 	if strings.Contains(errStr, "no rows in a query result") {
-		return error2.ErrNoRows, http.StatusOK
+		return error2.ErrNoRows, http.StatusNotFound
 	}
 	if strings.Contains(errStr, "Error while dialing dial tcp") {
 		return error2.ErrInternal, http.StatusInternalServerError
