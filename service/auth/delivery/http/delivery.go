@@ -8,6 +8,8 @@ import (
 	error2 "backend/service/auth/error"
 	"backend/service/email"
 	"net/http"
+	"github.com/spf13/viper"
+	"backend/pkg/models"
 )
 
 const logMessage = "service:auth:delivery:http:"
@@ -65,10 +67,11 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusInternalServerError) {
 		return
 	}
+	template := viper.GetString("reg_html")
 	setSessionIdCookie(w, sessionId)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
-	email.SendEmail("Подтвержение регистрации", "Вы успешно зарегистрировались на BMSTUSA!", []string{u.Mail})
+	email.SendEmail("Подтвержение регистрации", template, []models.User{*u})
 	log.Debug(message + "ended")
 }
 

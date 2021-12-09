@@ -1,12 +1,29 @@
 package email
 
 import (
-	log "github.com/sirupsen/logrus"
+	"bytes"
+	"fmt"
+	"html/template"
 	"net/smtp"
 	"os"
+	"backend/pkg/models"
 )
 
-func SendEmail(theme, message string, recievers []string) {
+type Mail struct {
+	Sender  string
+	Subject string
+	Body    bytes.Buffer
+}
+
+func BuildMessage(mail Mail) string {
+	msg := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\r\n"
+	msg += fmt.Sprintf("From: %s\r\n", mail.Sender)
+	msg += fmt.Sprintf("Subject: %s\r\n", mail.Subject)
+	msg += fmt.Sprintf("\r\n%s\r\n", mail.Body.String())
+	return msg
+}
+
+func SendEmail(theme, htmlTemplate string, users []models.User) {
 	from := os.Getenv("EMAIL_ADDR")
 	password := os.Getenv("EMAIL_PASSWORD")
 
@@ -14,14 +31,28 @@ func SendEmail(theme, message string, recievers []string) {
 	port := "587"
 	address := host + ":" + port
 
-	theme += "\n"
-	emailMessage := []byte(theme + message)
-
-	auth := smtp.PlainAuth("", from, password, host)
-
-	err := smtp.SendMail(address, auth, from, recievers, emailMessage)
+	ts, err := template.ParseFiles(htmlTemplate)
 	if err != nil {
-		log.Error(err)
-		return
+		fmt.Println(err)
+	}
+
+	for _, reciever := range users {
+
+		var body bytes.Buffer
+		ts.Execute(&body, reciever)
+
+		request := Mail{
+			Sender:  from,
+			Subject: theme,
+			Body:    body,
+		}
+		msg := BuildMessage(request)
+		auth := smtp.PlainAuth("", from, password, host)
+
+		err := smtp.SendMail(address, auth, from, []string{reciever.Mail}, []byte(msg))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
 }

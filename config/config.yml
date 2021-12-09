@@ -30,4 +30,10 @@ img_path:
     #"/home/ubuntu/static/images"
     "/app/static/images"
 
+reg_html:
+    "./static/emailTemplate/registration.html"
+
+new_event_html:
+    "./static/emailTemplate/newEvent.html"
+
 
