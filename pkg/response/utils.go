@@ -189,7 +189,7 @@ func CheckIfNoError(w *http.ResponseWriter, err error, msg string) bool {
 	errRefactored, status := refactorError(err)
 	if err != nil {
 		log.Error(msg+"err = ", errRefactored)
-		SendResponse(*w, ErrorResponse(errRefactored.Error(), status))
+		SendResponse(*w, StatusResponse(status))
 		return false
 	}
 	return true
