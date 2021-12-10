@@ -3,6 +3,7 @@ package usecase
 import (
 	log "backend/pkg/logger"
 	"backend/pkg/models"
+	"backend/service/email"
 	"backend/service/event"
 	error2 "backend/service/event/error"
 	"encoding/json"
@@ -10,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"github.com/spf13/viper"
 )
 
 const logMessage = "service:event:usecase:"
@@ -177,4 +179,14 @@ func (a *UseCase) IsVisited(eventId string, userId string) (bool, error) {
 
 func (a *UseCase) GetCities() ([]string, error) {
 	return a.repository.GetCities()
+}
+
+func (a *UseCase) EmailNotify(eventId string) error {
+	recievers, err := a.repository.EmailNotify(eventId)
+	if err != nil {
+		return err
+	}
+	template := viper.GetString("new_event_html")
+	email.SendEmail("Пора на тусовку",template,recievers)
+	return nil
 }

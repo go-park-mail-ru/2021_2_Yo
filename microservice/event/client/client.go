@@ -73,6 +73,31 @@ func MakeModelEvent(out *proto.Event) *models.Event {
 	}
 }
 
+func MakeProtoInfo(info *models.Info) *proto.EmailInfo {
+	if info == nil {
+		return &proto.EmailInfo{}
+	}
+	return &proto.EmailInfo{
+		Name: info.Name,
+		Mail: info.Mail,
+		Title: info.Title,
+		ImgUrl: info.Img_url,
+	}
+}
+
+func MakeProtoInfoArray(infoArray []*models.Info) *proto.EmailInfoArray {
+	if infoArray == nil {
+		return &proto.EmailInfoArray{}
+	}
+	result := make([]*proto.EmailInfo, len(infoArray))
+	for i, info := range infoArray {
+		result[i] = MakeProtoInfo(info)
+	}
+	return &proto.EmailInfoArray{
+		InfoArray: result,
+	}
+}
+
 func (c *EventService) CreateEvent(ctx context.Context, in *proto.Event) (*proto.EventId, error) {
 	modelEvent := MakeModelEvent(in)
 	eventId, err := c.repository.CreateEvent(modelEvent)
@@ -161,6 +186,15 @@ func (c *EventService) GetCities(ctx context.Context, in *proto.Empty) (*proto.G
 	result, err := c.repository.GetCities()
 	out := &proto.GetCitiesRequest{
 		Cities: result,
+	}
+	return out, err
+}
+
+func (c *EventService) EmailNotify(ctx context.Context, in *proto.EventId) (*proto.EmailInfoArray, error) {
+	eventId := in.ID
+	result, err := c.repository.EmailNotify(eventId)
+	out := &proto.EmailInfoArray{
+		InfoArray: MakeProtoInfoArray(result).InfoArray,
 	}
 	return out, err
 }

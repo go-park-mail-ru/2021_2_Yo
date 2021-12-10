@@ -19,4 +19,6 @@ type UseCase interface {
 	IsVisited(eventId string, userId string) (bool, error)
 	//
 	GetCities() ([]string, error)
+	//
+	EmailNotify(eventId string) error
 }

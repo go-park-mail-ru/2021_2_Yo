@@ -229,3 +229,23 @@ func (s *Repository) GetCities() ([]string, error) {
 	result := out.Cities
 	return result, err
 }
+
+func (s *Repository) EmailNotify(eventId string) ([]*models.Info, error) {
+	in := &eventGrpc.EventId {
+		ID: eventId,
+	}
+	out, err := s.client.EmailNotify(context.Background(), in)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*models.Info, len(out.InfoArray))
+	for i, protoInfo := range out.InfoArray {
+		result[i] = &models.Info{
+			Name: protoInfo.Name,
+			Mail: protoInfo.Mail,
+			Title: protoInfo.Title,
+			Img_url: protoInfo.ImgUrl,
+		}
+	}
+	return result, nil
+}

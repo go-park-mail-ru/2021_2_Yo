@@ -71,7 +71,10 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	setSessionIdCookie(w, sessionId)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
-	email.SendEmail("Подтвержение регистрации", template, []models.User{*u})
+	info := &models.Info{
+		Name: u.Name,
+	}
+	email.SendEmail("Подтвержение регистрации", template, []*models.Info{info})
 	log.Debug(message + "ended")
 }
 

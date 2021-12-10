@@ -4,7 +4,6 @@ import (
 	log "backend/pkg/logger"
 	"backend/pkg/response"
 	"backend/pkg/utils"
-	"backend/service/email"
 	"backend/service/user"
 	"net/http"
 	"strings"
@@ -96,7 +95,6 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response.SendResponse(w, response.OkResponse())
-	email.SendEmail("Ваш пароль был изменён", "Если это были не вы, обратитесь в службу безопасности,возможно, ваш аккаунт собираются угнать", []string{u.Mail})
 	log.Debug(message + "ended")
 }
 

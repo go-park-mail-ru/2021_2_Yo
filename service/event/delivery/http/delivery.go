@@ -50,6 +50,10 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
 		return
 	}
+	err = h.useCase.EmailNotify(eventID)
+	if err != nil {
+		log.Error(err)
+	}
 	response.SendResponse(w, response.EventIdResponse(eventID))
 	log.Debug(message + "ended")
 }

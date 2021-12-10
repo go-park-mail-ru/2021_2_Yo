@@ -45,6 +45,10 @@ const (
 	unvisitQuery     = `delete from "visitor" where event_id = $1 and user_id = $2`
 	isVisitedQuery   = `select count(*) from "visitor" where event_id = $1 and user_id = $2`
 	getCitiesQuery   = `select distinct city from event`
+	getSubsInfo      = `select u2.name, u2.mail, e.title, e.img_url from "user" as u1 join subscribe on u1.id = subscribe.subscribed_id
+							join "user" as u2 on u2.id = subscribe.subscriber_id 
+							join "event" as e on e.id = $1
+							where e.author_id = u1.id`
 )
 
 func (s *Repository) checkAuthor(eventId int, userId int) error {
@@ -429,4 +433,34 @@ func (s *Repository) GetCities() ([]string, error) {
 	}
 	log.Debug(message + "ended")
 	return resultCities, nil
+}
+
+func (s *Repository) EmailNotify(eventId string) ([]*models.Info, error) {
+	message := logMessage + "EmailNotify:"
+	log.Debug(message + "started")
+	query := getSubsInfo
+	rows, err := s.db.Queryx(query)
+	if err != nil {
+		log.Error(err)
+		return nil, error2.ErrPostgres 
+	}
+	defer rows.Close()
+	var subsInfo []*models.Info
+	for rows.Next() {
+		var mail,name,title,img_url string
+		err := rows.Scan(&name,&mail,&title,&img_url)
+		if err != nil {
+			log.Error(err)
+			return nil, error2.ErrPostgres
+		}
+		userInfo :=&models.Info{
+			Name: name,
+			Mail: mail,
+			Title: title,
+			Img_url: img_url,
+		}
+		subsInfo = append(subsInfo, userInfo)
+	}
+	log.Debug(message + "ended")
+	return subsInfo, nil
 }

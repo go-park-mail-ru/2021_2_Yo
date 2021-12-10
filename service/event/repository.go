@@ -17,4 +17,6 @@ type Repository interface {
 	IsVisited(eventId string, userId string) (bool, error)
 	//
 	GetCities() ([]string, error)
+	//
+	EmailNotify(eventId string) ([]*models.Info, error)
 }

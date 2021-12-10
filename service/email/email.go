@@ -23,7 +23,7 @@ func BuildMessage(mail Mail) string {
 	return msg
 }
 
-func SendEmail(theme, htmlTemplate string, users []models.User) {
+func SendEmail(theme, htmlTemplate string, info []*models.Info) {
 	from := os.Getenv("EMAIL_ADDR")
 	password := os.Getenv("EMAIL_PASSWORD")
 
@@ -36,7 +36,7 @@ func SendEmail(theme, htmlTemplate string, users []models.User) {
 		fmt.Println(err)
 	}
 
-	for _, reciever := range users {
+	for _, reciever := range info {
 
 		var body bytes.Buffer
 		ts.Execute(&body, reciever)

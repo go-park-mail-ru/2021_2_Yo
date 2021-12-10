@@ -74,6 +74,17 @@ message GetCitiesRequest {
     repeated string Cities = 1;
 }
 
+message EmailInfo {
+    string Name = 1;
+    string Mail = 2;
+    string Title = 3;
+    string Img_url = 4;
+}
+
+message EmailInfoArray {
+   repeated EmailInfo infoArray = 1;
+}
+
 message Empty {}
 
 service EventService {
@@ -88,4 +99,5 @@ service EventService {
     rpc Unvisit(VisitRequest) returns (Empty) {}
     rpc IsVisited(VisitRequest) returns (IsVisitedRequest) {}
     rpc GetCities(Empty) returns (GetCitiesRequest) {}
+    rpc EmailNotify(EventId) returns (EmailInfoArray) {}
 }
