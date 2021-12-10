@@ -9,7 +9,7 @@ const logMessage = "response:response:"
 type HttpStatus int
 
 type Response struct {
-	Status  int         `json:"status"`
+	Status  HttpStatus  `json:"status"`
 	Message string      `json:"message,omitempty"`
 	Body    interface{} `json:"body,omitempty"`
 }
@@ -28,9 +28,9 @@ func OkResponse() *Response {
 	}
 }
 
-func ErrorResponse(errorMessage string) *Response {
+func ErrorResponse(errorMessage string, status HttpStatus) *Response {
 	return &Response{
-		Status:  404,
+		Status:  status,
 		Message: errorMessage,
 	}
 }

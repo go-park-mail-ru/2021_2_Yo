@@ -3,12 +3,12 @@ package middleware
 import (
 	log "backend/pkg/logger"
 	"backend/pkg/response"
-	"backend/pkg/utils"
 	"backend/service/auth"
 	"context"
-	"github.com/gorilla/mux"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 const logMessage = "middleware:"
@@ -32,7 +32,7 @@ func (m *Middlewares) Recovery(next http.Handler) http.Handler {
 			err := recover()
 			if err != nil {
 				log.Error(message+"err = ", err)
-				response.SendResponse(w, response.ErrorResponse("Internal server error"))
+				response.SendResponse(w, response.ErrorResponse("Internal server error", 500))
 			}
 		}()
 		next.ServeHTTP(w, r)
@@ -94,11 +94,11 @@ func (m *Middlewares) Auth(next http.Handler) http.Handler {
 	message := logMessage + "Auth:"
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_id")
-		if !utils.CheckIfNoError(&w, err, message, http.StatusBadRequest) {
+		if !response.CheckIfNoError(&w, err, message) {
 			return
 		}
 		userId, err := m.authService.CheckSession(cookie.Value)
-		if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
+		if !response.CheckIfNoError(&w, err, message) {
 			return
 		}
 		userCtx := context.WithValue(r.Context(), "userId", userId)
@@ -111,7 +111,7 @@ func (m *Middlewares) CSRF(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gottenToken := (*r).Header.Get("X-CSRF-Token")
 		userId, err := m.authService.CheckToken(gottenToken)
-		if !utils.CheckIfNoError(&w, err, message, http.StatusNotFound) {
+		if !response.CheckIfNoError(&w, err, message) {
 			return
 		}
 		userCtx := context.WithValue(r.Context(), "userId", userId)
