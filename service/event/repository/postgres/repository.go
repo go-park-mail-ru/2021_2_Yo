@@ -439,7 +439,7 @@ func (s *Repository) EmailNotify(eventId string) ([]*models.Info, error) {
 	message := logMessage + "EmailNotify:"
 	log.Debug(message + "started")
 	query := getSubsInfo
-	rows, err := s.db.Queryx(query)
+	rows, err := s.db.Queryx(query,eventId)
 	if err != nil {
 		log.Error(err)
 		return nil, error2.ErrPostgres 
