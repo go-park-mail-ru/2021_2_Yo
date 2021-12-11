@@ -53,7 +53,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 	err = h.useCase.EmailNotify(eventID)
 	if err != nil {
-		log.Error(err)
+		log.Error(message+"err = ", err)
 	}
 	response.SendResponse(w, response.EventIdResponse(eventID))
 	log.Debug(message + "ended")

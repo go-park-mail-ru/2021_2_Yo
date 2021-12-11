@@ -13,7 +13,7 @@ import (
 
 const logMessage = "middleware:"
 
-var allowedOrigins = []string{"http://127.0.0.1:3000", "https://bmstusssa.herokuapp.com"}
+var allowedOrigins = []string{"", "http://127.0.0.1:3000", "https://bmstusssa.herokuapp.com"}
 
 type Middlewares struct {
 	authService auth.UseCase

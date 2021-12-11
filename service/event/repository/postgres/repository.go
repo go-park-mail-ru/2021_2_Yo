@@ -151,7 +151,6 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 			postgresEvent.Tag,
 			postgresEvent.ID)
 		if err != nil {
-			log.Debug(message+"err = ", err)
 			return error2.ErrPostgres
 		}
 	}
@@ -177,7 +176,6 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 	query := deleteEventQuery
 	_, err = s.db.Query(query, eventIdInt)
 	if err != nil {
-		log.Error(err)
 		return error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
@@ -417,7 +415,6 @@ func (s *Repository) GetCities() ([]string, error) {
 	query := getCitiesQuery
 	rows, err := s.db.Queryx(query)
 	if err != nil {
-		log.Error(err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -426,7 +423,6 @@ func (s *Repository) GetCities() ([]string, error) {
 		var c string
 		err := rows.Scan(&c)
 		if err != nil {
-			log.Error(err)
 			return nil, error2.ErrPostgres
 		}
 		resultCities = append(resultCities, c)
@@ -441,7 +437,6 @@ func (s *Repository) EmailNotify(eventId string) ([]*models.Info, error) {
 	query := getSubsInfo
 	rows, err := s.db.Queryx(query,eventId)
 	if err != nil {
-		log.Error(err)
 		return nil, error2.ErrPostgres 
 	}
 	defer rows.Close()
@@ -450,7 +445,6 @@ func (s *Repository) EmailNotify(eventId string) ([]*models.Info, error) {
 		var mail,name,title,img_url string
 		err := rows.Scan(&name,&mail,&title,&img_url)
 		if err != nil {
-			log.Error(err)
 			return nil, error2.ErrPostgres
 		}
 		userInfo :=&models.Info{

@@ -5,6 +5,7 @@ import (
 	log "backend/pkg/logger"
 	"backend/pkg/register"
 	"backend/pkg/utils"
+	"backend/prometheus"
 	authDelivery "backend/service/auth/delivery/http"
 	grpc3 "backend/service/event/repository/grpc"
 	grpc2 "backend/service/user/repository/grpc"
@@ -31,8 +32,6 @@ import (
 
 	protoAuth "backend/microservice/auth/proto"
 	authUseCase "backend/service/auth/usecase"
-
-	"backend/prometheus"
 )
 
 const logMessage = "server:"
@@ -105,7 +104,6 @@ func NewApp(opts *Options) (*App, error) {
 	eventPort := viper.GetString("event_port")
 	eventHost := viper.GetString("event_host")
 	eventMicroserviceAddr := eventHost + ":" + eventPort
-	log.Debug(eventMicroserviceAddr)
 
 	eventGrpcConn, err := grpc.Dial(eventMicroserviceAddr, grpc.WithInsecure())
 	if err != nil {
@@ -167,7 +165,6 @@ func (app *App) Run() error {
 	}
 	message := logMessage + "Run:"
 	log.Info(message + "start")
-	r := newRouterWithEndpoints(app)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = viper.GetString("bmstusa_port")
@@ -176,6 +173,7 @@ func (app *App) Run() error {
 	if app.Options.Testing {
 		port = "test port"
 	}
+	r := newRouterWithEndpoints(app)
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
 		log.Error(message+"err = ", err)
