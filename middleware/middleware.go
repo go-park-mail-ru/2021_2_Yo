@@ -32,7 +32,7 @@ func (m *Middlewares) Recovery(next http.Handler) http.Handler {
 			err := recover()
 			if err != nil {
 				log.Error(message+"err = ", err)
-				response.SendResponse(w, response.ErrorResponse("Internal server error", 500))
+				response.SendResponse(w, response.StatusResponse(http.StatusInternalServerError))
 			}
 		}()
 		next.ServeHTTP(w, r)

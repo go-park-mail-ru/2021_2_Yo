@@ -149,7 +149,7 @@ func SendResponse(w http.ResponseWriter, response interface{}) {
 
 func refactorError(err error) (error, HttpStatus) {
 	if err == nil {
-		return nil, 200
+		return nil, http.StatusOK
 	}
 	errStr := err.Error()
 	if strings.Contains(errStr, "user already exists") {

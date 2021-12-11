@@ -28,13 +28,6 @@ func OkResponse() *Response {
 	}
 }
 
-func ErrorResponse(errorMessage string, status HttpStatus) *Response {
-	return &Response{
-		Status:  status,
-		Message: errorMessage,
-	}
-}
-
 func UserResponse(user *models.User) *Response {
 	return &Response{
 		Status:  200,
