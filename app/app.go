@@ -1,4 +1,4 @@
-package server
+package app
 
 import (
 	eventGrpc "backend/microservice/event/proto"
@@ -105,6 +105,7 @@ func NewApp(opts *Options) (*App, error) {
 	eventPort := viper.GetString("event_port")
 	eventHost := viper.GetString("event_host")
 	eventMicroserviceAddr := eventHost + ":" + eventPort
+	log.Debug(eventMicroserviceAddr)
 
 	eventGrpcConn, err := grpc.Dial(eventMicroserviceAddr, grpc.WithInsecure())
 	if err != nil {
@@ -143,14 +144,8 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Use(mm.Metrics)
 	r.Methods("OPTIONS").HandlerFunc(options)
 
-	//TODO: Потом раскоментить и убрать то, что снизу
-	//authRouter := r.PathPrefix("/auth").Subrouter()
-	//register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)
-
-	r.HandleFunc("/auth/signup", app.AuthManager.SignUp).Methods("POST")
-	r.HandleFunc("/auth/login", app.AuthManager.SignIn).Methods("POST")
-	logoutHandlerFunc := http.HandlerFunc(app.AuthManager.Logout)
-	r.Handle("/auth/logout", mw.Auth(logoutHandlerFunc))
+	authRouter := r.PathPrefix("/auth").Subrouter()
+	register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)
 
 	eventRouter := r.PathPrefix("/events").Subrouter()
 	eventRouter.Methods("POST").Subrouter().Use(mw.CSRF)
@@ -177,9 +172,9 @@ func (app *App) Run() error {
 	if port == "" {
 		port = viper.GetString("bmstusa_port")
 	}
-	log.Info(message+"port =", port)
+	log.Info(message+"port = ", port)
 	if app.Options.Testing {
-		port = "wrong port"
+		port = "test port"
 	}
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
