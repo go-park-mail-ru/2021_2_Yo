@@ -10,8 +10,8 @@ import (
 )
 
 func AuthHTTPEndpoints(r *mux.Router, delivery *authHttp.Delivery, middlewares *middleware.Middlewares) {
-	r.HandleFunc("/signup", delivery.SignUp)
-	r.HandleFunc("/login", delivery.SignIn)
+	r.HandleFunc("/signup", delivery.SignUp).Methods("POST")
+	r.HandleFunc("/login", delivery.SignIn).Methods("POST")
 	logoutHandlerFunc := http.HandlerFunc(delivery.Logout)
 	r.Handle("/logout", middlewares.Auth(logoutHandlerFunc))
 }

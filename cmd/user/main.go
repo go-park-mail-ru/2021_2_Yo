@@ -1,11 +1,11 @@
 package main
 
 import (
-	"backend/microservice/event/client"
-	proto "backend/microservice/event/proto"
+	"backend/microservice/user/client"
+	proto "backend/microservice/user/proto"
 	log "backend/pkg/logger"
 	"backend/pkg/utils"
-	repository "backend/service/event/repository/postgres"
+	"backend/service/user/repository/postgres"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -17,13 +17,11 @@ import (
 const logMessage = "microservice:event:"
 
 func main() {
-
 	logLevel := logrus.DebugLevel
 	log.Init(logLevel)
-
 	log.Info(logMessage + "started")
 
-	viper.AddConfigPath("../config")
+	viper.AddConfigPath("../../config")
 	viper.SetConfigName("config")
 	err := viper.ReadInConfig()
 	if err != nil {
@@ -36,26 +34,22 @@ func main() {
 		log.Error(logMessage+"err =", err)
 		os.Exit(1)
 	}
-
-	port := viper.GetString("event_port")
-
+	port := viper.GetString("user_port")
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Error(logMessage+"err =", err)
 		os.Exit(1)
 	}
-
 	server := grpc.NewServer()
 
-	eventRepository := repository.NewRepository(db)
-	eventService := client.NewEventService(eventRepository)
-	proto.RegisterEventServiceServer(server, eventService)
+	userRepository := postgres.NewRepository(db)
+	userClient := client.NewUserService(userRepository)
+	proto.RegisterUserServiceServer(server, userClient)
 
-	log.Info("started event microservice on ", port)
+	log.Info("started user microservice on ", port)
 	err = server.Serve(listener)
 	if err != nil {
 		log.Error(logMessage+"err =", err)
 		os.Exit(1)
 	}
-
 }

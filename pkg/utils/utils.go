@@ -58,22 +58,19 @@ func InitPostgresDB() (*sqlx.DB, error) {
 		log.Error(message+"err =", err)
 		return nil, err
 	}
-	log.Info(message+"db status =", db.Stats())
 	return db, nil
 }
 
-func InitRedisDB(dbConfName string) (*redis.Client, error) {
-
-	addr := viper.GetString(dbConfName + ".addr")
-	dbId := viper.GetInt(dbConfName + ".db_id")
-
+func InitRedisDB() (*redis.Client, error) {
+	addr := viper.GetString("redis_db.addr")
+	dbId := viper.GetInt("redis_db.db_id")
 	client := redis.NewClient(&redis.Options{
 		Addr:     addr,
 		Password: "",
 		DB:       dbId,
 	})
 	if client == nil {
-		return nil, errors.New("init redis db")
+		return nil, errors.New("redis db init failed")
 	}
 	return client, nil
 }

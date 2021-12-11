@@ -4,12 +4,11 @@ import (
 	protoAuth "backend/microservice/auth/proto"
 	sessionRepo "backend/microservice/auth/repository/session"
 	userRepo "backend/microservice/auth/repository/user"
-	"backend/pkg/logger"
+	log "backend/pkg/logger"
 	"backend/pkg/utils"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 
 	"backend/microservice/auth/usecase"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -17,45 +16,34 @@ import (
 	"os"
 )
 
-func env() {
-	// loads values from .env into the system
-	if err := godotenv.Load(); err != nil {
-		log.Print("No .env file found")
-	}
-}
+const logMessage = "microservice:auth:"
 
 func main() {
-	env()
-	viper.AddConfigPath("../config")
+	logLevel := logrus.DebugLevel
+	log.Init(logLevel)
+	log.Info(logMessage + "started")
+
+	viper.AddConfigPath("../../config")
 	viper.SetConfigName("config")
-	logLevel := log.DebugLevel
-	logger.Init(logLevel)
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Error("main:err = ", err)
+		log.Error(logMessage+"err = ", err)
 		os.Exit(1)
 	}
 
 	port := viper.GetString("auth_port")
 
-	//Подключение постгрес
 	postDB, err := utils.InitPostgresDB()
 	if err != nil {
-		log.Error(err)
+		log.Error(logMessage+"err = ", err)
 	}
-	//Подключение редис
-	redisDB, err := utils.InitRedisDB("redis_db_session")
+	redisDB, err := utils.InitRedisDB()
 	if err != nil {
-		log.Error(err)
+		log.Error(logMessage+"err = ", err)
 	}
-
-	response := redisDB.Ping()
-
-	log.Info(redisDB)
-	log.Info(response)
 	authListener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
-		log.Error(err)
+		log.Error(logMessage+"err = ", err)
 	}
 
 	server := grpc.NewServer()

@@ -1,10 +1,11 @@
-package server
+package app
 
 import (
 	eventGrpc "backend/microservice/event/proto"
 	log "backend/pkg/logger"
 	"backend/pkg/register"
 	"backend/pkg/utils"
+	"backend/prometheus"
 	authDelivery "backend/service/auth/delivery/http"
 	grpc3 "backend/service/event/repository/grpc"
 	grpc2 "backend/service/user/repository/grpc"
@@ -33,8 +34,6 @@ import (
 	authUseCase "backend/service/auth/usecase"
 
 	"backend/easyWebsocket"
-
-	"backend/prometheus"
 )
 
 const logMessage = "server:"
@@ -149,14 +148,8 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Use(mm.Metrics)
 	r.Methods("OPTIONS").HandlerFunc(options)
 
-	//TODO: Потом раскоментить и убрать то, что снизу
-	//authRouter := r.PathPrefix("/auth").Subrouter()
-	//register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)
-
-	r.HandleFunc("/auth/signup", app.AuthManager.SignUp).Methods("POST")
-	r.HandleFunc("/auth/login", app.AuthManager.SignIn).Methods("POST")
-	logoutHandlerFunc := http.HandlerFunc(app.AuthManager.Logout)
-	r.Handle("/auth/logout", mw.Auth(logoutHandlerFunc))
+	authRouter := r.PathPrefix("/auth").Subrouter()
+	register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)
 
 	eventRouter := r.PathPrefix("/events").Subrouter()
 	eventRouter.Methods("POST").Subrouter().Use(mw.CSRF)
@@ -178,15 +171,15 @@ func (app *App) Run() error {
 	}
 	message := logMessage + "Run:"
 	log.Info(message + "start")
-	r := newRouterWithEndpoints(app)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = viper.GetString("bmstusa_port")
 	}
-	log.Info(message+"port =", port)
+	log.Info(message+"port = ", port)
 	if app.Options.Testing {
-		port = "wrong port"
+		port = "test port"
 	}
+	r := newRouterWithEndpoints(app)
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
 		log.Error(message+"err = ", err)

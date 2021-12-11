@@ -4,13 +4,11 @@ import (
 	protoAuth "backend/microservice/auth/proto"
 	"context"
 	"github.com/dgrijalva/jwt-go/v4"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
 )
 
 func generateCsrfToken(userId string) (string, error) {
-	message := logMessage + "GenerateCsrfToken:"
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
 		ID:        userId,
 		ExpiresAt: jwt.At(time.Now().Add(time.Hour * 7 * 24)), //Week  P.S. Maybe Frontend should ask us
@@ -18,7 +16,6 @@ func generateCsrfToken(userId string) (string, error) {
 	secretWord := os.Getenv("CSRFSECRET")
 	csrfToken, err := jwtToken.SignedString([]byte(secretWord))
 	if err != nil {
-		log.Error(message+"err = ", err)
 		return "", err
 	}
 	return csrfToken, err
