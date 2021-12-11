@@ -32,6 +32,8 @@ import (
 	protoAuth "backend/microservice/auth/proto"
 	authUseCase "backend/service/auth/usecase"
 
+	"backend/easyWebsocket"
+
 	"backend/prometheus"
 )
 
@@ -48,6 +50,7 @@ type App struct {
 	UserManager  *userDelivery.Delivery
 	EventManager *eventDelivery.Delivery
 	db           *sql.DB
+	WebsocketPool *easyWebsocket.PubSub
 }
 
 func NewApp(opts *Options) (*App, error) {
@@ -119,12 +122,15 @@ func NewApp(opts *Options) (*App, error) {
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
+	PubSub := easyWebsocket.NewPubSub()
+
 	return &App{
 		Options:      opts,
 		AuthManager:  authD,
 		UserManager:  userD,
 		EventManager: eventD,
 		db:           db,
+		WebsocketPool: PubSub,
 	}, nil
 }
 
