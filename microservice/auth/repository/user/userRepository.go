@@ -1,7 +1,6 @@
 package user
 
 import (
-	log "backend/pkg/logger"
 	"backend/pkg/models"
 	error2 "backend/service/auth/error"
 	sql2 "database/sql"

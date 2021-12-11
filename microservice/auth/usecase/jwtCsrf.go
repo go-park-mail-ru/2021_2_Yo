@@ -4,7 +4,6 @@ import (
 	protoAuth "backend/microservice/auth/proto"
 	"context"
 	"github.com/dgrijalva/jwt-go/v4"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
 )
