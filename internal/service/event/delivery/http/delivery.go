@@ -1,10 +1,10 @@
 package http
 
 import (
+	response2 "backend/internal/response"
 	"backend/internal/service/event"
+	"backend/internal/utils"
 	log "backend/pkg/logger"
-	"backend/pkg/response"
-	"backend/pkg/utils"
 	"errors"
 	"net/http"
 	"strings"
@@ -29,18 +29,18 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
 	err := r.ParseMultipartForm(5 << 20)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
 	eventReader := strings.NewReader(r.FormValue("json"))
-	eventFromRequest, err := response.GetEventFromRequest(eventReader)
-	if !response.CheckIfNoError(&w, err, message) {
+	eventFromRequest, err := response2.GetEventFromRequest(eventReader)
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
 
 	imgUrl, err := utils.SaveImageFromRequest(r, "file")
 	if err == utils.ErrFileExt {
-		response.CheckIfNoError(&w, err, message)
+		response2.CheckIfNoError(&w, err, message)
 		return
 	}
 	if err == nil {
@@ -48,14 +48,14 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 	eventFromRequest.AuthorId = userId
 	eventID, err := h.useCase.CreateEvent(eventFromRequest)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
 	err = h.useCase.EmailNotify(eventID)
 	if err != nil {
 		log.Error(message+"err = ", err)
 	}
-	response.SendResponse(w, response.EventIdResponse(eventID))
+	response2.SendResponse(w, response2.EventIdResponse(eventID))
 	log.Debug(message + "ended")
 }
 
@@ -66,17 +66,17 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	eventId := vars["id"]
 	userId := r.Context().Value("userId").(string)
 	err := r.ParseMultipartForm(5 << 20)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
 	eventReader := strings.NewReader(r.FormValue("json"))
-	eventFromRequest, err := response.GetEventFromRequest(eventReader)
-	if !response.CheckIfNoError(&w, err, message) {
+	eventFromRequest, err := response2.GetEventFromRequest(eventReader)
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
 	imgUrl, err := utils.SaveImageFromRequest(r, "file")
 	if err == utils.ErrFileExt {
-		response.CheckIfNoError(&w, err, message)
+		response2.CheckIfNoError(&w, err, message)
 		return
 	}
 	if err == nil {
@@ -84,10 +84,10 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 	eventFromRequest.ID = eventId
 	err = h.useCase.UpdateEvent(eventFromRequest, userId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -98,10 +98,10 @@ func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	eventId := vars["id"]
 	userId := r.Context().Value("userId").(string)
 	err := h.useCase.DeleteEvent(eventId, userId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -111,10 +111,10 @@ func (h *Delivery) GetEventById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	eventId := vars["id"]
 	resultEvent, err := h.useCase.GetEventById(eventId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.EventResponse(resultEvent))
+	response2.SendResponse(w, response2.EventResponse(resultEvent))
 }
 
 type getEventsVars struct {
@@ -156,10 +156,10 @@ func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	tags := strings.Split(tag, "|")
 
 	eventsList, err := h.useCase.GetEvents(userId, title, category, city, date, tags)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.EventListResponse(eventsList))
+	response2.SendResponse(w, response2.EventListResponse(eventsList))
 }
 
 func (h *Delivery) GetVisitedEvents(w http.ResponseWriter, r *http.Request) {
@@ -168,10 +168,10 @@ func (h *Delivery) GetVisitedEvents(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["id"]
 	eventList, err := h.useCase.GetVisitedEvents(userId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.EventListResponse(eventList))
+	response2.SendResponse(w, response2.EventListResponse(eventList))
 }
 
 func (h *Delivery) GetCreatedEvents(w http.ResponseWriter, r *http.Request) {
@@ -180,10 +180,10 @@ func (h *Delivery) GetCreatedEvents(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["id"]
 	eventList, err := h.useCase.GetCreatedEvents(userId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.EventListResponse(eventList))
+	response2.SendResponse(w, response2.EventListResponse(eventList))
 }
 
 func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
@@ -191,18 +191,18 @@ func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	vars, ok := r.Context().Value("vars").(map[string]string)
 	if !ok {
-		response.CheckIfNoError(&w, errors.New("type casting error"), message)
+		response2.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
 	userId, ok := r.Context().Value("userId").(string)
 	if !ok {
-		response.CheckIfNoError(&w, errors.New("type casting error"), message)
+		response2.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
 	eventId := vars["id"]
 	err := h.useCase.Visit(eventId, userId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -211,18 +211,18 @@ func (h *Delivery) Unvisit(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	vars, ok := r.Context().Value("vars").(map[string]string)
 	if !ok {
-		response.CheckIfNoError(&w, errors.New("type casting error"), message)
+		response2.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
 	userId, ok := r.Context().Value("userId").(string)
 	if !ok {
-		response.CheckIfNoError(&w, errors.New("type casting error"), message)
+		response2.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
 	eventId := vars["id"]
 	err := h.useCase.Unvisit(eventId, userId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -231,18 +231,18 @@ func (h *Delivery) IsVisited(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	vars, ok := r.Context().Value("vars").(map[string]string)
 	if !ok {
-		response.CheckIfNoError(&w, errors.New("type casting error"), message)
+		response2.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
 	userId, ok := r.Context().Value("userId").(string)
 	if !ok {
-		response.CheckIfNoError(&w, errors.New("type casting error"), message)
+		response2.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
 	eventId := vars["id"]
 	res, err := h.useCase.IsVisited(eventId, userId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.FavouriteResponse(res))
+	response2.SendResponse(w, response2.FavouriteResponse(res))
 	log.Debug(message + "ended")
 }
 
@@ -250,9 +250,9 @@ func (h *Delivery) GetCities(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetCities:"
 	log.Debug(message + "started")
 	res, err := h.useCase.GetCities()
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.CitiesResponse(res))
+	response2.SendResponse(w, response2.CitiesResponse(res))
 	log.Debug(message + "ended")
 }

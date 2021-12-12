@@ -1,10 +1,10 @@
 package usecase
 
 import (
+	"backend/internal/models"
 	"backend/internal/service/user"
 	error2 "backend/internal/service/user/error"
-	"backend/pkg/models"
-	"backend/pkg/utils"
+	"backend/internal/utils"
 )
 
 const logMessage = "service:user:usecase:"

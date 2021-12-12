@@ -1,11 +1,11 @@
 package usecase
 
 import (
+	"backend/internal/models"
 	"backend/internal/service/email"
 	"backend/internal/service/event"
 	error2 "backend/internal/service/event/error"
 	log "backend/pkg/logger"
-	"backend/pkg/models"
 	"encoding/json"
 	"errors"
 	"github.com/spf13/viper"

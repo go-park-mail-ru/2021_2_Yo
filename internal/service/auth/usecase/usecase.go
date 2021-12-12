@@ -2,7 +2,7 @@ package usecase
 
 import (
 	protoAuth "backend/internal/microservice/auth/proto"
-	"backend/pkg/models"
+	"backend/internal/models"
 	"context"
 )
 

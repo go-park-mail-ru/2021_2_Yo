@@ -1,7 +1,7 @@
 package email
 
 import (
-	"backend/pkg/models"
+	"backend/internal/models"
 	"bytes"
 	"fmt"
 	"html/template"

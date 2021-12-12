@@ -1,15 +1,18 @@
 package prometheus
 
 import (
-	"backend/pkg/utils"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 )
+
+type modifiedResponse struct {
+	http.ResponseWriter
+	StatusCode int
+}
 
 type metricsMiddleware struct {
 	opsProcessed    *prometheus.CounterVec
@@ -43,7 +46,9 @@ func NewMetricsMiddleware() *metricsMiddleware {
 
 func (mm *metricsMiddleware) Metrics(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		sw := utils.NewModifiedResponse(w)
+		sw := &modifiedResponse{
+			ResponseWriter: w,
+		}
 		path := r.RequestURI[:strings.IndexByte(r.RequestURI, '/')]
 		if r.URL.Path != "/metrics" {
 			mm.requestNow.With(prometheus.Labels{

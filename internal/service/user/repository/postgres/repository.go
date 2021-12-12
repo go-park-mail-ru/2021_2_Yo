@@ -1,9 +1,9 @@
 package postgres
 
 import (
+	"backend/internal/models"
 	error2 "backend/internal/service/user/error"
 	log "backend/pkg/logger"
-	"backend/pkg/models"
 	sql2 "database/sql"
 	sql "github.com/jmoiron/sqlx"
 	"strconv"

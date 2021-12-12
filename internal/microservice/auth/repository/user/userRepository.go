@@ -1,8 +1,8 @@
 package user
 
 import (
+	"backend/internal/models"
 	error2 "backend/internal/service/auth/error"
-	"backend/pkg/models"
 	sql2 "database/sql"
 	"github.com/jmoiron/sqlx"
 	"strconv"

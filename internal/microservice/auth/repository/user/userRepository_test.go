@@ -1,7 +1,7 @@
 package user
 
 import (
-	"backend/pkg/models"
+	"backend/internal/models"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"

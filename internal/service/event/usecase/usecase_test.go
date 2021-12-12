@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"backend/internal/microservice/event/proto"
+	"backend/internal/models"
 	error2 "backend/internal/service/event/error"
 	repository "backend/microservice/event/repository"
-	"backend/pkg/models"
 	"context"
 	"errors"
 	"github.com/stretchr/testify/require"

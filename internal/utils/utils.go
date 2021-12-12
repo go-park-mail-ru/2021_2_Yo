@@ -116,17 +116,3 @@ func GenerateCsrfToken(userId string) (string, error) {
 	}
 	return csrfToken, err
 }
-
-type modifiedResponse struct {
-	http.ResponseWriter
-	StatusCode int
-}
-
-func NewModifiedResponse(w http.ResponseWriter) *modifiedResponse {
-	return &modifiedResponse{ResponseWriter: w}
-}
-
-func (w *modifiedResponse) WriteHeader(statusCode int) {
-	w.StatusCode = statusCode
-	w.ResponseWriter.WriteHeader(statusCode)
-}

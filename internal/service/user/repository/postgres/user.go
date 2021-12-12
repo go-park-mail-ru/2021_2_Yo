@@ -1,8 +1,8 @@
 package postgres
 
 import (
+	"backend/internal/models"
 	error2 "backend/internal/service/user/error"
-	"backend/pkg/models"
 	"strconv"
 )
 

@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	response2 "backend/internal/response"
 	"backend/internal/service/auth"
 	log "backend/pkg/logger"
-	"backend/pkg/response"
 	"context"
 	"net/http"
 	"time"
@@ -32,7 +32,7 @@ func (m *Middlewares) Recovery(next http.Handler) http.Handler {
 			err := recover()
 			if err != nil {
 				log.Error(message+"err = ", err)
-				response.SendResponse(w, response.StatusResponse(http.StatusInternalServerError))
+				response2.SendResponse(w, response2.StatusResponse(http.StatusInternalServerError))
 			}
 		}()
 		next.ServeHTTP(w, r)
@@ -93,11 +93,11 @@ func (m *Middlewares) Auth(next http.Handler) http.Handler {
 	message := logMessage + "Auth:"
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_id")
-		if !response.CheckIfNoError(&w, err, message) {
+		if !response2.CheckIfNoError(&w, err, message) {
 			return
 		}
 		userId, err := m.authService.CheckSession(cookie.Value)
-		if !response.CheckIfNoError(&w, err, message) {
+		if !response2.CheckIfNoError(&w, err, message) {
 			return
 		}
 		userCtx := context.WithValue(r.Context(), "userId", userId)
@@ -110,7 +110,7 @@ func (m *Middlewares) CSRF(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gottenToken := (*r).Header.Get("X-CSRF-Token")
 		userId, err := m.authService.CheckToken(gottenToken)
-		if !response.CheckIfNoError(&w, err, message) {
+		if !response2.CheckIfNoError(&w, err, message) {
 			return
 		}
 		userCtx := context.WithValue(r.Context(), "userId", userId)

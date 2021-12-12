@@ -1,7 +1,7 @@
 package response
 
 import (
-	"backend/pkg/models"
+	models2 "backend/internal/models"
 )
 
 const logMessage = "response:response:"
@@ -27,21 +27,21 @@ func OkResponse() *Response {
 	}
 }
 
-func UserResponse(user *models.User) *Response {
+func UserResponse(user *models2.User) *Response {
 	return &Response{
 		Status: 200,
 		Body:   MakeUserResponseBody(user),
 	}
 }
 
-func UserListResponse(users []*models.User) *Response {
+func UserListResponse(users []*models2.User) *Response {
 	return &Response{
 		Status: 200,
 		Body:   MakeUserListResponseBody(users),
 	}
 }
 
-func EventResponse(event *models.Event) *Response {
+func EventResponse(event *models2.Event) *Response {
 	return &Response{
 		Status: 200,
 		Body:   MakeEventResponseBody(event),
@@ -51,13 +51,13 @@ func EventResponse(event *models.Event) *Response {
 func EventIdResponse(eventID string) *Response {
 	return &Response{
 		Status: 200,
-		Body: models.EventIDResponseBody{
+		Body: models2.EventIDResponseBody{
 			ID: eventID,
 		},
 	}
 }
 
-func EventListResponse(events []*models.Event) *Response {
+func EventListResponse(events []*models2.Event) *Response {
 	return &Response{
 		Status: 200,
 		Body:   MakeEventListResponseBody(events),
@@ -67,7 +67,7 @@ func EventListResponse(events []*models.Event) *Response {
 func SubscribedResponse(result bool) *Response {
 	return &Response{
 		Status: 200,
-		Body: models.SubscribedResponseBody{
+		Body: models2.SubscribedResponseBody{
 			Result: result,
 		},
 	}
@@ -76,7 +76,7 @@ func SubscribedResponse(result bool) *Response {
 func FavouriteResponse(result bool) *Response {
 	return &Response{
 		Status: 200,
-		Body: models.FavouriteResponseBody{
+		Body: models2.FavouriteResponseBody{
 			Result: result,
 		},
 	}
@@ -85,7 +85,7 @@ func FavouriteResponse(result bool) *Response {
 func CitiesResponse(cities []string) *Response {
 	return &Response{
 		Status: 200,
-		Body: models.CitiesResponseBody{
+		Body: models2.CitiesResponseBody{
 			Cities: cities,
 		},
 	}

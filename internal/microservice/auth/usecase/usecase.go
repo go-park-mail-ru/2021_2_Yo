@@ -3,8 +3,8 @@ package usecase
 import (
 	interfaces2 "backend/internal/microservice/auth/interfaces"
 	protoAuth "backend/internal/microservice/auth/proto"
-	"backend/pkg/models"
-	"backend/pkg/utils"
+	"backend/internal/models"
+	"backend/internal/utils"
 	"context"
 )
 

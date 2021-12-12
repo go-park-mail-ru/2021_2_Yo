@@ -2,10 +2,10 @@ package http
 
 import (
 	"backend/internal/notification"
+	response2 "backend/internal/response"
 	"backend/internal/service/user"
+	"backend/internal/utils"
 	log "backend/pkg/logger"
-	"backend/pkg/response"
-	"backend/pkg/utils"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
@@ -30,15 +30,15 @@ func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
 	foundUser, err := h.useCase.GetUserById(userId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
 	CSRFToken, err := utils.GenerateCsrfToken(userId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
 	w.Header().Set("X-CSRF-Token", CSRFToken)
-	response.SendResponse(w, response.UserResponse(foundUser))
+	response2.SendResponse(w, response2.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }
 
@@ -48,10 +48,10 @@ func (h *Delivery) GetUserById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["id"]
 	foundUser, err := h.useCase.GetUserById(userId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.UserResponse(foundUser))
+	response2.SendResponse(w, response2.UserResponse(foundUser))
 	log.Debug(message + "ended")
 }
 
@@ -59,17 +59,17 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserInfo:"
 	log.Debug(message + "started")
 	err := r.ParseMultipartForm(5 << 20)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
 	userReader := strings.NewReader(r.FormValue("json"))
-	userFromRequest, err := response.GetUserFromRequest(userReader)
-	if !response.CheckIfNoError(&w, err, message) {
+	userFromRequest, err := response2.GetUserFromRequest(userReader)
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
 	imgUrl, err := utils.SaveImageFromRequest(r, "file")
 	if err == utils.ErrFileExt {
-		response.CheckIfNoError(&w, err, message)
+		response2.CheckIfNoError(&w, err, message)
 		return
 	}
 	if err == nil {
@@ -77,10 +77,10 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	userFromRequest.ID = r.Context().Value("userId").(string)
 	err = h.useCase.UpdateUserInfo(userFromRequest)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -88,15 +88,15 @@ func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserPassword:"
 	log.Debug(message + "started")
 	userId := r.Context().Value("userId").(string)
-	u, err := response.GetUserFromRequest(r.Body)
-	if !response.CheckIfNoError(&w, err, message) {
+	u, err := response2.GetUserFromRequest(r.Body)
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
 	err = h.useCase.UpdateUserPassword(userId, u.Password)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -106,10 +106,10 @@ func (h *Delivery) GetSubscribers(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["id"]
 	subscribers, err := h.useCase.GetSubscribers(userId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.UserListResponse(subscribers))
+	response2.SendResponse(w, response2.UserListResponse(subscribers))
 	log.Debug(message + "ended")
 }
 
@@ -119,10 +119,10 @@ func (h *Delivery) GetSubscribes(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["id"]
 	subscribers, err := h.useCase.GetSubscribes(userId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.UserListResponse(subscribers))
+	response2.SendResponse(w, response2.UserListResponse(subscribers))
 	log.Debug(message + "ended")
 }
 
@@ -131,10 +131,10 @@ func (h *Delivery) GetVisitors(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	eventId := r.Context().Value("eventId").(string)
 	userList, err := h.useCase.GetVisitors(eventId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.UserListResponse(userList))
+	response2.SendResponse(w, response2.UserListResponse(userList))
 	log.Debug(message + "ended")
 }
 
@@ -145,11 +145,11 @@ func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
 	subscriberId := r.Context().Value("userId").(string)
 	subscribedId := vars["id"]
 	err := h.useCase.Subscribe(subscribedId, subscriberId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
 	subscriber, err := h.useCase.GetUserById(subscriberId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
 	err = h.notificator.NewSubscriber(subscribedId, subscriber.Name)
@@ -157,7 +157,7 @@ func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
 		//To db
 		//storeNotification()
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -168,10 +168,10 @@ func (h *Delivery) Unsubscribe(w http.ResponseWriter, r *http.Request) {
 	subscriberId := r.Context().Value("userId").(string)
 	subscribedId := vars["id"]
 	err := h.useCase.Unsubscribe(subscribedId, subscriberId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.OkResponse())
+	response2.SendResponse(w, response2.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -182,9 +182,9 @@ func (h *Delivery) IsSubscribed(w http.ResponseWriter, r *http.Request) {
 	subscriberId := r.Context().Value("userId").(string)
 	subscribedId := vars["id"]
 	res, err := h.useCase.IsSubscribed(subscribedId, subscriberId)
-	if !response.CheckIfNoError(&w, err, message) {
+	if !response2.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response.SendResponse(w, response.SubscribedResponse(res))
+	response2.SendResponse(w, response2.SubscribedResponse(res))
 	log.Debug(message + "ended")
 }

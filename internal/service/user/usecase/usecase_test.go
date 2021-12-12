@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"backend/internal/microservice/user/proto"
+	"backend/internal/models"
 	error2 "backend/internal/service/user/error"
-	"backend/pkg/models"
-	"backend/pkg/utils"
+	"backend/internal/utils"
 	"context"
 	"errors"
 

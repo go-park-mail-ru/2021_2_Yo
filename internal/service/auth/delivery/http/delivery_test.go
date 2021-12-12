@@ -1,9 +1,9 @@
 package http
 
 import (
+	models2 "backend/internal/models"
 	"backend/internal/service/auth/usecase"
 	log "backend/pkg/logger"
-	"backend/pkg/models"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -19,14 +19,14 @@ const logTestMessage = "auth:delivery:test"
 
 var signUpTests = []struct {
 	id          int
-	input       *models.UserResponseBody
+	input       *models2.UserResponseBody
 	useCaseErr1 error
 	useCaseErr2 error
 	useCaseErr3 error
 }{
 	{
 		1,
-		&models.UserResponseBody{
+		&models2.UserResponseBody{
 			Mail: "testMail@mail.ru",
 		},
 		nil,
@@ -35,7 +35,7 @@ var signUpTests = []struct {
 	},
 	{
 		2,
-		&models.UserResponseBody{
+		&models2.UserResponseBody{
 			Mail: "testMail",
 		},
 		nil,
@@ -44,7 +44,7 @@ var signUpTests = []struct {
 	},
 	{
 		3,
-		&models.UserResponseBody{
+		&models2.UserResponseBody{
 			Mail: "testMail@mail.ru",
 		},
 		errors.New("test_err"),
@@ -53,7 +53,7 @@ var signUpTests = []struct {
 	},
 	{
 		4,
-		&models.UserResponseBody{
+		&models2.UserResponseBody{
 			Mail: "testMail@mail.ru",
 		},
 		nil,
@@ -62,7 +62,7 @@ var signUpTests = []struct {
 	},
 	{
 		5,
-		&models.UserResponseBody{
+		&models2.UserResponseBody{
 			Mail: "testMail@mail.ru",
 		},
 		nil,
@@ -82,7 +82,7 @@ func TestSignUp(t *testing.T) {
 		bodyUserJSON, err := json.Marshal(test.input)
 		require.NoError(t, err, logTestMessage+"err =", err)
 
-		userModel := new(models.User)
+		userModel := new(models2.User)
 		userModel.Mail = test.input.Mail
 
 		useCaseMock.On("SignUp", userModel).Return("", test.useCaseErr1)
@@ -102,14 +102,14 @@ func TestSignUp(t *testing.T) {
 
 var signInTests = []struct {
 	id          int
-	input       *models.UserResponseBody
+	input       *models2.UserResponseBody
 	useCaseErr1 error
 	useCaseErr2 error
 	useCaseErr3 error
 }{
 	{
 		1,
-		&models.UserResponseBody{
+		&models2.UserResponseBody{
 			Mail:     "testMail@mail.ru",
 			Password: "testPassword",
 		},
@@ -119,7 +119,7 @@ var signInTests = []struct {
 	},
 	{
 		2,
-		&models.UserResponseBody{
+		&models2.UserResponseBody{
 			Mail:     "testMail",
 			Password: "testPassword",
 		},
@@ -129,7 +129,7 @@ var signInTests = []struct {
 	},
 	{
 		3,
-		&models.UserResponseBody{
+		&models2.UserResponseBody{
 			Mail:     "testMail@mail.ru",
 			Password: "testPassword",
 		},
@@ -139,7 +139,7 @@ var signInTests = []struct {
 	},
 	{
 		4,
-		&models.UserResponseBody{
+		&models2.UserResponseBody{
 			Mail:     "testMail@mail.ru",
 			Password: "testPassword",
 		},
@@ -149,7 +149,7 @@ var signInTests = []struct {
 	},
 	{
 		5,
-		&models.UserResponseBody{
+		&models2.UserResponseBody{
 			Mail:     "testMail@mail.ru",
 			Password: "testPassword",
 		},
@@ -164,7 +164,7 @@ func TestSignIn(t *testing.T) {
 		useCaseMock := new(usecase.UseCaseMock)
 		deliveryTest := NewDelivery(useCaseMock)
 
-		userModel := new(models.User)
+		userModel := new(models2.User)
 		userModel.Mail = test.input.Mail
 		userModel.Password = test.input.Password
 

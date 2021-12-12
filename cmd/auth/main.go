@@ -5,8 +5,8 @@ import (
 	sessionRepo "backend/internal/microservice/auth/repository/session"
 	userRepo "backend/internal/microservice/auth/repository/user"
 	"backend/internal/microservice/auth/usecase"
+	"backend/internal/utils"
 	log "backend/pkg/logger"
-	"backend/pkg/utils"
 	"github.com/sirupsen/logrus"
 
 	_ "github.com/lib/pq"

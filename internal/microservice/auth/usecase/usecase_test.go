@@ -2,8 +2,8 @@ package usecase
 
 import (
 	protoAuth "backend/internal/microservice/auth/proto"
-	"backend/pkg/models"
-	"backend/pkg/utils"
+	"backend/internal/models"
+	"backend/internal/utils"
 	"context"
 	"github.com/stretchr/testify/assert"
 	"testing"

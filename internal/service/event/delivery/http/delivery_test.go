@@ -1,8 +1,8 @@
 package http
 
 import (
+	"backend/internal/models"
 	"backend/internal/service/event/usecase"
-	"backend/pkg/models"
 	"bytes"
 	"context"
 	"encoding/json"

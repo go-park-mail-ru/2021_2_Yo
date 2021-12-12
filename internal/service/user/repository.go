@@ -1,6 +1,8 @@
 package user
 
-import "backend/pkg/models"
+import (
+	"backend/internal/models"
+)
 
 type Repository interface {
 	GetUserById(userId string) (*models.User, error)
