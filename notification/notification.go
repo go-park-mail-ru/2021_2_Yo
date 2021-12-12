@@ -1,30 +1,30 @@
 package notification
 
 import (
-	"backend/easyWebsocket"
+	"backend/websocket"
 )
 
-type SubsNotificator struct {
-	userConnectionsPool *easyWebsocket.PubSub
+type Notificator struct {
+	pool *websocket.Pool
 }
 
-func NewSubsNotificator(userPool *easyWebsocket.PubSub) *SubsNotificator {
-	return &SubsNotificator{
-		userConnectionsPool: userPool,
+func NewSubsNotificator(pool *websocket.Pool) *Notificator {
+	return &Notificator{
+		pool: pool,
 	}
 }
 
-func (sn *SubsNotificator) NewSubscriber(subberId string, subberName string) error {
-	ws := sn.userConnectionsPool.GetConn(subberId)
+func (sn *Notificator) NewSubscriber(subscriberId string, subscribedName string) error {
+	ws := sn.pool.GetConn(subscriberId)
 	type Message struct {
-		Name string `json:"Name`
+		Name string `json:"Name"`
 	}
 	m := &Message{
-		Name: subberName,
+		Name: subscribedName,
 	}
 	err := ws.WriteJSON(m)
 	if err != nil {
-		sn.userConnectionsPool.RemoveConn(subberId)
+		sn.pool.RemoveConn(subscriberId)
 		return err
 	}
 	return nil

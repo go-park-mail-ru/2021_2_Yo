@@ -10,6 +10,7 @@ import (
 	authDelivery "backend/service/auth/delivery/http"
 	grpc3 "backend/service/event/repository/grpc"
 	grpc2 "backend/service/user/repository/grpc"
+	"backend/websocket"
 	"errors"
 
 	userRepository "backend/microservice/user/proto"
@@ -33,7 +34,6 @@ import (
 
 	protoAuth "backend/microservice/auth/proto"
 	authUseCase "backend/service/auth/usecase"
-	"backend/easyWebsocket"
 )
 
 const logMessage = "server:"
@@ -99,7 +99,7 @@ func NewApp(opts *Options) (*App, error) {
 		}
 	}
 
-	PubSub := easyWebsocket.NewPubSub()
+	PubSub := websocket.NewPubSub()
 
 	SubsNotificator := notification.NewSubsNotificator(PubSub)
 
@@ -124,10 +124,6 @@ func NewApp(opts *Options) (*App, error) {
 	eventR := grpc3.NewRepository(eventRClient)
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
-
-	
-
-
 
 	return &App{
 		Options:      opts,

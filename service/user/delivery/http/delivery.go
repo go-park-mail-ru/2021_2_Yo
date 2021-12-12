@@ -14,14 +14,14 @@ import (
 const logMessage = "service:user:delivery:http:"
 
 type Delivery struct {
-	useCase         user.UseCase
-	SubsNotificator notification.SubsNotificator
+	useCase     user.UseCase
+	notificator notification.Notificator
 }
 
-func NewDelivery(useCase user.UseCase, notificator notification.SubsNotificator) *Delivery {
+func NewDelivery(useCase user.UseCase, notificator notification.Notificator) *Delivery {
 	return &Delivery{
-		useCase:         useCase,
-		SubsNotificator: notificator,
+		useCase:     useCase,
+		notificator: notificator,
 	}
 }
 
@@ -152,7 +152,7 @@ func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
 	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
-	err = h.SubsNotificator.NewSubscriber(subscribedId, subscriber.Name)
+	err = h.notificator.NewSubscriber(subscribedId, subscriber.Name)
 	if err != nil {
 		//To db
 		//storeNotification()
