@@ -32,8 +32,7 @@ import (
 
 	protoAuth "backend/microservice/auth/proto"
 	authUseCase "backend/service/auth/usecase"
-
-	"backend/easyWebsocket"
+	//"backend/easyWebsocket"
 )
 
 const logMessage = "server:"
@@ -49,7 +48,7 @@ type App struct {
 	UserManager  *userDelivery.Delivery
 	EventManager *eventDelivery.Delivery
 	db           *sql.DB
-	WebsocketPool *easyWebsocket.PubSub
+	//WebsocketPool *easyWebsocket.PubSub
 }
 
 func NewApp(opts *Options) (*App, error) {
@@ -121,7 +120,7 @@ func NewApp(opts *Options) (*App, error) {
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
-	PubSub := easyWebsocket.NewPubSub()
+	//PubSub := easyWebsocket.NewPubSub()
 
 	return &App{
 		Options:      opts,
@@ -129,7 +128,7 @@ func NewApp(opts *Options) (*App, error) {
 		UserManager:  userD,
 		EventManager: eventD,
 		db:           db,
-		WebsocketPool: PubSub,
+		//WebsocketPool: PubSub,
 	}, nil
 }
 
