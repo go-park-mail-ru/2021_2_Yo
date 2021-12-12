@@ -13,10 +13,10 @@ RUN go mod download
 
 COPY . .
 
-RUN cd microservice/event/cmd && go build -o event
+RUN cd cmd/server && go build -o server
 
-EXPOSE 8083
+EXPOSE 8080
 
-WORKDIR /app/microservice/event/cmd
+WORKDIR /app/cmd/server
 
-CMD ["./event"]
+CMD ["./server"]

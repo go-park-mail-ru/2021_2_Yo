@@ -1,10 +1,12 @@
 version: "3.6"
 services:
   bmstusa-app:
-    build: "./"
-    command: ./backend
+    build: 
+      context: ./ 
+      dockerfile: ./cmd/server/Dockerfile
+    command: ./server
     volumes:
-      - images-storage:/app/static/images
+      - images-storage:/cmd/static/images
     ports:
       - "8080:8080"
     depends_on:
@@ -15,7 +17,7 @@ services:
   auth:
     build:
       context: ./ 
-      dockerfile: ./microservice/auth/Dockerfile
+      dockerfile: ./cmd/auth/Dockerfile
     command: "./auth"
     ports:
       - "8081:8081"
@@ -25,7 +27,7 @@ services:
   event:
     build:
       context: ./ 
-      dockerfile: ./microservice/event/Dockerfile
+      dockerfile: ./cmd/event/Dockerfile
     command: "./event"
     volumes:
       - images-storage:/app/static/images
@@ -35,7 +37,7 @@ services:
   user:
     build:
       context: ./ 
-      dockerfile: ./microservice/user/Dockerfile
+      dockerfile: ./cmd/user/Dockerfile
     command: "./user"
     volumes:
       - images-storage:/app/static/images

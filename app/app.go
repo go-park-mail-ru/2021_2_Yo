@@ -2,6 +2,7 @@ package app
 
 import (
 	eventGrpc "backend/microservice/event/proto"
+	"backend/notification"
 	log "backend/pkg/logger"
 	"backend/pkg/register"
 	"backend/pkg/utils"
@@ -32,7 +33,7 @@ import (
 
 	protoAuth "backend/microservice/auth/proto"
 	authUseCase "backend/service/auth/usecase"
-	//"backend/easyWebsocket"
+	"backend/easyWebsocket"
 )
 
 const logMessage = "server:"
@@ -98,10 +99,14 @@ func NewApp(opts *Options) (*App, error) {
 		}
 	}
 
+	PubSub := easyWebsocket.NewPubSub()
+
+	SubsNotificator := notification.NewSubsNotificator(PubSub)
+
 	userRClient := userRepository.NewUserServiceClient(userGrpcConn)
 	userR := grpc2.NewRepository(userRClient)
 	userUC := userUseCase.NewUseCase(userR)
-	userD := userDelivery.NewDelivery(userUC)
+	userD := userDelivery.NewDelivery(userUC, *SubsNotificator)
 
 	eventPort := viper.GetString("event_port")
 	eventHost := viper.GetString("event_host")
@@ -120,7 +125,9 @@ func NewApp(opts *Options) (*App, error) {
 	eventUC := eventUseCase.NewUseCase(eventR)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
-	//PubSub := easyWebsocket.NewPubSub()
+	
+
+
 
 	return &App{
 		Options:      opts,

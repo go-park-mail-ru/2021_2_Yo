@@ -1,12 +1,27 @@
 package easyWebsocket
 
 import (
-	"net/http"
-	"strconv"
+	//log "backend/pkg/logger"
+	"encoding/json"
+	//"net/http"
+	//"strconv"
 	"sync"
-	log "backend/pkg/logger"
+
 	"github.com/gorilla/websocket"
 )
+
+const (
+	PUBLISH     = "publish"
+	SUBSCRIBE   = "subscribe"
+)
+
+type Message struct {
+	Action string `json:"action"`
+	//Для подписки нужен id на кого подписались
+	SubbedTo string `json:"subbedTo"`
+	//На запас
+	Message json.RawMessage `json:"message"`
+}
 
 type PubSub struct {
 	mutex sync.RWMutex
@@ -31,6 +46,33 @@ func (p *PubSub) RemoveConn (userId int) {
 	p.mutex.Unlock()
 }
 
+func (p *PubSub) GetConn (userId int) (*websocket.Conn) {
+	return p.Connections[userId]
+}
+
+/*
+func (p *PubSub) Subscribe(userId string, subbedTo string) {
+	Просто отправь данные лол
+}
+
+/*
+func(p *PubSub) HandleRecieveMessage(userId string, messageType int,  message []byte) (*PubSub) {
+	m := Message{}
+
+	err := json.Unmarshal(message, &m)
+	if err != nil {
+		log.Error("not correct json")
+		return p
+	}
+
+	switch m.Action {
+
+	case SUBSCRIBE:
+		p.Subscribe(userId,m.SubbedTo)
+
+	}
+}
+
 func (p *PubSub) WebSocketHandler(w http.ResponseWriter, r *http.Request) {
     ws, err := upgrader.Upgrade(w,r,nil)
 	if err != nil {
@@ -45,7 +87,6 @@ func (p *PubSub) WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 	iUserId, _ := strconv.Atoi(userId)
 
 	p.AddConn(iUserId,ws)
-	
 	for {
 		messageType, message, err := ws.ReadMessage()
 		if err != nil {
@@ -57,6 +98,9 @@ func (p *PubSub) WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		//need to do write funcs
-		ws.HandleReceiveMessage(client, messageType, p)
+		//Вот это вообще не нужно по идее
+		//p.HandleRecieveMessage(userId, messageType, message)
 	}
 }
+*/
+

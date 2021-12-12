@@ -13,8 +13,10 @@ RUN go mod download
 
 COPY . .
 
-RUN go build 
+RUN cd cmd/event && go build -o event
 
-EXPOSE 8080
+EXPOSE 8083
 
-CMD ["./backend"]
+WORKDIR /app/cmd/auth
+
+CMD ["./event"]

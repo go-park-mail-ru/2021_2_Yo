@@ -7,7 +7,7 @@ import (
 	"backend/service/user"
 	"net/http"
 	"strings"
-
+	"backend/notification"
 	"github.com/gorilla/mux"
 )
 
@@ -15,11 +15,13 @@ const logMessage = "service:user:delivery:http:"
 
 type Delivery struct {
 	useCase user.UseCase
+	SubsNotificator notification.SubsNotificator
 }
 
-func NewDelivery(useCase user.UseCase) *Delivery {
+func NewDelivery(useCase user.UseCase, notificator notification.SubsNotificator) *Delivery {
 	return &Delivery{
 		useCase: useCase,
+		SubsNotificator: notificator,
 	}
 }
 
@@ -145,6 +147,15 @@ func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
 	err := h.useCase.Subscribe(subscribedId, subscriberId)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
+	}
+	//Get Me Also subscriberName
+	err := h.useCase.GetSubscriberName()
+	//Ok new func
+	err = h.SubsNotificator.NewSubscriber(subscribedId,subscriberName) {
+		if err != nil {
+			//To db
+			storeNotification()
+		}
 	}
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")

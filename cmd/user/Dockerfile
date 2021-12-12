@@ -13,10 +13,10 @@ RUN go mod download
 
 COPY . .
 
-RUN cd microservice/auth/cmd && go build -o auth
+RUN cd cmd/user && go build -o user
 
-EXPOSE 8081
+EXPOSE 8084
 
-WORKDIR /app/microservice/auth/cmd
+WORKDIR /app/cmd/user
 
-CMD ["./auth"]
+CMD ["./user"]

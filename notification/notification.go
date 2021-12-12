@@ -2,7 +2,6 @@ package notification
 
 import (
 	"backend/easyWebsocket"
-	"strconv"
 )
 
 type SubsNotificator struct {
@@ -15,9 +14,18 @@ func NewSubsNotificator (userPool *easyWebsocket.PubSub) *SubsNotificator {
 	}
 }
 
-func (sn * SubsNotificator) NewSubscriber(subId string, subbedToId string) {
-	_, err := strconv.Atoi(subId)
-	if err != nil {
-		return
+func (sn *SubsNotificator) NewSubscriber(subberId int, subberName string) error {
+	ws := sn.userConnectionsPool.GetConn(subberId)
+	type Message struct {
+		Name string `json:"Name`
 	}
+	m := &Message{
+		Name: subberName,
+	}
+	err := ws.WriteJSON(m)
+	if err != nil {
+		sn.userConnectionsPool.RemoveConn(subberId)
+		return err
+	}
+	return nil
 }
