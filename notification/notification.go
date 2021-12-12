@@ -8,13 +8,13 @@ type SubsNotificator struct {
 	userConnectionsPool *easyWebsocket.PubSub
 }
 
-func NewSubsNotificator (userPool *easyWebsocket.PubSub) *SubsNotificator {
+func NewSubsNotificator(userPool *easyWebsocket.PubSub) *SubsNotificator {
 	return &SubsNotificator{
 		userConnectionsPool: userPool,
 	}
 }
 
-func (sn *SubsNotificator) NewSubscriber(subberId int, subberName string) error {
+func (sn *SubsNotificator) NewSubscriber(subberId string, subberName string) error {
 	ws := sn.userConnectionsPool.GetConn(subberId)
 	type Message struct {
 		Name string `json:"Name`

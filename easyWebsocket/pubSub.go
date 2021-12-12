@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	PUBLISH     = "publish"
-	SUBSCRIBE   = "subscribe"
+	PUBLISH   = "publish"
+	SUBSCRIBE = "subscribe"
 )
 
 type Message struct {
@@ -24,29 +24,29 @@ type Message struct {
 }
 
 type PubSub struct {
-	mutex sync.RWMutex
-	Connections map[int]*websocket.Conn
+	mutex       sync.RWMutex
+	Connections map[string]*websocket.Conn
 }
 
 func NewPubSub() *PubSub {
 	return &PubSub{
-		Connections: make (map[int]*websocket.Conn),
+		Connections: make(map[string]*websocket.Conn),
 	}
 }
 
-func (p *PubSub) AddConn(userId int, ws *websocket.Conn) {
+func (p *PubSub) AddConn(userId string, ws *websocket.Conn) {
 	p.mutex.Lock()
 	p.Connections[userId] = ws
 	p.mutex.Unlock()
 }
 
-func (p *PubSub) RemoveConn (userId int) {
+func (p *PubSub) RemoveConn(userId string) {
 	p.mutex.Lock()
 	p.Connections[userId] = nil
 	p.mutex.Unlock()
 }
 
-func (p *PubSub) GetConn (userId int) (*websocket.Conn) {
+func (p *PubSub) GetConn(userId string) *websocket.Conn {
 	return p.Connections[userId]
 }
 
@@ -76,7 +76,7 @@ func(p *PubSub) HandleRecieveMessage(userId string, messageType int,  message []
 func (p *PubSub) WebSocketHandler(w http.ResponseWriter, r *http.Request) {
     ws, err := upgrader.Upgrade(w,r,nil)
 	if err != nil {
-		return 
+		return
 	}
 
 	userId, err := GetID(ws)
@@ -103,4 +103,3 @@ func (p *PubSub) WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 */
-
