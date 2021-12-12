@@ -16,8 +16,7 @@ type Response struct {
 
 func StatusResponse(status HttpStatus) *Response {
 	return &Response{
-		Status: 200,
-		Body:   status,
+		Status: status,
 	}
 }
 
@@ -30,32 +29,28 @@ func OkResponse() *Response {
 
 func UserResponse(user *models.User) *Response {
 	return &Response{
-		Status:  200,
-		Message: "",
-		Body:    MakeUserResponseBody(user),
+		Status: 200,
+		Body:   MakeUserResponseBody(user),
 	}
 }
 
 func UserListResponse(users []*models.User) *Response {
 	return &Response{
-		Status:  200,
-		Message: "",
-		Body:    MakeUserListResponseBody(users),
+		Status: 200,
+		Body:   MakeUserListResponseBody(users),
 	}
 }
 
 func EventResponse(event *models.Event) *Response {
 	return &Response{
-		Status:  200,
-		Message: "",
-		Body:    MakeEventResponseBody(event),
+		Status: 200,
+		Body:   MakeEventResponseBody(event),
 	}
 }
 
 func EventIdResponse(eventID string) *Response {
 	return &Response{
-		Status:  200,
-		Message: "",
+		Status: 200,
 		Body: models.EventIDResponseBody{
 			ID: eventID,
 		},
@@ -64,16 +59,14 @@ func EventIdResponse(eventID string) *Response {
 
 func EventListResponse(events []*models.Event) *Response {
 	return &Response{
-		Status:  200,
-		Message: "",
-		Body:    MakeEventListResponseBody(events),
+		Status: 200,
+		Body:   MakeEventListResponseBody(events),
 	}
 }
 
 func SubscribedResponse(result bool) *Response {
 	return &Response{
-		Status:  200,
-		Message: "",
+		Status: 200,
 		Body: models.SubscribedResponseBody{
 			Result: result,
 		},
@@ -82,8 +75,7 @@ func SubscribedResponse(result bool) *Response {
 
 func FavouriteResponse(result bool) *Response {
 	return &Response{
-		Status:  200,
-		Message: "",
+		Status: 200,
 		Body: models.FavouriteResponseBody{
 			Result: result,
 		},
@@ -92,8 +84,7 @@ func FavouriteResponse(result bool) *Response {
 
 func CitiesResponse(cities []string) *Response {
 	return &Response{
-		Status:  200,
-		Message: "",
+		Status: 200,
 		Body: models.CitiesResponseBody{
 			Cities: cities,
 		},
