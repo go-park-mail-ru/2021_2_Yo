@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend/app"
+	"backend/internal/app"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"

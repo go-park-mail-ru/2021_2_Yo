@@ -1,10 +1,10 @@
 package register
 
 import (
-	"backend/middleware"
-	authHttp "backend/service/auth/delivery/http"
-	eventHttp "backend/service/event/delivery/http"
-	userHttp "backend/service/user/delivery/http"
+	"backend/internal/middleware"
+	authHttp "backend/internal/service/auth/delivery/http"
+	eventHttp "backend/internal/service/event/delivery/http"
+	userHttp "backend/internal/service/user/delivery/http"
 	"github.com/gorilla/mux"
 	"net/http"
 )

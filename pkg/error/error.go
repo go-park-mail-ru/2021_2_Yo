@@ -11,8 +11,6 @@ var (
 	ErrNoRows          = errors.New("Запрашиваемые данные отсутствуют")
 	ErrCookie          = errors.New("Ошибка с получением cookie")
 	ErrUserExists      = errors.New("Пользователь уже зарегистрирован")
-	ErrAuthService     = errors.New("Проблема на сервисе авторизации")
 	ErrInternal        = errors.New("Проблема на стороне сервера")
 	ErrSessionNotFound = errors.New("Сессия пользователя не найдена")
-	//ErrNotAuthorised = errors.New("Пользователь не авторизован")
 )

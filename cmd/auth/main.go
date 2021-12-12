@@ -1,14 +1,14 @@
 package main
 
 import (
-	protoAuth "backend/microservice/auth/proto"
-	sessionRepo "backend/microservice/auth/repository/session"
-	userRepo "backend/microservice/auth/repository/user"
+	protoAuth "backend/internal/microservice/auth/proto"
+	sessionRepo "backend/internal/microservice/auth/repository/session"
+	userRepo "backend/internal/microservice/auth/repository/user"
+	"backend/internal/microservice/auth/usecase"
 	log "backend/pkg/logger"
 	"backend/pkg/utils"
 	"github.com/sirupsen/logrus"
 
-	"backend/microservice/auth/usecase"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"

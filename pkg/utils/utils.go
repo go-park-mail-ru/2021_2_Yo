@@ -24,18 +24,6 @@ var (
 	ErrFileExt = errors.New("wrong file extension")
 )
 
-func GetSecret() (string, error) {
-	message := logMessage + "getSecret:"
-	secret := os.Getenv("SECRET")
-	if secret == "" {
-		secret = "secret1234"
-		err := errors.New("can't get secret from environment")
-		log.Error(message+"err =", err)
-		return secret, nil
-	}
-	return secret, nil
-}
-
 func CreatePasswordHash(password string) string {
 	hash := sha256.New()
 	hash.Write([]byte(password))

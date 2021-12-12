@@ -1,11 +1,11 @@
 package main
 
 import (
-	"backend/microservice/user/client"
-	proto "backend/microservice/user/proto"
+	"backend/internal/microservice/user/client"
+	proto "backend/internal/microservice/user/proto"
+	"backend/internal/service/user/repository/postgres"
 	log "backend/pkg/logger"
 	"backend/pkg/utils"
-	"backend/service/user/repository/postgres"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
