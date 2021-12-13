@@ -138,7 +138,6 @@ func MakeEventListResponseBody(events []*models2.Event) models2.EventListRespons
 
 func SendResponse(w http.ResponseWriter, response interface{}) {
 	message := logMessage + "SendResponse:"
-	log.Debug(message + "HERE")
 	w.WriteHeader(http.StatusOK)
 	b, err := json.Marshal(response)
 	if err != nil {
@@ -146,7 +145,6 @@ func SendResponse(w http.ResponseWriter, response interface{}) {
 		return
 	}
 	w.Write(b)
-	log.Debug(message + "END")
 }
 
 func refactorError(err error) (error, HttpStatus) {
