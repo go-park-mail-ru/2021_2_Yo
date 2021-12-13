@@ -256,7 +256,4 @@ func (h *Delivery) GetCities(w http.ResponseWriter, r *http.Request) {
 	}
 	response.SendResponse(w, response.CitiesResponse(res))
 	log.Debug(message + "ended")
-	log.Debug(message + "ended")
-	log.Debug(message + "ended")
-	log.Debug(message + "ended")
 }
