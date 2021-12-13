@@ -4,7 +4,7 @@ services:
     build: 
       context: ./ 
       dockerfile: ./cmd/server/Dockerfile
-    command: ./server
+    command: "./server"
     volumes:
       - images-storage:/cmd/static/images
     ports:
