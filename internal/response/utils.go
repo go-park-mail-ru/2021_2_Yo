@@ -145,7 +145,6 @@ func SendResponse(w http.ResponseWriter, response interface{}) {
 		return
 	}
 	w.Write(b)
-	log.Debug(string(b))
 }
 
 func refactorError(err error) (error, HttpStatus) {
