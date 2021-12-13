@@ -186,9 +186,10 @@ func refactorError(err error) (error, HttpStatus) {
 }
 
 func CheckIfNoError(w *http.ResponseWriter, err error, msg string) bool {
+	log.Error(msg+"err = ", err)
 	errRefactored, status := refactorError(err)
 	if err != nil {
-		log.Error(msg+"err = ", errRefactored)
+		log.Error(msg+"refactored err = ", errRefactored)
 		SendResponse(*w, StatusResponse(status))
 		return false
 	}
