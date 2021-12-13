@@ -102,7 +102,6 @@ func NewApp(opts *Options) (*App, error) {
 	eventPort := viper.GetString("event_port")
 	eventHost := viper.GetString("event_host")
 	eventMicroserviceAddr := eventHost + ":" + eventPort
-	log.Debug(message + eventMicroserviceAddr)
 
 	eventGrpcConn, err := grpc.Dial(eventMicroserviceAddr, grpc.WithInsecure())
 	if err != nil {
@@ -167,16 +166,10 @@ func (app *App) Run() error {
 		port = "test port"
 	}
 	r := newRouterWithEndpoints(app)
-	_ = r
-	res, err1 := app.EventManager.UseCase.GetCities()
-	log.Debug(err1)
-	log.Debug(res)
-	/*
-		err := http.ListenAndServe(":"+port, r)
-		if err != nil {
-			log.Error(message+"err = ", err)
-			return err
-		}
-	*/
+	err := http.ListenAndServe(":"+port, r)
+	if err != nil {
+		log.Error(message+"err = ", err)
+		return err
+	}
 	return nil
 }
