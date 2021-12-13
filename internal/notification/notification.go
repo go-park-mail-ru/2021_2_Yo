@@ -8,7 +8,7 @@ type Notificator struct {
 	pool *websocket.Pool
 }
 
-func NewSubsNotificator(pool *websocket.Pool) *Notificator {
+func NewNotificator(pool *websocket.Pool) *Notificator {
 	return &Notificator{
 		pool: pool,
 	}

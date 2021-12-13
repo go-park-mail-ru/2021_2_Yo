@@ -5,17 +5,12 @@ import (
 	"sync"
 )
 
-const (
-	PUBLISH   = "publish"
-	SUBSCRIBE = "subscribe"
-)
-
 type Pool struct {
 	mutex       sync.RWMutex
 	Connections map[string]*websocket.Conn
 }
 
-func NewPubSub() *Pool {
+func NewPool() *Pool {
 	return &Pool{
 		Connections: make(map[string]*websocket.Conn),
 	}

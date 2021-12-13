@@ -50,3 +50,28 @@ type FavouriteResponseBody struct {
 type CitiesResponseBody struct {
 	Cities []string `json:"cities"`
 }
+
+type SubscriptionNotificationBody struct {
+	UserId      string `json:"userId"`
+	UserName    string `json:"userName"`
+	UserSurname string `json:"userSurname"`
+	UserImgUrl  string `json:"userImgUrl"`
+}
+
+type InvitationNotificationBody struct {
+	UserId      string `json:"userId"`
+	UserName    string `json:"userName"`
+	UserSurname string `json:"userSurname"`
+	UserImgUrl  string `json:"userImgUrl"`
+	EventName   string `json:"eventName"`
+	EventId     string `json:"eventId"`
+}
+
+type NewEventNotificationBody struct {
+	UserId      string `json:"userId"`
+	UserName    string `json:"userName"`
+	UserSurname string `json:"userSurname"`
+	UserImgUrl  string `json:"userImgUrl"`
+	EventName   string `json:"eventName"`
+	EventId     string `json:"eventId"`
+}

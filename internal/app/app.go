@@ -19,8 +19,6 @@ import (
 	"backend/internal/websocket"
 	log "backend/pkg/logger"
 	"backend/pkg/prometheus"
-	"errors"
-
 	"fmt"
 	"net/http"
 	"os"
@@ -46,13 +44,9 @@ type App struct {
 	UserManager  *userDelivery.Delivery
 	EventManager *eventDelivery.Delivery
 	db           *sql.DB
-	//WebsocketPool *easyWebsocket.PubSub
 }
 
 func NewApp(opts *Options) (*App, error) {
-	if opts == nil {
-		return nil, errors.New("Unexpected NewApp error")
-	}
 	message := logMessage + "NewApp:"
 	log.Init(opts.LogLevel)
 	log.Info(fmt.Sprintf(message+"started, log level = %s", opts.LogLevel))
@@ -96,9 +90,9 @@ func NewApp(opts *Options) (*App, error) {
 		}
 	}
 
-	PubSub := websocket.NewPubSub()
+	pool := websocket.NewPool()
 
-	SubsNotificator := notification.NewSubsNotificator(PubSub)
+	SubsNotificator := notification.NewNotificator(pool)
 
 	userRClient := userRepository.NewUserServiceClient(userGrpcConn)
 	userR := grpc2.NewRepository(userRClient)
@@ -128,11 +122,7 @@ func NewApp(opts *Options) (*App, error) {
 		UserManager:  userD,
 		EventManager: eventD,
 		db:           db,
-		//WebsocketPool: PubSub,
 	}, nil
-}
-
-func options(w http.ResponseWriter, r *http.Request) {
 }
 
 func newRouterWithEndpoints(app *App) *mux.Router {
@@ -145,7 +135,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
 	r.Use(mm.Metrics)
-	r.Methods("OPTIONS").HandlerFunc(options)
+	r.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 
 	authRouter := r.PathPrefix("/auth").Subrouter()
 	register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)

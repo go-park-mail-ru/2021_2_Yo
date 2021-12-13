@@ -2,7 +2,7 @@ package http
 
 import (
 	models2 "backend/internal/models"
-	response2 "backend/internal/response"
+	response "backend/internal/response"
 	error2 "backend/internal/service/user/error"
 	"backend/internal/service/user/usecase"
 	"backend/pkg/response"
@@ -10,11 +10,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/gorilla/mux"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/require"
 )
 
 const logTestMessage = "auth:delivery:test"
@@ -24,7 +25,7 @@ var getUserTests = []struct {
 	input      string
 	user       *models2.User
 	useCaseErr error
-	output     *response2.Response
+	output     *response.Response
 }{
 	{1,
 		"1",
@@ -32,7 +33,7 @@ var getUserTests = []struct {
 			ID: "1",
 		},
 		nil,
-		response2.UserResponse(&models2.User{ID: "1"})},
+		response.UserResponse(&models2.User{ID: "1"})},
 	{2,
 		"1",
 		nil,
@@ -63,7 +64,7 @@ var getUserByIdTests = []struct {
 	input      string
 	user       *models2.User
 	useCaseErr error
-	output     *response2.Response
+	output     *response.Response
 }{
 	{1,
 		"1",
@@ -71,7 +72,7 @@ var getUserByIdTests = []struct {
 			ID: "1",
 		},
 		nil,
-		response2.UserResponse(&models2.User{
+		response.UserResponse(&models2.User{
 			ID: "1",
 		})},
 	{2,
@@ -104,7 +105,7 @@ var updateUserInfoTests = []struct {
 	input      string
 	user       *models2.UserResponseBody
 	useCaseErr error
-	output     *response2.Response
+	output     *response.Response
 }{
 	{1,
 		"1",
@@ -114,7 +115,7 @@ var updateUserInfoTests = []struct {
 			About:   "testAbout",
 		},
 		nil,
-		response2.OkResponse()},
+		response.OkResponse()},
 	{2,
 		"1",
 		&models2.UserResponseBody{
@@ -128,7 +129,7 @@ var updateUserInfoTests = []struct {
 		"1",
 		nil,
 		nil,
-		response.ErrorResponse(response2.ErrJSONDecoding.Error())},
+		response.ErrorResponse(response.ErrJSONDecoding.Error())},
 }
 
 func TestUpdateUserInfo(t *testing.T) {
@@ -171,7 +172,7 @@ var updateUserPasswordTests = []struct {
 	input      string
 	user       *models2.UserResponseBody
 	useCaseErr error
-	output     *response2.Response
+	output     *response.Response
 }{
 	{1,
 		"1",
@@ -179,7 +180,7 @@ var updateUserPasswordTests = []struct {
 			Password: "testPassword",
 		},
 		nil,
-		response2.OkResponse()},
+		response.OkResponse()},
 	{2,
 		"1",
 		&models2.UserResponseBody{
@@ -191,7 +192,7 @@ var updateUserPasswordTests = []struct {
 		"1",
 		nil,
 		nil,
-		response.ErrorResponse(response2.ErrJSONDecoding.Error())},
+		response.ErrorResponse(response.ErrJSONDecoding.Error())},
 }
 
 func TestUpdateUserPassword(t *testing.T) {
