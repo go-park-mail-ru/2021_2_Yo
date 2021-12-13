@@ -226,6 +226,9 @@ func (s *Repository) IsVisited(eventId string, userId string) (bool, error) {
 func (s *Repository) GetCities() ([]string, error) {
 	in := &eventGrpc.Empty{}
 	out, err := s.client.GetCities(context.Background(), in)
+	if err != nil {
+		return nil, err
+	}
 	result := out.Cities
 	return result, err
 }
