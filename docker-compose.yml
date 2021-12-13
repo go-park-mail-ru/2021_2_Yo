@@ -6,7 +6,7 @@ services:
       dockerfile: ./cmd/server/Dockerfile
     command: "./server"
     volumes:
-      - images-storage:/cmd/static/images
+      - images-storage:/app/static/images
     ports:
       - "8080:8080"
     depends_on:
