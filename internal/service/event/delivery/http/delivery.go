@@ -16,11 +16,13 @@ const logMessage = "service:event:delivery:http:"
 
 type Delivery struct {
 	useCase event.UseCase
+	UseCase event.UseCase
 }
 
 func NewDelivery(useCase event.UseCase) *Delivery {
 	return &Delivery{
 		useCase: useCase,
+		UseCase: useCase,
 	}
 }
 
@@ -250,7 +252,6 @@ func (h *Delivery) GetCities(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetCities:"
 	log.Debug(message + "started")
 	res, err := h.useCase.GetCities()
-	log.Debug(res)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}

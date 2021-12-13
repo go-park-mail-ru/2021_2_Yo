@@ -166,10 +166,16 @@ func (app *App) Run() error {
 		port = "test port"
 	}
 	r := newRouterWithEndpoints(app)
-	err := http.ListenAndServe(":"+port, r)
-	if err != nil {
-		log.Error(message+"err = ", err)
-		return err
-	}
+	_ = r
+	res, err1 := app.EventManager.UseCase.GetCities()
+	log.Debug(err1)
+	log.Debug(res)
+	/*
+		err := http.ListenAndServe(":"+port, r)
+		if err != nil {
+			log.Error(message+"err = ", err)
+			return err
+		}
+	*/
 	return nil
 }
