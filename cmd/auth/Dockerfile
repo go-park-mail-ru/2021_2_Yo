@@ -13,7 +13,7 @@ RUN go mod download
 
 COPY . .
 
-RUN cd cmd/auth && && go build -o auth
+RUN cd cmd/auth && go build -o auth
 
 EXPOSE 8081
 

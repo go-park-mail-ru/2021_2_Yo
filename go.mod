@@ -12,7 +12,6 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/jmoiron/sqlx v1.3.4
-	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.4
 	github.com/prometheus/client_golang v1.11.0
 	github.com/satori/go.uuid v1.2.0
