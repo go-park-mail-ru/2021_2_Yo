@@ -102,6 +102,7 @@ func NewApp(opts *Options) (*App, error) {
 	eventPort := viper.GetString("event_port")
 	eventHost := viper.GetString("event_host")
 	eventMicroserviceAddr := eventHost + ":" + eventPort
+	log.Debug(message + eventMicroserviceAddr)
 
 	eventGrpcConn, err := grpc.Dial(eventMicroserviceAddr, grpc.WithInsecure())
 	if err != nil {
