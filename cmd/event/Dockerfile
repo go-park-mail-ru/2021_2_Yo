@@ -17,6 +17,6 @@ RUN cd cmd/event && go build -o event
 
 EXPOSE 8083
 
-WORKDIR /app/cmd/auth
+WORKDIR /app/cmd/event
 
 CMD ["./event"]
