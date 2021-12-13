@@ -250,6 +250,7 @@ func (h *Delivery) GetCities(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetCities:"
 	log.Debug(message + "started")
 	res, err := h.useCase.GetCities()
+	log.Debug(res)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
