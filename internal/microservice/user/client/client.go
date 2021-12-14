@@ -93,6 +93,13 @@ func (c *UserService) GetSubscribes(ctx context.Context, in *proto.UserId) (*pro
 	return out, err
 }
 
+func (c *UserService) GetFriends(ctx context.Context, in *proto.UserId) (*proto.Users, error) {
+	userId := in.ID
+	modelUsers, err := c.repository.GetFriends(userId)
+	out := MakeProtoUsers(modelUsers)
+	return out, err
+}
+
 func (c *UserService) GetVisitors(ctx context.Context, in *proto.EventId) (*proto.Users, error) {
 	eventId := in.ID
 	modelUsers, err := c.repository.GetVisitors(eventId)
