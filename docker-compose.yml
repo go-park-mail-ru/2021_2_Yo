@@ -1,9 +1,8 @@
 version: "3.6"
 services:
   bmstusa-app:
-    build: 
-      context: ./ 
-      dockerfile: ./cmd/server/Dockerfile
+    image: sarpol/server:latest
+    restart: unless-stopped
     command: "./server"
     volumes:
       - images-storage:/app/static/images
@@ -15,9 +14,8 @@ services:
       - user
 
   auth:
-    build:
-      context: ./ 
-      dockerfile: ./cmd/auth/Dockerfile
+    image: sarpol/auth:latest
+    restart: unless-stopped
     command: "./auth"
     ports:
       - "8081:8081"
@@ -25,9 +23,8 @@ services:
       - redis-db
 
   event:
-    build:
-      context: ./ 
-      dockerfile: ./cmd/event/Dockerfile
+    image: sarpol/event:latest
+    restart: unless-stopped
     command: "./event"
     volumes:
       - images-storage:/app/static/images
@@ -35,9 +32,8 @@ services:
       - "8083:8083"
 
   user:
-    build:
-      context: ./ 
-      dockerfile: ./cmd/user/Dockerfile
+    image: sarpol/user:latest
+    restart: unless-stopped
     command: "./user"
     volumes:
       - images-storage:/app/static/images
