@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-const logMessage = "server:"
+const logMessage = "cmd:server:"
 
 func main() {
 	log.Info(logMessage + "started")

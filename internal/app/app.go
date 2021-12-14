@@ -2,25 +2,24 @@ package app
 
 import (
 	protoAuth "backend/internal/microservice/auth/proto"
-	"backend/internal/microservice/event/proto"
+	eventRepository "backend/internal/microservice/event/proto"
 	userRepository "backend/internal/microservice/user/proto"
 	"backend/internal/middleware"
-	"backend/internal/notification"
 	"backend/internal/register"
 	authDelivery "backend/internal/service/auth/delivery/http"
 	authUseCase "backend/internal/service/auth/usecase"
 	eventDelivery "backend/internal/service/event/delivery/http"
-	grpc3 "backend/internal/service/event/repository/grpc"
+	eventGrpc "backend/internal/service/event/repository/grpc"
 	eventUseCase "backend/internal/service/event/usecase"
+	"backend/internal/service/notification/delivery/websocket"
+	"backend/internal/service/notification/repository/postgres"
 	userDelivery "backend/internal/service/user/delivery/http"
-	grpc2 "backend/internal/service/user/repository/grpc"
+	userGrpc "backend/internal/service/user/repository/grpc"
 	userUseCase "backend/internal/service/user/usecase"
 	"backend/internal/utils"
-	"backend/internal/websocket"
 	log "backend/pkg/logger"
+	"backend/pkg/notificator"
 	"backend/pkg/prometheus"
-	"errors"
-
 	"fmt"
 	"net/http"
 	"os"
@@ -46,13 +45,15 @@ type App struct {
 	UserManager  *userDelivery.Delivery
 	EventManager *eventDelivery.Delivery
 	db           *sql.DB
-	//WebsocketPool *easyWebsocket.PubSub
+}
+
+func getGrpcAddres(portKey string, hostKey string) string {
+	port := viper.GetString(portKey)
+	host := viper.GetString(hostKey)
+	return host + ":" + port
 }
 
 func NewApp(opts *Options) (*App, error) {
-	if opts == nil {
-		return nil, errors.New("Unexpected NewApp error")
-	}
 	message := logMessage + "NewApp:"
 	log.Init(opts.LogLevel)
 	log.Info(fmt.Sprintf(message+"started, log level = %s", opts.LogLevel))
@@ -65,14 +66,21 @@ func NewApp(opts *Options) (*App, error) {
 		}
 	}
 
-	authPort := viper.GetString("auth_port")
-	authHost := viper.GetString("auth_host")
-	AuthAddr := authHost + ":" + authPort
-
-	grpcConnAuth, err := grpc.Dial(
-		AuthAddr,
-		grpc.WithInsecure(),
-	)
+	grpcConnAuth, err := grpc.Dial(getGrpcAddres("auth_port", "auth_host"), grpc.WithInsecure())
+	if err != nil {
+		log.Error(message+"err = ", err)
+		if !opts.Testing {
+			return nil, err
+		}
+	}
+	userGrpcConn, err := grpc.Dial(getGrpcAddres("user_port", "user_host"), grpc.WithInsecure())
+	if err != nil {
+		log.Error(message+"err = ", err)
+		if !opts.Testing {
+			return nil, err
+		}
+	}
+	eventGrpcConn, err := grpc.Dial(getGrpcAddres("event_port", "event_host"), grpc.WithInsecure())
 	if err != nil {
 		log.Error(message+"err = ", err)
 		if !opts.Testing {
@@ -81,45 +89,22 @@ func NewApp(opts *Options) (*App, error) {
 	}
 
 	authClient := protoAuth.NewAuthClient(grpcConnAuth)
-	authService := authUseCase.NewUseCase(authClient)
-	authD := authDelivery.NewDelivery(authService)
-
-	userPort := viper.GetString("user_port")
-	userHost := viper.GetString("user_host")
-	userMicroserviceAddr := userHost + ":" + userPort
-
-	userGrpcConn, err := grpc.Dial(userMicroserviceAddr, grpc.WithInsecure())
-	if err != nil {
-		log.Error(message+"err = ", err)
-		if !opts.Testing {
-			return nil, err
-		}
-	}
-
-	PubSub := websocket.NewPubSub()
-
-	SubsNotificator := notification.NewSubsNotificator(PubSub)
-
 	userRClient := userRepository.NewUserServiceClient(userGrpcConn)
-	userR := grpc2.NewRepository(userRClient)
+	eventRClient := eventRepository.NewEventServiceClient(eventGrpcConn)
+
+	notificationR := postgres.NewRepository(db)
+	userR := userGrpc.NewRepository(userRClient)
+	eventR := eventGrpc.NewRepository(eventRClient)
+
+	authService := authUseCase.NewUseCase(authClient)
 	userUC := userUseCase.NewUseCase(userR)
-	userD := userDelivery.NewDelivery(userUC, *SubsNotificator)
-
-	eventPort := viper.GetString("event_port")
-	eventHost := viper.GetString("event_host")
-	eventMicroserviceAddr := eventHost + ":" + eventPort
-
-	eventGrpcConn, err := grpc.Dial(eventMicroserviceAddr, grpc.WithInsecure())
-	if err != nil {
-		log.Error(message+"err = ", err)
-		if !opts.Testing {
-			return nil, err
-		}
-	}
-
-	eventRClient := eventGrpc.NewEventServiceClient(eventGrpcConn)
-	eventR := grpc3.NewRepository(eventRClient)
 	eventUC := eventUseCase.NewUseCase(eventR)
+
+	pool := websocket.NewPool()
+	notificationManager := notificator.NewNotificator(pool, notificationR, userR, eventR)
+
+	authD := authDelivery.NewDelivery(authService)
+	userD := userDelivery.NewDelivery(userUC, *notificationManager)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
 	return &App{
@@ -128,11 +113,7 @@ func NewApp(opts *Options) (*App, error) {
 		UserManager:  userD,
 		EventManager: eventD,
 		db:           db,
-		//WebsocketPool: PubSub,
 	}, nil
-}
-
-func options(w http.ResponseWriter, r *http.Request) {
 }
 
 func newRouterWithEndpoints(app *App) *mux.Router {
@@ -145,7 +126,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
 	r.Use(mm.Metrics)
-	r.Methods("OPTIONS").HandlerFunc(options)
+	r.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 
 	authRouter := r.PathPrefix("/auth").Subrouter()
 	register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)

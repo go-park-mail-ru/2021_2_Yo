@@ -14,7 +14,7 @@ import (
 	"os"
 )
 
-const logMessage = "microservice:event:"
+const logMessage = "cmd:event:"
 
 func main() {
 	logLevel := logrus.DebugLevel

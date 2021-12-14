@@ -1,8 +1,8 @@
 package http
 
 import (
-	models2 "backend/internal/models"
-	response2 "backend/internal/response"
+	models "backend/internal/models"
+	response "backend/internal/response"
 	error2 "backend/internal/service/user/error"
 	"backend/internal/service/user/usecase"
 	"backend/pkg/response"
@@ -10,11 +10,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/gorilla/mux"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/require"
 )
 
 const logTestMessage = "auth:delivery:test"
@@ -22,17 +23,17 @@ const logTestMessage = "auth:delivery:test"
 var getUserTests = []struct {
 	id         int
 	input      string
-	user       *models2.User
+	user       *models.User
 	useCaseErr error
-	output     *response2.Response
+	output     *response.Response
 }{
 	{1,
 		"1",
-		&models2.User{
+		&models.User{
 			ID: "1",
 		},
 		nil,
-		response2.UserResponse(&models2.User{ID: "1"})},
+		response.UserResponse(&models.User{ID: "1"})},
 	{2,
 		"1",
 		nil,
@@ -61,17 +62,17 @@ func TestGetUser(t *testing.T) {
 var getUserByIdTests = []struct {
 	id         int
 	input      string
-	user       *models2.User
+	user       *models.User
 	useCaseErr error
-	output     *response2.Response
+	output     *response.Response
 }{
 	{1,
 		"1",
-		&models2.User{
+		&models.User{
 			ID: "1",
 		},
 		nil,
-		response2.UserResponse(&models2.User{
+		response.UserResponse(&models.User{
 			ID: "1",
 		})},
 	{2,
@@ -102,22 +103,22 @@ func TestGetUserById(t *testing.T) {
 var updateUserInfoTests = []struct {
 	id         int
 	input      string
-	user       *models2.UserResponseBody
+	user       *models.UserResponseBody
 	useCaseErr error
-	output     *response2.Response
+	output     *response.Response
 }{
 	{1,
 		"1",
-		&models2.UserResponseBody{
+		&models.UserResponseBody{
 			Name:    "testName",
 			Surname: "testSurname",
 			About:   "testAbout",
 		},
 		nil,
-		response2.OkResponse()},
+		response.OkResponse()},
 	{2,
 		"1",
-		&models2.UserResponseBody{
+		&models.UserResponseBody{
 			Name:    "testName",
 			Surname: "testSurname",
 			About:   "testAbout",
@@ -128,7 +129,7 @@ var updateUserInfoTests = []struct {
 		"1",
 		nil,
 		nil,
-		response.ErrorResponse(response2.ErrJSONDecoding.Error())},
+		response.ErrorResponse(response.ErrJSONDecoding.Error())},
 }
 
 func TestUpdateUserInfo(t *testing.T) {
@@ -138,7 +139,7 @@ func TestUpdateUserInfo(t *testing.T) {
 
 		userId := test.input
 
-		userModel := new(models2.User)
+		userModel := new(models.User)
 		if test.user != nil {
 			userModel.ID = userId
 			userModel.Name = test.user.Name
@@ -169,20 +170,20 @@ func TestUpdateUserInfo(t *testing.T) {
 var updateUserPasswordTests = []struct {
 	id         int
 	input      string
-	user       *models2.UserResponseBody
+	user       *models.UserResponseBody
 	useCaseErr error
-	output     *response2.Response
+	output     *response.Response
 }{
 	{1,
 		"1",
-		&models2.UserResponseBody{
+		&models.UserResponseBody{
 			Password: "testPassword",
 		},
 		nil,
-		response2.OkResponse()},
+		response.OkResponse()},
 	{2,
 		"1",
-		&models2.UserResponseBody{
+		&models.UserResponseBody{
 			Password: "testPassword",
 		},
 		error2.ErrUserNotFound,
@@ -191,7 +192,7 @@ var updateUserPasswordTests = []struct {
 		"1",
 		nil,
 		nil,
-		response.ErrorResponse(response2.ErrJSONDecoding.Error())},
+		response.ErrorResponse(response.ErrJSONDecoding.Error())},
 }
 
 func TestUpdateUserPassword(t *testing.T) {
@@ -201,7 +202,7 @@ func TestUpdateUserPassword(t *testing.T) {
 
 		userId := test.input
 
-		userModel := new(models2.User)
+		userModel := new(models.User)
 		if test.user != nil {
 			userModel.Password = test.user.Password
 		}
@@ -250,7 +251,7 @@ func TestGetSubscribers(t *testing.T) {
 		useCaseMock := new(usecase.UseCaseMock)
 		deliveryTest := NewDelivery(useCaseMock)
 
-		useCaseMock.On("GetSubscribers", test.userId).Return([]*models2.User{}, test.useCaseErr)
+		useCaseMock.On("GetSubscribers", test.userId).Return([]*models.User{}, test.useCaseErr)
 
 		r := mux.NewRouter()
 		r.HandleFunc("/{id:[0-9]+}", deliveryTest.GetSubscribers).Methods("GET")
@@ -283,7 +284,7 @@ func TestGetSubscribes(t *testing.T) {
 		useCaseMock := new(usecase.UseCaseMock)
 		deliveryTest := NewDelivery(useCaseMock)
 
-		useCaseMock.On("GetSubscribes", test.userId).Return([]*models2.User{}, test.useCaseErr)
+		useCaseMock.On("GetSubscribes", test.userId).Return([]*models.User{}, test.useCaseErr)
 
 		r := mux.NewRouter()
 		r.HandleFunc("/{id:[0-9]+}", deliveryTest.GetSubscribes).Methods("GET")
@@ -316,7 +317,7 @@ func TestGetVisitors(t *testing.T) {
 		useCaseMock := new(usecase.UseCaseMock)
 		deliveryTest := NewDelivery(useCaseMock)
 
-		useCaseMock.On("GetVisitors", test.eventId).Return([]*models2.User{}, test.useCaseErr)
+		useCaseMock.On("GetVisitors", test.eventId).Return([]*models.User{}, test.useCaseErr)
 
 		r := mux.NewRouter()
 		r.HandleFunc("/test", deliveryTest.GetVisitors).Methods("GET")

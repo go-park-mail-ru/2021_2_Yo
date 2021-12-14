@@ -1,8 +1,8 @@
 package websocket
 
 import (
+	log "backend/pkg/logger"
 	"github.com/gorilla/websocket"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -13,6 +13,7 @@ var upgrader = websocket.Upgrader{
 }
 
 type ID struct {
+	//TODO: Скорее всего, здесь нужен тег
 	ID string
 }
 
@@ -28,9 +29,8 @@ func GetID(conn *websocket.Conn) (string, error) {
 func Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		log.Error("err = ", err)
 		return nil, err
 	}
-
 	return conn, nil
 }

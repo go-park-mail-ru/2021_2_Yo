@@ -26,8 +26,8 @@ redis_db:
     db_id: 0
 
 img_path:
-    #"/home/ubuntu/static/images"
-    "/app/static/images"
+    "/home/ubuntu/static/images"
+    #"/app/static/images"
 
 reg_html:
     "./static/emailTemplate/registration.html"

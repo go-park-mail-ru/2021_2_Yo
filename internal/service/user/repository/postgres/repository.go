@@ -151,6 +151,36 @@ func (s *Repository) GetSubscribes(userId string) ([]*models.User, error) {
 	return resultUsers, nil
 }
 
+func (s *Repository) GetFriends(userId string) ([]*models.User, error) {
+	message := logMessage + "GetFriends:"
+	log.Debug(message + "started")
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+	query := `select u.* from "user" as u where u.id in 
+    (select u.id from "user" as u join subscribe s on s.subscriber_id = u.id where s.subscribed_id = $1 
+    intersect 
+    select u.id from "user" as u join subscribe s on s.subscribed_id = u.id where s.subscriber_id = $1 )`
+	rows, err := s.db.Queryx(query, userIdInt)
+	if err != nil {
+		return nil, error2.ErrPostgres
+	}
+	defer rows.Close()
+	var resultUsers []*models.User
+	for rows.Next() {
+		var u User
+		err := rows.StructScan(&u)
+		if err != nil {
+			return nil, error2.ErrPostgres
+		}
+		modelUser := toModelUser(&u)
+		resultUsers = append(resultUsers, modelUser)
+	}
+	log.Debug(message + "ended")
+	return resultUsers, nil
+}
+
 func (s *Repository) GetVisitors(eventId string) ([]*models.User, error) {
 	message := logMessage + "GetVisitors:"
 	log.Debug(message + "started")

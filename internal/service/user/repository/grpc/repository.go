@@ -102,6 +102,21 @@ func (a *Repository) GetSubscribes(userId string) ([]*models.User, error) {
 	return result, err
 }
 
+func (a *Repository) GetFriends(userId string) ([]*models.User, error) {
+	in := &proto.UserId{
+		ID: userId,
+	}
+	out, err := a.client.GetFriends(context.Background(), in)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*models.User, len(out.Users))
+	for i, protoUser := range out.Users {
+		result[i] = MakeModelUser(protoUser)
+	}
+	return result, err
+}
+
 func (a *Repository) GetVisitors(eventId string) ([]*models.User, error) {
 	in := &proto.EventId{
 		ID: eventId,

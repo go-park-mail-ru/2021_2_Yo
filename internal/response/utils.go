@@ -2,15 +2,16 @@ package response
 
 import (
 	error2 "backend/internal/error"
-	models2 "backend/internal/models"
+	models "backend/internal/models"
 	log "backend/pkg/logger"
 	"encoding/json"
 	"errors"
-	"github.com/asaskevich/govalidator"
-	"github.com/go-sanitize/sanitize"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/go-sanitize/sanitize"
 )
 
 var (
@@ -36,10 +37,10 @@ func ValidateAndSanitize(object interface{}) error {
 	return nil
 }
 
-func GetUserFromRequest(r io.Reader) (*models2.User, error) {
+func GetUserFromRequest(r io.Reader) (*models.User, error) {
 	message := logMessage + "GetUserFromRequest:"
 	_ = message
-	userInput := new(models2.UserResponseBody)
+	userInput := new(UserResponseBody)
 	err := json.NewDecoder(r).Decode(userInput)
 	if err != nil {
 		return nil, ErrJSONDecoding
@@ -48,7 +49,7 @@ func GetUserFromRequest(r io.Reader) (*models2.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	result := &models2.User{
+	result := &models.User{
 		Name:     userInput.Name,
 		Surname:  userInput.Surname,
 		Mail:     userInput.Mail,
@@ -58,8 +59,8 @@ func GetUserFromRequest(r io.Reader) (*models2.User, error) {
 	return result, nil
 }
 
-func MakeUserResponseBody(u *models2.User) models2.UserResponseBody {
-	return models2.UserResponseBody{
+func MakeUserResponseBody(u *models.User) UserResponseBody {
+	return UserResponseBody{
 		ID:       u.ID,
 		Name:     u.Name,
 		Surname:  u.Surname,
@@ -70,18 +71,18 @@ func MakeUserResponseBody(u *models2.User) models2.UserResponseBody {
 	}
 }
 
-func MakeUserListResponseBody(users []*models2.User) models2.UserListResponseBody {
-	result := make([]models2.UserResponseBody, len(users))
+func MakeUserListResponseBody(users []*models.User) UserListResponseBody {
+	result := make([]UserResponseBody, len(users))
 	for i := 0; i < len(users); i++ {
 		result[i] = MakeUserResponseBody(users[i])
 	}
-	return models2.UserListResponseBody{
+	return UserListResponseBody{
 		Users: result,
 	}
 }
 
-func GetEventFromRequest(r io.Reader) (*models2.Event, error) {
-	eventInput := new(models2.EventResponseBody)
+func GetEventFromRequest(r io.Reader) (*models.Event, error) {
+	eventInput := new(EventResponseBody)
 	err := json.NewDecoder(r).Decode(eventInput)
 	if err != nil {
 		return nil, ErrJSONDecoding
@@ -90,7 +91,7 @@ func GetEventFromRequest(r io.Reader) (*models2.Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	result := &models2.Event{
+	result := &models.Event{
 		ID:          eventInput.ID,
 		Title:       eventInput.Title,
 		Description: eventInput.Description,
@@ -107,8 +108,8 @@ func GetEventFromRequest(r io.Reader) (*models2.Event, error) {
 	return result, nil
 }
 
-func MakeEventResponseBody(e *models2.Event) models2.EventResponseBody {
-	return models2.EventResponseBody{
+func MakeEventResponseBody(e *models.Event) EventResponseBody {
+	return EventResponseBody{
 		ID:          e.ID,
 		Title:       e.Title,
 		Description: e.Description,
@@ -126,13 +127,35 @@ func MakeEventResponseBody(e *models2.Event) models2.EventResponseBody {
 	}
 }
 
-func MakeEventListResponseBody(events []*models2.Event) models2.EventListResponseBody {
-	result := make([]models2.EventResponseBody, len(events))
+func MakeEventListResponseBody(events []*models.Event) EventListResponseBody {
+	result := make([]EventResponseBody, len(events))
 	for i := 0; i < len(events); i++ {
 		result[i] = MakeEventResponseBody(events[i])
 	}
-	return models2.EventListResponseBody{
+	return EventListResponseBody{
 		Events: result,
+	}
+}
+
+func MakeNotificationResponseBody(n *models.Notification) NotificationResponseBody {
+	return NotificationResponseBody{
+		Type:        n.Type,
+		UserId:      n.UserId,
+		UserName:    n.UserName,
+		UserSurname: n.UserSurname,
+		UserImgUrl:  n.UserImgUrl,
+		EventId:     n.EventId,
+		EventTitle:  n.EventTitle,
+	}
+}
+
+func MakeNotificationListResponseBody(notifications []*models.Notification) NotificationListResponseBody {
+	result := make([]NotificationResponseBody, len(notifications))
+	for i := 0; i < len(notifications); i++ {
+		result[i] = MakeNotificationResponseBody(notifications[i])
+	}
+	return NotificationListResponseBody{
+		Notifications: result,
 	}
 }
 
@@ -186,9 +209,12 @@ func refactorError(err error) (error, HttpStatus) {
 }
 
 func CheckIfNoError(w *http.ResponseWriter, err error, msg string) bool {
+	if err != nil {
+		log.Error(msg+"err = ", err)
+	}
 	errRefactored, status := refactorError(err)
 	if err != nil {
-		log.Error(msg+"err = ", errRefactored)
+		log.Error(msg+"refactored err = ", errRefactored)
 		SendResponse(*w, StatusResponse(status))
 		return false
 	}

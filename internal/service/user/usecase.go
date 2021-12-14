@@ -12,6 +12,7 @@ type UseCase interface {
 	///////
 	GetSubscribers(userId string) ([]*models.User, error)
 	GetSubscribes(userId string) ([]*models.User, error)
+	GetFriends(userId string) ([]*models.User, error)
 	GetVisitors(eventId string) ([]*models.User, error)
 	///////
 	Subscribe(subscribedId string, subscriberId string) error

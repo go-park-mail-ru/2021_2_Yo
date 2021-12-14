@@ -2,13 +2,14 @@ package http
 
 import (
 	"backend/internal/models"
-	response2 "backend/internal/response"
+	response "backend/internal/response"
 	"backend/internal/service/auth"
 	error2 "backend/internal/service/auth/error"
 	"backend/internal/service/email"
 	log "backend/pkg/logger"
-	"github.com/spf13/viper"
 	"net/http"
+
+	"github.com/spf13/viper"
 )
 
 const logMessage = "service:auth:delivery:http:"
@@ -50,26 +51,26 @@ func setExpiredCookie(w http.ResponseWriter) {
 func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignUp:"
 	log.Debug(message + "started")
-	u, err := response2.GetUserFromRequest(r.Body)
-	if !response2.CheckIfNoError(&w, err, message) {
+	u, err := response.GetUserFromRequest(r.Body)
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	userId, err := h.UseCase.SignUp(u)
-	if !response2.CheckIfNoError(&w, err, message) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	sessionId, err := h.UseCase.CreateSession(userId)
-	if !response2.CheckIfNoError(&w, err, message) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	CSRFToken, err := h.UseCase.CreateToken(userId)
-	if !response2.CheckIfNoError(&w, err, message) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	template := viper.GetString("reg_html")
 	setSessionIdCookie(w, sessionId)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
-	response2.SendResponse(w, response2.OkResponse())
+	response.SendResponse(w, response.OkResponse())
 	info := &models.Info{
 		Name: u.Name,
 	}
@@ -80,25 +81,25 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "SignIn:"
 	log.Debug(message + "started")
-	u, err := response2.GetUserFromRequest(r.Body)
-	if !response2.CheckIfNoError(&w, err, message) {
+	u, err := response.GetUserFromRequest(r.Body)
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	userId, err := h.UseCase.SignIn(u)
-	if !response2.CheckIfNoError(&w, err, message) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	sessionId, err := h.UseCase.CreateSession(userId)
-	if !response2.CheckIfNoError(&w, err, message) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	CSRFToken, err := h.UseCase.CreateToken(userId)
-	if !response2.CheckIfNoError(&w, err, message) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	setSessionIdCookie(w, sessionId)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
-	response2.SendResponse(w, response2.OkResponse())
+	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
 
@@ -110,13 +111,13 @@ func (h *Delivery) Logout(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		err = error2.ErrCookie
 	}
-	if !response2.CheckIfNoError(&w, err, message) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
 	err = h.UseCase.DeleteSession(cookie.Value)
-	if !response2.CheckIfNoError(&w, err, message) {
+	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
-	response2.SendResponse(w, response2.OkResponse())
+	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }

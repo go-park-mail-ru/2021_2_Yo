@@ -64,3 +64,15 @@ CREATE TABLE "subscribe" (
                            UNIQUE(subscribed_id, subscriber_id),
                            CHECK ( subscribed_id <> subscribe.subscriber_id )
 );
+
+CREATE TABLE "notification" (
+    type varchar(50) CHECK (type in ('sub', 'inv', 'new')) not null,
+                                    receiver_id varchar(50) not null,
+                                    user_id varchar(50) not null,
+                                    user_name varchar(50) not null,
+                                    user_surname varchar(50) not null,
+                                    user_img_url varchar(150) not null,
+                                    event_id varchar(50) default '',
+                                    event_title varchar(255) default '',
+                                    seen bool default false
+);

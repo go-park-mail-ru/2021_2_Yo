@@ -74,6 +74,20 @@ func (a *UseCase) GetSubscribes(userId string) ([]*models.User, error) {
 	return resultUsers, nil
 }
 
+func (a *UseCase) GetFriends(userId string) ([]*models.User, error) {
+	if userId == "" {
+		return nil, error2.ErrEmptyData
+	}
+	resultUsers, err := a.repository.GetFriends(userId)
+	if err != nil {
+		return nil, err
+	}
+	for i, _ := range resultUsers {
+		resultUsers[i].Password = ""
+	}
+	return resultUsers, nil
+}
+
 func (a *UseCase) GetVisitors(eventId string) ([]*models.User, error) {
 	if eventId == "" {
 		return nil, error2.ErrEmptyData

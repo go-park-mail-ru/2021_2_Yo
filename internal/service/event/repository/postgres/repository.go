@@ -1,13 +1,14 @@
 package postgres
 
 import (
-	models2 "backend/internal/models"
+	models "backend/internal/models"
 	error2 "backend/internal/service/event/error"
 	log "backend/pkg/logger"
 	sql2 "database/sql"
+	"strconv"
+
 	sql "github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"strconv"
 )
 
 type Repository struct {
@@ -65,7 +66,7 @@ func (s *Repository) checkAuthor(eventId int, userId int) error {
 	}
 }
 
-func (s *Repository) CreateEvent(e *models2.Event) (string, error) {
+func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 	message := logMessage + "CreateEvent:"
 	log.Debug(message + "started")
 	newEvent, err := toPostgresEvent(e)
@@ -99,7 +100,7 @@ func (s *Repository) CreateEvent(e *models2.Event) (string, error) {
 	return eventIdStr, nil
 }
 
-func (s *Repository) UpdateEvent(e *models2.Event, userId string) error {
+func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 	message := logMessage + "UpdateEvent:"
 	log.Debug(message + "started")
 	eventIdInt, err := strconv.Atoi(e.ID)
@@ -182,7 +183,7 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 	return nil
 }
 
-func (s *Repository) GetEventById(eventId string) (*models2.Event, error) {
+func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 	message := logMessage + "GetEventById:"
 	log.Debug(message + "started")
 	var query string
@@ -206,7 +207,7 @@ func (s *Repository) GetEventById(eventId string) (*models2.Event, error) {
 	return modelEvent, nil
 }
 
-func (s *Repository) GetEvents(userId string, title string, category string, city string, date string, tags []string) ([]*models2.Event, error) {
+func (s *Repository) GetEvents(userId string, title string, category string, city string, date string, tags []string) ([]*models.Event, error) {
 	message := logMessage + "GetEvents:"
 	log.Debug(message + "started")
 	postgresTags := make(pq.StringArray, len(tags))
@@ -272,7 +273,7 @@ func (s *Repository) GetEvents(userId string, title string, category string, cit
 		return nil, err
 	}
 	defer rows.Close()
-	var resultEvents []*models2.Event
+	var resultEvents []*models.Event
 	for rows.Next() {
 		var e Event
 		err := rows.StructScan(&e)
@@ -287,7 +288,7 @@ func (s *Repository) GetEvents(userId string, title string, category string, cit
 	return resultEvents, nil
 }
 
-func (s *Repository) GetVisitedEvents(userId string) ([]*models2.Event, error) {
+func (s *Repository) GetVisitedEvents(userId string) ([]*models.Event, error) {
 	message := logMessage + "GetVisitedEvents:"
 	log.Debug(message + "started")
 	userIdInt, err := strconv.Atoi(userId)
@@ -300,7 +301,7 @@ func (s *Repository) GetVisitedEvents(userId string) ([]*models2.Event, error) {
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
-	var resultEvents []*models2.Event
+	var resultEvents []*models.Event
 	for rows.Next() {
 		var e Event
 		err := rows.StructScan(&e)
@@ -314,7 +315,7 @@ func (s *Repository) GetVisitedEvents(userId string) ([]*models2.Event, error) {
 	return resultEvents, nil
 }
 
-func (s *Repository) GetCreatedEvents(authorId string) ([]*models2.Event, error) {
+func (s *Repository) GetCreatedEvents(authorId string) ([]*models.Event, error) {
 	message := logMessage + "GetCreatedEvents:"
 	log.Debug(message + "started")
 	authorIdInt, err := strconv.Atoi(authorId)
@@ -327,7 +328,7 @@ func (s *Repository) GetCreatedEvents(authorId string) ([]*models2.Event, error)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
-	var resultEvents []*models2.Event
+	var resultEvents []*models.Event
 	for rows.Next() {
 		var e Event
 		err := rows.StructScan(&e)
@@ -431,7 +432,7 @@ func (s *Repository) GetCities() ([]string, error) {
 	return resultCities, nil
 }
 
-func (s *Repository) EmailNotify(eventId string) ([]*models2.Info, error) {
+func (s *Repository) EmailNotify(eventId string) ([]*models.Info, error) {
 	message := logMessage + "EmailNotify:"
 	log.Debug(message + "started")
 	query := getSubsInfo
@@ -440,14 +441,14 @@ func (s *Repository) EmailNotify(eventId string) ([]*models2.Info, error) {
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
-	var subsInfo []*models2.Info
+	var subsInfo []*models.Info
 	for rows.Next() {
 		var mail, name, title, img_url string
 		err := rows.Scan(&name, &mail, &title, &img_url)
 		if err != nil {
 			return nil, error2.ErrPostgres
 		}
-		userInfo := &models2.Info{
+		userInfo := &models.Info{
 			Name:    name,
 			Mail:    mail,
 			Title:   title,
