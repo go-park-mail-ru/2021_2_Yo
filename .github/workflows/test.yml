@@ -17,14 +17,14 @@ jobs:
         run: cat cover.out | fgrep -v "main.go" | fgrep -v "mock.go" | fgrep -v "pb.go" > cover1.out
 
       - name: Create badge
-          run: |
-            total=`go tool cover -func=cover.out | grep total | grep -Eo '[0-9]+\.[0-9]+'`
-            if (( $(echo "$total <= 40" | bc -l) )) ; then
-              COLOR=red
-            elif (( $(echo "$total > 60" | bc -l) )); then
-              COLOR=green
-            else
-              COLOR=orange
-            fi
-            curl "https://img.shields.io/badge/coverage-$total%25-$COLOR" > tests.svg
+        run: |
+          total=`go tool cover -func=cover.out | grep total | grep -Eo '[0-9]+\.[0-9]+'`
+          if (( $(echo "$total <= 40" | bc -l) )) ; then
+            COLOR=red
+          elif (( $(echo "$total > 60" | bc -l) )); then
+            COLOR=green
+          else
+            COLOR=orange
+          fi
+          curl "https://img.shields.io/badge/coverage-$total%25-$COLOR" > tests.svg
     
