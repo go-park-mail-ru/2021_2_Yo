@@ -46,7 +46,7 @@ jobs:
     needs: build
     steps:
       - name: Download docker-compose.yml
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: backend
       - name: Place Files
