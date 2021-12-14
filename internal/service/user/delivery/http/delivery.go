@@ -130,8 +130,7 @@ func (h *Delivery) GetSubscribes(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) GetFriends(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetFriends:"
 	log.Debug(message + "started")
-	vars := mux.Vars(r)
-	userId := vars["id"]
+	userId := r.Context().Value("userId").(string)
 	subscribers, err := h.useCase.GetFriends(userId)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
