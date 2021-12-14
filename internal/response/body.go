@@ -1,4 +1,4 @@
-package models
+package response
 
 type UserResponseBody struct {
 	ID       string `json:"id,omitempty"`
@@ -51,27 +51,16 @@ type CitiesResponseBody struct {
 	Cities []string `json:"cities"`
 }
 
-type SubscriptionNotificationBody struct {
+type NotificationResponseBody struct {
+	Type        string `json:"type"`
 	UserId      string `json:"userId"`
 	UserName    string `json:"userName"`
 	UserSurname string `json:"userSurname"`
 	UserImgUrl  string `json:"userImgUrl"`
+	EventId     string `json:"eventId,omitempty"`
+	EventTitle  string `json:"eventTitle,omitempty"`
 }
 
-type InvitationNotificationBody struct {
-	UserId      string `json:"userId"`
-	UserName    string `json:"userName"`
-	UserSurname string `json:"userSurname"`
-	UserImgUrl  string `json:"userImgUrl"`
-	EventName   string `json:"eventName"`
-	EventId     string `json:"eventId"`
-}
-
-type NewEventNotificationBody struct {
-	UserId      string `json:"userId"`
-	UserName    string `json:"userName"`
-	UserSurname string `json:"userSurname"`
-	UserImgUrl  string `json:"userImgUrl"`
-	EventName   string `json:"eventName"`
-	EventId     string `json:"eventId"`
+type NotificationListResponseBody struct {
+	Notifications []NotificationResponseBody `json:"notifications"`
 }

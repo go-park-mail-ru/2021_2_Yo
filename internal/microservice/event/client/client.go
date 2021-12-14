@@ -2,7 +2,7 @@ package client
 
 import (
 	proto "backend/internal/microservice/event/proto"
-	models2 "backend/internal/models"
+	models "backend/internal/models"
 	"backend/internal/service/event"
 	"context"
 )
@@ -19,7 +19,7 @@ func NewEventService(repository event.Repository) *EventService {
 	}
 }
 
-func MakeProtoEvent(e *models2.Event) *proto.Event {
+func MakeProtoEvent(e *models.Event) *proto.Event {
 	if e == nil {
 		return &proto.Event{}
 	}
@@ -41,7 +41,7 @@ func MakeProtoEvent(e *models2.Event) *proto.Event {
 	}
 }
 
-func MakeProtoEvents(e []*models2.Event) *proto.Events {
+func MakeProtoEvents(e []*models.Event) *proto.Events {
 	if e == nil {
 		return &proto.Events{}
 	}
@@ -54,8 +54,8 @@ func MakeProtoEvents(e []*models2.Event) *proto.Events {
 	}
 }
 
-func MakeModelEvent(out *proto.Event) *models2.Event {
-	return &models2.Event{
+func MakeModelEvent(out *proto.Event) *models.Event {
+	return &models.Event{
 		ID:          out.ID,
 		Title:       out.Title,
 		Description: out.Description,
@@ -73,7 +73,7 @@ func MakeModelEvent(out *proto.Event) *models2.Event {
 	}
 }
 
-func MakeProtoInfo(info *models2.Info) *proto.EmailInfo {
+func MakeProtoInfo(info *models.Info) *proto.EmailInfo {
 	if info == nil {
 		return &proto.EmailInfo{}
 	}
@@ -85,7 +85,7 @@ func MakeProtoInfo(info *models2.Info) *proto.EmailInfo {
 	}
 }
 
-func MakeProtoInfoArray(infoArray []*models2.Info) *proto.EmailInfoArray {
+func MakeProtoInfoArray(infoArray []*models.Info) *proto.EmailInfoArray {
 	if infoArray == nil {
 		return &proto.EmailInfoArray{}
 	}

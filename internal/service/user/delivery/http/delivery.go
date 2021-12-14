@@ -1,11 +1,11 @@
 package http
 
 import (
-	"backend/internal/notification"
 	response "backend/internal/response"
 	"backend/internal/service/user"
 	"backend/internal/utils"
 	log "backend/pkg/logger"
+	"backend/pkg/notificator"
 	"net/http"
 	"strings"
 
@@ -16,10 +16,10 @@ const logMessage = "service:user:delivery:http:"
 
 type Delivery struct {
 	useCase     user.UseCase
-	notificator notification.Notificator
+	notificator notificator.Notificator
 }
 
-func NewDelivery(useCase user.UseCase, notificator notification.Notificator) *Delivery {
+func NewDelivery(useCase user.UseCase, notificator notificator.Notificator) *Delivery {
 	return &Delivery{
 		useCase:     useCase,
 		notificator: notificator,
@@ -149,14 +149,9 @@ func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
 	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
-	subscriber, err := h.useCase.GetUserById(subscriberId)
+	err = h.notificator.NewSubscriberNotification(subscribedId, subscriberId)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
-	}
-	err = h.notificator.NewSubscriber(subscribedId, subscriber.Name)
-	if err != nil {
-		//To db
-		//storeNotification()
 	}
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
@@ -187,5 +182,41 @@ func (h *Delivery) IsSubscribed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response.SendResponse(w, response.SubscribedResponse(res))
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) GetAllNotifications(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetAllNotifications:"
+	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	res, err := h.notificator.GetAllNotifications(userId)
+	if !response.CheckIfNoError(&w, err, message) {
+		return
+	}
+	response.SendResponse(w, response.NotificationListResponse(res))
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) GetNewNotifications(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetNewNotifications:"
+	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	res, err := h.notificator.GetNewNotifications(userId)
+	if !response.CheckIfNoError(&w, err, message) {
+		return
+	}
+	response.SendResponse(w, response.NotificationListResponse(res))
+	log.Debug(message + "ended")
+}
+
+func (h *Delivery) UpdateNotificationsStatus(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "UpdateNotificationsStatus:"
+	log.Debug(message + "started")
+	userId := r.Context().Value("userId").(string)
+	err := h.notificator.UpdateNotificationsStatus(userId)
+	if !response.CheckIfNoError(&w, err, message) {
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }

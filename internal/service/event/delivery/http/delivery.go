@@ -16,13 +16,11 @@ const logMessage = "service:event:delivery:http:"
 
 type Delivery struct {
 	useCase event.UseCase
-	UseCase event.UseCase
 }
 
 func NewDelivery(useCase event.UseCase) *Delivery {
 	return &Delivery{
 		useCase: useCase,
-		UseCase: useCase,
 	}
 }
 

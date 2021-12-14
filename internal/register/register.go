@@ -31,17 +31,24 @@ func UserHTTPEndpoints(r *mux.Router, uDelivery *userHttp.Delivery, eDelivery *e
 
 	updateUserPasswordHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.UpdateUserPassword)))
 	r.Handle("/password", updateUserPasswordHandlerFunc).Methods("POST")
-	//
 
-	subscribeHandleFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.Subscribe)))
-	r.Handle("/{id:[0-9]+}/subscription", subscribeHandleFunc).Methods("POST")
+	subscribeHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.Subscribe)))
+	r.Handle("/{id:[0-9]+}/subscription", subscribeHandlerFunc).Methods("POST")
 
-	unsubscribeHandleFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.Unsubscribe)))
-	r.Handle("/{id:[0-9]+}/subscription", unsubscribeHandleFunc).Methods("DELETE")
+	unsubscribeHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.Unsubscribe)))
+	r.Handle("/{id:[0-9]+}/subscription", unsubscribeHandlerFunc).Methods("DELETE")
 
-	isSubscribedHandleFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.IsSubscribed)))
-	r.Handle("/{id:[0-9]+}/subscription", isSubscribedHandleFunc).Methods("GET")
-	//
+	isSubscribedHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.IsSubscribed)))
+	r.Handle("/{id:[0-9]+}/subscription", isSubscribedHandlerFunc).Methods("GET")
+
+	getAllNotificationsHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.GetAllNotifications)))
+	r.Handle("/notifications/all", getAllNotificationsHandlerFunc).Methods("GET")
+
+	getNewNotificationsHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.GetNewNotifications)))
+	r.Handle("/notifications/new", getNewNotificationsHandlerFunc).Methods("GET")
+
+	updateNotificationsStatusHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.UpdateNotificationsStatus)))
+	r.Handle("/notifications", updateNotificationsStatusHandlerFunc).Methods("UPDATE")
 }
 
 func EventHTTPEndpoints(r *mux.Router, delivery *eventHttp.Delivery, mws *middleware.Middlewares) {
@@ -55,7 +62,7 @@ func EventHTTPEndpoints(r *mux.Router, delivery *eventHttp.Delivery, mws *middle
 	r.Handle("/{id:[0-9]+}", deleteEventHandlerFunc).Methods("DELETE")
 	createEventHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.CreateEvent)))
 	r.Handle("", createEventHandlerFunc).Methods("POST")
-	//
+
 	visitHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(delivery.Visit)))
 	r.Handle("/{id:[0-9]+}/favourite", visitHandlerFunc).Methods("POST")
 
