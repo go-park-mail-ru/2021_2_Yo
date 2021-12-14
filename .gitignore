@@ -18,5 +18,7 @@ coverage.out
 grafana
 grafana.ini
 
+bin
+
 # Dependency directories (remove the comment below to include it)
 # vendor/
