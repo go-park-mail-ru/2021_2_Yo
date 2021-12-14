@@ -2,6 +2,9 @@ name: Tests
 
 on:
   push:
+    branches: [ci/cd, main]
+  pull_request:
+    branches: [main]
 
 jobs:
   tests:
