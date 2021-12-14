@@ -1,4 +1,4 @@
-name: Golan
+name: Golang
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: read
-  
+
 jobs:
   golangci:
     name: lint
