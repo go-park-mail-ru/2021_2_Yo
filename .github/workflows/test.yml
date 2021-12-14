@@ -28,13 +28,13 @@ jobs:
       - name: Build Docker User-Service
         run: docker build -t ${{ secrets.DOCKER_USER}}/user:${{ env.USER_TAG }} --target user-build .
       - name: Push Docker Server
-        run: docker push -t ${{ secrets.DOCKER_USER}}/server:${{ env.SERVER_TAG }} 
+        run: docker push  ${{ secrets.DOCKER_USER}}/server:${{ env.SERVER_TAG }} 
       - name: Push Docker Auth-Service
-        run: docker build -t ${{ secrets.DOCKER_USER}}/auth:${{ env.AUTH_TAG }} 
+        run: docker build  ${{ secrets.DOCKER_USER}}/auth:${{ env.AUTH_TAG }} 
       - name: Push Docker Event-Service
-        run: docker build -t ${{ secrets.DOCKER_USER}}/event:${{ env.EVENT_TAG }} 
+        run: docker build  ${{ secrets.DOCKER_USER}}/event:${{ env.EVENT_TAG }} 
       - name: Push Docker User-Service
-        run: docker build -t ${{ secrets.DOCKER_USER}}/user:${{ env.USER_TAG }} 
+        run: docker build  ${{ secrets.DOCKER_USER}}/user:${{ env.USER_TAG }} 
 
 
 
