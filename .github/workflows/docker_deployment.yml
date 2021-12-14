@@ -55,7 +55,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
-          source: "Backend"
+          source: "backend"
           target: "/home/ubuntu/bmstusa"
       - name: Pull Server Image
         uses: appleboy/ssh-action@master
