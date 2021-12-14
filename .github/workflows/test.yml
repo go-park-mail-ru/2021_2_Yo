@@ -45,8 +45,8 @@ jobs:
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: $ {{ secrets.PRIVATE_KEY }}
-          script: sudo docker pull $ {{ secrets.DOCKER_USER }}/server:${{ env.SERVER_TAG }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: sudo docker pull ${{ secrets.DOCKER_USER }}/server:${{ env.SERVER_TAG }}
 
 
 
