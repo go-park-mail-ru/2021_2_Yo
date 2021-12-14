@@ -127,6 +127,19 @@ func (h *Delivery) GetSubscribes(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "ended")
 }
 
+func (h *Delivery) GetFriends(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "GetFriends:"
+	log.Debug(message + "started")
+	vars := mux.Vars(r)
+	userId := vars["id"]
+	subscribers, err := h.useCase.GetFriends(userId)
+	if !response.CheckIfNoError(&w, err, message) {
+		return
+	}
+	response.SendResponse(w, response.UserListResponse(subscribers))
+	log.Debug(message + "ended")
+}
+
 func (h *Delivery) GetVisitors(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetVisitors:"
 	log.Debug(message + "started")
@@ -167,6 +180,7 @@ func (h *Delivery) Unsubscribe(w http.ResponseWriter, r *http.Request) {
 	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
+	_ = h.notificator.DeleteSubscribeNotification(subscribedId, subscriberId)
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }

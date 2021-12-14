@@ -4,6 +4,7 @@ import "backend/internal/models"
 
 type Repository interface {
 	CreateSubscribeNotification(receiverId string, subscriber *models.User, seen bool) error
+	DeleteSubscribeNotification(receiverId string, userId string) error
 	CreateInviteNotification(receiverId string, invitor *models.User, event *models.Event, seen bool) error
 	CreateNewEventNotification(receiverId string, invitor *models.User, event *models.Event, seen bool) error
 	UpdateNotificationsStatus(userId string) error

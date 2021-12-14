@@ -22,6 +22,7 @@ func UserHTTPEndpoints(r *mux.Router, uDelivery *userHttp.Delivery, eDelivery *e
 	r.HandleFunc("/{id:[0-9]+}/events/created", eDelivery.GetCreatedEvents).Methods("GET")
 	r.HandleFunc("/{id:[0-9]+}/subscribers", uDelivery.GetSubscribers).Methods("GET")
 	r.HandleFunc("/{id:[0-9]+}/subscriptions", uDelivery.GetSubscribes).Methods("GET")
+	r.HandleFunc("/{id:[0-9]+}/friends", uDelivery.GetFriends).Methods("GET")
 
 	getUserHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.GetUser)))
 	r.Handle("", getUserHandlerFunc).Methods("GET")

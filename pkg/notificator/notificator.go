@@ -63,6 +63,10 @@ func (n *Notificator) NewSubscriberNotification(receiverId string, userId string
 	}
 }
 
+func (n *Notificator) DeleteSubscribeNotification(receiverId string, userId string) error {
+	return n.nRepository.DeleteSubscribeNotification(receiverId, userId)
+}
+
 func (n *Notificator) InvitationNotification(receiverId string, userId string, eventId string) error {
 	u, err := n.uRepository.GetUserById(userId)
 	if err != nil {

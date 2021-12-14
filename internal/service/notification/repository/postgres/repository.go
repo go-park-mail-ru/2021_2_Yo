@@ -33,6 +33,18 @@ func (s *Repository) CreateSubscribeNotification(receiverId string, user *models
 	return nil
 }
 
+func (s *Repository) DeleteSubscribeNotification(receiverId string, userId string) error {
+	message := logMessage + "DeleteSubscribeNotification:"
+	log.Debug(message + "started")
+	query := `delete from "notification" where type = $1 and receiver_id = $2 and user_id = $3`
+	_, err := s.db.Query(query, "sub", receiverId, userId)
+	if err != nil {
+		return error2.ErrPostgres
+	}
+	log.Debug(message + "ended")
+	return nil
+}
+
 func (s *Repository) CreateInviteNotification(receiverId string, user *models.User, event *models.Event, seen bool) error {
 	message := logMessage + "CreateInvNotification:"
 	log.Debug(message + "started")
