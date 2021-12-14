@@ -24,7 +24,6 @@ func NewRepository(database *sql.DB) *Repository {
 const (
 	logMessage          = "service:event:repository:postgres:"
 	checkAuthorQuery    = `select author_id from "event" where id = $1`
-	listQuery           = `select * from "event"`
 	incrementEventViews = `update "event" set viewed = viewed + 1 where event.id = $1`
 	getEventQuery       = `select * from "event" where id = $1`
 	createEventQuery    = `insert into "event" 
@@ -193,7 +192,10 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 		return nil, error2.ErrAtoi
 	}
 	query = incrementEventViews
-	s.db.Query(query, eventIdInt)
+	_, err = s.db.Query(query, eventIdInt)
+	if err != nil {
+		return nil, error2.ErrQuery
+	}
 	query = getEventQuery
 	err = s.db.Get(&e, query, eventIdInt)
 	if err != nil {

@@ -16,7 +16,6 @@ const (
 	updateUserInfoQuery              = `update "user" set name = $1, surname = $2, about = $3, img_url = $4 where id = $5`
 	updateUserPasswordQuery          = `update "user" set password = $1 where id = $2`
 	//TODO: updateUserImg в отдельный метод
-	updateUserImgUrlQuery = `update "user" set img_url = $1 where id = $2`
 	getSubscribersQuery   = `select u.* from "user" as u join subscribe s on s.subscriber_id = u.id where s.subscribed_id = $1`
 	getSubscribesQuery    = `select u.* from "user" as u join subscribe s on s.subscribed_id = u.id where s.subscriber_id = $1`
 	getVisitorsQuery      = `select u.* from "user" as u join visitor v on u.id = v.user_id where v.event_id = $1`

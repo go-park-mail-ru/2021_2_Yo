@@ -8,9 +8,8 @@ import (
 	"context"
 )
 
-const (
-	logMessage = "microservice auth"
-)
+//const logMessage = "microservice auth"
+
 
 type authService struct {
 	authUserRepository    interfaces2.UserRepository

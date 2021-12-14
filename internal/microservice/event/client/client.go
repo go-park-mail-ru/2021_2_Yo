@@ -7,7 +7,7 @@ import (
 	"context"
 )
 
-const logMessage = "microservice:event:client:"
+//const logMessage = "microservice:event:client:"
 
 type EventService struct {
 	repository event.Repository

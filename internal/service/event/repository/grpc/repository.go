@@ -6,7 +6,7 @@ import (
 	"context"
 )
 
-const logMessage = "service:event:repository:grpc:"
+//const logMessage = "service:event:repository:grpc:"
 
 type Repository struct {
 	client eventGrpc.EventServiceClient

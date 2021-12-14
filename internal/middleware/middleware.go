@@ -80,8 +80,10 @@ func (m *Middlewares) Logging(next http.Handler) http.Handler {
 func (m *Middlewares) GetVars(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
+		type varsCtxFix string
+		var varctx varsCtxFix
 		if vars != nil {
-			varsCtx := context.WithValue(r.Context(), "vars", vars)
+			varsCtx := context.WithValue(r.Context(), varctx, vars)
 			next.ServeHTTP(w, r.WithContext(varsCtx))
 			return
 		}
@@ -100,7 +102,9 @@ func (m *Middlewares) Auth(next http.Handler) http.Handler {
 		if !response.CheckIfNoError(&w, err, message) {
 			return
 		}
-		userCtx := context.WithValue(r.Context(), "userId", userId)
+		type userCtxFix string
+		var userctx userCtxFix
+		userCtx := context.WithValue(r.Context(), userctx, userId)
 		next.ServeHTTP(w, r.WithContext(userCtx))
 	})
 }
@@ -113,7 +117,9 @@ func (m *Middlewares) CSRF(next http.Handler) http.Handler {
 		if !response.CheckIfNoError(&w, err, message) {
 			return
 		}
-		userCtx := context.WithValue(r.Context(), "userId", userId)
+		type userCtxFix string
+		var userctx userCtxFix
+		userCtx := context.WithValue(r.Context(), userctx, userId)
 		next.ServeHTTP(w, r.WithContext(userCtx))
 	})
 }

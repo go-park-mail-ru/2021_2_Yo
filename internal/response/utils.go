@@ -167,7 +167,10 @@ func SendResponse(w http.ResponseWriter, response interface{}) {
 		log.Error(message+"err =", err)
 		return
 	}
-	w.Write(b)
+	_, err = w.Write(b)
+	if err != nil {
+		log.Error(message+"err =", err)
+	}
 }
 
 func refactorError(err error) (error, HttpStatus) {

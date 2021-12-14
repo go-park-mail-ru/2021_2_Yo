@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"net/smtp"
 	"os"
+	log "backend/pkg/logger"
 )
 
 type Mail struct {
@@ -39,7 +40,10 @@ func SendEmail(theme, htmlTemplate string, info []*models.Info) {
 	for _, reciever := range info {
 
 		var body bytes.Buffer
-		ts.Execute(&body, reciever)
+		err = ts.Execute(&body, reciever)
+		if err != nil {
+			log.Error(err)
+		}
 
 		request := Mail{
 			Sender:  from,
