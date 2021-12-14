@@ -199,6 +199,25 @@ func (h *Delivery) IsSubscribed(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "ended")
 }
 
+func (h *Delivery) Invite(w http.ResponseWriter, r *http.Request) {
+	message := logMessage + "Invite:"
+	log.Debug(message + "started")
+	q := r.URL.Query()
+	var eventId string
+	if len(q["eventId"]) > 0 {
+		eventId = q["eventId"][0]
+	}
+	vars := r.Context().Value("vars").(map[string]string)
+	userId := r.Context().Value("userId").(string)
+	receiverId := vars["id"]
+	err := h.notificator.InvitationNotification(receiverId, userId, eventId)
+	if !response.CheckIfNoError(&w, err, message) {
+		return
+	}
+	response.SendResponse(w, response.OkResponse())
+	log.Debug(message + "ended")
+}
+
 func (h *Delivery) GetAllNotifications(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetAllNotifications:"
 	log.Debug(message + "started")

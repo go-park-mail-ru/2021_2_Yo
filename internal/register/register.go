@@ -50,6 +50,9 @@ func UserHTTPEndpoints(r *mux.Router, uDelivery *userHttp.Delivery, eDelivery *e
 
 	updateNotificationsStatusHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.UpdateNotificationsStatus)))
 	r.Handle("/notifications", updateNotificationsStatusHandlerFunc).Methods("UPDATE")
+
+	inviteHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.Invite)))
+	r.Handle("/{id:[0-9]+}/invite", inviteHandlerFunc).Methods("POST")
 }
 
 func EventHTTPEndpoints(r *mux.Router, delivery *eventHttp.Delivery, mws *middleware.Middlewares) {
