@@ -76,7 +76,7 @@ func TestCreateEvent(t *testing.T) {
 
 		w := httptest.NewRecorder()
 		type ctxUserId string
-		var CUID ctxUserId
+		CUID := ctxUserId("userId")
 		userIdContext := context.WithValue(context.Background(), CUID, test.userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 	}
