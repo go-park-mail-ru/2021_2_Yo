@@ -1,11 +1,9 @@
 package usecase
 
 import (
-	"backend/internal/microservice/event/proto"
 	"backend/internal/models"
 	error2 "backend/internal/service/event/error"
-	repository "backend/microservice/event/repository"
-	"context"
+	"backend/internal/service/event/repository/mock"
 	"errors"
 	"github.com/stretchr/testify/require"
 	"strconv"
@@ -46,13 +44,9 @@ var createEventTests = []struct {
 
 func TestCreateEvent(t *testing.T) {
 	for _, test := range createEventTests {
-		repositoryMock := new(repository.RepositoryClientMock)
+		repositoryMock := new(mock.RepositoryMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		var in *eventGrpc.Event
-		if test.event != nil {
-			in = MakeProtoEvent(test.event)
-		}
-		repositoryMock.On("CreateEvent", context.Background(), in).Return(&eventGrpc.EventId{}, test.outputErr)
+		repositoryMock.On("CreateEvent", test.event).Return("", test.outputErr)
 		actualEventId, actualErr := useCaseTest.CreateEvent(test.event)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 		require.Equal(t, test.outputEventId, actualEventId, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
@@ -93,17 +87,9 @@ var updateEventTests = []struct {
 
 func TestUpdateEvent(t *testing.T) {
 	for _, test := range updateEventTests {
-		repositoryMock := new(repository.RepositoryClientMock)
+		repositoryMock := new(mock.RepositoryMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		var pe *eventGrpc.Event
-		if test.event != nil {
-			pe = MakeProtoEvent(test.event)
-		}
-		in := &eventGrpc.UpdateEventRequest{
-			Event:  pe,
-			UserId: test.userId,
-		}
-		repositoryMock.On("UpdateEvent", context.Background(), in).Return(&eventGrpc.Empty{}, test.outputErr)
+		repositoryMock.On("UpdateEvent", test.event, test.userId).Return(test.outputErr)
 		actualErr := useCaseTest.UpdateEvent(test.event, test.userId)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
@@ -134,13 +120,9 @@ var deleteEventTests = []struct {
 
 func TestDeleteEvent(t *testing.T) {
 	for _, test := range deleteEventTests {
-		repositoryMock := new(repository.RepositoryClientMock)
+		repositoryMock := new(mock.RepositoryMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		in := &eventGrpc.DeleteEventRequest{
-			EventId: test.eventId,
-			UserId:  test.userId,
-		}
-		repositoryMock.On("DeleteEvent", context.Background(), in).Return(&eventGrpc.Empty{}, test.outputErr)
+		repositoryMock.On("DeleteEvent", test.eventId, test.userId).Return(test.outputErr)
 		actualErr := useCaseTest.DeleteEvent(test.eventId, test.userId)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
@@ -171,12 +153,9 @@ var getEventByIdTests = []struct {
 
 func TestGetEventById(t *testing.T) {
 	for _, test := range getEventByIdTests {
-		repositoryMock := new(repository.RepositoryClientMock)
+		repositoryMock := new(mock.RepositoryMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		in := &eventGrpc.EventId{
-			ID: test.eventId,
-		}
-		repositoryMock.On("GetEventById", context.Background(), in).Return(&eventGrpc.Event{}, test.outputErr)
+		repositoryMock.On("GetEventById", test.eventId).Return(test.outputRes, test.outputErr)
 		actualRes, actualErr := useCaseTest.GetEventById(test.eventId)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 		require.Equal(t, test.outputRes, actualRes)
@@ -185,6 +164,7 @@ func TestGetEventById(t *testing.T) {
 
 var getEventsTests = []struct {
 	id        int
+	authorId  string
 	title     string
 	category  string
 	city      string
@@ -194,6 +174,7 @@ var getEventsTests = []struct {
 	outputRes []*models.Event
 }{
 	{1,
+		"",
 		"test",
 		"test",
 		"test",
@@ -203,6 +184,7 @@ var getEventsTests = []struct {
 		[]*models.Event{},
 	},
 	{1,
+		"",
 		"test",
 		"test",
 		"test",
@@ -215,17 +197,10 @@ var getEventsTests = []struct {
 
 func TestGetEvents(t *testing.T) {
 	for _, test := range getEventsTests {
-		repositoryMock := new(repository.RepositoryClientMock)
+		repositoryMock := new(mock.RepositoryMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		in := &eventGrpc.GetEventsRequest{
-			Title:    test.title,
-			Category: test.category,
-			City:     test.city,
-			Date:     test.date,
-			Tags:     test.tags,
-		}
-		repositoryMock.On("GetEvents", context.Background(), in).Return(&eventGrpc.Events{}, test.outputErr)
-		actualRes, actualErr := useCaseTest.GetEvents(test.title, test.category, test.city, test.date, test.tags)
+		repositoryMock.On("GetEvents", test.authorId, test.title, test.category, test.city, test.date, test.tags).Return(test.outputRes, test.outputErr)
+		actualRes, actualErr := useCaseTest.GetEvents(test.authorId, test.title, test.category, test.city, test.date, test.tags)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 		require.Equal(t, test.outputRes, actualRes)
 	}
@@ -258,16 +233,9 @@ var getVisitedEventsTests = []struct {
 
 func TestGetVisitedEvents(t *testing.T) {
 	for _, test := range getVisitedEventsTests {
-		repositoryMock := new(repository.RepositoryClientMock)
+		repositoryMock := new(mock.RepositoryMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		in := &eventGrpc.UserId{
-			ID: test.userId,
-		}
-		repositoryMock.On("GetVisitedEvents", context.Background(), in).Return(&eventGrpc.Events{
-			Events: []*eventGrpc.Event{
-				&eventGrpc.Event{},
-			},
-		}, test.outputErr)
+		repositoryMock.On("GetVisitedEvents", test.userId).Return(test.outputRes, test.outputErr)
 		actualRes, actualErr := useCaseTest.GetVisitedEvents(test.userId)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 		require.Equal(t, test.outputRes, actualRes)
@@ -301,16 +269,9 @@ var getCreatedEventsTests = []struct {
 
 func TestGetCreatedEvents(t *testing.T) {
 	for _, test := range getCreatedEventsTests {
-		repositoryMock := new(repository.RepositoryClientMock)
+		repositoryMock := new(mock.RepositoryMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		in := &eventGrpc.UserId{
-			ID: test.userId,
-		}
-		repositoryMock.On("GetCreatedEvents", context.Background(), in).Return(&eventGrpc.Events{
-			Events: []*eventGrpc.Event{
-				&eventGrpc.Event{},
-			},
-		}, test.outputErr)
+		repositoryMock.On("GetCreatedEvents", test.userId).Return(test.outputRes, test.outputErr)
 		actualRes, actualErr := useCaseTest.GetCreatedEvents(test.userId)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 		require.Equal(t, test.outputRes, actualRes)
@@ -342,13 +303,9 @@ var visitTests = []struct {
 
 func TestVisit(t *testing.T) {
 	for _, test := range visitTests {
-		repositoryMock := new(repository.RepositoryClientMock)
+		repositoryMock := new(mock.RepositoryMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		in := &eventGrpc.VisitRequest{
-			EventId: test.eventId,
-			UserId:  test.userId,
-		}
-		repositoryMock.On("Visit", context.Background(), in).Return(&eventGrpc.Empty{}, test.outputErr)
+		repositoryMock.On("Visit", test.eventId, test.userId).Return(test.outputErr)
 		actualErr := useCaseTest.Visit(test.eventId, test.userId)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
@@ -379,13 +336,9 @@ var unvisitTests = []struct {
 
 func TestUnvisit(t *testing.T) {
 	for _, test := range unvisitTests {
-		repositoryMock := new(repository.RepositoryClientMock)
+		repositoryMock := new(mock.RepositoryMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		in := &eventGrpc.VisitRequest{
-			EventId: test.eventId,
-			UserId:  test.userId,
-		}
-		repositoryMock.On("Unvisit", context.Background(), in).Return(&eventGrpc.Empty{}, test.outputErr)
+		repositoryMock.On("Unvisit", test.eventId, test.userId).Return(test.outputErr)
 		actualErr := useCaseTest.Unvisit(test.eventId, test.userId)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 	}
@@ -420,15 +373,9 @@ var isVisitedTests = []struct {
 
 func TestIsVisited(t *testing.T) {
 	for _, test := range isVisitedTests {
-		repositoryMock := new(repository.RepositoryClientMock)
+		repositoryMock := new(mock.RepositoryMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		in := &eventGrpc.VisitRequest{
-			EventId: test.eventId,
-			UserId:  test.userId,
-		}
-		repositoryMock.On("IsVisited", context.Background(), in).Return(&eventGrpc.IsVisitedRequest{
-			Result: test.outputRes,
-		}, test.outputErr)
+		repositoryMock.On("IsVisited", test.eventId, test.userId).Return(test.outputRes, test.outputErr)
 		actualRes, actualErr := useCaseTest.IsVisited(test.eventId, test.userId)
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 		require.Equal(t, test.outputRes, actualRes, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
@@ -452,12 +399,9 @@ var getCitiesTests = []struct {
 
 func TestGetCities(t *testing.T) {
 	for _, test := range getCitiesTests {
-		repositoryMock := new(repository.RepositoryClientMock)
+		repositoryMock := new(mock.RepositoryMock)
 		useCaseTest := NewUseCase(repositoryMock)
-		in := &eventGrpc.Empty{}
-		repositoryMock.On("GetCities", context.Background(), in).Return(&eventGrpc.GetCitiesRequest{
-			Cities: test.outputRes,
-		}, test.outputErr)
+		repositoryMock.On("GetCities").Return(test.outputRes, test.outputErr)
 		actualRes, actualErr := useCaseTest.GetCities()
 		require.Equal(t, test.outputErr, actualErr, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")
 		require.Equal(t, test.outputRes, actualRes, logTestMessage+" "+strconv.Itoa(test.id)+" "+"error")

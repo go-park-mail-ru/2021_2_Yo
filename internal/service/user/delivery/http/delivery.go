@@ -16,10 +16,10 @@ const logMessage = "service:user:delivery:http:"
 
 type Delivery struct {
 	useCase     user.UseCase
-	notificator notificator.Notificator
+	notificator notificator.NotificationManager
 }
 
-func NewDelivery(useCase user.UseCase, notificator notificator.Notificator) *Delivery {
+func NewDelivery(useCase user.UseCase, notificator notificator.NotificationManager) *Delivery {
 	return &Delivery{
 		useCase:     useCase,
 		notificator: notificator,

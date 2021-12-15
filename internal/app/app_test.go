@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestUtils(t *testing.T) {
+func TestApp(t *testing.T) {
 	options := &Options{
 		LogLevel: log.DebugLevel,
 		Testing:  true,

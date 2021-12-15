@@ -1,15 +1,11 @@
 package http
 
 import (
-	"backend/internal/models"
 	response "backend/internal/response"
 	"backend/internal/service/auth"
 	error2 "backend/internal/service/auth/error"
-	"backend/internal/service/email"
 	log "backend/pkg/logger"
 	"net/http"
-
-	"github.com/spf13/viper"
 )
 
 const logMessage = "service:auth:delivery:http:"
@@ -67,14 +63,16 @@ func (h *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
-	template := viper.GetString("reg_html")
+	//template := viper.GetString("reg_html")
 	setSessionIdCookie(w, sessionId)
 	w.Header().Set("X-CSRF-Token", CSRFToken)
 	response.SendResponse(w, response.OkResponse())
-	info := &models.Info{
-		Name: u.Name,
-	}
-	email.SendEmail("Подтвержение регистрации", template, []*models.Info{info})
+	/*
+		info := &models.Info{
+			Name: u.Name,
+		}
+	*/
+	//email.SendEmail("Подтвержение регистрации", template, []*models.Info{info})
 	log.Debug(message + "ended")
 }
 

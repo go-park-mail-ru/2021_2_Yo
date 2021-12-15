@@ -2,6 +2,7 @@ package http
 
 import (
 	models "backend/internal/models"
+	"backend/internal/response"
 	"backend/internal/service/auth/usecase"
 	log "backend/pkg/logger"
 	"bytes"
@@ -20,14 +21,14 @@ const logTestMessage = "auth:delivery:test"
 
 var signUpTests = []struct {
 	id          int
-	input       *models.UserResponseBody
+	input       *response.UserResponseBody
 	useCaseErr1 error
 	useCaseErr2 error
 	useCaseErr3 error
 }{
 	{
 		1,
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Mail: "testMail@mail.ru",
 		},
 		nil,
@@ -36,7 +37,7 @@ var signUpTests = []struct {
 	},
 	{
 		2,
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Mail: "testMail",
 		},
 		nil,
@@ -45,7 +46,7 @@ var signUpTests = []struct {
 	},
 	{
 		3,
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Mail: "testMail@mail.ru",
 		},
 		errors.New("test_err"),
@@ -54,7 +55,7 @@ var signUpTests = []struct {
 	},
 	{
 		4,
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Mail: "testMail@mail.ru",
 		},
 		nil,
@@ -63,7 +64,7 @@ var signUpTests = []struct {
 	},
 	{
 		5,
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Mail: "testMail@mail.ru",
 		},
 		nil,
@@ -94,7 +95,6 @@ func TestSignUp(t *testing.T) {
 		r.HandleFunc("/signup", deliveryTest.SignUp).Methods("POST")
 		req, err := http.NewRequest("POST", "/signup", bytes.NewBuffer(bodyUserJSON))
 		require.NoError(t, err, logTestMessage+"NewRequest error")
-		_ = req
 
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
@@ -103,14 +103,14 @@ func TestSignUp(t *testing.T) {
 
 var signInTests = []struct {
 	id          int
-	input       *models.UserResponseBody
+	input       *response.UserResponseBody
 	useCaseErr1 error
 	useCaseErr2 error
 	useCaseErr3 error
 }{
 	{
 		1,
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Mail:     "testMail@mail.ru",
 			Password: "testPassword",
 		},
@@ -120,7 +120,7 @@ var signInTests = []struct {
 	},
 	{
 		2,
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Mail:     "testMail",
 			Password: "testPassword",
 		},
@@ -130,7 +130,7 @@ var signInTests = []struct {
 	},
 	{
 		3,
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Mail:     "testMail@mail.ru",
 			Password: "testPassword",
 		},
@@ -140,7 +140,7 @@ var signInTests = []struct {
 	},
 	{
 		4,
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Mail:     "testMail@mail.ru",
 			Password: "testPassword",
 		},
@@ -150,7 +150,7 @@ var signInTests = []struct {
 	},
 	{
 		5,
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Mail:     "testMail@mail.ru",
 			Password: "testPassword",
 		},

@@ -47,7 +47,7 @@ type App struct {
 	db           *sql.DB
 }
 
-func getGrpcAddres(portKey string, hostKey string) string {
+func getGrpcAddress(portKey string, hostKey string) string {
 	port := viper.GetString(portKey)
 	host := viper.GetString(hostKey)
 	return host + ":" + port
@@ -66,21 +66,21 @@ func NewApp(opts *Options) (*App, error) {
 		}
 	}
 
-	grpcConnAuth, err := grpc.Dial(getGrpcAddres("auth_port", "auth_host"), grpc.WithInsecure())
+	grpcConnAuth, err := grpc.Dial(getGrpcAddress("auth_port", "auth_host"), grpc.WithInsecure())
 	if err != nil {
 		log.Error(message+"err = ", err)
 		if !opts.Testing {
 			return nil, err
 		}
 	}
-	userGrpcConn, err := grpc.Dial(getGrpcAddres("user_port", "user_host"), grpc.WithInsecure())
+	userGrpcConn, err := grpc.Dial(getGrpcAddress("user_port", "user_host"), grpc.WithInsecure())
 	if err != nil {
 		log.Error(message+"err = ", err)
 		if !opts.Testing {
 			return nil, err
 		}
 	}
-	eventGrpcConn, err := grpc.Dial(getGrpcAddres("event_port", "event_host"), grpc.WithInsecure())
+	eventGrpcConn, err := grpc.Dial(getGrpcAddress("event_port", "event_host"), grpc.WithInsecure())
 	if err != nil {
 		log.Error(message+"err = ", err)
 		if !opts.Testing {
@@ -104,7 +104,7 @@ func NewApp(opts *Options) (*App, error) {
 	notificationManager := notificator.NewNotificator(pool, notificationR, userR, eventR)
 
 	authD := authDelivery.NewDelivery(authService)
-	userD := userDelivery.NewDelivery(userUC, *notificationManager)
+	userD := userDelivery.NewDelivery(userUC, notificationManager)
 	eventD := eventDelivery.NewDelivery(eventUC)
 
 	return &App{

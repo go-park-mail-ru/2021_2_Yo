@@ -18,10 +18,7 @@ func TestUtils(t *testing.T) {
 	r.HandleFunc("/metrics", testHandlerFunc).Methods("GET")
 	r.HandleFunc("/not_metrics", testHandlerFunc).Methods("GET")
 	w := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/metrics", bytes.NewBuffer(nil))
+	req, err := http.NewRequest("GET", "test/metrics", bytes.NewBuffer(nil))
 	require.NoError(t, err)
 	r.ServeHTTP(w, req)
-	req1, err := http.NewRequest("GET", "/not_metrics", bytes.NewBuffer(nil))
-	require.NoError(t, err)
-	r.ServeHTTP(w, req1)
 }
