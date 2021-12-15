@@ -1,4 +1,4 @@
-version: "3.6"
+version: "3.5"
 services:
   bmstusa-app:
     image: sarpol/server:latest
@@ -9,10 +9,13 @@ services:
     ports:
       - "8080:8080"
     depends_on:
+      postgres-db:
+        condition: service_healthy
+    links:
+      - postgres-db
       - auth
       - event
       - user
-      - postgres-db
 
   auth:
     image: sarpol/auth:latest
@@ -21,8 +24,11 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - redis-db
+      postgres-db:
+          condition: service_healthy
+    links:
       - postgres-db
+      - redis-db
 
   event:
     image: sarpol/event:latest
@@ -33,6 +39,9 @@ services:
     ports:
       - "8083:8083"
     depends_on:
+      postgres-db:
+        condition: service_healthy
+    links:
       - postgres-db
 
   user:
@@ -44,6 +53,9 @@ services:
     ports:
       - "8084:8084"
     depends_on:
+      postgres-db:
+        condition: service_healthy
+    links:
       - postgres-db
   
   prometheus:
@@ -62,6 +74,11 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     ports:
       - "5432:5432"
   
