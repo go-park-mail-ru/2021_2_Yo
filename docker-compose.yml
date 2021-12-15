@@ -12,6 +12,7 @@ services:
       - auth
       - event
       - user
+      - postgres-db
 
   auth:
     image: sarpol/auth:latest
@@ -21,6 +22,7 @@ services:
       - "8081:8081"
     depends_on:
       - redis-db
+      - postgres-db
 
   event:
     image: sarpol/event:latest
@@ -30,6 +32,8 @@ services:
       - images-storage:/app/static/images
     ports:
       - "8083:8083"
+    depends_on:
+      - postgres-db
 
   user:
     image: sarpol/user:latest
@@ -39,16 +43,17 @@ services:
       - images-storage:/app/static/images
     ports:
       - "8084:8084"
+    depends_on:
+      - postgres-db
   
   prometheus:
     image: prom/prometheus
     ports:
       - "9090:9090"
     volumes:
-      - "./prometheus:/etc/prometheus"
+      - "./pkg/prometheus:/etc/prometheus"
     depends_on:
       - bmstusa-app
-
 
   postgres-db:
     restart: always
