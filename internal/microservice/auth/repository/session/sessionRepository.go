@@ -22,6 +22,7 @@ func (s *Repository) Create(data *authServiceModels.SessionData) error {
 	message := logMessage + "Create:"
 	log.Info(message)
 	res := s.db.Set(data.SessionId, data.UserId, data.Expiration)
+	log.Error(message+"res = ",res)
 	return res.Err()
 }
 

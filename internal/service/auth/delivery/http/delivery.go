@@ -89,12 +89,10 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	sessionId, err := h.UseCase.CreateSession(userId)
 	if !response.CheckIfNoError(&w, err, message) {
-		log.Error("1 ", err)
 		return
 	}
 	CSRFToken, err := h.UseCase.CreateToken(userId)
 	if !response.CheckIfNoError(&w, err, message) {
-		log.Error("2 ",err)
 		return
 	}
 	setSessionIdCookie(w, sessionId)

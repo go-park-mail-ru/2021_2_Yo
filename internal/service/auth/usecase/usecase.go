@@ -3,6 +3,7 @@ package usecase
 import (
 	protoAuth "backend/internal/microservice/auth/proto"
 	"backend/internal/models"
+	"backend/pkg/log"
 	"context"
 )
 
@@ -36,10 +37,12 @@ func (s *UseCase) SignIn(u *models.User) (string, error) {
 		Mail:     u.Mail,
 		Password: u.Password,
 	}
+	log.Debug("SIGNIN START")
 	out, err := s.client.SignIn(context.Background(), in)
 	if err != nil {
 		return "", err
 	}
+	log.Debug("SIGNIN END")
 	userId := out.ID
 	return userId, nil
 }
