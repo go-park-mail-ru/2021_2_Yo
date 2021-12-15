@@ -6,6 +6,7 @@ import (
 	"backend/internal/models"
 	"backend/internal/utils"
 	"context"
+	log "backend/pkg/logger"
 )
 
 //const logMessage = "microservice auth"
@@ -45,6 +46,7 @@ func (s *authService) SignIn(ctx context.Context, in *protoAuth.SignInRequest) (
 
 	u, err := s.authUserRepository.GetUser(in.Mail, utils.CreatePasswordHash(in.Password))
 	if err != nil {
+		log.Error("err = ",err)
 		return &protoAuth.UserId{}, err
 	}
 
