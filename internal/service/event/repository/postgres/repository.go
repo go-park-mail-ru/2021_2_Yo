@@ -213,15 +213,11 @@ func (s *Repository) GetEvents(userId string, title string, category string, cit
 	message := logMessage + "GetEvents:"
 	log.Debug(message + "started")
 	postgresTags := make(pq.StringArray, len(tags))
-
-	var userIdInt int
-
 	for i := range tags {
 		postgresTags[i] = tags[i]
 	}
-	query := `select e.*, count(v) from event as e
-				left join visitor as v on e.id = v.event_id and `
-	query += `v.user_id = $1 `
+
+	var userIdInt int
 	if userId == "" {
 		userIdInt = 0
 	} else {
@@ -231,6 +227,10 @@ func (s *Repository) GetEvents(userId string, title string, category string, cit
 		}
 		userIdInt = userIdInt1
 	}
+
+	query := `select e.*, count(v) from event as e
+				left join visitor as v on e.id = v.event_id and `
+	query += `v.user_id = $1 `
 	if title != "" {
 		query += `where lower(title) ~ lower($2) and `
 	} else {

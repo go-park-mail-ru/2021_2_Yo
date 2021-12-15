@@ -289,7 +289,7 @@ func TestGetEvents(t *testing.T) {
 		tag := test.vars["tags"]
 		tags := strings.Split(tag, "|")
 
-		useCaseMock.On("GetEvents", title, category, city, date, tags).Return(test.eventList, test.useCaseErr)
+		useCaseMock.On("GetEvents", "", title, category, city, date, tags).Return(test.eventList, test.useCaseErr)
 
 		r := mux.NewRouter()
 		r.HandleFunc("/events", deliveryTest.GetEvents).Methods("GET")

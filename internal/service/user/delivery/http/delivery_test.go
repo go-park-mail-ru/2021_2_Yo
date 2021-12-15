@@ -5,7 +5,7 @@ import (
 	response "backend/internal/response"
 	error2 "backend/internal/service/user/error"
 	"backend/internal/service/user/usecase"
-	"backend/pkg/response"
+	"backend/pkg/notificator"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -38,13 +38,14 @@ var getUserTests = []struct {
 		"1",
 		nil,
 		error2.ErrUserNotFound,
-		response.ErrorResponse(error2.ErrUserNotFound.Error())},
+		response.StatusResponse(http.StatusNotFound)},
 }
 
 func TestGetUser(t *testing.T) {
 	for _, test := range getUserTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		userId := test.input
 		useCaseMock.On("GetUserById", userId).Return(test.user, test.useCaseErr)
@@ -79,13 +80,14 @@ var getUserByIdTests = []struct {
 		"1",
 		nil,
 		error2.ErrUserNotFound,
-		response.ErrorResponse(error2.ErrUserNotFound.Error())},
+		response.StatusResponse(http.StatusNotFound)},
 }
 
 func TestGetUserById(t *testing.T) {
 	for _, test := range getUserByIdTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		userId := test.input
 
@@ -103,13 +105,13 @@ func TestGetUserById(t *testing.T) {
 var updateUserInfoTests = []struct {
 	id         int
 	input      string
-	user       *models.UserResponseBody
+	user       *response.UserResponseBody
 	useCaseErr error
 	output     *response.Response
 }{
 	{1,
 		"1",
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Name:    "testName",
 			Surname: "testSurname",
 			About:   "testAbout",
@@ -118,24 +120,25 @@ var updateUserInfoTests = []struct {
 		response.OkResponse()},
 	{2,
 		"1",
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Name:    "testName",
 			Surname: "testSurname",
 			About:   "testAbout",
 		},
 		error2.ErrUserNotFound,
-		response.ErrorResponse(error2.ErrUserNotFound.Error())},
+		response.StatusResponse(http.StatusNotFound)},
 	{3,
 		"1",
 		nil,
 		nil,
-		response.ErrorResponse(response.ErrJSONDecoding.Error())},
+		response.StatusResponse(http.StatusNotFound)},
 }
 
 func TestUpdateUserInfo(t *testing.T) {
 	for _, test := range updateUserInfoTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		userId := test.input
 
@@ -170,35 +173,36 @@ func TestUpdateUserInfo(t *testing.T) {
 var updateUserPasswordTests = []struct {
 	id         int
 	input      string
-	user       *models.UserResponseBody
+	user       *response.UserResponseBody
 	useCaseErr error
 	output     *response.Response
 }{
 	{1,
 		"1",
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Password: "testPassword",
 		},
 		nil,
 		response.OkResponse()},
 	{2,
 		"1",
-		&models.UserResponseBody{
+		&response.UserResponseBody{
 			Password: "testPassword",
 		},
 		error2.ErrUserNotFound,
-		response.ErrorResponse(error2.ErrUserNotFound.Error())},
+		response.StatusResponse(http.StatusNotFound)},
 	{3,
 		"1",
 		nil,
 		nil,
-		response.ErrorResponse(response.ErrJSONDecoding.Error())},
+		response.StatusResponse(http.StatusNotFound)},
 }
 
 func TestUpdateUserPassword(t *testing.T) {
 	for _, test := range updateUserPasswordTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		userId := test.input
 
@@ -249,7 +253,8 @@ var getSubscribersTests = []struct {
 func TestGetSubscribers(t *testing.T) {
 	for _, test := range getSubscribersTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		useCaseMock.On("GetSubscribers", test.userId).Return([]*models.User{}, test.useCaseErr)
 
@@ -282,7 +287,8 @@ var getSubscribesTests = []struct {
 func TestGetSubscribes(t *testing.T) {
 	for _, test := range getSubscribesTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		useCaseMock.On("GetSubscribes", test.userId).Return([]*models.User{}, test.useCaseErr)
 
@@ -292,6 +298,41 @@ func TestGetSubscribes(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
+	}
+}
+
+var getFriendsTests = []struct {
+	id         int
+	userId     string
+	useCaseErr error
+}{
+	{
+		1,
+		"1",
+		nil,
+	},
+	{
+		2,
+		"1",
+		errors.New("test_err"),
+	},
+}
+
+func TestGetFriends(t *testing.T) {
+	for _, test := range getFriendsTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
+
+		useCaseMock.On("GetFriends", test.userId).Return([]*models.User{}, test.useCaseErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/test", deliveryTest.GetFriends).Methods("GET")
+		req, err := http.NewRequest("GET", "/test", nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+		w := httptest.NewRecorder()
+		ctx := context.WithValue(context.Background(), "userId", test.userId)
+		r.ServeHTTP(w, req.WithContext(ctx))
 	}
 }
 
@@ -315,7 +356,8 @@ var getVisitorsTests = []struct {
 func TestGetVisitors(t *testing.T) {
 	for _, test := range getVisitorsTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		useCaseMock.On("GetVisitors", test.eventId).Return([]*models.User{}, test.useCaseErr)
 
@@ -356,7 +398,8 @@ var subscribeTests = []struct {
 func TestSubscribe(t *testing.T) {
 	for _, test := range subscribeTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		var eId string
 		var uId string
@@ -370,6 +413,7 @@ func TestSubscribe(t *testing.T) {
 		}
 
 		useCaseMock.On("Subscribe", eId, uId).Return(test.useCaseErr)
+		notificatorMock.On("NewSubscriberNotification", eId, uId).Return(test.useCaseErr)
 
 		r := mux.NewRouter()
 		r.HandleFunc("/test", deliveryTest.Subscribe).Methods("GET")
@@ -412,7 +456,8 @@ var unsubscribeTests = []struct {
 func TestUnsubscribe(t *testing.T) {
 	for _, test := range unsubscribeTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		var eId string
 		var uId string
@@ -426,6 +471,7 @@ func TestUnsubscribe(t *testing.T) {
 		}
 
 		useCaseMock.On("Unsubscribe", eId, uId).Return(test.useCaseErr)
+		notificatorMock.On("DeleteSubscribeNotification", eId, uId).Return(test.useCaseErr)
 
 		r := mux.NewRouter()
 		r.HandleFunc("/test", deliveryTest.Unsubscribe).Methods("GET")
@@ -468,7 +514,8 @@ var isSubscribedTests = []struct {
 func TestIsSubscribed(t *testing.T) {
 	for _, test := range isSubscribedTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		var eId string
 		var uId string
@@ -496,3 +543,58 @@ func TestIsSubscribed(t *testing.T) {
 		r.ServeHTTP(w, req)
 	}
 }
+
+/*
+var inviteTests = []struct {
+	id         int
+	vars       map[string]string
+	userId     string
+	eventId    string
+	useCaseErr error
+}{
+	{
+		1,
+		map[string]string{
+			"id": "1",
+		},
+		"1",
+		"1",
+		nil,
+	},
+	{
+		2,
+		map[string]string{
+			"id": "123",
+		},
+		"1",
+		"1",
+		errors.New("test_err"),
+	},
+}
+
+func TestInvite(t *testing.T) {
+	for _, test := range inviteTests {
+		useCaseMock := new(usecase.UseCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
+
+		vars := test.vars
+		receiverId := vars["id"]
+		userId := test.userId
+
+		useCaseMock.On("InvitationNotification", receiverId, userId, test.eventId).Return(test.useCaseErr)
+
+		r := mux.NewRouter()
+		r.HandleFunc("/test", deliveryTest.Invite).Methods("GET")
+		req, err := http.NewRequest("GET", "/test?eventId="+test.eventId, nil)
+		require.NoError(t, err, logTestMessage+"NewRequest error")
+
+		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
+		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
+		req = req.WithContext(ctxUserId)
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+	}
+}
+*/
