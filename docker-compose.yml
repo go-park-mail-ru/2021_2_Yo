@@ -49,14 +49,16 @@ services:
     depends_on:
       - bmstusa-app
 
-# for remote
-#  postgres-db:
-#    restart: always
-#   image: postgres:latest
-#   environment:
-#     - POSTGRES_PASSWORD=password
-#  ports:
-#    - "5432:5432"
+
+  postgres-db:
+    restart: always
+    image: postgres:latest
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - pgdata:/var/lib/postgresql
+    ports:
+      - "5432:5432"
   
   redis-db:
     restart: always
@@ -92,6 +94,7 @@ services:
 volumes:
   grafana-data:
     external: true
+  pgdata:
   images-storage:
     driver: local    
     driver_opts:       
