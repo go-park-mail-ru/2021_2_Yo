@@ -54,33 +54,6 @@ func TestSignUp(t *testing.T) {
 	}
 }
 
-var signInTests = []struct {
-	id        int
-	input     *models.User
-	clientRes *protoAuth.UserId
-	clientErr error
-	output    string
-}{
-	{
-		1,
-		&models.User{},
-		&protoAuth.UserId{
-			ID: "test",
-		},
-		nil,
-		"test",
-	},
-	{
-		2,
-		&models.User{},
-		&protoAuth.UserId{
-			ID: "",
-		},
-		errors.New("test_err"),
-		"",
-	},
-}
-
 func TestSignIn(t *testing.T) {
 	for _, test := range signUpTests {
 		clientMock := new(usecase.AuthClientMock)
@@ -254,33 +227,6 @@ func TestCreateToken(t *testing.T) {
 		require.Equal(t, test.clientErr, err)
 		require.Equal(t, test.output, res)
 	}
-}
-
-var checkTokenTests = []struct {
-	id        int
-	input     string
-	clientRes *protoAuth.UserId
-	clientErr error
-	output    string
-}{
-	{
-		1,
-		"test",
-		&protoAuth.UserId{
-			ID: "test",
-		},
-		nil,
-		"test",
-	},
-	{
-		2,
-		"test",
-		&protoAuth.UserId{
-			ID: "",
-		},
-		errors.New("test_err"),
-		"",
-	},
 }
 
 func TestCheckToken(t *testing.T) {

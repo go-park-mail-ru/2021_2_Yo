@@ -46,12 +46,12 @@ func cityAndAddrByCoordinates(latitude, longitude string) (string, string, error
 		return "", "", err
 	}
 	type Data struct {
-		City string `json:"city,omittempty`
+		City string `json:"city,omitempty"`
 	}
 
 	type AddrInfo struct {
-		Value              string `json:"value,omittempty`
-		Unrestricted_value string `json:"unresticted_value,omitempty`
+		Value              string `json:"value,omitempty"`
+		Unrestricted_value string `json:"unrestricted_value,omitempty"`
 		Data               Data   `json:"data,omitempty"`
 	}
 

@@ -55,7 +55,9 @@ func TestGetUser(t *testing.T) {
 		w := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/user", bytes.NewBuffer(nil))
 		require.NoError(t, err, logTestMessage+"NewRequest error")
-		userIdContext := context.WithValue(context.Background(), "userId", userId)
+		type ctxUserId string
+		var CUID ctxUserId
+		userIdContext := context.WithValue(context.Background(), CUID, userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 	}
 }
@@ -165,7 +167,9 @@ func TestUpdateUserInfo(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
-		userIdContext := context.WithValue(context.Background(), "userId", userId)
+		type ctxUserId string
+		var CUID ctxUserId
+		userIdContext := context.WithValue(context.Background(), CUID, userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 	}
 }
@@ -228,7 +232,9 @@ func TestUpdateUserPassword(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
-		userIdContext := context.WithValue(context.Background(), "userId", userId)
+		type ctxUserId string
+		var CUID ctxUserId
+		userIdContext := context.WithValue(context.Background(), CUID, userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 	}
 }
@@ -331,7 +337,9 @@ func TestGetFriends(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 		w := httptest.NewRecorder()
-		ctx := context.WithValue(context.Background(), "userId", test.userId)
+		type ctxUserId string
+		var CUID ctxUserId
+		ctx := context.WithValue(context.Background(), CUID, test.userId)
 		r.ServeHTTP(w, req.WithContext(ctx))
 	}
 }
@@ -366,7 +374,9 @@ func TestGetVisitors(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 		w := httptest.NewRecorder()
-		eventIdCtx := context.WithValue(context.Background(), "eventId", test.eventId)
+		type ctxEventId string
+		var CEID ctxEventId
+		eventIdCtx := context.WithValue(context.Background(), CEID, test.eventId)
 		r.ServeHTTP(w, req.WithContext(eventIdCtx))
 	}
 }

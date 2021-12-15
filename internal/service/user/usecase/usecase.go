@@ -7,8 +7,6 @@ import (
 	"backend/internal/utils"
 )
 
-const logMessage = "service:user:usecase:"
-
 type UseCase struct {
 	repository user.Repository
 }
@@ -54,7 +52,7 @@ func (a *UseCase) GetSubscribers(userId string) ([]*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i, _ := range resultUsers {
+	for i := range resultUsers {
 		resultUsers[i].Password = ""
 	}
 	return resultUsers, nil
@@ -68,7 +66,7 @@ func (a *UseCase) GetSubscribes(userId string) ([]*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i, _ := range resultUsers {
+	for i := range resultUsers {
 		resultUsers[i].Password = ""
 	}
 	return resultUsers, nil
@@ -82,7 +80,7 @@ func (a *UseCase) GetFriends(userId string) ([]*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i, _ := range resultUsers {
+	for i := range resultUsers {
 		resultUsers[i].Password = ""
 	}
 	return resultUsers, nil
@@ -96,7 +94,7 @@ func (a *UseCase) GetVisitors(eventId string) ([]*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i, _ := range resultUsers {
+	for i := range resultUsers {
 		resultUsers[i].Password = ""
 	}
 	return resultUsers, nil

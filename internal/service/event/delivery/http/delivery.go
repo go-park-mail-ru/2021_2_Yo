@@ -117,12 +117,6 @@ func (h *Delivery) GetEventById(w http.ResponseWriter, r *http.Request) {
 	response.SendResponse(w, response.EventResponse(resultEvent))
 }
 
-type getEventsVars struct {
-	title    string   `valid:"type(string),length(0|50)" san:"xss"`
-	category string   `valid:"type(string),length(0|50)" san:"xss"`
-	tags     []string `valid:"type(string),length(0|50)" san:"xss"`
-}
-
 func (h *Delivery) GetEvents(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetEvents:"
 	log.Debug(message + "started")

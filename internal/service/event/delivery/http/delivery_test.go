@@ -75,7 +75,9 @@ func TestCreateEvent(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
-		userIdContext := context.WithValue(context.Background(), "userId", test.userId)
+		type ctxUserId string
+		var CUID ctxUserId
+		userIdContext := context.WithValue(context.Background(), CUID, test.userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 	}
 }
@@ -146,8 +148,11 @@ func TestUpdateEvent(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
-		userIdContext := context.WithValue(context.Background(), "userId", test.userId)
-		varsContext := context.WithValue(userIdContext, "vars", test.vars)
+		type ctxUserId string
+		var CUID ctxUserId
+		var CVARS ctxUserId
+		userIdContext := context.WithValue(context.Background(), CUID, test.userId)
+		varsContext := context.WithValue(userIdContext, CVARS, test.vars)
 		r.ServeHTTP(w, req.WithContext(varsContext))
 	}
 }
@@ -383,28 +388,6 @@ func TestGetVisitedEvents(t *testing.T) {
 	}
 }
 
-var getCreatedEventsTests = []struct {
-	id         int
-	userId     string
-	useCaseErr error
-}{
-	{
-		1,
-		"1",
-		nil,
-	},
-	{
-		2,
-		"1",
-		errors.New("test_err"),
-	},
-	{
-		3,
-		"1",
-		errors.New("test_err"),
-	},
-}
-
 func TestGetCreatedEvents(t *testing.T) {
 	for _, test := range getVisitedEventsTests {
 		useCaseMock := new(usecase.UseCaseMock)
@@ -544,37 +527,6 @@ func TestUnvisit(t *testing.T) {
 		r.ServeHTTP(w, req)
 	}
 }
-
-var isVisitedTests = []struct {
-	id         int
-	vars       interface{}
-	userId     interface{}
-	useCaseErr error
-}{
-	{
-		1,
-		map[string]string{
-			"id": "123",
-		},
-		"1",
-		nil,
-	},
-	{
-		2,
-		errors.New(""),
-		"2",
-		errors.New("test_err"),
-	},
-	{
-		3,
-		map[string]string{
-			"id": "123",
-		},
-		errors.New(""),
-		errors.New("test_err"),
-	},
-}
-
 func TestIsVisited(t *testing.T) {
 	for _, test := range unvisitTests {
 		useCaseMock := new(usecase.UseCaseMock)
@@ -605,20 +557,6 @@ func TestIsVisited(t *testing.T) {
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 	}
-}
-
-var getCitiesTests = []struct {
-	id         int
-	useCaseErr error
-}{
-	{
-		1,
-		nil,
-	},
-	{
-		2,
-		errors.New("test_err"),
-	},
 }
 
 func TestGetCities(t *testing.T) {
