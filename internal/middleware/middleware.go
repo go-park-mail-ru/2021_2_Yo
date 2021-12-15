@@ -97,6 +97,7 @@ func (m *Middlewares) Auth(next http.Handler) http.Handler {
 			return
 		}
 		userId, err := m.authService.CheckSession(cookie.Value)
+		log.Debug("userId = ", userId)
 		if !response.CheckIfNoError(&w, err, message) {
 			return
 		}
