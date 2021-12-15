@@ -1,4 +1,4 @@
-name: StartApp
+name: StartAppTest
 
 env:
   SERVER_TAG: latest
