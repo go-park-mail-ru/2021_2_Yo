@@ -55,9 +55,7 @@ func TestGetUser(t *testing.T) {
 		w := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/user", bytes.NewBuffer(nil))
 		require.NoError(t, err, logTestMessage+"NewRequest error")
-		type ctxUserId string
-		var CUID ctxUserId
-		userIdContext := context.WithValue(context.Background(), CUID, userId)
+		userIdContext := context.WithValue(context.Background(), "userId", userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 	}
 }
@@ -232,9 +230,7 @@ func TestUpdateUserPassword(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
-		type ctxUserId string
-		var CUID ctxUserId
-		userIdContext := context.WithValue(context.Background(), CUID, userId)
+		userIdContext := context.WithValue(context.Background(), "userId", userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 	}
 }
@@ -337,9 +333,7 @@ func TestGetFriends(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 		w := httptest.NewRecorder()
-		type ctxUserId string
-		var CUID ctxUserId
-		ctx := context.WithValue(context.Background(), CUID, test.userId)
+		ctx := context.WithValue(context.Background(), "userId", test.userId)
 		r.ServeHTTP(w, req.WithContext(ctx))
 	}
 }
@@ -374,9 +368,7 @@ func TestGetVisitors(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 		w := httptest.NewRecorder()
-		type ctxEventId string
-		var CEID ctxEventId
-		eventIdCtx := context.WithValue(context.Background(), CEID, test.eventId)
+		eventIdCtx := context.WithValue(context.Background(), "eventId", test.eventId)
 		r.ServeHTTP(w, req.WithContext(eventIdCtx))
 	}
 }

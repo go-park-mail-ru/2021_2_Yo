@@ -11,7 +11,7 @@ import (
 
 	"github.com/gorilla/mux"
 )
-type ctxString string
+
 const logMessage = "service:event:delivery:http:"
 
 type Delivery struct {
@@ -27,8 +27,7 @@ func NewDelivery(useCase event.UseCase) *Delivery {
 func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "CreateEvent:"
 	log.Debug(message + "started")
-	userId := r.Context().Value("userId").(ctxString)
-	userIdStr := string(userId)
+	userId := r.Context().Value("userId").(string)
 	err := r.ParseMultipartForm(5 << 20)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
@@ -47,7 +46,7 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		eventFromRequest.ImgUrl = imgUrl
 	}
-	eventFromRequest.AuthorId = userIdStr
+	eventFromRequest.AuthorId = userId
 	eventID, err := h.useCase.CreateEvent(eventFromRequest)
 	if !response.CheckIfNoError(&w, err, message) {
 		return

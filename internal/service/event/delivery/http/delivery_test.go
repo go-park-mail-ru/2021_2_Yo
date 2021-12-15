@@ -75,9 +75,7 @@ func TestCreateEvent(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
-		type ctxUserId string
-		CUID := ctxUserId("userId")
-		userIdContext := context.WithValue(context.Background(), CUID, test.userId)
+		userIdContext := context.WithValue(context.Background(), "userId", test.userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 	}
 }
@@ -148,11 +146,8 @@ func TestUpdateEvent(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
-		type ctxUserId string
-		var CUID ctxUserId
-		var CVARS ctxUserId
-		userIdContext := context.WithValue(context.Background(), CUID, test.userId)
-		varsContext := context.WithValue(userIdContext, CVARS, test.vars)
+		userIdContext := context.WithValue(context.Background(), "userId", test.userId)
+		varsContext := context.WithValue(userIdContext, "vars", test.vars)
 		r.ServeHTTP(w, req.WithContext(varsContext))
 	}
 }
