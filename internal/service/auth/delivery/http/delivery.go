@@ -84,6 +84,7 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userId, err := h.UseCase.SignIn(u)
+	log.Debug(message+"err = ", err)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
