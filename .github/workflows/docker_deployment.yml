@@ -80,8 +80,6 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/bmstusa/backend
-            docker stop $(docker ps -aq)
-            docker rm $(docker ps -aq)
             sudo docker volume create --name=grafana-storage
             git pull
             sudo docker-compose down
