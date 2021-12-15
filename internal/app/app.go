@@ -44,6 +44,7 @@ type App struct {
 	AuthManager  *authDelivery.Delivery
 	UserManager  *userDelivery.Delivery
 	EventManager *eventDelivery.Delivery
+	wsPool 		 *websocket.Pool
 	db           *sql.DB
 }
 
@@ -112,6 +113,7 @@ func NewApp(opts *Options) (*App, error) {
 		AuthManager:  authD,
 		UserManager:  userD,
 		EventManager: eventD,
+		wsPool: 	  pool,
 		db:           db,
 	}, nil
 }
@@ -136,6 +138,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	userRouter := r.PathPrefix("/user").Subrouter()
 	userRouter.Methods("POST").Subrouter().Use(mw.CSRF)
 	register.UserHTTPEndpoints(userRouter, app.UserManager, app.EventManager, mw)
+	r.HandleFunc("/ws", app.wsPool.WebsocketHandler)
 
 	r.Handle("/metrics", promhttp.Handler())
 
