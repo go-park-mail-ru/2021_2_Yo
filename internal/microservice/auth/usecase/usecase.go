@@ -5,7 +5,6 @@ import (
 	protoAuth "backend/internal/microservice/auth/proto"
 	"backend/internal/models"
 	"backend/internal/utils"
-	log "backend/pkg/logger"
 	"context"
 )
 
@@ -43,16 +42,13 @@ func (s *authService) SignUp(ctx context.Context, in *protoAuth.SignUpRequest) (
 
 func (s *authService) SignIn(ctx context.Context, in *protoAuth.SignInRequest) (*protoAuth.UserId, error) {
 
-	log.Debug("HERE SignIn")
 	u, err := s.authUserRepository.GetUser(in.Mail, utils.CreatePasswordHash(in.Password))
 	if err != nil {
-		log.Error("err = ", err)
 		return &protoAuth.UserId{}, err
 	}
 
 	out := &protoAuth.UserId{
 		ID: u.ID,
 	}
-	log.Debug("HERE SignIn")
 	return out, nil
 }

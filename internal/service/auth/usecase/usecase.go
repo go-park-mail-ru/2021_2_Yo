@@ -3,7 +3,6 @@ package usecase
 import (
 	protoAuth "backend/internal/microservice/auth/proto"
 	"backend/internal/models"
-	log "backend/pkg/logger"
 	"context"
 )
 
@@ -38,7 +37,6 @@ func (s *UseCase) SignIn(u *models.User) (string, error) {
 		Password: u.Password,
 	}
 	out, err := s.client.SignIn(context.Background(), in)
-	log.Debug("UseCase SignIn err = ", err)
 	if err != nil {
 		return "", err
 	}
