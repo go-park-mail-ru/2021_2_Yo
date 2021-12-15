@@ -280,7 +280,6 @@ func (s *Repository) GetEvents(userId string, title string, category string, cit
 		var e Event
 		err := rows.StructScan(&e)
 		if err != nil {
-			log.Error(message, "err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelEvent := toModelEvent(&e)
@@ -358,7 +357,6 @@ func (s *Repository) Visit(eventId string, userId string) error {
 	query := visitQuery
 	_, err = s.db.Query(query, eventIdInt, userIdInt)
 	if err != nil {
-		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
@@ -379,7 +377,6 @@ func (s *Repository) Unvisit(eventId string, userId string) error {
 	query := unvisitQuery
 	_, err = s.db.Query(query, eventIdInt, userIdInt)
 	if err != nil {
-		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
@@ -402,7 +399,6 @@ func (s *Repository) IsVisited(eventId string, userId string) (bool, error) {
 	result := false
 	err = s.db.Get(&count, query, eventIdInt, userIdInt)
 	if err != nil {
-		log.Error(message+"err = ", err)
 		return false, error2.ErrPostgres
 	}
 	if count > 0 {
