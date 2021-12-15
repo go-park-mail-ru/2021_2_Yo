@@ -3,6 +3,7 @@ package usecase
 import (
 	authServiceModels "backend/internal/microservice/auth/models"
 	protoAuth "backend/internal/microservice/auth/proto"
+	log "backend/pkg/logger"
 	"context"
 	"errors"
 	"math/rand"
@@ -46,6 +47,7 @@ func (s *authService) CreateSession(ctx context.Context, protoUserId *protoAuth.
 	}
 	err := s.authSessionRepository.Create(sessionData)
 	if err != nil {
+		log.Error("CreateSession err = ", err)
 		return &protoAuth.Session{}, err
 	}
 	response := &protoAuth.Session{

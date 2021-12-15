@@ -88,7 +88,6 @@ func (h *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sessionId, err := h.UseCase.CreateSession(userId)
-	log.Debug(message+"err = ", err)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}

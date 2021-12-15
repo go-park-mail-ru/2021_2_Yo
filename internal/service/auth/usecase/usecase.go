@@ -3,6 +3,7 @@ package usecase
 import (
 	protoAuth "backend/internal/microservice/auth/proto"
 	"backend/internal/models"
+	log "backend/pkg/logger"
 	"context"
 )
 
@@ -50,6 +51,7 @@ func (s *UseCase) CreateSession(userId string) (string, error) {
 	}
 	out, err := s.client.CreateSession(context.Background(), in)
 	if err != nil {
+		log.Error("CreateSession err = ", err)
 		return "", err
 	}
 	sessionId := out.Session
