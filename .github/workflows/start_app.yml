@@ -14,10 +14,10 @@ on:
 jobs:
   start:
     runs-on: ubuntu-latest
-    - name: Start App
+    steps:
+      - name: Start App
         uses: appleboy/ssh-action@master
         with:
-          envs: GITHUB_SHA
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
