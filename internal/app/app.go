@@ -129,7 +129,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	rApi.Use(mw.CORS)
 	rApi.Use(mw.Recovery)
 	//r.Use(mm.Metrics)
-	rApi.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) { log.Debug("OPTIONS CALLED 1") })
+	rApi.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 	authRouter := rApi.PathPrefix("/auth").Subrouter()
 	register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)
 	eventRouter := rApi.PathPrefix("/events").Subrouter()

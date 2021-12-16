@@ -13,7 +13,7 @@ import (
 
 const logMessage = "middleware:"
 
-var allowedOrigins = []string{"", "http://127.0.0.1:8080", "http://127.0.0.1:3000", "https://bmstusssa.herokuapp.com"}
+var allowedOrigins = []string{"", "http://127.0.0.1:8080", "http://127.0.0.1:3000", "https://bmstusssa.herokuapp.com", "https://bmstusa.ru"}
 
 type Middlewares struct {
 	authService auth.UseCase
@@ -50,7 +50,7 @@ func (m *Middlewares) CORS(next http.Handler) http.Handler {
 			}
 		}
 		if !isAllowed {
-			log.Debug("CORS not allowed origin = ", origin)
+			log.Error("CORS not allowed origin = ", origin)
 			return
 		}
 		w.Header().Set("Access-Control-Allow-Origin", origin)
