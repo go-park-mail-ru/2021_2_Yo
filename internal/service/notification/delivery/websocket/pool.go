@@ -40,13 +40,14 @@ func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		log.Error(err)
 		return
 	}
+	log.Info("HERE1")
 
 	userID, err := GetID(conn)
 	if err != nil {
 		log.Error(err)
 	}
+	log.Info("HERE2")
 
 	p.AddConn(userID, conn)
-
 	log.Info("New Client is connected with id: ", userID, "total: ", len(p.Connections))
 }
