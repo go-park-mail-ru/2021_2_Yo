@@ -35,7 +35,6 @@ func (p *Pool) GetConn(userId string) *websocket.Conn {
 }
 
 func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
-	log.Debug("WebsocketHandler start")
 	_, ok := w.(http.Hijacker)
 	if !ok {
 		log.Info(!ok)
@@ -52,5 +51,5 @@ func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	p.AddConn(userID, conn)
-	log.Info("New Client is connected with id: ", userID, "total: ", len(p.Connections))
+	log.Info("WebsocketHandler new client with id: ", userID, " total clients: ", len(p.Connections))
 }
