@@ -76,7 +76,7 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 	if err != nil {
 		return err
 	}
-	ws := n.pool.GetConn(userId)
+	ws := n.pool.GetConn(receiverId)
 	if ws != nil {
 		m := &NotificationBody{
 			Type:        "0",
@@ -89,7 +89,7 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 		}
 		err := ws.WriteJSON(m)
 		if err != nil {
-			n.pool.RemoveConn(userId)
+			n.pool.RemoveConn(receiverId)
 			err = n.nRepository.CreateInviteNotification(receiverId, u, e, false)
 			return err
 		} else {
@@ -111,7 +111,7 @@ func (n *Notificator) NewEventNotification(receiverId string, userId string, eve
 	if err != nil {
 		return err
 	}
-	ws := n.pool.GetConn(userId)
+	ws := n.pool.GetConn(receiverId)
 	if ws != nil {
 		m := &NotificationBody{
 			Type:        "0",
@@ -124,7 +124,7 @@ func (n *Notificator) NewEventNotification(receiverId string, userId string, eve
 		}
 		err := ws.WriteJSON(m)
 		if err != nil {
-			n.pool.RemoveConn(userId)
+			n.pool.RemoveConn(receiverId)
 			err = n.nRepository.CreateNewEventNotification(receiverId, u, e, false)
 			return err
 		} else {
