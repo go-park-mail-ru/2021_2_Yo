@@ -11,6 +11,7 @@ type Notification struct {
 	UserImgUrl  string `db:"user_img_url"`
 	EventId     string `db:"event_id"`
 	EventTitle  string `db:"event_title"`
+	Seen        bool   `db:"seen"`
 }
 
 func toModelNotification(n *Notification) *models.Notification {

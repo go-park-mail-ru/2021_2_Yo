@@ -103,7 +103,7 @@ func (s *Repository) GetAllNotifications(userId string) ([]*models.Notification,
 		var n Notification
 		err := rows.StructScan(&n)
 		if err != nil {
-			log.Error(message, "err = ", err)
+			log.Error(message, "err 2 = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelNotification := toModelNotification(&n)
