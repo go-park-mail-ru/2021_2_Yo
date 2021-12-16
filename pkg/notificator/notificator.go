@@ -6,6 +6,7 @@ import (
 	"backend/internal/service/notification"
 	"backend/internal/service/notification/delivery/websocket"
 	"backend/internal/service/user"
+	log "github.com/sirupsen/logrus"
 )
 
 type Notificator struct {
@@ -89,6 +90,7 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 		}
 		err := ws.WriteJSON(m)
 		if err != nil {
+			log.Error(err)
 			n.pool.RemoveConn(receiverId)
 			err = n.nRepository.CreateInviteNotification(receiverId, u, e, false)
 			return err
