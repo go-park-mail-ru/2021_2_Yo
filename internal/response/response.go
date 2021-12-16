@@ -93,7 +93,7 @@ func CitiesResponse(cities []string) *Response {
 
 func NotificationListResponse(notifications []*models.Notification) *Response {
 	return &Response{
-		Status: 0,
+		Status: 200,
 		Body:   MakeNotificationListResponseBody(notifications),
 	}
 }

@@ -2,12 +2,12 @@ package email
 
 import (
 	"backend/internal/models"
+	log "backend/pkg/logger"
 	"bytes"
 	"fmt"
 	"html/template"
 	"net/smtp"
 	"os"
-	log "backend/pkg/logger"
 )
 
 type Mail struct {

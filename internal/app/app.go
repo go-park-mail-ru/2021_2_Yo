@@ -44,7 +44,7 @@ type App struct {
 	AuthManager  *authDelivery.Delivery
 	UserManager  *userDelivery.Delivery
 	EventManager *eventDelivery.Delivery
-	wsPool 		 *websocket.Pool
+	wsPool       *websocket.Pool
 	db           *sql.DB
 }
 
@@ -113,7 +113,7 @@ func NewApp(opts *Options) (*App, error) {
 		AuthManager:  authD,
 		UserManager:  userD,
 		EventManager: eventD,
-		wsPool: 	  pool,
+		wsPool:       pool,
 		db:           db,
 	}, nil
 }

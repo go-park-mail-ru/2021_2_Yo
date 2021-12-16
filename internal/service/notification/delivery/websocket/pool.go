@@ -1,10 +1,10 @@
 package websocket
 
 import (
-	"github.com/gorilla/websocket"
-	"sync"
-	"net/http"
 	log "backend/pkg/logger"
+	"github.com/gorilla/websocket"
+	"net/http"
+	"sync"
 )
 
 type Pool struct {
@@ -34,7 +34,7 @@ func (p *Pool) GetConn(userId string) *websocket.Conn {
 	return p.Connections[userId]
 }
 
-func(p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
+func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Error(err)
@@ -48,5 +48,5 @@ func(p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 
 	p.AddConn(userID, conn)
 
-	log.Info("New Client is connected with id: ",userID,"total: ", len(p.Connections))
+	log.Info("New Client is connected with id: ", userID, "total: ", len(p.Connections))
 }

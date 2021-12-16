@@ -6,7 +6,6 @@ import (
 	"backend/internal/service/notification"
 	"backend/internal/service/notification/delivery/websocket"
 	"backend/internal/service/user"
-	log "backend/pkg/logger"
 )
 
 type Notificator struct {
@@ -36,7 +35,6 @@ type NotificationBody struct {
 }
 
 func (n *Notificator) NewSubscriberNotification(receiverId string, userId string) error {
-	log.Debug("NewSubscriberNotification Started")
 	u, err := n.uRepository.GetUserById(userId)
 	if err != nil {
 		return err
@@ -70,7 +68,6 @@ func (n *Notificator) DeleteSubscribeNotification(receiverId string, userId stri
 }
 
 func (n *Notificator) InvitationNotification(receiverId string, userId string, eventId string) error {
-	log.Debug("InviteNotification Started")
 	u, err := n.uRepository.GetUserById(userId)
 	if err != nil {
 		return err
@@ -106,7 +103,6 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 }
 
 func (n *Notificator) NewEventNotification(receiverId string, userId string, eventId string) error {
-	log.Debug("NewEventNotification Started")
 	u, err := n.uRepository.GetUserById(userId)
 	if err != nil {
 		return err

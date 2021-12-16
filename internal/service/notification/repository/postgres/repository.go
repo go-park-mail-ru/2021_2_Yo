@@ -33,7 +33,6 @@ func (s *Repository) CreateSubscribeNotification(receiverId string, user *models
 	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, seen) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 	_, err := s.db.Query(query, newSubscriberType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, seen)
 	if err != nil {
-		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
@@ -94,7 +93,6 @@ func (s *Repository) GetAllNotifications(userId string) ([]*models.Notification,
 	query := `select * from notification where receiver_id = $1`
 	rows, err := s.db.Queryx(query, userId)
 	if err != nil {
-		log.Error(message, "err = ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -103,7 +101,6 @@ func (s *Repository) GetAllNotifications(userId string) ([]*models.Notification,
 		var n Notification
 		err := rows.StructScan(&n)
 		if err != nil {
-			log.Error(message, "err 2 = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelNotification := toModelNotification(&n)
@@ -119,7 +116,6 @@ func (s *Repository) GetNewNotifications(userId string) ([]*models.Notification,
 	query := `select * from notification where receiver_id = $1 and seen = false`
 	rows, err := s.db.Queryx(query, userId)
 	if err != nil {
-		log.Error(message, "err = ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -128,7 +124,6 @@ func (s *Repository) GetNewNotifications(userId string) ([]*models.Notification,
 		var n Notification
 		err := rows.StructScan(&n)
 		if err != nil {
-			log.Error(message, "err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelNotification := toModelNotification(&n)
