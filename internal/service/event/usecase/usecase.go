@@ -37,7 +37,7 @@ func cityAndAddrByCoordinates(latitude, longitude string) (string, string, error
 	}
 	req.Header.Set("Accept", "application/json")
 	Token := os.Getenv("MAPS_TOKEN")
-	req.Header.Set("Authorization", Token)
+	req.Header.Set("Authorization", "Token "+Token)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
