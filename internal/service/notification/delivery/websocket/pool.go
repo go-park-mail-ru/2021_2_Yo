@@ -39,6 +39,7 @@ func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	log.Debug("r = ", r.Header)
 	r.Header.Set("Connection", "upgrade")
 	r.Header.Set("Upgrade", "websocket")
+	r.Header.Del("Sec-Websocket-Extensions")
 
 	conn, err := upgrader.Upgrade(w, r, r.Header)
 	if err != nil {
