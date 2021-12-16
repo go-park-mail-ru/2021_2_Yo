@@ -2,8 +2,10 @@ package websocket
 
 import (
 	log "backend/pkg/logger"
-	"github.com/gorilla/websocket"
+	"encoding/json"
 	"net/http"
+
+	"github.com/gorilla/websocket"
 )
 
 var upgrader = websocket.Upgrader{
@@ -18,7 +20,7 @@ type ID struct {
 }
 
 func GetID(conn *websocket.Conn) (string, error) {
-	var userID ID
+	/*var userID ID
 	log.Info("here in id")
 	err := conn.ReadJSON(userID)
 	log.Error(err)
@@ -26,6 +28,17 @@ func GetID(conn *websocket.Conn) (string, error) {
 		return "", err
 	}
 	return userID.ID, nil
+	*/
+	_, p, err := conn.ReadMessage()
+	if err != nil {
+		log.Error("read message", err)
+	}
+	uId := ID{}
+	err = json.Unmarshal(p, &uId)
+	if err != nil {
+		log.Error("unmarshal",err)
+	}
+	return uId.ID, nil
 }
 
 func Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
