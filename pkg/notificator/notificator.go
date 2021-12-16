@@ -6,6 +6,7 @@ import (
 	"backend/internal/service/notification"
 	"backend/internal/service/notification/delivery/websocket"
 	"backend/internal/service/user"
+	log "backend/pkg/logger"
 )
 
 type Notificator struct {
@@ -35,6 +36,7 @@ type NotificationBody struct {
 }
 
 func (n *Notificator) NewSubscriberNotification(receiverId string, userId string) error {
+	log.Debug("NewSubscriberNotification Started")
 	u, err := n.uRepository.GetUserById(userId)
 	if err != nil {
 		return err

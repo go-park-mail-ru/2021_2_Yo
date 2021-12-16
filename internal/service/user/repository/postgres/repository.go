@@ -221,6 +221,7 @@ func (s *Repository) Subscribe(subscribedId string, subscriberId string) error {
 	query := subscribeQuery
 	_, err = s.db.Query(query, subscribedIdInt, subscriberIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
 	log.Debug(message + "ended")

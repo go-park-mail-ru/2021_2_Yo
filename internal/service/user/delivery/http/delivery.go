@@ -163,6 +163,7 @@ func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
 	}
 	err = h.notificator.NewSubscriberNotification(subscribedId, subscriberId)
 	if !response.CheckIfNoError(&w, err, message) {
+		log.Error(message+"HERE err =", err)
 		return
 	}
 	response.SendResponse(w, response.OkResponse())
