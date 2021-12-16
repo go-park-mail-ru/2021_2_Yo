@@ -36,7 +36,7 @@ func (p *Pool) GetConn(userId string) *websocket.Conn {
 
 func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	log.Debug("WebsocketHandler start")
-	log.Debug("r = ", r)
+	log.Debug("r = ", r.Header)
 
 	conn, err := upgrader.Upgrade(w, r, r.Header)
 	if err != nil {
