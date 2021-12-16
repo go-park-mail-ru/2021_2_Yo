@@ -70,6 +70,7 @@ func (n *Notificator) DeleteSubscribeNotification(receiverId string, userId stri
 }
 
 func (n *Notificator) InvitationNotification(receiverId string, userId string, eventId string) error {
+	log.Debug("InviteNotification Started")
 	u, err := n.uRepository.GetUserById(userId)
 	if err != nil {
 		return err
@@ -105,6 +106,7 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 }
 
 func (n *Notificator) NewEventNotification(receiverId string, userId string, eventId string) error {
+	log.Debug("NewEventNotification Started")
 	u, err := n.uRepository.GetUserById(userId)
 	if err != nil {
 		return err
