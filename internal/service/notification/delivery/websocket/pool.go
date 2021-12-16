@@ -38,6 +38,7 @@ func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	log.Debug("WebsocketHandler start")
 	log.Debug("r = ", r.Header)
 	r.Header.Set("Connection", "upgrade")
+	r.Header.Set("Upgrade", "websocket")
 
 	conn, err := upgrader.Upgrade(w, r, r.Header)
 	if err != nil {
