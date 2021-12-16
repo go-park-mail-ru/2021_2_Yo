@@ -37,6 +37,10 @@ func (p *Pool) GetConn(userId string) *websocket.Conn {
 func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	log.Debug("WebsocketHandler start")
 	log.Debug("w's type is %T\n", w)
+	h, ok := w.(http.Hijacker)
+	if !ok {
+		log.Info(!ok)
+	}
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Error(err)
