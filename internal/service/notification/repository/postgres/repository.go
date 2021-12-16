@@ -33,6 +33,7 @@ func (s *Repository) CreateSubscribeNotification(receiverId string, user *models
 	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, seen) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 	_, err := s.db.Query(query, newSubscriberType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, seen)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
