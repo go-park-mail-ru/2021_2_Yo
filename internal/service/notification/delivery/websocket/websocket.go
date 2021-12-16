@@ -21,6 +21,7 @@ func GetID(conn *websocket.Conn) (string, error) {
 	var userID ID
 	log.Info("here in id")
 	err := conn.ReadJSON(userID)
+	log.Error(err)
 	if err != nil {
 		return "", err
 	}
