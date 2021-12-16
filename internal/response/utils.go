@@ -4,8 +4,8 @@ import (
 	error2 "backend/internal/error"
 	models "backend/internal/models"
 	log "backend/pkg/logger"
-	"encoding/json"
 	"errors"
+	json "github.com/mailru/easyjson"
 	"io"
 	"net/http"
 	"strings"
@@ -41,7 +41,8 @@ func GetUserFromRequest(r io.Reader) (*models.User, error) {
 	message := logMessage + "GetUserFromRequest:"
 	_ = message
 	userInput := new(UserResponseBody)
-	err := json.NewDecoder(r).Decode(userInput)
+	err := json.UnmarshalFromReader(r, userInput)
+	//err := json.NewDecoder(r).Decode(userInput)
 	if err != nil {
 		return nil, ErrJSONDecoding
 	}
@@ -83,7 +84,8 @@ func MakeUserListResponseBody(users []*models.User) UserListResponseBody {
 
 func GetEventFromRequest(r io.Reader) (*models.Event, error) {
 	eventInput := new(EventResponseBody)
-	err := json.NewDecoder(r).Decode(eventInput)
+	err := json.UnmarshalFromReader(r, eventInput)
+
 	if err != nil {
 		return nil, ErrJSONDecoding
 	}
@@ -159,7 +161,7 @@ func MakeNotificationListResponseBody(notifications []*models.Notification) Noti
 	}
 }
 
-func SendResponse(w http.ResponseWriter, response interface{}) {
+func SendResponse(w http.ResponseWriter, response *Response) {
 	message := logMessage + "SendResponse:"
 	w.WriteHeader(http.StatusOK)
 	b, err := json.Marshal(response)
