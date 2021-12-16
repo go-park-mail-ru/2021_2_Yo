@@ -13,7 +13,7 @@ jobs:
       - name: Coverage
         run: go test -cover -coverprofile=cover.out -coverpkg=./... ./...
       - name: Exclude directories
-        run: cat cover.out | fgrep -v "main.go" | fgrep -v "mock.go" | fgrep -v "pb.go" > cover1.out
+        run: cat cover.out | fgrep -v "main.go" | fgrep -v "mock.go" | fgrep -v "pb.go" | fgrep -v "response_easyjson.go" > cover1.out
 
       - name: Create badge
         run: |
