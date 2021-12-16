@@ -50,6 +50,7 @@ func (m *Middlewares) CORS(next http.Handler) http.Handler {
 			}
 		}
 		if !isAllowed {
+			log.Debug("CORS not allowed origin = ", origin)
 			return
 		}
 		w.Header().Set("Access-Control-Allow-Origin", origin)
