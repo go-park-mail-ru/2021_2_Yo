@@ -1,8 +1,12 @@
-version: "3.6"
+version: "3.5"
 services:
   bmstusa-app:
-    build: "./"
-    command: ./backend
+    image: sarpol/server:latest
+    env_file: .env
+    restart: unless-stopped
+    command: "./server"
+    volumes:
+      - images-storage:/app/static/images
     ports:
       - "8080:8080"
     depends_on:
@@ -11,9 +15,9 @@ services:
       - user
 
   auth:
-    build:
-      context: ./ 
-      dockerfile: ./microservice/auth/Dockerfile
+    image: sarpol/auth:latest
+    env_file: .env
+    restart: unless-stopped
     command: "./auth"
     ports:
       - "8081:8081"
@@ -21,18 +25,22 @@ services:
       - redis-db
 
   event:
-    build:
-      context: ./ 
-      dockerfile: ./microservice/event/Dockerfile
+    image: sarpol/event:latest
+    env_file: .env
+    restart: unless-stopped
     command: "./event"
+    volumes:
+      - images-storage:/app/static/images
     ports:
       - "8083:8083"
 
   user:
-    build:
-      context: ./ 
-      dockerfile: ./microservice/user/Dockerfile
+    image: sarpol/user:latest
+    env_file: .env
+    restart: unless-stopped
     command: "./user"
+    volumes:
+      - images-storage:/app/static/images
     ports:
       - "8084:8084"
   
@@ -41,16 +49,9 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - "./prometheus:/etc/prometheus"
-
-# for remote
-#  postgres-db:
-#    restart: always
-#   image: postgres:latest
-#   environment:
-#     - POSTGRES_PASSWORD=password
-#  ports:
-#    - "5432:5432"
+      - "./pkg/prometheus:/etc/prometheus"
+    depends_on:
+      - bmstusa-app
   
   redis-db:
     restart: always
@@ -58,12 +59,38 @@ services:
     ports:
       - "6380:6379"
 
+  node-exporter:
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+    ports:
+      - "9100:9100"
   
   grafana:
     image: grafana/grafana
     ports:
       - "3000:3000"
+    volumes:
+    #  - "./grafana.ini:/etc/grafana/grafana.ini"
+      - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
-
-    
+      
+# Explicitly define the persistent volume for your data storage
+volumes:
+  grafana-data:
+    external: true
+  pgdata:
+  images-storage:
+    driver: local    
+    driver_opts:       
+      o: bind       
+      type: none       
+      device: /home/ubuntu/static/images

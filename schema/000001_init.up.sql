@@ -2,8 +2,8 @@ CREATE TABLE "user" (
                         id serial not null unique,
                         name varchar(50) not null,
                         surname varchar(50) not null,
-                        about varchar(150),
-                        img_url varchar(150),
+                        about varchar(150) default '',
+                        img_url varchar(150) default '',
                         mail varchar(150) not null unique,
                         password varchar(255) not null
 );
@@ -16,7 +16,7 @@ CREATE TABLE "event" (
                          city varchar(255) not null,
                          category varchar(255) not null,
                          viewed BIGINT not null,
-                         img_url varchar(500),
+                         img_url varchar(500) default '',
                          date varchar(10) not null,
                          geo varchar(255) default '' not null,
                          address varchar(255) default '' not null,
@@ -63,4 +63,17 @@ CREATE TABLE "subscribe" (
                            subscriber_id int references "user" (id) on delete cascade not null,
                            UNIQUE(subscribed_id, subscriber_id),
                            CHECK ( subscribed_id <> subscribe.subscriber_id )
+);
+
+CREATE TABLE "notification" (
+    id serial not null unique,
+    type varchar(50) CHECK (type in ('0', '1', '2')) not null,
+                                    receiver_id varchar(50) not null,
+                                    user_id varchar(50) not null,
+                                    user_name varchar(50) not null,
+                                    user_surname varchar(50) not null,
+                                    user_img_url varchar(150) not null,
+                                    event_id varchar(50) default '',
+                                    event_title varchar(255) default '',
+                                    seen bool default false
 );
