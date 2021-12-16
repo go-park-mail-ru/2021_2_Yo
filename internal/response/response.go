@@ -7,6 +7,7 @@ import (
 const logMessage = "response:response:"
 
 type HttpStatus int
+type CtxString string
 
 type Response struct {
 	Status  HttpStatus  `json:"status"`

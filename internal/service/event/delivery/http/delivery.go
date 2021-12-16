@@ -27,7 +27,7 @@ func NewDelivery(useCase event.UseCase) *Delivery {
 func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "CreateEvent:"
 	log.Debug(message + "started")
-	userId := r.Context().Value("userId").(string)
+	userId := r.Context().Value(response.CtxString("userId")).(string)
 	err := r.ParseMultipartForm(5 << 20)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
@@ -64,9 +64,9 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateEvent:"
 	log.Debug(message + "started")
-	vars := r.Context().Value("vars").(map[string]string)
+	vars := r.Context().Value(response.CtxString("vars")).(map[string]string)
 	eventId := vars["id"]
-	userId := r.Context().Value("userId").(string)
+	userId := r.Context().Value(response.CtxString("userId")).(string)
 	err := r.ParseMultipartForm(5 << 20)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
@@ -96,9 +96,9 @@ func (h *Delivery) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "DeleteEvent:"
 	log.Debug(message + "started")
-	vars := r.Context().Value("vars").(map[string]string)
+	vars := r.Context().Value(response.CtxString("vars")).(map[string]string)
 	eventId := vars["id"]
-	userId := r.Context().Value("userId").(string)
+	userId := r.Context().Value(response.CtxString("userId")).(string)
 	err := h.useCase.DeleteEvent(eventId, userId)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
@@ -185,11 +185,11 @@ func (h *Delivery) GetCreatedEvents(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Visit:"
 	log.Debug(message + "started")
-	vars, ok := r.Context().Value("vars").(map[string]string)
+	vars, ok := r.Context().Value(response.CtxString("vars")).(map[string]string)
 	if !ok {
 		response.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
-	userId, ok := r.Context().Value("userId").(string)
+	userId, ok := r.Context().Value(response.CtxString("userId")).(string)
 	if !ok {
 		response.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
@@ -205,11 +205,11 @@ func (h *Delivery) Visit(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) Unvisit(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Unvisit:"
 	log.Debug(message + "started")
-	vars, ok := r.Context().Value("vars").(map[string]string)
+	vars, ok := r.Context().Value(response.CtxString("vars")).(map[string]string)
 	if !ok {
 		response.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
-	userId, ok := r.Context().Value("userId").(string)
+	userId, ok := r.Context().Value(response.CtxString("userId")).(string)
 	if !ok {
 		response.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
@@ -225,11 +225,11 @@ func (h *Delivery) Unvisit(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) IsVisited(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "IsVisited:"
 	log.Debug(message + "started")
-	vars, ok := r.Context().Value("vars").(map[string]string)
+	vars, ok := r.Context().Value(response.CtxString("vars")).(map[string]string)
 	if !ok {
 		response.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}
-	userId, ok := r.Context().Value("userId").(string)
+	userId, ok := r.Context().Value(response.CtxString("userId")).(string)
 	if !ok {
 		response.CheckIfNoError(&w, errors.New("type casting error"), message)
 	}

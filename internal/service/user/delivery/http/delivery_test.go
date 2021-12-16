@@ -55,7 +55,7 @@ func TestGetUser(t *testing.T) {
 		w := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/user", bytes.NewBuffer(nil))
 		require.NoError(t, err, logTestMessage+"NewRequest error")
-		userIdContext := context.WithValue(context.Background(), "userId", userId)
+		userIdContext := context.WithValue(context.Background(), response.CtxString("userId"), userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 	}
 }
@@ -230,7 +230,7 @@ func TestUpdateUserPassword(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
-		userIdContext := context.WithValue(context.Background(), "userId", userId)
+		userIdContext := context.WithValue(context.Background(), response.CtxString("userId"), userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 	}
 }
@@ -333,7 +333,7 @@ func TestGetFriends(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 		w := httptest.NewRecorder()
-		ctx := context.WithValue(context.Background(), "userId", test.userId)
+		ctx := context.WithValue(context.Background(), response.CtxString("userId"), test.userId)
 		r.ServeHTTP(w, req.WithContext(ctx))
 	}
 }
@@ -368,7 +368,7 @@ func TestGetVisitors(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 		w := httptest.NewRecorder()
-		eventIdCtx := context.WithValue(context.Background(), "eventId", test.eventId)
+		eventIdCtx := context.WithValue(context.Background(), response.CtxString("eventId"), test.eventId)
 		r.ServeHTTP(w, req.WithContext(eventIdCtx))
 	}
 }
@@ -422,8 +422,8 @@ func TestSubscribe(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
-		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
-		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
+		ctxVars := context.WithValue(context.Background(), response.CtxString("vars"), test.vars)
+		ctxUserId := context.WithValue(ctxVars, response.CtxString("userId"), test.userId)
 		req = req.WithContext(ctxUserId)
 
 		w := httptest.NewRecorder()
@@ -480,8 +480,8 @@ func TestUnsubscribe(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
-		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
-		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
+		ctxVars := context.WithValue(context.Background(), response.CtxString("vars"), test.vars)
+		ctxUserId := context.WithValue(ctxVars, response.CtxString("userId"), test.userId)
 		req = req.WithContext(ctxUserId)
 
 		w := httptest.NewRecorder()
@@ -537,8 +537,8 @@ func TestIsSubscribed(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
-		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
-		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
+		ctxVars := context.WithValue(context.Background(), response.CtxString("vars"), test.vars)
+		ctxUserId := context.WithValue(ctxVars, response.CtxString("userId"), test.userId)
 		req = req.WithContext(ctxUserId)
 
 		w := httptest.NewRecorder()
@@ -591,7 +591,7 @@ func TestInvite(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test?eventId="+test.eventId, nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
-		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
+		ctxVars := context.WithValue(context.Background(), response.CtxString("vars"), test.vars)
 		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
 		req = req.WithContext(ctxUserId)
 

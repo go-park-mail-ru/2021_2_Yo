@@ -2,6 +2,7 @@ package http
 
 import (
 	"backend/internal/models"
+	"backend/internal/response"
 	"backend/internal/service/event/usecase"
 	"bytes"
 	"context"
@@ -75,7 +76,7 @@ func TestCreateEvent(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
-		userIdContext := context.WithValue(context.Background(), "userId", test.userId)
+		userIdContext := context.WithValue(context.Background(), response.CtxString("userId"), test.userId)
 		r.ServeHTTP(w, req.WithContext(userIdContext))
 	}
 }
@@ -146,8 +147,8 @@ func TestUpdateEvent(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
-		userIdContext := context.WithValue(context.Background(), "userId", test.userId)
-		varsContext := context.WithValue(userIdContext, "vars", test.vars)
+		userIdContext := context.WithValue(context.Background(), response.CtxString("userId"), test.userId)
+		varsContext := context.WithValue(userIdContext, response.CtxString("vars"), test.vars)
 		r.ServeHTTP(w, req.WithContext(varsContext))
 	}
 }
@@ -190,8 +191,8 @@ func TestDeleteEvent(t *testing.T) {
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
 		w := httptest.NewRecorder()
-		userIdContext := context.WithValue(context.Background(), "userId", test.userId)
-		varsContext := context.WithValue(userIdContext, "vars", test.vars)
+		userIdContext := context.WithValue(context.Background(), response.CtxString("userId"), test.userId)
+		varsContext := context.WithValue(userIdContext, response.CtxString("vars"), test.vars)
 		r.ServeHTTP(w, req.WithContext(varsContext))
 	}
 }
@@ -452,8 +453,8 @@ func TestVisit(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
-		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
-		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
+		ctxVars := context.WithValue(context.Background(), response.CtxString("vars"), test.vars)
+		ctxUserId := context.WithValue(ctxVars, response.CtxString("userId"), test.userId)
 		req = req.WithContext(ctxUserId)
 
 		w := httptest.NewRecorder()
@@ -514,8 +515,8 @@ func TestUnvisit(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
-		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
-		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
+		ctxVars := context.WithValue(context.Background(), response.CtxString("vars"), test.vars)
+		ctxUserId := context.WithValue(ctxVars, response.CtxString("userId"), test.userId)
 		req = req.WithContext(ctxUserId)
 
 		w := httptest.NewRecorder()
@@ -545,8 +546,8 @@ func TestIsVisited(t *testing.T) {
 		req, err := http.NewRequest("GET", "/test", nil)
 		require.NoError(t, err, logTestMessage+"NewRequest error")
 
-		ctxVars := context.WithValue(context.Background(), "vars", test.vars)
-		ctxUserId := context.WithValue(ctxVars, "userId", test.userId)
+		ctxVars := context.WithValue(context.Background(), response.CtxString("vars"), test.vars)
+		ctxUserId := context.WithValue(ctxVars, response.CtxString("userId"), test.userId)
 		req = req.WithContext(ctxUserId)
 
 		w := httptest.NewRecorder()

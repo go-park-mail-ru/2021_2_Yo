@@ -29,7 +29,7 @@ func NewDelivery(useCase user.UseCase, notificator notificator.NotificationManag
 func (h *Delivery) GetUser(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetUser:"
 	log.Debug(message + "started")
-	userId := r.Context().Value("userId").(string)
+	userId := r.Context().Value(response.CtxString("userId")).(string)
 	foundUser, err := h.useCase.GetUserById(userId)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
@@ -76,7 +76,7 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		userFromRequest.ImgUrl = imgUrl
 	}
-	userFromRequest.ID = r.Context().Value("userId").(string)
+	userFromRequest.ID = r.Context().Value(response.CtxString("userId")).(string)
 	err = h.useCase.UpdateUserInfo(userFromRequest)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
@@ -88,7 +88,7 @@ func (h *Delivery) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateUserPassword:"
 	log.Debug(message + "started")
-	userId := r.Context().Value("userId").(string)
+	userId := r.Context().Value(response.CtxString("userId")).(string)
 	u, err := response.GetUserFromRequest(r.Body)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
@@ -130,7 +130,7 @@ func (h *Delivery) GetSubscribes(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) GetFriends(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetFriends:"
 	log.Debug(message + "started")
-	userId := r.Context().Value("userId").(string)
+	userId := r.Context().Value(response.CtxString("userId")).(string)
 	subscribers, err := h.useCase.GetFriends(userId)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
@@ -142,7 +142,7 @@ func (h *Delivery) GetFriends(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) GetVisitors(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetVisitors:"
 	log.Debug(message + "started")
-	eventId := r.Context().Value("eventId").(string)
+	eventId := r.Context().Value(response.CtxString("eventId")).(string)
 	userList, err := h.useCase.GetVisitors(eventId)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
@@ -154,8 +154,8 @@ func (h *Delivery) GetVisitors(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Subscribe:"
 	log.Debug(message + "started")
-	vars := r.Context().Value("vars").(map[string]string)
-	subscriberId := r.Context().Value("userId").(string)
+	vars := r.Context().Value(response.CtxString("vars")).(map[string]string)
+	subscriberId := r.Context().Value(response.CtxString("userId")).(string)
 	subscribedId := vars["id"]
 	err := h.useCase.Subscribe(subscribedId, subscriberId)
 	if !response.CheckIfNoError(&w, err, message) {
@@ -172,8 +172,8 @@ func (h *Delivery) Subscribe(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) Unsubscribe(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "Unsubscribe:"
 	log.Debug(message + "started")
-	vars := r.Context().Value("vars").(map[string]string)
-	subscriberId := r.Context().Value("userId").(string)
+	vars := r.Context().Value(response.CtxString("vars")).(map[string]string)
+	subscriberId := r.Context().Value(response.CtxString("userId")).(string)
 	subscribedId := vars["id"]
 	err := h.useCase.Unsubscribe(subscribedId, subscriberId)
 	if !response.CheckIfNoError(&w, err, message) {
@@ -187,8 +187,8 @@ func (h *Delivery) Unsubscribe(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) IsSubscribed(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "IsSubscribed:"
 	log.Debug(message + "started")
-	vars := r.Context().Value("vars").(map[string]string)
-	subscriberId := r.Context().Value("userId").(string)
+	vars := r.Context().Value(response.CtxString("vars")).(map[string]string)
+	subscriberId := r.Context().Value(response.CtxString("userId")).(string)
 	subscribedId := vars["id"]
 	res, err := h.useCase.IsSubscribed(subscribedId, subscriberId)
 	if !response.CheckIfNoError(&w, err, message) {
@@ -206,8 +206,8 @@ func (h *Delivery) Invite(w http.ResponseWriter, r *http.Request) {
 	if len(q["eventId"]) > 0 {
 		eventId = q["eventId"][0]
 	}
-	vars := r.Context().Value("vars").(map[string]string)
-	userId := r.Context().Value("userId").(string)
+	vars := r.Context().Value(response.CtxString("vars")).(map[string]string)
+	userId := r.Context().Value(response.CtxString("userId")).(string)
 	receiverId := vars["id"]
 	err := h.notificator.InvitationNotification(receiverId, userId, eventId)
 	if !response.CheckIfNoError(&w, err, message) {
@@ -220,7 +220,7 @@ func (h *Delivery) Invite(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) GetAllNotifications(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetAllNotifications:"
 	log.Debug(message + "started")
-	userId := r.Context().Value("userId").(string)
+	userId := r.Context().Value(response.CtxString("userId")).(string)
 	res, err := h.notificator.GetAllNotifications(userId)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
@@ -232,7 +232,7 @@ func (h *Delivery) GetAllNotifications(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) GetNewNotifications(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetNewNotifications:"
 	log.Debug(message + "started")
-	userId := r.Context().Value("userId").(string)
+	userId := r.Context().Value(response.CtxString("userId")).(string)
 	res, err := h.notificator.GetNewNotifications(userId)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
@@ -244,7 +244,7 @@ func (h *Delivery) GetNewNotifications(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) UpdateNotificationsStatus(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "UpdateNotificationsStatus:"
 	log.Debug(message + "started")
-	userId := r.Context().Value("userId").(string)
+	userId := r.Context().Value(response.CtxString("userId")).(string)
 	err := h.notificator.UpdateNotificationsStatus(userId)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
