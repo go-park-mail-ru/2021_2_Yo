@@ -19,6 +19,7 @@ type ID struct {
 
 func GetID(conn *websocket.Conn) (string, error) {
 	var userID ID
+	log.Info("here in id")
 	err := conn.ReadJSON(userID)
 	if err != nil {
 		return "", err
