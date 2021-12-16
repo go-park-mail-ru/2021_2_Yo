@@ -6,7 +6,6 @@ import (
 	"backend/internal/service/notification"
 	"backend/internal/service/notification/delivery/websocket"
 	"backend/internal/service/user"
-	log "backend/pkg/logger"
 )
 
 type Notificator struct {
@@ -42,9 +41,8 @@ func (n *Notificator) NewSubscriberNotification(receiverId string, userId string
 	}
 	ws := n.pool.GetConn(userId)
 	if ws != nil {
-		log.Debug("HERE")
 		m := &NotificationBody{
-			Type:        "subscription",
+			Type:        "0",
 			UserId:      u.ID,
 			UserName:    u.Name,
 			UserSurname: u.Surname,
@@ -81,7 +79,7 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 	ws := n.pool.GetConn(userId)
 	if ws != nil {
 		m := &NotificationBody{
-			Type:        "subscription",
+			Type:        "0",
 			UserId:      u.ID,
 			UserName:    u.Name,
 			UserSurname: u.Surname,
@@ -116,7 +114,7 @@ func (n *Notificator) NewEventNotification(receiverId string, userId string, eve
 	ws := n.pool.GetConn(userId)
 	if ws != nil {
 		m := &NotificationBody{
-			Type:        "subscription",
+			Type:        "0",
 			UserId:      u.ID,
 			UserName:    u.Name,
 			UserSurname: u.Surname,
