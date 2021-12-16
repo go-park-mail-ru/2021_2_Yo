@@ -14,11 +14,20 @@ import (
 	"google.golang.org/grpc"
 	"net"
 	"os"
+	"github.com/joho/godotenv"
 )
 
 const logMessage = "cmd:auth:"
 
+func env() {
+	// loads values from .env into the system
+	if err := godotenv.Load("../../.env"); err != nil {
+		log.Error("No .env file found")
+	}
+}
+
 func main() {
+	env()
 	logLevel := logrus.DebugLevel
 	log.Init(logLevel)
 	log.Info(logMessage + "started")

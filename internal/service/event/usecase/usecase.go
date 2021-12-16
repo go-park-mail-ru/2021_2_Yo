@@ -8,10 +8,12 @@ import (
 	log "backend/pkg/logger"
 	"encoding/json"
 	"errors"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
 const logMessage = "service:event:usecase:"
@@ -34,7 +36,8 @@ func cityAndAddrByCoordinates(latitude, longitude string) (string, string, error
 		return "", "", err
 	}
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", "Token aaa00e3861df0b3fe38857306563ad4bee84550f")
+	Token := os.Getenv("MAPS_TOKEN")
+	req.Header.Set("Authorization", Token)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

@@ -6,11 +6,20 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
+	"github.com/joho/godotenv"
 )
 
 const logMessage = "cmd:server:"
 
+func env() {
+	// loads values from .env into the system
+	if err := godotenv.Load("../../.env"); err != nil {
+		log.Print("No .env file found")
+	}
+}
+
 func main() {
+	env()
 	log.Info(logMessage + "started")
 	viper.AddConfigPath("../../config")
 	viper.SetConfigName("config")

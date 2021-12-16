@@ -34,7 +34,7 @@ func InitPostgresDB() (*sqlx.DB, error) {
 	message := logMessage + "InitPostgresDB:"
 
 	user := viper.GetString("postgres_db.user")
-	password := viper.GetString("postgres_db.password")
+	password := os.Getenv("POSTGRES_PASSWORD")
 	host := viper.GetString("postgres_db.host")
 	port := viper.GetString("postgres_db.port")
 	dbname := viper.GetString("postgres_db.dbname")
