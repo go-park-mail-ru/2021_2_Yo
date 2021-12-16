@@ -3,6 +3,7 @@ package postgres
 import "backend/internal/models"
 
 type Notification struct {
+	Id          int    `db:"id"`
 	Type        string `db:"type"`
 	ReceiverId  string `db:"receiver_id"`
 	UserId      string `db:"user_id"`

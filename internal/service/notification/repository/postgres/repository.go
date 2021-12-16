@@ -90,7 +90,7 @@ func (s *Repository) UpdateNotificationsStatus(userId string) error {
 func (s *Repository) GetAllNotifications(userId string) ([]*models.Notification, error) {
 	message := logMessage + "GetAllNotifications:"
 	log.Debug(message + "started")
-	query := `select * from notification where receiver_id = $1`
+	query := `select * from notification where receiver_id = $1 order by id desc`
 	rows, err := s.db.Queryx(query, userId)
 	if err != nil {
 		return nil, err
