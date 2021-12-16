@@ -39,7 +39,7 @@ func (n *Notificator) NewSubscriberNotification(receiverId string, userId string
 	if err != nil {
 		return err
 	}
-	ws := n.pool.GetConn(userId)
+	ws := n.pool.GetConn(receiverId)
 	if ws != nil {
 		m := &NotificationBody{
 			Type:        "0",
@@ -50,7 +50,7 @@ func (n *Notificator) NewSubscriberNotification(receiverId string, userId string
 		}
 		err := ws.WriteJSON(m)
 		if err != nil {
-			n.pool.RemoveConn(userId)
+			n.pool.RemoveConn(receiverId)
 			err = n.nRepository.CreateSubscribeNotification(receiverId, u, false)
 			return err
 		} else {
