@@ -15,26 +15,15 @@ var upgrader = websocket.Upgrader{
 }
 
 type ID struct {
-	//TODO: Скорее всего, здесь нужен тег
 	ID string `json:"id,omitempty"`
 }
 
 func GetID(conn *websocket.Conn) (string, error) {
-	/*var userID ID
-	log.Info("here in id")
-	err := conn.ReadJSON(userID)
-	log.Error(err)
-	if err != nil {
-		return "", err
-	}
-	return userID.ID, nil
-	*/
 	_, p, err := conn.ReadMessage()
 	if err != nil {
 		log.Error("read message", err)
 	}
 	uId := ID{}
-	log.Info("body :=",string(p))
 	err = json.Unmarshal(p, &uId)
 	if err != nil {
 		log.Error("unmarshal",err)
