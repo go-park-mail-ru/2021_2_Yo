@@ -30,7 +30,7 @@ type NotificationBody struct {
 	UserId      string `json:"userId"`
 	UserName    string `json:"userName"`
 	UserSurname string `json:"userSurname"`
-	UserImgUrl  string `json:"userImgUrl"`
+	UserImgUrl  string `json:"userImgUrl,omitempty"`
 	EventId     string `json:"eventId,omitempty"`
 	EventTitle  string `json:"eventTitle,omitempty"`
 }
@@ -47,7 +47,9 @@ func (n *Notificator) NewSubscriberNotification(receiverId string, userId string
 			UserId:      u.ID,
 			UserName:    u.Name,
 			UserSurname: u.Surname,
-			UserImgUrl:  u.ImgUrl,
+		}
+		if u.ImgUrl != "" {
+			m.UserImgUrl = u.ImgUrl
 		}
 		err := ws.WriteJSON(m)
 		if err != nil {
@@ -86,9 +88,11 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 			UserId:      u.ID,
 			UserName:    u.Name,
 			UserSurname: u.Surname,
-			UserImgUrl:  u.ImgUrl,
 			EventId:     e.ID,
 			EventTitle:  e.Title,
+		}
+		if u.ImgUrl != "" {
+			m.UserImgUrl = u.ImgUrl
 		}
 		err := ws.WriteJSON(m)
 		if err != nil {
@@ -123,9 +127,11 @@ func (n *Notificator) NewEventNotification(receiverId string, userId string, eve
 			UserId:      u.ID,
 			UserName:    u.Name,
 			UserSurname: u.Surname,
-			UserImgUrl:  u.ImgUrl,
 			EventId:     e.ID,
 			EventTitle:  e.Title,
+		}
+		if u.ImgUrl != "" {
+			m.UserImgUrl = u.ImgUrl
 		}
 		err := ws.WriteJSON(m)
 		if err != nil {
