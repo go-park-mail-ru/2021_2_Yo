@@ -51,6 +51,7 @@ func (n *Notificator) NewSubscriberNotification(receiverId string, userId string
 		}
 		err := ws.WriteJSON(m)
 		if err != nil {
+			log.Error("NewSubscriberNotification err = ", err)
 			n.pool.RemoveConn(receiverId)
 			err = n.nRepository.CreateSubscribeNotification(receiverId, u, false)
 			return err
@@ -59,6 +60,7 @@ func (n *Notificator) NewSubscriberNotification(receiverId string, userId string
 			return err
 		}
 	} else {
+		log.Error("NewSubscriberNotification ws = ", ws)
 		err := n.nRepository.CreateSubscribeNotification(receiverId, u, false)
 		return err
 	}
@@ -90,7 +92,7 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 		}
 		err := ws.WriteJSON(m)
 		if err != nil {
-			log.Error(err)
+			log.Error("InvitationNotification err = ", err)
 			n.pool.RemoveConn(receiverId)
 			err = n.nRepository.CreateInviteNotification(receiverId, u, e, false)
 			return err
@@ -99,6 +101,7 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 			return err
 		}
 	} else {
+		log.Error("InvitationNotification ws = ", ws)
 		err = n.nRepository.CreateInviteNotification(receiverId, u, e, false)
 		return err
 	}
