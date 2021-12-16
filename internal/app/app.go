@@ -140,7 +140,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	register.UserHTTPEndpoints(userRouter, app.UserManager, app.EventManager, mw)
 	r.HandleFunc("/ws", app.wsPool.WebsocketHandler).Methods("GET")
 
-	r.Handle("/metrics", promhttp.Handler())
+	//r.Handle("/metrics", promhttp.Handler())
 
 	return r
 }
