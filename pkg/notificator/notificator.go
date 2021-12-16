@@ -79,7 +79,7 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 	ws := n.pool.GetConn(receiverId)
 	if ws != nil {
 		m := &NotificationBody{
-			Type:        "0",
+			Type:        "1",
 			UserId:      u.ID,
 			UserName:    u.Name,
 			UserSurname: u.Surname,
@@ -114,7 +114,7 @@ func (n *Notificator) NewEventNotification(receiverId string, userId string, eve
 	ws := n.pool.GetConn(receiverId)
 	if ws != nil {
 		m := &NotificationBody{
-			Type:        "0",
+			Type:        "2",
 			UserId:      u.ID,
 			UserName:    u.Name,
 			UserSurname: u.Surname,
