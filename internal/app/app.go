@@ -19,7 +19,7 @@ import (
 	"backend/internal/utils"
 	log "backend/pkg/logger"
 	"backend/pkg/notificator"
-	"backend/pkg/prometheus"
+	//"backend/pkg/prometheus"
 	"fmt"
 	"net/http"
 	"os"
@@ -120,14 +120,14 @@ func NewApp(opts *Options) (*App, error) {
 
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddlewares(app.AuthManager.UseCase)
-	mm := prometheus.NewMetricsMiddleware()
+	//mm := prometheus.NewMetricsMiddleware()
 
 	r := mux.NewRouter()
 	r.Use(mw.GetVars)
 	r.Use(mw.Logging)
 	r.Use(mw.CORS)
 	r.Use(mw.Recovery)
-	r.Use(mm.Metrics)
+	//r.Use(mm.Metrics)
 	r.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 
 	authRouter := r.PathPrefix("/auth").Subrouter()
