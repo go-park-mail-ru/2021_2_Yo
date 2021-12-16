@@ -14,7 +14,7 @@ var upgrader = websocket.Upgrader{
 
 type ID struct {
 	//TODO: Скорее всего, здесь нужен тег
-	ID string
+	ID string `json:"id,omitempty"`
 }
 
 func GetID(conn *websocket.Conn) (string, error) {
