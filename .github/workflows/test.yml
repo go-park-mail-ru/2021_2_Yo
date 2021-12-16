@@ -17,7 +17,7 @@ jobs:
 
       - name: Create badge
         run: |
-          total=`go tool cover -func=cover.out | grep total | grep -Eo '[0-9]+\.[0-9]+'`
+          total=`go tool cover -func=cover1.out | grep total | grep -Eo '[0-9]+\.[0-9]+'`
           if (( $(echo "$total <= 40" | bc -l) )) ; then
             COLOR=red
           elif (( $(echo "$total > 60" | bc -l) )); then
