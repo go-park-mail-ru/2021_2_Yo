@@ -13,10 +13,10 @@ event_host: "event"
 #event_host: "localhost"
 
 postgres_db:
-    user: "yo_admin"
+    user: "postgres"
     host: "95.163.212.36"
     port: "5432"
-    dbname: "bmstusa-db"
+    dbname: "postgres"
     sslmode: "disable"
 
 redis_db:
