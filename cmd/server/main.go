@@ -2,11 +2,11 @@ package main
 
 import (
 	"backend/internal/app"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
-	"github.com/joho/godotenv"
 )
 
 const logMessage = "cmd:server:"

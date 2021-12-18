@@ -5,8 +5,9 @@ import (
 	error2 "backend/internal/service/user/error"
 	log "backend/pkg/logger"
 	sql2 "database/sql"
-	sql "github.com/jmoiron/sqlx"
 	"strconv"
+
+	sql "github.com/jmoiron/sqlx"
 )
 
 const (
@@ -65,13 +66,21 @@ func (s *Repository) UpdateUserInfo(u *models.User) error {
 	var query string
 	if postgresUser.ImgUrl == "" {
 		query = updateUserInfoQueryWithoutImgUrl
-		_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ID)
+		rows, err := s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ID)
+		if err != nil {
+			return error2.ErrPostgres
+		}
+		err = rows.Close()
 		if err != nil {
 			return error2.ErrPostgres
 		}
 	} else {
 		query = updateUserInfoQuery
-		_, err = s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
+		rows, err := s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
+		if err != nil {
+			return error2.ErrPostgres
+		}
+		err = rows.Close()
 		if err != nil {
 			return error2.ErrPostgres
 		}
@@ -88,7 +97,11 @@ func (s *Repository) UpdateUserPassword(userId string, password string) error {
 		return error2.ErrAtoi
 	}
 	query := updateUserPasswordQuery
-	_, err = s.db.Query(query, password, userIdInt)
+	rows, err := s.db.Query(query, password, userIdInt)
+	if err != nil {
+		return error2.ErrPostgres
+	}
+	err = rows.Close()
 	if err != nil {
 		return error2.ErrPostgres
 	}
@@ -219,7 +232,11 @@ func (s *Repository) Subscribe(subscribedId string, subscriberId string) error {
 		return error2.ErrAtoi
 	}
 	query := subscribeQuery
-	_, err = s.db.Query(query, subscribedIdInt, subscriberIdInt)
+	rows, err := s.db.Query(query, subscribedIdInt, subscriberIdInt)
+	if err != nil {
+		return error2.ErrPostgres
+	}
+	err = rows.Close()
 	if err != nil {
 		return error2.ErrPostgres
 	}
@@ -239,7 +256,11 @@ func (s *Repository) Unsubscribe(subscribedId string, subscriberId string) error
 		return error2.ErrAtoi
 	}
 	query := unsubscribeQuery
-	_, err = s.db.Query(query, subscribedIdInt, subscriberIdInt)
+	rows, err := s.db.Query(query, subscribedIdInt, subscriberIdInt)
+	if err != nil {
+		return error2.ErrPostgres
+	}
+	err = rows.Close()
 	if err != nil {
 		return error2.ErrPostgres
 	}
