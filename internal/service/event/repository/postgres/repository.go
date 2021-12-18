@@ -137,10 +137,7 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 		if err != nil {
 			return error2.ErrPostgres
 		}
-		err = rows.Close()
-		if err != nil {
-			return error2.ErrPostgres
-		}
+		defer rows.Close()
 	} else {
 		query = updateEventQueryWithoutImgUrl
 		rows, err := s.db.Query(query,
@@ -157,10 +154,7 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 		if err != nil {
 			return error2.ErrPostgres
 		}
-		err = rows.Close()
-		if err != nil {
-			return error2.ErrPostgres
-		}
+		defer rows.Close()
 	}
 	log.Debug(message + "ended")
 	return nil
@@ -186,10 +180,7 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 	if err != nil {
 		return error2.ErrPostgres
 	}
-	err = rows.Close()
-	if err != nil {
-		return error2.ErrPostgres
-	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }
@@ -208,10 +199,7 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 	if err != nil {
 		return nil, error2.ErrPostgres
 	}
-	err = rows.Close()
-	if err != nil {
-		return nil, error2.ErrPostgres
-	}
+	defer rows.Close()
 	query = getEventQuery
 	err = s.db.Get(&e, query, eventIdInt)
 	if err != nil {
@@ -287,10 +275,6 @@ func (s *Repository) GetEvents(userId string, title string, category string, cit
          e.author_id 
          order by viewed DESC`
 	rows, err := s.db.Queryx(query, userIdInt, title, category, city, date, postgresTags)
-	if err != nil {
-		return nil, error2.ErrPostgres
-	}
-	err = rows.Close()
 	if err != nil {
 		return nil, error2.ErrPostgres
 	}
@@ -379,10 +363,7 @@ func (s *Repository) Visit(eventId string, userId string) error {
 	if err != nil {
 		return error2.ErrPostgres
 	}
-	err = rows.Close()
-	if err != nil {
-		return error2.ErrPostgres
-	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }
@@ -403,10 +384,7 @@ func (s *Repository) Unvisit(eventId string, userId string) error {
 	if err != nil {
 		return error2.ErrPostgres
 	}
-	err = rows.Close()
-	if err != nil {
-		return error2.ErrPostgres
-	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }

@@ -70,20 +70,14 @@ func (s *Repository) UpdateUserInfo(u *models.User) error {
 		if err != nil {
 			return error2.ErrPostgres
 		}
-		err = rows.Close()
-		if err != nil {
-			return error2.ErrPostgres
-		}
+		defer rows.Close()
 	} else {
 		query = updateUserInfoQuery
 		rows, err := s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
 		if err != nil {
 			return error2.ErrPostgres
 		}
-		err = rows.Close()
-		if err != nil {
-			return error2.ErrPostgres
-		}
+		defer rows.Close()
 	}
 	log.Debug(message + "ended")
 	return nil
@@ -101,10 +95,7 @@ func (s *Repository) UpdateUserPassword(userId string, password string) error {
 	if err != nil {
 		return error2.ErrPostgres
 	}
-	err = rows.Close()
-	if err != nil {
-		return error2.ErrPostgres
-	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }
@@ -236,10 +227,7 @@ func (s *Repository) Subscribe(subscribedId string, subscriberId string) error {
 	if err != nil {
 		return error2.ErrPostgres
 	}
-	err = rows.Close()
-	if err != nil {
-		return error2.ErrPostgres
-	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }
@@ -260,10 +248,7 @@ func (s *Repository) Unsubscribe(subscribedId string, subscriberId string) error
 	if err != nil {
 		return error2.ErrPostgres
 	}
-	err = rows.Close()
-	if err != nil {
-		return error2.ErrPostgres
-	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }
