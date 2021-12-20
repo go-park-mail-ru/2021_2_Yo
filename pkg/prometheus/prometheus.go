@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
+	"strconv"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
@@ -42,11 +42,19 @@ func NewMetricsMiddleware() *metricsMiddleware {
 func (mm *metricsMiddleware) Metrics(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := r.RequestURI
-		pathArr := strings.Split(path, "?")
+		pathArr := strings.Split(path, "/")
+		var resultPath string
+		for index,_ := range pathArr {
+			_,err := strconv.Atoi(pathArr[index])
+			if err != nil {
+		 	resultPath += pathArr[index]
+			resultPath += "/"
+			}
+		}
 		if r.URL.Path != "/metrics" {
 			mm.requestNow.With(prometheus.Labels{
 				"method": r.Method,
-				"path":   pathArr[0],
+				"path":   resultPath,
 			}).Inc()
 		}
 		start := time.Now()
@@ -55,17 +63,17 @@ func (mm *metricsMiddleware) Metrics(next http.Handler) http.Handler {
 		if r.URL.Path != "/metrics" {
 			mm.requestDuration.With(prometheus.Labels{
 				"method": r.Method,
-				"path":   pathArr[0],
+				"path":   resultPath,
 			}).Observe(float64(elapsed)/float64(time.Second))
 
 			mm.requestNow.With(prometheus.Labels{
 				"method": r.Method,
-				"path":   pathArr[0],
+				"path":   resultPath,
 			}).Dec()
 
 			mm.opsProcessed.With(prometheus.Labels{
 				"method": r.Method,
-				"path":   pathArr[0],
+				"path":   resultPath,
 				"status": "200",
 			}).Inc()
 		}
