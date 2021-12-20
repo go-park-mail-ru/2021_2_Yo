@@ -78,7 +78,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-    #  - "./grafana.ini:/etc/grafana/grafana.ini"
+      - "./grafana.ini:/etc/grafana/grafana.ini"
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
