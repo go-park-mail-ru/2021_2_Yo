@@ -27,13 +27,13 @@ func NewNotificator(pool *websocket.Pool, nr notification.Repository, ur user.Re
 
 type NotificationBody struct {
 	Type        string `json:"type"`
+	Seen        bool   `json:"seen"`
 	UserId      string `json:"userId"`
 	UserName    string `json:"userName"`
 	UserSurname string `json:"userSurname"`
 	UserImgUrl  string `json:"userImgUrl,omitempty"`
 	EventId     string `json:"eventId,omitempty"`
 	EventTitle  string `json:"eventTitle,omitempty"`
-	Seen 		bool   `json:"seen,omitempty"`
 }
 
 func (n *Notificator) NewSubscriberNotification(receiverId string, userId string) error {
@@ -45,10 +45,10 @@ func (n *Notificator) NewSubscriberNotification(receiverId string, userId string
 	if ws != nil {
 		m := &NotificationBody{
 			Type:        "0",
+			Seen:        false,
 			UserId:      u.ID,
 			UserName:    u.Name,
 			UserSurname: u.Surname,
-			Seen:		 false,
 		}
 		if u.ImgUrl != "" {
 			m.UserImgUrl = u.ImgUrl
@@ -87,12 +87,12 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 	if ws != nil {
 		m := &NotificationBody{
 			Type:        "1",
+			Seen:        false,
 			UserId:      u.ID,
 			UserName:    u.Name,
 			UserSurname: u.Surname,
 			EventId:     e.ID,
 			EventTitle:  e.Title,
-			Seen:		 false,
 		}
 		if u.ImgUrl != "" {
 			m.UserImgUrl = u.ImgUrl
@@ -127,12 +127,12 @@ func (n *Notificator) NewEventNotification(receiverId string, userId string, eve
 	if ws != nil {
 		m := &NotificationBody{
 			Type:        "2",
+			Seen:        false,
 			UserId:      u.ID,
 			UserName:    u.Name,
 			UserSurname: u.Surname,
 			EventId:     e.ID,
 			EventTitle:  e.Title,
-			Seen:		 false,
 		}
 		if u.ImgUrl != "" {
 			m.UserImgUrl = u.ImgUrl

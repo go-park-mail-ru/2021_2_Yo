@@ -142,13 +142,13 @@ func MakeEventListResponseBody(events []*models.Event) EventListResponseBody {
 func MakeNotificationResponseBody(n *models.Notification) NotificationResponseBody {
 	return NotificationResponseBody{
 		Type:        n.Type,
+		Seen:        n.Seen,
 		UserId:      n.UserId,
 		UserName:    n.UserName,
 		UserSurname: n.UserSurname,
 		UserImgUrl:  n.UserImgUrl,
 		EventId:     n.EventId,
 		EventTitle:  n.EventTitle,
-		Seen:		 n.Seen,
 	}
 }
 
@@ -156,7 +156,6 @@ func MakeNotificationListResponseBody(notifications []*models.Notification) Noti
 	result := make([]NotificationResponseBody, len(notifications))
 	for i := 0; i < len(notifications); i++ {
 		result[i] = MakeNotificationResponseBody(notifications[i])
-		log.Debug(result[i])
 	}
 	return NotificationListResponseBody{
 		Notifications: result,
