@@ -156,7 +156,6 @@ func MakeNotificationListResponseBody(notifications []*models.Notification) Noti
 	result := make([]NotificationResponseBody, len(notifications))
 	for i := 0; i < len(notifications); i++ {
 		result[i] = MakeNotificationResponseBody(notifications[i])
-		log.Debug(result[i].Seen)
 	}
 	return NotificationListResponseBody{
 		Notifications: result,
@@ -167,7 +166,6 @@ func SendResponse(w http.ResponseWriter, response *Response) {
 	message := logMessage + "SendResponse:"
 	w.WriteHeader(http.StatusOK)
 	b, err := json.Marshal(response)
-	log.Debug(message, "body = ", string(b))
 	if err != nil {
 		log.Error(message+"err =", err)
 		return
