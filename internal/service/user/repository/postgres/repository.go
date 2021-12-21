@@ -154,18 +154,28 @@ func (s *Repository) GetSubscribes(userId string) ([]*models.User, error) {
 	return resultUsers, nil
 }
 
-func (s *Repository) GetFriends(userId string) ([]*models.User, error) {
+func (s *Repository) GetFriends(userId string, eventId string) ([]*models.User, error) {
 	message := logMessage + "GetFriends:"
 	log.Debug(message + "started")
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
 		return nil, error2.ErrAtoi
 	}
-	query := `select u.* from "user" as u where u.id in 
-    (select u.id from "user" as u join subscribe s on s.subscriber_id = u.id where s.subscribed_id = $1 
-    intersect 
-    select u.id from "user" as u join subscribe s on s.subscribed_id = u.id where s.subscriber_id = $1 )`
-	rows, err := s.db.Queryx(query, userIdInt)
+	eventIdInt, err := strconv.Atoi(eventId)
+	if err != nil {
+		return nil, error2.ErrAtoi
+	}
+	query := `(select u_id from
+    (select u.id as u_id from "user" as u
+                                  join subscribe s on s.subscriber_id = u.id where s.subscribed_id = $1
+     intersect
+     select u.id from "user" as u join subscribe s on s.subscribed_id = u.id
+     where s.subscriber_id = $1) as friends
+        where u_id not in (
+            select author_id from "event" where id = $2
+            union
+            select receiver_id::int from notification as n where n.event_id = $2::varchar and type = '1'));`
+	rows, err := s.db.Queryx(query, userIdInt, eventIdInt)
 	if err != nil {
 		return nil, error2.ErrPostgres
 	}

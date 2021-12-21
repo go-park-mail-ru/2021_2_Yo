@@ -102,9 +102,10 @@ func (a *Repository) GetSubscribes(userId string) ([]*models.User, error) {
 	return result, err
 }
 
-func (a *Repository) GetFriends(userId string) ([]*models.User, error) {
-	in := &proto.UserId{
-		ID: userId,
+func (a *Repository) GetFriends(userId string, eventId string) ([]*models.User, error) {
+	in := &proto.GetFriendsRequest{
+		UserId:  userId,
+		EventId: eventId,
 	}
 	out, err := a.client.GetFriends(context.Background(), in)
 	if err != nil {

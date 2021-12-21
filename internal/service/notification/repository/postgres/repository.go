@@ -105,7 +105,6 @@ func (s *Repository) GetAllNotifications(userId string) ([]*models.Notification,
 		}
 		modelNotification := toModelNotification(&n)
 		resultNotifications = append(resultNotifications, modelNotification)
-		log.Debug(modelNotification)
 	}
 	log.Debug(message + "ended")
 	return resultNotifications, nil

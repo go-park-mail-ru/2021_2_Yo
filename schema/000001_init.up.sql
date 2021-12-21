@@ -65,6 +65,8 @@ CREATE TABLE "subscribe" (
                            CHECK ( subscribed_id <> subscribe.subscriber_id )
 );
 
+drop table "notification";
+
 CREATE TABLE "notification" (
     id serial not null unique,
     type varchar(50) CHECK (type in ('0', '1', '2')) not null,
@@ -75,5 +77,15 @@ CREATE TABLE "notification" (
                                     user_img_url varchar(150) not null,
                                     event_id varchar(50) default '',
                                     event_title varchar(255) default '',
-                                    seen bool default false
+                                    seen bool default false,
+                                    UNIQUE(type, receiver_id, user_id, event_id)
 );
+
+(select u_id from
+    (select u.id as u_id from "user" as u
+                                  join subscribe s on s.subscriber_id = u.id where s.subscribed_id = 5
+     intersect
+     select u.id from "user" as u join subscribe s on s.subscribed_id = u.id
+     where s.subscriber_id = 3) as friends
+        left join event as e on e.author_id <> u_id
+        left join notification as n on e.id = n.event_id::int where n.user_id::int <> u_id);
