@@ -222,7 +222,7 @@ func (h *Delivery) GetAllNotifications(w http.ResponseWriter, r *http.Request) {
 	log.Debug(message + "started")
 	userId := r.Context().Value(response.CtxString("userId")).(string)
 	res, err := h.notificator.GetAllNotifications(userId)
-	log.Debug(res)
+	log.Debug(&res)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
