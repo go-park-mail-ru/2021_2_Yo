@@ -33,6 +33,7 @@ type NotificationBody struct {
 	UserImgUrl  string `json:"userImgUrl,omitempty"`
 	EventId     string `json:"eventId,omitempty"`
 	EventTitle  string `json:"eventTitle,omitempty"`
+	Seen 		bool   `json:"seen,omitempty"`
 }
 
 func (n *Notificator) NewSubscriberNotification(receiverId string, userId string) error {
@@ -47,6 +48,7 @@ func (n *Notificator) NewSubscriberNotification(receiverId string, userId string
 			UserId:      u.ID,
 			UserName:    u.Name,
 			UserSurname: u.Surname,
+			Seen:		 false,
 		}
 		if u.ImgUrl != "" {
 			m.UserImgUrl = u.ImgUrl
@@ -90,6 +92,7 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 			UserSurname: u.Surname,
 			EventId:     e.ID,
 			EventTitle:  e.Title,
+			Seen:		 false,
 		}
 		if u.ImgUrl != "" {
 			m.UserImgUrl = u.ImgUrl
@@ -129,6 +132,7 @@ func (n *Notificator) NewEventNotification(receiverId string, userId string, eve
 			UserSurname: u.Surname,
 			EventId:     e.ID,
 			EventTitle:  e.Title,
+			Seen:		 false,
 		}
 		if u.ImgUrl != "" {
 			m.UserImgUrl = u.ImgUrl
