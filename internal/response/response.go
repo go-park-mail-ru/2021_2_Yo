@@ -74,7 +74,7 @@ type NotificationResponseBody struct {
 	UserImgUrl  string `json:"userImgUrl"`
 	EventId     string `json:"eventId,omitempty"`
 	EventTitle  string `json:"eventTitle,omitempty"`
-	Seen		bool   `json:"seen"`
+	Seen        string `json:"seen"`
 }
 
 type NotificationListResponseBody struct {
