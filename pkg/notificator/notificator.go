@@ -60,7 +60,7 @@ func (n *Notificator) NewSubscriberNotification(receiverId string, userId string
 			err = n.nRepository.CreateSubscribeNotification(receiverId, u, false)
 			return err
 		} else {
-			err = n.nRepository.CreateSubscribeNotification(receiverId, u, true)
+			err = n.nRepository.CreateSubscribeNotification(receiverId, u, false)
 			return err
 		}
 	} else {
@@ -104,7 +104,7 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 			err = n.nRepository.CreateInviteNotification(receiverId, u, e, false)
 			return err
 		} else {
-			err = n.nRepository.CreateInviteNotification(receiverId, u, e, true)
+			err = n.nRepository.CreateInviteNotification(receiverId, u, e, false)
 			return err
 		}
 	} else {
@@ -143,7 +143,7 @@ func (n *Notificator) NewEventNotification(receiverId string, userId string, eve
 			err = n.nRepository.CreateNewEventNotification(receiverId, u, e, false)
 			return err
 		} else {
-			err = n.nRepository.CreateNewEventNotification(receiverId, u, e, true)
+			err = n.nRepository.CreateNewEventNotification(receiverId, u, e, false)
 			return err
 		}
 	} else {
