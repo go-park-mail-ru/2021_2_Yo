@@ -140,15 +140,9 @@ func MakeEventListResponseBody(events []*models.Event) EventListResponseBody {
 }
 
 func MakeNotificationResponseBody(n *models.Notification) NotificationResponseBody {
-	seen := ""
-	if n.Seen {
-		seen = "true"
-	} else {
-		seen = "false"
-	}
 	return NotificationResponseBody{
 		Type:        n.Type,
-		Seen:        seen,
+		Seen:        n.Seen,
 		UserId:      n.UserId,
 		UserName:    n.UserName,
 		UserSurname: n.UserSurname,
@@ -173,6 +167,7 @@ func SendResponse(w http.ResponseWriter, response *Response) {
 	message := logMessage + "SendResponse:"
 	w.WriteHeader(http.StatusOK)
 	b, err := json.Marshal(response)
+	log.Debug(message, "body = ", string(b))
 	if err != nil {
 		log.Error(message+"err =", err)
 		return

@@ -68,7 +68,7 @@ type CitiesResponseBody struct {
 
 type NotificationResponseBody struct {
 	Type        string `json:"type"`
-	Seen        string `json:"seen"`
+	Seen        bool   `json:"seen"`
 	UserId      string `json:"userId"`
 	UserName    string `json:"userName"`
 	UserSurname string `json:"userSurname"`
