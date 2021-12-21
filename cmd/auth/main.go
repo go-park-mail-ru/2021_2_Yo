@@ -9,12 +9,12 @@ import (
 	log "backend/pkg/logger"
 	"github.com/sirupsen/logrus"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"net"
 	"os"
-	"github.com/joho/godotenv"
 )
 
 const logMessage = "cmd:auth:"
@@ -66,7 +66,7 @@ func main() {
 	log.Info("started auth microservice on ", port)
 	err = server.Serve(authListener)
 	if err != nil {
-		log.Error("serve troubles")
+		log.Error(logMessage+"err = ", err)
 	}
 
 }

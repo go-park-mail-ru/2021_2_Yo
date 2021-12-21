@@ -19,14 +19,14 @@ import (
 	"backend/internal/utils"
 	log "backend/pkg/logger"
 	"backend/pkg/notificator"
-	//"backend/pkg/prometheus"
+	"backend/pkg/prometheus"
 	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
-	//"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -120,7 +120,7 @@ func NewApp(opts *Options) (*App, error) {
 
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddlewares(app.AuthManager.UseCase)
-	//mm := prometheus.NewMetricsMiddleware()
+	mm := prometheus.NewMetricsMiddleware()
 
 	r := mux.NewRouter()
 	rApi := r.PathPrefix("/api").Subrouter()
@@ -128,7 +128,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	rApi.Use(mw.Logging)
 	rApi.Use(mw.CORS)
 	rApi.Use(mw.Recovery)
-	//r.Use(mm.Metrics)
+	r.Use(mm.Metrics)
 	rApi.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 	authRouter := rApi.PathPrefix("/auth").Subrouter()
 	register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)
@@ -140,7 +140,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	register.UserHTTPEndpoints(userRouter, app.UserManager, app.EventManager, mw)
 	r.HandleFunc("/ws", app.wsPool.WebsocketHandler).Methods("GET")
 
-	//r.Handle("/metrics", promhttp.Handler())
+	r.Handle("/metrics", promhttp.Handler())
 
 	return r
 }

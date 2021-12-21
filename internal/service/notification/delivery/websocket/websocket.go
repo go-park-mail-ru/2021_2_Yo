@@ -26,7 +26,7 @@ func GetID(conn *websocket.Conn) (string, error) {
 	uId := ID{}
 	err = json.Unmarshal(p, &uId)
 	if err != nil {
-		log.Error("unmarshal",err)
+		log.Error("unmarshal", err)
 	}
 	return uId.ID, nil
 }

@@ -6,13 +6,13 @@ import (
 	repository "backend/internal/service/event/repository/postgres"
 	"backend/internal/utils"
 	log "backend/pkg/logger"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"net"
 	"os"
-	"github.com/joho/godotenv"
 )
 
 func env() {

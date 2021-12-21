@@ -24,7 +24,7 @@ user-service:
 .PHONY: cover
 cover:
 	go test -cover -coverprofile=cover.out -coverpkg=./... ./...
-	cat cover.out | fgrep -v "main.go" | fgrep -v "mock.go" | fgrep -v "pb.go" > cover1.out
+	cat cover.out | fgrep -v "main.go" | fgrep -v "mock.go" | fgrep -v "pb.go" | fgrep -v "response_easyjson.go" > cover1.out
 	go tool cover -func=cover1.out
 
 .PHONY:
