@@ -1,6 +1,8 @@
 package notification
 
-import "backend/internal/models"
+import (
+	"backend/internal/models"
+)
 
 type Repository interface {
 	CreateSubscribeNotification(receiverId string, subscriber *models.User, event *models.Event) error
@@ -10,4 +12,5 @@ type Repository interface {
 	UpdateNotificationsStatus(userId string) error
 	GetAllNotifications(userId string) ([]*models.Notification, error)
 	GetNewNotifications(userId string) ([]*models.Notification, error)
+	CreateTomorrowEventNotification(receiverId string, invitor *models.User, event *models.Event) error
 }

@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
@@ -40,12 +41,13 @@ type Options struct {
 }
 
 type App struct {
-	Options      *Options
-	AuthManager  *authDelivery.Delivery
-	UserManager  *userDelivery.Delivery
-	EventManager *eventDelivery.Delivery
-	wsPool       *websocket.Pool
-	db           *sql.DB
+	Options             *Options
+	AuthManager         *authDelivery.Delivery
+	UserManager         *userDelivery.Delivery
+	EventManager        *eventDelivery.Delivery
+	wsPool              *websocket.Pool
+	notificationManager notificator.NotificationManager
+	db                  *sql.DB
 }
 
 func getGrpcAddress(portKey string, hostKey string) string {
@@ -109,12 +111,13 @@ func NewApp(opts *Options) (*App, error) {
 	eventD := eventDelivery.NewDelivery(eventUC, notificationManager)
 
 	return &App{
-		Options:      opts,
-		AuthManager:  authD,
-		UserManager:  userD,
-		EventManager: eventD,
-		wsPool:       pool,
-		db:           db,
+		Options:             opts,
+		AuthManager:         authD,
+		UserManager:         userD,
+		EventManager:        eventD,
+		wsPool:              pool,
+		notificationManager: notificationManager,
+		db:                  db,
 	}, nil
 }
 
@@ -160,6 +163,13 @@ func (app *App) Run() error {
 		port = "test port"
 	}
 	r := newRouterWithEndpoints(app)
+	go func() {
+		err := app.notificationManager.EventTomorrowNotification()
+		if err != nil {
+			return
+		}
+		time.Sleep(time.Hour)
+	}()
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
 		log.Error(message+"err = ", err)

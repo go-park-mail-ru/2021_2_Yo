@@ -69,7 +69,7 @@ drop table "notification";
 
 CREATE TABLE "notification" (
     id serial not null unique,
-    type varchar(50) CHECK (type in ('0', '1', '2')) not null,
+    type varchar(50) CHECK (type in ('0', '1', '2', '3')) not null,
                                     receiver_id varchar(50) not null,
                                     user_id varchar(50) not null,
                                     user_name varchar(50) not null,

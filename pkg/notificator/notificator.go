@@ -150,9 +150,33 @@ func (n *Notificator) EventTomorrowNotification() error {
 	currentTime := time.Now()
 	currentDate := currentTime.Format("02.01.2006")
 	events, err := n.eRepository.GetEvents("", "", "", "", currentDate, nil)
-	_ = events
 	if err != nil {
 		return err
+	}
+	for _, e := range events {
+		visitors, err := n.uRepository.GetVisitors(e.ID)
+		if err != nil {
+			return err
+		}
+		author, err := n.uRepository.GetUserById(e.AuthorId)
+		m := &NotificationBody{
+			Type:        "2",
+			Seen:        false,
+			UserId:      author.ID,
+			UserName:    author.Name,
+			UserSurname: author.Surname,
+			EventId:     e.ID,
+			EventTitle:  e.Title,
+		}
+		if author.ImgUrl != "" {
+			m.UserImgUrl = author.ImgUrl
+		}
+		for _, v := range visitors {
+			err := n.createAndSendNotification(m, v.ID, author, e, n.nRepository.CreateTomorrowEventNotification)
+			if err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }

@@ -25,6 +25,7 @@ const (
 	newSubscriberType = "0"
 	invitationType    = "1"
 	newEventType      = "2"
+	eventTomorrowType = "3"
 )
 
 func (s *Repository) CreateSubscribeNotification(receiverId string, user *models.User, event *models.Event) error {
@@ -131,4 +132,16 @@ func (s *Repository) GetNewNotifications(userId string) ([]*models.Notification,
 	}
 	log.Debug(message + "ended")
 	return resultNotifications, nil
+}
+
+func (s *Repository) CreateTomorrowEventNotification(receiverId string, user *models.User, event *models.Event) error {
+	message := logMessage + "CreateTomorrowEventNotification:"
+	log.Debug(message + "started")
+	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, event_id, event_title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+	_, err := s.db.Query(query, eventTomorrowType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title)
+	if err != nil {
+		return error2.ErrPostgres
+	}
+	log.Debug(message + "ended")
+	return nil
 }
