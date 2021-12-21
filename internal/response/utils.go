@@ -156,6 +156,7 @@ func MakeNotificationListResponseBody(notifications []*models.Notification) Noti
 	result := make([]NotificationResponseBody, len(notifications))
 	for i := 0; i < len(notifications); i++ {
 		result[i] = MakeNotificationResponseBody(notifications[i])
+		log.Debug(result[i])
 	}
 	return NotificationListResponseBody{
 		Notifications: result,
