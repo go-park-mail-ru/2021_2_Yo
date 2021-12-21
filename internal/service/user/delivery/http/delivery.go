@@ -252,3 +252,4 @@ func (h *Delivery) UpdateNotificationsStatus(w http.ResponseWriter, r *http.Requ
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")
 }
+

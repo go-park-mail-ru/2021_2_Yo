@@ -111,7 +111,7 @@ func (s *Repository) GetAllNotifications(userId string) ([]*models.Notification,
 }
 
 func (s *Repository) GetNewNotifications(userId string) ([]*models.Notification, error) {
-	message := logMessage + "GetAllNotifications:"
+	message := logMessage + "GetNewNotifications:"
 	log.Debug(message + "started")
 	query := `select * from notification where receiver_id = $1 and seen = false`
 	rows, err := s.db.Queryx(query, userId)

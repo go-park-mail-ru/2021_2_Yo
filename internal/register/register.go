@@ -49,7 +49,7 @@ func UserHTTPEndpoints(r *mux.Router, uDelivery *userHttp.Delivery, eDelivery *e
 	r.Handle("/notifications/new", getNewNotificationsHandlerFunc).Methods("GET")
 
 	updateNotificationsStatusHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.UpdateNotificationsStatus)))
-	r.Handle("/notifications", updateNotificationsStatusHandlerFunc).Methods("UPDATE")
+	r.Handle("/notifications/all", updateNotificationsStatusHandlerFunc).Methods("POST")
 
 	getFriendsHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.GetFriends)))
 	r.Handle("/friends", getFriendsHandlerFunc).Methods("GET")
