@@ -223,6 +223,10 @@ func (h *Delivery) GetAllNotifications(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(response.CtxString("userId")).(string)
 	res, err := h.notificator.GetAllNotifications(userId)
 	log.Debug(res)
+	for _, notification := range res {
+		log.Debug(message + "started mas logs")
+		log.Debug(notification)
+	}
 	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
