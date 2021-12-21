@@ -10,4 +10,5 @@ type NotificationManager interface {
 	UpdateNotificationsStatus(receiverId string) error
 	GetAllNotifications(receiverId string) ([]*models.Notification, error)
 	GetNewNotifications(receiverId string) ([]*models.Notification, error)
+	EventTomorrowNotification() error
 }

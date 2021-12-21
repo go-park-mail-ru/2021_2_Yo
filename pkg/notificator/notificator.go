@@ -6,7 +6,7 @@ import (
 	"backend/internal/service/notification"
 	"backend/internal/service/notification/delivery/websocket"
 	"backend/internal/service/user"
-	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 type Notificator struct {
@@ -36,38 +36,40 @@ type NotificationBody struct {
 	EventTitle  string `json:"eventTitle,omitempty"`
 }
 
+func (n *Notificator) createAndSendNotification(notification *NotificationBody, receiverId string, user *models.User, event *models.Event, repoFunc func(string, *models.User, *models.Event) error) error {
+	ws := n.pool.GetConn(receiverId)
+	if ws != nil {
+		err := ws.WriteJSON(notification)
+		if err != nil {
+			n.pool.RemoveConn(receiverId)
+			err = repoFunc(receiverId, user, event)
+			return err
+		} else {
+			err = repoFunc(receiverId, user, event)
+			return err
+		}
+	} else {
+		err := repoFunc(receiverId, user, event)
+		return err
+	}
+}
+
 func (n *Notificator) NewSubscriberNotification(receiverId string, userId string) error {
 	u, err := n.uRepository.GetUserById(userId)
 	if err != nil {
 		return err
 	}
-	ws := n.pool.GetConn(receiverId)
-	if ws != nil {
-		m := &NotificationBody{
-			Type:        "0",
-			Seen:        false,
-			UserId:      u.ID,
-			UserName:    u.Name,
-			UserSurname: u.Surname,
-		}
-		if u.ImgUrl != "" {
-			m.UserImgUrl = u.ImgUrl
-		}
-		err := ws.WriteJSON(m)
-		if err != nil {
-			log.Error("NewSubscriberNotification err = ", err)
-			n.pool.RemoveConn(receiverId)
-			err = n.nRepository.CreateSubscribeNotification(receiverId, u, false)
-			return err
-		} else {
-			err = n.nRepository.CreateSubscribeNotification(receiverId, u, false)
-			return err
-		}
-	} else {
-		log.Error("NewSubscriberNotification ws = ", ws)
-		err := n.nRepository.CreateSubscribeNotification(receiverId, u, false)
-		return err
+	nf := &NotificationBody{
+		Type:        "0",
+		Seen:        false,
+		UserId:      u.ID,
+		UserName:    u.Name,
+		UserSurname: u.Surname,
 	}
+	if u.ImgUrl != "" {
+		nf.UserImgUrl = u.ImgUrl
+	}
+	return n.createAndSendNotification(nf, receiverId, u, nil, n.nRepository.CreateSubscribeNotification)
 }
 
 func (n *Notificator) DeleteSubscribeNotification(receiverId string, userId string) error {
@@ -83,35 +85,19 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 	if err != nil {
 		return err
 	}
-	ws := n.pool.GetConn(receiverId)
-	if ws != nil {
-		m := &NotificationBody{
-			Type:        "1",
-			Seen:        false,
-			UserId:      u.ID,
-			UserName:    u.Name,
-			UserSurname: u.Surname,
-			EventId:     e.ID,
-			EventTitle:  e.Title,
-		}
-		if u.ImgUrl != "" {
-			m.UserImgUrl = u.ImgUrl
-		}
-		err := ws.WriteJSON(m)
-		if err != nil {
-			log.Error("InvitationNotification err = ", err)
-			n.pool.RemoveConn(receiverId)
-			err = n.nRepository.CreateInviteNotification(receiverId, u, e, false)
-			return err
-		} else {
-			err = n.nRepository.CreateInviteNotification(receiverId, u, e, false)
-			return err
-		}
-	} else {
-		log.Error("InvitationNotification ws = ", ws)
-		err = n.nRepository.CreateInviteNotification(receiverId, u, e, false)
-		return err
+	m := &NotificationBody{
+		Type:        "1",
+		Seen:        false,
+		UserId:      u.ID,
+		UserName:    u.Name,
+		UserSurname: u.Surname,
+		EventId:     e.ID,
+		EventTitle:  e.Title,
 	}
+	if u.ImgUrl != "" {
+		m.UserImgUrl = u.ImgUrl
+	}
+	return n.createAndSendNotification(m, receiverId, u, e, n.nRepository.CreateInviteNotification)
 }
 
 func (n *Notificator) NewEventNotification(userId string, eventId string) error {
@@ -140,26 +126,9 @@ func (n *Notificator) NewEventNotification(userId string, eventId string) error 
 		m.UserImgUrl = author.ImgUrl
 	}
 	for _, sub := range subscribers {
-		ws := n.pool.GetConn(sub.ID)
-		if ws != nil {
-			err := ws.WriteJSON(m)
-			if err != nil {
-				n.pool.RemoveConn(sub.ID)
-				err = n.nRepository.CreateNewEventNotification(sub.ID, author, e, false)
-				if err != nil {
-					return err
-				}
-			} else {
-				err = n.nRepository.CreateNewEventNotification(sub.ID, author, e, false)
-				if err != nil {
-					return err
-				}
-			}
-		} else {
-			err = n.nRepository.CreateNewEventNotification(sub.ID, author, e, false)
-			if err != nil {
-				return err
-			}
+		err := n.createAndSendNotification(m, sub.ID, author, e, n.nRepository.CreateNewEventNotification)
+		if err != nil {
+			return err
 		}
 	}
 	return nil
@@ -175,4 +144,15 @@ func (n *Notificator) GetAllNotifications(receiverId string) ([]*models.Notifica
 
 func (n *Notificator) GetNewNotifications(receiverId string) ([]*models.Notification, error) {
 	return n.nRepository.GetNewNotifications(receiverId)
+}
+
+func (n *Notificator) EventTomorrowNotification() error {
+	currentTime := time.Now()
+	currentDate := currentTime.Format("02.01.2006")
+	events, err := n.eRepository.GetEvents("", "", "", "", currentDate, nil)
+	_ = events
+	if err != nil {
+		return err
+	}
+	return nil
 }

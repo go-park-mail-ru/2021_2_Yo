@@ -5,17 +5,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-/*
-type UseCaseMock struct {
-	mock.Mock
-}
-
-func (m *UseCaseMock) GetUserById(userId string) (*models.User, error) {
-	args := m.Called(userId)
-	return args.Get(0).(*models.User), args.Error(1)
-}
-*/
-
 type NotificatorMock struct {
 	mock.Mock
 }
@@ -53,4 +42,9 @@ func (m *NotificatorMock) GetAllNotifications(receiverId string) ([]*models.Noti
 func (m *NotificatorMock) GetNewNotifications(receiverId string) ([]*models.Notification, error) {
 	args := m.Called(receiverId)
 	return args.Get(0).([]*models.Notification), args.Error(1)
+}
+
+func (m *NotificatorMock) EventTomorrowNotification() error {
+	args := m.Called()
+	return args.Error(0)
 }

@@ -27,11 +27,11 @@ const (
 	newEventType      = "2"
 )
 
-func (s *Repository) CreateSubscribeNotification(receiverId string, user *models.User, seen bool) error {
+func (s *Repository) CreateSubscribeNotification(receiverId string, user *models.User, event *models.Event) error {
 	message := logMessage + "CreateSubNotification:"
 	log.Debug(message + "started")
-	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, seen) VALUES ($1, $2, $3, $4, $5, $6, $7)`
-	_, err := s.db.Query(query, newSubscriberType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, seen)
+	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url) VALUES ($1, $2, $3, $4, $5, $6)`
+	_, err := s.db.Query(query, newSubscriberType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl)
 	if err != nil {
 		return error2.ErrPostgres
 	}
@@ -51,11 +51,11 @@ func (s *Repository) DeleteSubscribeNotification(receiverId string, userId strin
 	return nil
 }
 
-func (s *Repository) CreateInviteNotification(receiverId string, user *models.User, event *models.Event, seen bool) error {
+func (s *Repository) CreateInviteNotification(receiverId string, user *models.User, event *models.Event) error {
 	message := logMessage + "CreateInvNotification:"
 	log.Debug(message + "started")
-	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, event_id, event_title, seen) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
-	_, err := s.db.Query(query, invitationType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title, seen)
+	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, event_id, event_title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+	_, err := s.db.Query(query, invitationType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title)
 	if err != nil {
 		return error2.ErrPostgres
 	}
@@ -63,11 +63,11 @@ func (s *Repository) CreateInviteNotification(receiverId string, user *models.Us
 	return nil
 }
 
-func (s *Repository) CreateNewEventNotification(receiverId string, user *models.User, event *models.Event, seen bool) error {
+func (s *Repository) CreateNewEventNotification(receiverId string, user *models.User, event *models.Event) error {
 	message := logMessage + "CreateInvNotification:"
 	log.Debug(message + "started")
-	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, event_id, event_title, seen) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
-	_, err := s.db.Query(query, newEventType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title, seen)
+	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, event_id, event_title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+	_, err := s.db.Query(query, newEventType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title)
 	if err != nil {
 		return error2.ErrPostgres
 	}

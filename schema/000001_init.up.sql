@@ -80,12 +80,3 @@ CREATE TABLE "notification" (
                                     seen bool default false,
                                     UNIQUE(type, receiver_id, user_id, event_id)
 );
-
-(select u_id from
-    (select u.id as u_id from "user" as u
-                                  join subscribe s on s.subscriber_id = u.id where s.subscribed_id = 5
-     intersect
-     select u.id from "user" as u join subscribe s on s.subscribed_id = u.id
-     where s.subscriber_id = 3) as friends
-        left join event as e on e.author_id <> u_id
-        left join notification as n on e.id = n.event_id::int where n.user_id::int <> u_id);
