@@ -35,8 +35,8 @@ func (m *NotificatorMock) InvitationNotification(receiverId string, userId strin
 	return args.Error(0)
 }
 
-func (m *NotificatorMock) NewEventNotification(receiverId string, userId string, eventId string) error {
-	args := m.Called(receiverId, userId, eventId)
+func (m *NotificatorMock) NewEventNotification(userId string, eventId string) error {
+	args := m.Called(userId, eventId)
 	return args.Error(0)
 }
 

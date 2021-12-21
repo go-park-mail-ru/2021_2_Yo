@@ -4,6 +4,7 @@ import (
 	"backend/internal/models"
 	"backend/internal/response"
 	"backend/internal/service/event/usecase"
+	"backend/pkg/notificator"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -55,7 +56,8 @@ var createEventTests = []struct {
 func TestCreateEvent(t *testing.T) {
 	for _, test := range createEventTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		eventModel := new(models.Event)
 		if test.event != nil {
@@ -63,6 +65,7 @@ func TestCreateEvent(t *testing.T) {
 		}
 
 		useCaseMock.On("CreateEvent", eventModel, test.userId).Return(test.eventId, test.useCaseErr)
+		notificatorMock.On("NewEventNotification", test.userId, test.eventId).Return(nil)
 
 		bodyEventJSON, err := json.Marshal(test.event)
 		require.NoError(t, err, logTestMessage+"err =", err)
@@ -126,7 +129,8 @@ var updateEventTests = []struct {
 func TestUpdateEvent(t *testing.T) {
 	for _, test := range updateEventTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		eventModel := new(models.Event)
 		if test.event != nil {
@@ -181,7 +185,8 @@ var deleteEventTests = []struct {
 func TestDeleteEvent(t *testing.T) {
 	for _, test := range deleteEventTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		useCaseMock.On("DeleteEvent", test.eventId, test.userId).Return(test.useCaseErr)
 
@@ -231,7 +236,8 @@ var getEventByIdTests = []struct {
 func TestGetEventById(t *testing.T) {
 	for _, test := range getEventByIdTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		useCaseMock.On("GetEventById", test.eventId).Return(test.event, test.useCaseErr)
 
@@ -281,7 +287,8 @@ var getEventsTests = []struct {
 func TestGetEvents(t *testing.T) {
 	for _, test := range getEventsTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		title := test.vars["query"]
 		category := test.vars["category"]
@@ -329,7 +336,8 @@ var getEventsFromAuthorTests = []struct {
 func TestGetEventsFromAuthor(t *testing.T) {
 	for _, test := range getEventsFromAuthorTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		authorId := test.vars["authorid"]
 
@@ -371,7 +379,8 @@ var getVisitedEventsTests = []struct {
 func TestGetVisitedEvents(t *testing.T) {
 	for _, test := range getVisitedEventsTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		useCaseMock.On("GetVisitedEvents", test.userId).Return([]*models.Event{}, test.useCaseErr)
 
@@ -387,7 +396,8 @@ func TestGetVisitedEvents(t *testing.T) {
 func TestGetCreatedEvents(t *testing.T) {
 	for _, test := range getVisitedEventsTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		useCaseMock.On("GetCreatedEvents", test.userId).Return([]*models.Event{}, test.useCaseErr)
 
@@ -433,7 +443,8 @@ var visitTests = []struct {
 func TestVisit(t *testing.T) {
 	for _, test := range visitTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		var eId string
 		var uId string
@@ -495,7 +506,8 @@ var unvisitTests = []struct {
 func TestUnvisit(t *testing.T) {
 	for _, test := range unvisitTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		var eId string
 		var uId string
@@ -526,7 +538,8 @@ func TestUnvisit(t *testing.T) {
 func TestIsVisited(t *testing.T) {
 	for _, test := range unvisitTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		var eId string
 		var uId string
@@ -558,7 +571,8 @@ func TestIsVisited(t *testing.T) {
 func TestGetCities(t *testing.T) {
 	for _, test := range unvisitTests {
 		useCaseMock := new(usecase.UseCaseMock)
-		deliveryTest := NewDelivery(useCaseMock)
+		notificatorMock := new(notificator.NotificatorMock)
+		deliveryTest := NewDelivery(useCaseMock, notificatorMock)
 
 		useCaseMock.On("GetCities").Return([]string{}, test.useCaseErr)
 

@@ -114,8 +114,12 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 	}
 }
 
-func (n *Notificator) NewEventNotification(receiverId string, userId string, eventId string) error {
-	u, err := n.uRepository.GetUserById(userId)
+func (n *Notificator) NewEventNotification(userId string, eventId string) error {
+	author, err := n.uRepository.GetUserById(userId)
+	if err != nil {
+		return err
+	}
+	subscribers, err := n.uRepository.GetSubscribers(userId)
 	if err != nil {
 		return err
 	}
@@ -123,33 +127,36 @@ func (n *Notificator) NewEventNotification(receiverId string, userId string, eve
 	if err != nil {
 		return err
 	}
-	ws := n.pool.GetConn(receiverId)
-	if ws != nil {
-		m := &NotificationBody{
-			Type:        "2",
-			Seen:        false,
-			UserId:      u.ID,
-			UserName:    u.Name,
-			UserSurname: u.Surname,
-			EventId:     e.ID,
-			EventTitle:  e.Title,
-		}
-		if u.ImgUrl != "" {
-			m.UserImgUrl = u.ImgUrl
-		}
-		err := ws.WriteJSON(m)
-		if err != nil {
-			n.pool.RemoveConn(receiverId)
-			err = n.nRepository.CreateNewEventNotification(receiverId, u, e, false)
-			return err
+	for _, sub := range subscribers {
+		ws := n.pool.GetConn(sub.ID)
+		if ws != nil {
+			m := &NotificationBody{
+				Type:        "2",
+				Seen:        false,
+				UserId:      author.ID,
+				UserName:    author.Name,
+				UserSurname: author.Surname,
+				EventId:     e.ID,
+				EventTitle:  e.Title,
+			}
+			if author.ImgUrl != "" {
+				m.UserImgUrl = author.ImgUrl
+			}
+			err := ws.WriteJSON(m)
+			if err != nil {
+				n.pool.RemoveConn(sub.ID)
+				err = n.nRepository.CreateNewEventNotification(sub.ID, author, e, false)
+				return err
+			} else {
+				err = n.nRepository.CreateNewEventNotification(sub.ID, author, e, false)
+				return err
+			}
 		} else {
-			err = n.nRepository.CreateNewEventNotification(receiverId, u, e, false)
+			err = n.nRepository.CreateNewEventNotification(sub.ID, author, e, false)
 			return err
 		}
-	} else {
-		err = n.nRepository.CreateNewEventNotification(receiverId, u, e, false)
-		return err
 	}
+	return nil
 }
 
 func (n *Notificator) UpdateNotificationsStatus(receiverId string) error {

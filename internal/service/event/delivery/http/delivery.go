@@ -5,6 +5,7 @@ import (
 	"backend/internal/service/event"
 	"backend/internal/utils"
 	log "backend/pkg/logger"
+	"backend/pkg/notificator"
 	"errors"
 	"net/http"
 	"strings"
@@ -15,12 +16,14 @@ import (
 const logMessage = "service:event:delivery:http:"
 
 type Delivery struct {
-	useCase event.UseCase
+	useCase     event.UseCase
+	notificator notificator.NotificationManager
 }
 
-func NewDelivery(useCase event.UseCase) *Delivery {
+func NewDelivery(useCase event.UseCase, notificator notificator.NotificationManager) *Delivery {
 	return &Delivery{
-		useCase: useCase,
+		useCase:     useCase,
+		notificator: notificator,
 	}
 }
 
@@ -51,13 +54,8 @@ func (h *Delivery) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
-	/*
-		err = h.useCase.EmailNotify(eventID)
-		if err != nil {
-			log.Error(message+"err = ", err)
-		}
-	*/
 	response.SendResponse(w, response.EventIdResponse(eventID))
+	_ = h.notificator.NewEventNotification(userId, eventID)
 	log.Debug(message + "ended")
 }
 
