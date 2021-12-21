@@ -433,6 +433,8 @@ func easyjson6ff3ac1dDecodeBackendInternalResponse4(in *jlexer.Lexer, out *Notif
 		switch key {
 		case "type":
 			out.Type = string(in.String())
+		case "seen":
+			out.Seen = bool(in.Bool())
 		case "userId":
 			out.UserId = string(in.String())
 		case "userName":
@@ -463,6 +465,11 @@ func easyjson6ff3ac1dEncodeBackendInternalResponse4(out *jwriter.Writer, in Noti
 		const prefix string = ",\"type\":"
 		out.RawString(prefix[1:])
 		out.String(string(in.Type))
+	}
+	{
+		const prefix string = ",\"seen\":"
+		out.RawString(prefix)
+		out.Bool(bool(in.Seen))
 	}
 	{
 		const prefix string = ",\"userId\":"
