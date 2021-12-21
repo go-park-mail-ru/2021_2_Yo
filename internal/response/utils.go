@@ -148,6 +148,7 @@ func MakeNotificationResponseBody(n *models.Notification) NotificationResponseBo
 		UserImgUrl:  n.UserImgUrl,
 		EventId:     n.EventId,
 		EventTitle:  n.EventTitle,
+		Seen:		 n.Seen,
 	}
 }
 
