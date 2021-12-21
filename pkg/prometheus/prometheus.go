@@ -1,12 +1,12 @@
 package prometheus
 
 import (
-	"net/http"
-	"strings"
-	"time"
-	"strconv"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
 )
 
 type metricsMiddleware struct {
@@ -44,11 +44,11 @@ func (mm *metricsMiddleware) Metrics(next http.Handler) http.Handler {
 		path := r.RequestURI
 		pathArr := strings.Split(path, "/")
 		var resultPath string
-		for index,_ := range pathArr {
-			_,err := strconv.Atoi(pathArr[index])
+		for index, _ := range pathArr {
+			_, err := strconv.Atoi(pathArr[index])
 			if err != nil {
-		 	resultPath += pathArr[index]
-			resultPath += "/"
+				resultPath += pathArr[index]
+				resultPath += "/"
 			}
 		}
 		if r.URL.Path != "/metrics" {
@@ -64,7 +64,7 @@ func (mm *metricsMiddleware) Metrics(next http.Handler) http.Handler {
 			mm.requestDuration.With(prometheus.Labels{
 				"method": r.Method,
 				"path":   resultPath,
-			}).Observe(float64(elapsed)/float64(time.Second))
+			}).Observe(float64(elapsed) / float64(time.Second))
 
 			mm.requestNow.With(prometheus.Labels{
 				"method": r.Method,

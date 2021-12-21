@@ -25,6 +25,6 @@ func toModelNotification(n *Notification) *models.Notification {
 		UserImgUrl:  n.UserImgUrl,
 		EventId:     n.EventId,
 		EventTitle:  n.EventTitle,
-		Seen: 		 n.Seen,
+		Seen:        n.Seen,
 	}
 }
