@@ -165,7 +165,7 @@ func (s *Repository) GetFriends(userId string, eventId string) ([]*models.User, 
 	if err != nil {
 		return nil, error2.ErrAtoi
 	}
-	query := `select u_id from
+	query := `select * from "user" as u where u.id in (select u_id from
     (select u.id as u_id from "user" as u
                                   join subscribe s on s.subscriber_id = u.id where s.subscribed_id = $1
      intersect
@@ -174,7 +174,7 @@ func (s *Repository) GetFriends(userId string, eventId string) ([]*models.User, 
         where u_id not in (
             select author_id from "event" where id = $2
             union
-            select receiver_id::int from notification as n where n.event_id = $2::varchar and type = '1')`
+            select receiver_id::int from notification as n where n.event_id = $2::varchar and type = '1'))`
 	rows, err := s.db.Queryx(query, userIdInt, eventIdInt)
 	if err != nil {
 		log.Error(message+"err = ", err)
@@ -186,6 +186,7 @@ func (s *Repository) GetFriends(userId string, eventId string) ([]*models.User, 
 		var u User
 		err := rows.StructScan(&u)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelUser := toModelUser(&u)
