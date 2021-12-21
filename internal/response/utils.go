@@ -148,13 +148,13 @@ func MakeNotificationResponseBody(n *models.Notification) NotificationResponseBo
 	}
 	return NotificationResponseBody{
 		Type:        n.Type,
+		Seen:        seen,
 		UserId:      n.UserId,
 		UserName:    n.UserName,
 		UserSurname: n.UserSurname,
 		UserImgUrl:  n.UserImgUrl,
 		EventId:     n.EventId,
 		EventTitle:  n.EventTitle,
-		Seen:        seen,
 	}
 }
 

@@ -68,13 +68,13 @@ type CitiesResponseBody struct {
 
 type NotificationResponseBody struct {
 	Type        string `json:"type"`
+	Seen        string `json:"seen"`
 	UserId      string `json:"userId"`
 	UserName    string `json:"userName"`
 	UserSurname string `json:"userSurname"`
 	UserImgUrl  string `json:"userImgUrl"`
 	EventId     string `json:"eventId,omitempty"`
 	EventTitle  string `json:"eventTitle,omitempty"`
-	Seen        string `json:"seen"`
 }
 
 type NotificationListResponseBody struct {
