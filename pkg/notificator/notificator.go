@@ -127,33 +127,39 @@ func (n *Notificator) NewEventNotification(userId string, eventId string) error 
 	if err != nil {
 		return err
 	}
+	m := &NotificationBody{
+		Type:        "2",
+		Seen:        false,
+		UserId:      author.ID,
+		UserName:    author.Name,
+		UserSurname: author.Surname,
+		EventId:     e.ID,
+		EventTitle:  e.Title,
+	}
+	if author.ImgUrl != "" {
+		m.UserImgUrl = author.ImgUrl
+	}
 	for _, sub := range subscribers {
 		ws := n.pool.GetConn(sub.ID)
 		if ws != nil {
-			m := &NotificationBody{
-				Type:        "2",
-				Seen:        false,
-				UserId:      author.ID,
-				UserName:    author.Name,
-				UserSurname: author.Surname,
-				EventId:     e.ID,
-				EventTitle:  e.Title,
-			}
-			if author.ImgUrl != "" {
-				m.UserImgUrl = author.ImgUrl
-			}
 			err := ws.WriteJSON(m)
 			if err != nil {
 				n.pool.RemoveConn(sub.ID)
 				err = n.nRepository.CreateNewEventNotification(sub.ID, author, e, false)
-				return err
+				if err != nil {
+					return err
+				}
 			} else {
 				err = n.nRepository.CreateNewEventNotification(sub.ID, author, e, false)
-				return err
+				if err != nil {
+					return err
+				}
 			}
 		} else {
 			err = n.nRepository.CreateNewEventNotification(sub.ID, author, e, false)
-			return err
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
