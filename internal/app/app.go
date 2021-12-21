@@ -106,7 +106,7 @@ func NewApp(opts *Options) (*App, error) {
 
 	authD := authDelivery.NewDelivery(authService)
 	userD := userDelivery.NewDelivery(userUC, notificationManager)
-	eventD := eventDelivery.NewDelivery(eventUC)
+	eventD := eventDelivery.NewDelivery(eventUC, notificationManager)
 
 	return &App{
 		Options:      opts,
