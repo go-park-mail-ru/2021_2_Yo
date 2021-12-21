@@ -44,7 +44,7 @@ func (mm *metricsMiddleware) Metrics(next http.Handler) http.Handler {
 		path := r.RequestURI
 		pathArr := strings.Split(path, "/")
 		var resultPath string
-		for index, _ := range pathArr {
+		for index := range pathArr {
 			_, err := strconv.Atoi(pathArr[index])
 			if err != nil {
 				resultPath += pathArr[index]

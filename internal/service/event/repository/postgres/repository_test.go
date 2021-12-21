@@ -450,7 +450,7 @@ var getEventsTests = []struct {
 		tags:        nil,
 		postgresErr: sql2.ErrNoRows,
 		outputRes:   []*models.Event{},
-		outputErr:   sql2.ErrNoRows,
+		outputErr:   error2.ErrPostgres,
 	},
 }
 

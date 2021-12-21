@@ -6,11 +6,11 @@ env:
   EVENT_TAG: latest
   USER_TAG: latest
 
-#on:
-#  push:
-#    branches: [After_RK4]
-#  pull_request:
-#    branches: [main]
+on:
+  push:
+    branches: [After_RK4]
+  pull_request:
+    branches: [main]
 
 jobs:
   build:

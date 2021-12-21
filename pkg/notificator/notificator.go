@@ -159,6 +159,9 @@ func (n *Notificator) EventTomorrowNotification() error {
 			return err
 		}
 		author, err := n.uRepository.GetUserById(e.AuthorId)
+		if err != nil {
+			return err
+		}
 		m := &NotificationBody{
 			Type:        "2",
 			Seen:        false,
