@@ -5,7 +5,6 @@ import (
 	"backend/internal/service/user"
 	error2 "backend/internal/service/user/error"
 	"backend/internal/utils"
-	log "backend/pkg/logger"
 )
 
 type UseCase struct {
