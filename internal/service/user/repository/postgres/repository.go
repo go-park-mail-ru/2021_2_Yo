@@ -93,6 +93,7 @@ func (s *Repository) UpdateUserPassword(userId string, password string) error {
 	if err != nil {
 		return error2.ErrAtoi
 	}
+	log.Debug(message+"password = ", password)
 	query := updateUserPasswordQuery
 	rows, err := s.db.Query(query, password, userIdInt)
 	if err != nil {
