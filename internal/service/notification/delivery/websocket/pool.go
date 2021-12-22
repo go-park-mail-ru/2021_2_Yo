@@ -42,15 +42,19 @@ func (p *Pool) GetConn(userId string) *websocket.Conn {
 }
 
 func (p *Pool) PingConnections() int {
+	res := 0
 	p.mutex.Lock()
-	for _, conn := range p.Connections {
+	for i, conn := range p.Connections {
 		err := conn.WriteMessage(1, nil)
 		if err != nil {
 			log.Error("pool:PingConnections: err = ", err)
+			p.Connections[i] = nil
+		} else {
+			res++
 		}
 	}
 	p.mutex.Unlock()
-	return len(p.Connections)
+	return res
 }
 
 func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
