@@ -7,7 +7,6 @@ import (
 	"backend/internal/service/notification"
 	"backend/internal/service/notification/delivery/websocket"
 	"backend/internal/service/user"
-	log "backend/pkg/logger"
 	"time"
 )
 
@@ -59,8 +58,6 @@ func (n *Notificator) createAndSendNotification(notification *NotificationBody, 
 }
 
 func (n *Notificator) NewSubscriberNotification(receiverId string, userId string) error {
-	message := logMessage + "NewSubscriberNotification:"
-	log.Debug(message + "started")
 	u, err := n.uRepository.GetUserById(userId)
 	if err != nil {
 		return err
@@ -77,28 +74,16 @@ func (n *Notificator) NewSubscriberNotification(receiverId string, userId string
 	}
 	err = n.createAndSendNotification(nf, receiverId, u, nil, n.nRepository.CreateSubscribeNotification)
 	if err != nil {
-		log.Error(message+"err = ", err)
 		return err
 	}
-	log.Debug(message + "ended")
 	return nil
 }
 
 func (n *Notificator) DeleteSubscribeNotification(receiverId string, userId string) error {
-	message := logMessage + "DeleteSubscribeNotification:"
-	log.Debug(message + "started")
-	err := n.nRepository.DeleteSubscribeNotification(receiverId, userId)
-	if err != nil {
-		log.Error(message+"err = ", err)
-		return err
-	}
-	log.Debug(message + "ended")
-	return nil
+	return n.nRepository.DeleteSubscribeNotification(receiverId, userId)
 }
 
 func (n *Notificator) InvitationNotification(receiverId string, userId string, eventId string) error {
-	message := logMessage + "InvitationNotification:"
-	log.Debug(message + "started")
 	u, err := n.uRepository.GetUserById(userId)
 	if err != nil {
 		return err
@@ -121,16 +106,12 @@ func (n *Notificator) InvitationNotification(receiverId string, userId string, e
 	}
 	err = n.createAndSendNotification(m, receiverId, u, e, n.nRepository.CreateInviteNotification)
 	if err != nil {
-		log.Error(message+"err = ", err)
 		return err
 	}
-	log.Debug(message + "ended")
 	return nil
 }
 
 func (n *Notificator) NewEventNotification(userId string, eventId string) error {
-	message := logMessage + "NewEventNotification:"
-	log.Debug(message + "started")
 	author, err := n.uRepository.GetUserById(userId)
 	if err != nil {
 		return err
@@ -158,11 +139,9 @@ func (n *Notificator) NewEventNotification(userId string, eventId string) error 
 	for _, sub := range subscribers {
 		err := n.createAndSendNotification(m, sub.ID, author, e, n.nRepository.CreateNewEventNotification)
 		if err != nil {
-			log.Error(message+"err = ", err)
 			return err
 		}
 	}
-	log.Debug(message + "ended")
 	return nil
 }
 
@@ -179,14 +158,11 @@ func (n *Notificator) GetNewNotifications(receiverId string) ([]*models.Notifica
 }
 
 func (n *Notificator) EventTomorrowNotification() error {
-	message := logMessage + "EventTomorrowNotification:"
-	log.Debug(message + "started")
 	currentTime := time.Now().Add(time.Hour * 24)
 	currentDate := currentTime.Format("02.01.2006")
 	events, err := n.eRepository.GetEvents("", "", "", "", currentDate, nil)
 	if err != nil {
 		if err != error2.ErrNoRows {
-			log.Error(message+"err = ", err)
 			return err
 		}
 	}
@@ -214,11 +190,13 @@ func (n *Notificator) EventTomorrowNotification() error {
 		for _, v := range visitors {
 			err := n.createAndSendNotification(m, v.ID, author, e, n.nRepository.CreateTomorrowEventNotification)
 			if err != nil {
-				log.Error(message+"err = ", err)
 				return err
 			}
 		}
 	}
-	log.Debug(message + "ended")
 	return nil
+}
+
+func (n *Notificator) PingConnections() int {
+	return n.pool.PingConnections()
 }

@@ -11,4 +11,5 @@ type NotificationManager interface {
 	GetAllNotifications(receiverId string) ([]*models.Notification, error)
 	GetNewNotifications(receiverId string) ([]*models.Notification, error)
 	EventTomorrowNotification() error
+	PingConnections() int
 }

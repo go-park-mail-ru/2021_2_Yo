@@ -6,14 +6,12 @@ import (
 	"github.com/gorilla/websocket"
 	"net/http"
 	"sync"
-	"time"
 )
 
 var upgrader = websocket.Upgrader{
-	HandshakeTimeout: time.Hour * 24,
-	ReadBufferSize:   1024,
-	WriteBufferSize:  1024,
-	CheckOrigin:      func(r *http.Request) bool { return true },
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
 type Pool struct {
@@ -41,6 +39,18 @@ func (p *Pool) RemoveConn(userId string) {
 
 func (p *Pool) GetConn(userId string) *websocket.Conn {
 	return p.Connections[userId]
+}
+
+func (p *Pool) PingConnections() int {
+	p.mutex.Lock()
+	for _, conn := range p.Connections {
+		err := conn.WriteMessage(1, nil)
+		if err != nil {
+			log.Error("pool:PingConnections: err = ", err)
+		}
+	}
+	p.mutex.Unlock()
+	return len(p.Connections)
 }
 
 func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {

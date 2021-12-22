@@ -166,6 +166,10 @@ func (app *App) Run() error {
 	}
 	r := newRouterWithEndpoints(app)
 	go func() {
+		log.Info("connections alive: ", app.notificationManager.PingConnections())
+		time.Sleep(time.Minute)
+	}()
+	go func() {
 		time.Sleep(time.Minute)
 		err := app.notificationManager.EventTomorrowNotification()
 		if err != nil {
