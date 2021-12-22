@@ -165,14 +165,12 @@ func (app *App) Run() error {
 		port = "test port"
 	}
 	r := newRouterWithEndpoints(app)
-	/*
-		go func() {
-			for {
-				log.Info("connections alive: ", app.notificationManager.PingConnections())
-				time.Sleep(time.Second * 30)
-			}
-		}()
-	*/
+	go func() {
+		for {
+			log.Info("connections alive: ", app.notificationManager.PingConnections())
+			time.Sleep(time.Minute)
+		}
+	}()
 	go func() {
 		for {
 			time.Sleep(time.Minute)
