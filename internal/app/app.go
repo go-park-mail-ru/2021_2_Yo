@@ -166,9 +166,10 @@ func (app *App) Run() error {
 	}
 	r := newRouterWithEndpoints(app)
 	go func() {
-		for {
-			log.Info("connections alive: ", app.notificationManager.PingConnections())
+		for i := 0; i < 100; i++ {
+			log.Info(i, " connections alive: ", app.notificationManager.PingConnections())
 			time.Sleep(time.Minute)
+			log.Debug("HERE")
 		}
 	}()
 	go func() {
