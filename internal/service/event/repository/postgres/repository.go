@@ -92,6 +92,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		if err == sql2.ErrNoRows {
 			return "", error2.ErrNoRows
 		}
+		log.Error(message+"err = ", err)
 		return "", error2.ErrPostgres
 	}
 	eventIdStr := strconv.Itoa(eventId)
@@ -112,6 +113,7 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 	}
 	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return err
 	}
 	postgresEvent, err := toPostgresEvent(e)
@@ -135,6 +137,7 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 			postgresEvent.Tag,
 			postgresEvent.ID)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return error2.ErrPostgres
 		}
 		defer rows.Close()
@@ -152,6 +155,7 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 			postgresEvent.Tag,
 			postgresEvent.ID)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return error2.ErrPostgres
 		}
 		defer rows.Close()
@@ -173,11 +177,13 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 	}
 	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return err
 	}
 	query := deleteEventQuery
 	rows, err := s.db.Query(query, eventIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -197,6 +203,7 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 	query = incrementEventViews
 	rows, err := s.db.Query(query, eventIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -206,6 +213,7 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrNoRows
 		}
+		log.Error(message+"err = ", err)
 		return nil, error2.ErrPostgres
 	}
 	modelEvent := toModelEvent(&e)
