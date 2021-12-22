@@ -32,8 +32,10 @@ func (s *Repository) CreateSubscribeNotification(receiverId string, user *models
 	message := logMessage + "CreateSubNotification:"
 	log.Debug(message + "started")
 	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url) VALUES ($1, $2, $3, $4, $5, $6)`
-	_, err := s.db.Query(query, newSubscriberType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl)
+	rows, err := s.db.Query(query, newSubscriberType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl)
+	defer rows.Close()
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
@@ -44,8 +46,10 @@ func (s *Repository) DeleteSubscribeNotification(receiverId string, userId strin
 	message := logMessage + "DeleteSubscribeNotification:"
 	log.Debug(message + "started")
 	query := `delete from "notification" where type = $1 and receiver_id = $2 and user_id = $3`
-	_, err := s.db.Query(query, newSubscriberType, receiverId, userId)
+	rows, err := s.db.Query(query, newSubscriberType, receiverId, userId)
+	defer rows.Close()
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
@@ -56,10 +60,12 @@ func (s *Repository) CreateInviteNotification(receiverId string, user *models.Us
 	message := logMessage + "CreateInvNotification:"
 	log.Debug(message + "started")
 	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, event_id, event_title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
-	_, err := s.db.Query(query, invitationType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title)
+	rows, err := s.db.Query(query, invitationType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }
@@ -68,10 +74,12 @@ func (s *Repository) CreateNewEventNotification(receiverId string, user *models.
 	message := logMessage + "CreateInvNotification:"
 	log.Debug(message + "started")
 	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, event_id, event_title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
-	_, err := s.db.Query(query, newEventType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title)
+	rows, err := s.db.Query(query, newEventType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }
@@ -80,10 +88,12 @@ func (s *Repository) UpdateNotificationsStatus(userId string) error {
 	message := logMessage + "UpdateNotificationsStatus:"
 	log.Debug(message + "started")
 	query := `update "notification" set seen = true where receiver_id = $1`
-	_, err := s.db.Query(query, userId)
+	rows, err := s.db.Query(query, userId)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }
@@ -94,7 +104,8 @@ func (s *Repository) GetAllNotifications(userId string) ([]*models.Notification,
 	query := `select * from notification where receiver_id = $1 order by id desc`
 	rows, err := s.db.Queryx(query, userId)
 	if err != nil {
-		return nil, err
+		log.Error(message+"err = ", err)
+		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
 	var resultNotifications []*models.Notification
@@ -102,6 +113,7 @@ func (s *Repository) GetAllNotifications(userId string) ([]*models.Notification,
 		var n Notification
 		err := rows.StructScan(&n)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelNotification := toModelNotification(&n)
@@ -117,7 +129,8 @@ func (s *Repository) GetNewNotifications(userId string) ([]*models.Notification,
 	query := `select * from notification where receiver_id = $1 and seen = false`
 	rows, err := s.db.Queryx(query, userId)
 	if err != nil {
-		return nil, err
+		log.Error(message+"err = ", err)
+		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
 	var resultNotifications []*models.Notification
@@ -125,6 +138,7 @@ func (s *Repository) GetNewNotifications(userId string) ([]*models.Notification,
 		var n Notification
 		err := rows.StructScan(&n)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelNotification := toModelNotification(&n)
@@ -138,10 +152,12 @@ func (s *Repository) CreateTomorrowEventNotification(receiverId string, user *mo
 	message := logMessage + "CreateTomorrowEventNotification:"
 	log.Debug(message + "started")
 	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, event_id, event_title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
-	_, err := s.db.Query(query, eventTomorrowType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title)
+	rows, err := s.db.Query(query, eventTomorrowType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }

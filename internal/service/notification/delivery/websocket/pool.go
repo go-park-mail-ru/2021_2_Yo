@@ -45,12 +45,17 @@ func (p *Pool) PingConnections() int {
 	res := 0
 	p.mutex.Lock()
 	for i, conn := range p.Connections {
-		err := conn.WriteMessage(1, nil)
-		if err != nil {
-			log.Error("pool:PingConnections: err = ", err)
-			p.Connections[i] = nil
+		if conn != nil {
+			err := conn.WriteMessage(1, nil)
+			if err != nil {
+				log.Error("pool:PingConnections: err = ", err)
+				p.Connections[i] = nil
+			} else {
+				res++
+			}
 		} else {
-			res++
+			log.Error("pool:PingConnections: err = connection is nil")
+			p.Connections[i] = nil
 		}
 	}
 	p.mutex.Unlock()
