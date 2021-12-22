@@ -49,6 +49,7 @@ func (s *Repository) GetUserById(userId string) (*models.User, error) {
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrUserNotFound
 		}
+		log.Error(message+"err = ", err)
 		return nil, error2.ErrPostgres
 	}
 	modelUser := toModelUser(&u)
@@ -68,6 +69,7 @@ func (s *Repository) UpdateUserInfo(u *models.User) error {
 		query = updateUserInfoQueryWithoutImgUrl
 		rows, err := s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ID)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return error2.ErrPostgres
 		}
 		defer rows.Close()
@@ -75,6 +77,7 @@ func (s *Repository) UpdateUserInfo(u *models.User) error {
 		query = updateUserInfoQuery
 		rows, err := s.db.Query(query, postgresUser.Name, postgresUser.Surname, postgresUser.About, postgresUser.ImgUrl, postgresUser.ID)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return error2.ErrPostgres
 		}
 		defer rows.Close()
@@ -93,6 +96,7 @@ func (s *Repository) UpdateUserPassword(userId string, password string) error {
 	query := updateUserPasswordQuery
 	rows, err := s.db.Query(query, password, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -110,6 +114,7 @@ func (s *Repository) GetSubscribers(userId string) ([]*models.User, error) {
 	query := getSubscribersQuery
 	rows, err := s.db.Queryx(query, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -118,6 +123,7 @@ func (s *Repository) GetSubscribers(userId string) ([]*models.User, error) {
 		var u User
 		err := rows.StructScan(&u)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelUser := toModelUser(&u)
@@ -137,6 +143,7 @@ func (s *Repository) GetSubscribes(userId string) ([]*models.User, error) {
 	query := getSubscribesQuery
 	rows, err := s.db.Queryx(query, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -145,6 +152,7 @@ func (s *Repository) GetSubscribes(userId string) ([]*models.User, error) {
 		var u User
 		err := rows.StructScan(&u)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelUser := toModelUser(&u)
@@ -206,6 +214,7 @@ func (s *Repository) GetVisitors(eventId string) ([]*models.User, error) {
 	query := getVisitorsQuery
 	rows, err := s.db.Queryx(query, eventIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -214,6 +223,7 @@ func (s *Repository) GetVisitors(eventId string) ([]*models.User, error) {
 		var u User
 		err := rows.StructScan(&u)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelUser := toModelUser(&u)
@@ -237,6 +247,7 @@ func (s *Repository) Subscribe(subscribedId string, subscriberId string) error {
 	query := subscribeQuery
 	rows, err := s.db.Query(query, subscribedIdInt, subscriberIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -258,6 +269,7 @@ func (s *Repository) Unsubscribe(subscribedId string, subscriberId string) error
 	query := unsubscribeQuery
 	rows, err := s.db.Query(query, subscribedIdInt, subscriberIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -281,6 +293,7 @@ func (s *Repository) IsSubscribed(subscribedId string, subscriberId string) (boo
 	result := false
 	err = s.db.Get(&count, query, subscribedIdInt, subscriberIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return false, error2.ErrPostgres
 	}
 	if count > 0 {
