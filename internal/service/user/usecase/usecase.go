@@ -5,6 +5,7 @@ import (
 	"backend/internal/service/user"
 	error2 "backend/internal/service/user/error"
 	"backend/internal/utils"
+	log "backend/pkg/logger"
 )
 
 type UseCase struct {
@@ -40,7 +41,9 @@ func (a *UseCase) UpdateUserPassword(userId string, password string) error {
 	if userId == "" || password == "" {
 		return error2.ErrEmptyData
 	}
+	log.Debug("UpdateUserPassword: password = ", password)
 	hashedPassword := utils.CreatePasswordHash(password)
+	log.Debug("UpdateUserPassword: hashedPassword = ", hashedPassword)
 	return a.repository.UpdateUserPassword(userId, hashedPassword)
 }
 
