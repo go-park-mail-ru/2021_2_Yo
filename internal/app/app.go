@@ -174,7 +174,7 @@ func (app *App) Run() error {
 	}()
 	go func() {
 		for {
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Minute)
 			err := app.notificationManager.EventTomorrowNotification()
 			if err != nil {
 				return
