@@ -166,16 +166,20 @@ func (app *App) Run() error {
 	}
 	r := newRouterWithEndpoints(app)
 	go func() {
-		log.Info("connections alive: ", app.notificationManager.PingConnections())
-		time.Sleep(time.Minute)
+		for {
+			log.Info("connections alive: ", app.notificationManager.PingConnections())
+			time.Sleep(time.Minute)
+		}
 	}()
 	go func() {
-		time.Sleep(time.Second * 5)
-		err := app.notificationManager.EventTomorrowNotification()
-		if err != nil {
-			return
+		for {
+			time.Sleep(time.Second * 5)
+			err := app.notificationManager.EventTomorrowNotification()
+			if err != nil {
+				return
+			}
+			time.Sleep(time.Hour - time.Minute)
 		}
-		time.Sleep(time.Hour - time.Minute)
 	}()
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
