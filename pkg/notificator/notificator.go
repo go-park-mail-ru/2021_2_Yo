@@ -3,6 +3,7 @@ package notificator
 import (
 	"backend/internal/models"
 	"backend/internal/service/event"
+	error2 "backend/internal/service/event/error"
 	"backend/internal/service/notification"
 	"backend/internal/service/notification/delivery/websocket"
 	"backend/internal/service/user"
@@ -180,11 +181,14 @@ func (n *Notificator) GetNewNotifications(receiverId string) ([]*models.Notifica
 func (n *Notificator) EventTomorrowNotification() error {
 	message := logMessage + "EventTomorrowNotification:"
 	log.Debug(message + "started")
-	currentTime := time.Now()
+	currentTime := time.Now().Add(time.Hour * 24)
 	currentDate := currentTime.Format("02.01.2006")
 	events, err := n.eRepository.GetEvents("", "", "", "", currentDate, nil)
 	if err != nil {
-		return err
+		if err != error2.ErrNoRows {
+			log.Error(message+"err = ", err)
+			return err
+		}
 	}
 	for _, e := range events {
 		visitors, err := n.uRepository.GetVisitors(e.ID)

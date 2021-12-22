@@ -166,11 +166,12 @@ func (app *App) Run() error {
 	}
 	r := newRouterWithEndpoints(app)
 	go func() {
+		time.Sleep(time.Minute)
 		err := app.notificationManager.EventTomorrowNotification()
 		if err != nil {
 			return
 		}
-		time.Sleep(time.Hour)
+		time.Sleep(time.Hour - time.Minute)
 	}()
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
