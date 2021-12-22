@@ -3,7 +3,6 @@ package grpc
 import (
 	proto "backend/internal/microservice/user/proto"
 	"backend/internal/models"
-	"backend/internal/utils"
 	"context"
 )
 
@@ -63,10 +62,9 @@ func (a *Repository) UpdateUserInfo(u *models.User) error {
 }
 
 func (a *Repository) UpdateUserPassword(userId string, password string) error {
-	hashedPassword := utils.CreatePasswordHash(password)
 	in := &proto.UpdateUserPasswordRequest{
 		ID:       userId,
-		Password: hashedPassword,
+		Password: password,
 	}
 	_, err := a.client.UpdateUserPassword(context.Background(), in)
 	return err
