@@ -48,3 +48,8 @@ func (m *NotificatorMock) EventTomorrowNotification() error {
 	args := m.Called()
 	return args.Error(0)
 }
+
+func (m *NotificatorMock) PingConnections() int {
+	args := m.Called()
+	return args.Get(0).(int)
+}
