@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"backend/internal/response"
 	log "backend/pkg/logger"
 	"github.com/gorilla/websocket"
 	"net/http"
@@ -40,7 +41,8 @@ func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		log.Info(!ok)
 	}
 	////////////
-	//userId := r.Context().Value(response.CtxString("userId")).(string)
+	userId := r.Context().Value(response.CtxString("userId")).(string)
+	log.Debug("!!!!!!!!!!!!!WebsocketHandler:userId = ", userId)
 	///////////
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
