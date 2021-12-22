@@ -5,7 +5,6 @@ import (
 	protoAuth "backend/internal/microservice/auth/proto"
 	"backend/internal/models"
 	"backend/internal/utils"
-	log "backend/pkg/logger"
 	"context"
 )
 
