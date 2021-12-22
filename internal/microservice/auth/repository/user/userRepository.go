@@ -43,7 +43,6 @@ func (s *Repository) CreateUser(user *models.User) (string, error) {
 func (s *Repository) GetUser(mail, password string) (*models.User, error) {
 	query := getUserQuery
 	user := User{}
-	log.Debug("microservice:auth:repository:user:password = ", password)
 	err := s.db.Get(&user, query, mail, password)
 	if err != nil {
 		if err == sql2.ErrNoRows {

@@ -41,9 +41,7 @@ func (a *UseCase) UpdateUserPassword(userId string, password string) error {
 	if userId == "" || password == "" {
 		return error2.ErrEmptyData
 	}
-	log.Debug("UpdateUserPassword: password = ", password)
 	hashedPassword := utils.CreatePasswordHash(password)
-	log.Debug("UpdateUserPassword: hashedPassword = ", hashedPassword)
 	return a.repository.UpdateUserPassword(userId, hashedPassword)
 }
 

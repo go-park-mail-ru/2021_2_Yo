@@ -5,6 +5,7 @@ import (
 	error2 "backend/internal/service/notification/error"
 	log "backend/pkg/logger"
 	sql "github.com/jmoiron/sqlx"
+	"strings"
 )
 
 const (
@@ -35,7 +36,9 @@ func (s *Repository) CreateSubscribeNotification(receiverId string, user *models
 	rows, err := s.db.Query(query, newSubscriberType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl)
 	defer rows.Close()
 	if err != nil {
-		log.Error(message+"err = ", err)
+		if !strings.Contains(err.Error(), "duplicate key") {
+			log.Error(message+"err = ", err)
+		}
 		return error2.ErrPostgres
 	}
 	log.Debug(message + "ended")
@@ -62,7 +65,9 @@ func (s *Repository) CreateInviteNotification(receiverId string, user *models.Us
 	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, event_id, event_title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 	rows, err := s.db.Query(query, invitationType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title)
 	if err != nil {
-		log.Error(message+"err = ", err)
+		if !strings.Contains(err.Error(), "duplicate key") {
+			log.Error(message+"err = ", err)
+		}
 		return error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -76,7 +81,9 @@ func (s *Repository) CreateNewEventNotification(receiverId string, user *models.
 	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, event_id, event_title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 	rows, err := s.db.Query(query, newEventType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title)
 	if err != nil {
-		log.Error(message+"err = ", err)
+		if !strings.Contains(err.Error(), "duplicate key") {
+			log.Error(message+"err = ", err)
+		}
 		return error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -154,7 +161,9 @@ func (s *Repository) CreateTomorrowEventNotification(receiverId string, user *mo
 	query := `insert into "notification" (type, receiver_id, user_id, user_name, user_surname, user_img_url, event_id, event_title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 	rows, err := s.db.Query(query, eventTomorrowType, receiverId, user.ID, user.Name, user.Surname, user.ImgUrl, event.ID, event.Title)
 	if err != nil {
-		log.Error(message+"err = ", err)
+		if !strings.Contains(err.Error(), "duplicate key") {
+			log.Error(message+"err = ", err)
+		}
 		return error2.ErrPostgres
 	}
 	defer rows.Close()

@@ -43,9 +43,6 @@ func (s *authService) SignUp(ctx context.Context, in *protoAuth.SignUpRequest) (
 
 func (s *authService) SignIn(ctx context.Context, in *protoAuth.SignInRequest) (*protoAuth.UserId, error) {
 
-	log.Debug("microservice:auth:usecase:SignIn: password = ", in.Password)
-	log.Debug("microservice:auth:usecase:SignIn: hashedPassword = ", utils.CreatePasswordHash(in.Password))
-
 	u, err := s.authUserRepository.GetUser(in.Mail, utils.CreatePasswordHash(in.Password))
 	if err != nil {
 		return &protoAuth.UserId{}, err
