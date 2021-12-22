@@ -141,7 +141,9 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	userRouter := rApi.PathPrefix("/user").Subrouter()
 	userRouter.Methods("POST").Subrouter().Use(mw.CSRF)
 	register.UserHTTPEndpoints(userRouter, app.UserManager, app.EventManager, mw)
-	r.HandleFunc("/ws", app.wsPool.WebsocketHandler).Methods("GET")
+
+	websocketHandlerFunc := mw.Auth(http.HandlerFunc(app.wsPool.WebsocketHandler))
+	r.Handle("/ws", websocketHandlerFunc).Methods("GET")
 
 	r.Handle("/metrics", promhttp.Handler())
 

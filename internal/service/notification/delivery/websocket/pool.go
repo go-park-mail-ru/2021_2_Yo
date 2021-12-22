@@ -39,12 +39,14 @@ func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		log.Info(!ok)
 	}
+	////////////
+	//userId := r.Context().Value(response.CtxString("userId")).(string)
+	///////////
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Error(err)
 		return
 	}
-
 	userID, err := GetID(conn)
 	if err != nil {
 		log.Error(err)
