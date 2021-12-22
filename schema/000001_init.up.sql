@@ -12,7 +12,7 @@ CREATE TABLE "event" (
                          id serial not null unique,
                          title varchar(255) not null,
                          description varchar(500) not null,
-                         text varchar(1000) not null,
+                         text varchar(2200) not null,
                          city varchar(255) not null,
                          category varchar(255) not null,
                          viewed BIGINT not null,
@@ -24,12 +24,6 @@ CREATE TABLE "event" (
                          author_id int references "user" (id) on delete cascade not null
 );
 
-/*
-Просмотр (<=> избранное)
-event_id - id мероприятия
-user_id - id посетителя
-date - для графиков
-*/
 CREATE TABLE "view" (
                         id serial not null unique,
                         event_id int references "event" (id) on delete cascade not null,
@@ -38,12 +32,6 @@ CREATE TABLE "view" (
                         date date
 );
 
-/*
-Посетитель (<=> избранное)
-event_id - id мероприятия
-user_id - id посетителя
-date - для графиков
-*/
 CREATE TABLE "visitor" (
                         id serial not null unique,
                         event_id int references "event" (id) on delete cascade not null,
@@ -52,11 +40,6 @@ CREATE TABLE "visitor" (
                         date date
 );
 
-/*
-Подписка
-subscriber_id - id пользователя, который подписался
-subscribed_id - id пользователя, на которого подписались
-*/
 CREATE TABLE "subscribe" (
                            id serial not null unique,
                            subscribed_id int references "user" (id) on delete cascade not null,
