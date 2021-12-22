@@ -40,20 +40,12 @@ func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		log.Info(!ok)
 	}
-	////////////
 	userId := r.Context().Value(response.CtxString("userId")).(string)
-	log.Debug("!!!!!!!!!!!!!WebsocketHandler:userId = ", userId)
-	///////////
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Error(err)
 		return
 	}
-	userID, err := GetID(conn)
-	if err != nil {
-		log.Error(err)
-	}
-
-	p.AddConn(userID, conn)
-	log.Info("WebsocketHandler new client with id: ", userID, " total clients: ", len(p.Connections))
+	p.AddConn(userId, conn)
+	log.Info("WebsocketHandler new client with id: ", userId, " total clients: ", len(p.Connections))
 }
