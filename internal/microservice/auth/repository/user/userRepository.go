@@ -3,6 +3,7 @@ package user
 import (
 	"backend/internal/models"
 	error2 "backend/internal/service/auth/error"
+	log "backend/pkg/logger"
 	sql2 "database/sql"
 	"github.com/jmoiron/sqlx"
 	"strconv"
@@ -42,6 +43,7 @@ func (s *Repository) CreateUser(user *models.User) (string, error) {
 func (s *Repository) GetUser(mail, password string) (*models.User, error) {
 	query := getUserQuery
 	user := User{}
+	log.Debug("microservice:auth:repository:user:password = ", password)
 	err := s.db.Get(&user, query, mail, password)
 	if err != nil {
 		if err == sql2.ErrNoRows {
