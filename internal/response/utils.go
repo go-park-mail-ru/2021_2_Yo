@@ -60,6 +60,23 @@ func GetUserFromRequest(r io.Reader) (*models.User, error) {
 	return result, nil
 }
 
+func GetUsersIdFromRequest(r io.Reader) ([]string, error) {
+	message := logMessage + "GetUsersIdFromRequest:"
+	_ = message
+	usersIdInput := new(UsersIdResponseBody)
+	err := json.UnmarshalFromReader(r, usersIdInput)
+	if err != nil {
+		return nil, ErrJSONDecoding
+	}
+	err = ValidateAndSanitize(usersIdInput)
+	if err != nil {
+		return nil, err
+	}
+	result := usersIdInput.UsersId
+	return result, nil
+
+}
+
 func MakeUserResponseBody(u *models.User) UserResponseBody {
 	return UserResponseBody{
 		ID:       u.ID,

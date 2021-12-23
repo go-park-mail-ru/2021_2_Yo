@@ -16,13 +16,27 @@ const (
 	updateUserInfoQueryWithoutImgUrl = `update "user" set name = $1, surname = $2, about = $3 where id = $4`
 	updateUserInfoQuery              = `update "user" set name = $1, surname = $2, about = $3, img_url = $4 where id = $5`
 	updateUserPasswordQuery          = `update "user" set password = $1 where id = $2`
-	//TODO: updateUserImg в отдельный метод
-	getSubscribersQuery = `select u.* from "user" as u join subscribe s on s.subscriber_id = u.id where s.subscribed_id = $1`
-	getSubscribesQuery  = `select u.* from "user" as u join subscribe s on s.subscribed_id = u.id where s.subscriber_id = $1`
-	getVisitorsQuery    = `select u.* from "user" as u join visitor v on u.id = v.user_id where v.event_id = $1`
-	subscribeQuery      = `insert into "subscribe" (subscribed_id, subscriber_id) values ($1, $2)`
-	unsubscribeQuery    = `delete from subscribe where subscribed_id = $1 and subscriber_id = $2`
-	isSubscribedQuery   = `select count(*) from subscribe where subscribed_id = $1 and subscriber_id = $2`
+	getSubscribersQuery              = `select u.* from "user" as u join subscribe s on s.subscriber_id = u.id where s.subscribed_id = $1`
+	getSubscribesQuery               = `select u.* from "user" as u join subscribe s on s.subscribed_id = u.id where s.subscriber_id = $1`
+	getFriendsQuery                  = `select * from "user" as u where u.id in (select u.id as u_id from "user" as u
+                                  join subscribe s on s.subscriber_id = u.id where s.subscribed_id = $1
+     intersect
+     select u.id from "user" as u join subscribe s on s.subscribed_id = u.id
+     where s.subscriber_id = $1)`
+	getFriendsForEventQuery = `select * from "user" as u where u.id in (select u_id from
+    (select u.id as u_id from "user" as u
+                                  join subscribe s on s.subscriber_id = u.id where s.subscribed_id = $1
+     intersect
+     select u.id from "user" as u join subscribe s on s.subscribed_id = u.id
+     where s.subscriber_id = $1) as friends
+        where u_id not in (
+            select author_id from "event" where id = $2
+            union
+            select receiver_id::int from notification as n where n.event_id = $2::varchar and type = '1'))`
+	getVisitorsQuery  = `select u.* from "user" as u join visitor v on u.id = v.user_id where v.event_id = $1`
+	subscribeQuery    = `insert into "subscribe" (subscribed_id, subscriber_id) values ($1, $2)`
+	unsubscribeQuery  = `delete from subscribe where subscribed_id = $1 and subscriber_id = $2`
+	isSubscribedQuery = `select count(*) from subscribe where subscribed_id = $1 and subscriber_id = $2`
 )
 
 type Repository struct {
@@ -165,24 +179,21 @@ func (s *Repository) GetSubscribes(userId string) ([]*models.User, error) {
 func (s *Repository) GetFriends(userId string, eventId string) ([]*models.User, error) {
 	message := logMessage + "GetFriends:"
 	log.Debug(message + "started")
+	var query string
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
 		return nil, error2.ErrAtoi
 	}
-	eventIdInt, err := strconv.Atoi(eventId)
-	if err != nil {
-		return nil, error2.ErrAtoi
+	var eventIdInt int
+	if eventId != "" {
+		eventIdInt, err = strconv.Atoi(eventId)
+		if err != nil {
+			return nil, error2.ErrAtoi
+		}
+		query = getFriendsForEventQuery
+	} else {
+		query = getFriendsQuery
 	}
-	query := `select * from "user" as u where u.id in (select u_id from
-    (select u.id as u_id from "user" as u
-                                  join subscribe s on s.subscriber_id = u.id where s.subscribed_id = $1
-     intersect
-     select u.id from "user" as u join subscribe s on s.subscribed_id = u.id
-     where s.subscriber_id = $1) as friends
-        where u_id not in (
-            select author_id from "event" where id = $2
-            union
-            select receiver_id::int from notification as n where n.event_id = $2::varchar and type = '1'))`
 	rows, err := s.db.Queryx(query, userIdInt, eventIdInt)
 	if err != nil {
 		log.Error(message+"err = ", err)

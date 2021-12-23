@@ -211,12 +211,16 @@ func (h *Delivery) Invite(w http.ResponseWriter, r *http.Request) {
 	if len(q["eventId"]) > 0 {
 		eventId = q["eventId"][0]
 	}
-	vars := r.Context().Value(response.CtxString("vars")).(map[string]string)
 	userId := r.Context().Value(response.CtxString("userId")).(string)
-	receiverId := vars["id"]
-	err := h.notificator.InvitationNotification(receiverId, userId, eventId)
+	receiversId, err := response.GetUsersIdFromRequest(r.Body)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
+	}
+	for _, receiverId := range receiversId {
+		err = h.notificator.InvitationNotification(receiverId, userId, eventId)
+		if !response.CheckIfNoError(&w, err, message) {
+			return
+		}
 	}
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")

@@ -4,6 +4,8 @@ import (
 	models "backend/internal/models"
 )
 
+//easyjson -all response.go
+
 const logMessage = "response:response:"
 
 type HttpStatus int
@@ -27,6 +29,10 @@ type UserResponseBody struct {
 
 type UserListResponseBody struct {
 	Users []UserResponseBody `json:"users"`
+}
+
+type UsersIdResponseBody struct {
+	UsersId []string `json:"usersId" san:"xss"`
 }
 
 type EventIDResponseBody struct {
