@@ -168,7 +168,7 @@ func (app *App) Run() error {
 	go func() {
 		for {
 			log.Info("connections alive: ", app.notificationManager.PingConnections())
-			time.Sleep(time.Minute)
+			time.Sleep(time.Second * 30)
 		}
 	}()
 	go func() {
