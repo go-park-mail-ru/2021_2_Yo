@@ -179,6 +179,7 @@ func (s *Repository) GetSubscribes(userId string) ([]*models.User, error) {
 func (s *Repository) GetFriends(userId string, eventId string) ([]*models.User, error) {
 	message := logMessage + "GetFriends:"
 	log.Debug(message + "started")
+	var rows *sql.Rows
 	var query string
 	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
@@ -191,13 +192,18 @@ func (s *Repository) GetFriends(userId string, eventId string) ([]*models.User, 
 			return nil, error2.ErrAtoi
 		}
 		query = getFriendsForEventQuery
+		rows, err = s.db.Queryx(query, userIdInt, eventIdInt)
+		if err != nil {
+			log.Error(message+"err = ", err)
+			return nil, error2.ErrPostgres
+		}
 	} else {
 		query = getFriendsQuery
-	}
-	rows, err := s.db.Queryx(query, userIdInt, eventIdInt)
-	if err != nil {
-		log.Error(message+"err = ", err)
-		return nil, error2.ErrPostgres
+		rows, err = s.db.Queryx(query, userIdInt)
+		if err != nil {
+			log.Error(message+"err = ", err)
+			return nil, error2.ErrPostgres
+		}
 	}
 	defer rows.Close()
 	var resultUsers []*models.User
