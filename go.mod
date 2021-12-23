@@ -13,6 +13,7 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/joho/godotenv v1.4.0
+	github.com/kolesa-team/go-webp v1.0.1
 	github.com/lib/pq v1.10.4
 	github.com/mailru/easyjson v0.7.7
 	github.com/prometheus/client_golang v1.11.0

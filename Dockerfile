@@ -3,6 +3,7 @@
 FROM golang:latest as build
 LABEL maintainer="Artyom <artyomsh01@yandex.ru>"
 WORKDIR /app
+RUN sudo apt-get install libwebp-dev
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
@@ -12,6 +13,7 @@ RUN make build
 FROM golang:latest as server-build
 LABEL maintainer="Artyom <artyomsh01@yandex.ru>"
 WORKDIR /app
+RUN sudo apt-get install libwebp-dev
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
@@ -23,6 +25,7 @@ CMD ["./server"]
 FROM golang:latest as auth-build
 LABEL maintainer="Artyom <artyomsh01@yandex.ru>"
 WORKDIR /app
+RUN sudo apt-get install libwebp-dev
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
@@ -34,6 +37,7 @@ CMD ["./auth"]
 FROM golang:latest as event-build
 LABEL maintainer="Artyom <artyomsh01@yandex.ru>"
 WORKDIR /app
+RUN sudo apt-get install libwebp-dev
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
@@ -45,6 +49,7 @@ CMD ["./event"]
 FROM golang:latest as user-build
 LABEL maintainer="Artyom <artyomsh01@yandex.ru>"
 WORKDIR /app
+RUN sudo apt-get install libwebp-dev
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
