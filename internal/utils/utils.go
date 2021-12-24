@@ -100,7 +100,7 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 		}
 		defer output.Close()
 
-		options, err := encoder.NewLossyEncoderOptions(encoder.PresetDefault, 10)
+		options, err := encoder.NewLossyEncoderOptions(encoder.PresetDefault, 40)
 		if err != nil {
 			log.Error(err)
 		}
