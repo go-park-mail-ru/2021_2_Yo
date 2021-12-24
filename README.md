@@ -33,6 +33,8 @@
 
 -  [Отдельное спасибо](#acknowledgement)
 
+-  [Frontend](#frontend)
+
   
 
 ## 🧐 About <a name = "about"></a>
@@ -151,4 +153,5 @@ $(go env GOPATH)/bin/golangci-lint run
 
 Вся команда Технопарк VK. Это был замечательный семестр
 
-## 🎉 Frontend <a name = "acknowledgement"></a>
+## 🎉 Frontend <a name = "frontend"></a>
+https://github.com/frontend-park-mail-ru/2021_2_Yo
