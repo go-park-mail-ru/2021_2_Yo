@@ -7,8 +7,6 @@ env:
   USER_TAG: latest
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
 
