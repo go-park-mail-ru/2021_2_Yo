@@ -4,6 +4,8 @@ import (
 	models "backend/internal/models"
 )
 
+//easyjson -all response.go
+
 const logMessage = "response:response:"
 
 type HttpStatus int
@@ -29,23 +31,27 @@ type UserListResponseBody struct {
 	Users []UserResponseBody `json:"users"`
 }
 
+type UsersIdResponseBody struct {
+	UsersId []string `json:"usersId" san:"xss"`
+}
+
 type EventIDResponseBody struct {
 	ID string `json:"id"`
 }
 
 type EventResponseBody struct {
 	ID          string   `json:"id,omitempty"`
-	Title       string   `json:"title" valid:"type(string),length(0|255)" san:"xss"`
-	Description string   `json:"description" valid:"type(string),length(0|500)" san:"xss"`
-	Text        string   `json:"text" valid:"type(string),length(0|2200)" san:"xss"`
-	City        string   `json:"city" valid:"type(string),length(0|30)" san:"xss"`
+	Title       string   `json:"title" valid:"type(string),length(0|520)" san:"xss"`
+	Description string   `json:"description" valid:"type(string),length(0|1020)" san:"xss"`
+	Text        string   `json:"text" valid:"type(string),length(0|5000)" san:"xss"`
+	City        string   `json:"city" valid:"type(string),length(0|60)" san:"xss"`
 	Category    string   `json:"category" valid:"type(string),length(0|30)" san:"xss"`
 	Viewed      int      `json:"viewed" valid:"type(int)" san:"xss"`
 	ImgUrl      string   `json:"imgUrl" valid:"type(string),length(0|255)" san:"xss"`
 	Tag         []string `json:"tag" san:"xss"`
 	Date        string   `json:"date" valid:"type(string),length(0|10)" san:"xss"`
 	Geo         string   `json:"geo" valid:"type(string),length(0|255)"`
-	Address     string   `json:"address" valid:"type(string), length(0|255)" san:"xss"`
+	Address     string   `json:"address" valid:"type(string), length(0|520)" san:"xss"`
 	AuthorID    string   `json:"authorid" san:"xss"`
 	IsVisited   bool     `json:"favourite"`
 }
@@ -68,6 +74,7 @@ type CitiesResponseBody struct {
 
 type NotificationResponseBody struct {
 	Type        string `json:"type"`
+	Seen        bool   `json:"seen"`
 	UserId      string `json:"userId"`
 	UserName    string `json:"userName"`
 	UserSurname string `json:"userSurname"`

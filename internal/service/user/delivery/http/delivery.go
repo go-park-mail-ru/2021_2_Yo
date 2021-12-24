@@ -130,8 +130,13 @@ func (h *Delivery) GetSubscribes(w http.ResponseWriter, r *http.Request) {
 func (h *Delivery) GetFriends(w http.ResponseWriter, r *http.Request) {
 	message := logMessage + "GetFriends:"
 	log.Debug(message + "started")
+	q := r.URL.Query()
+	var eventId string
+	if len(q["eventId"]) > 0 {
+		eventId = q["eventId"][0]
+	}
 	userId := r.Context().Value(response.CtxString("userId")).(string)
-	subscribers, err := h.useCase.GetFriends(userId)
+	subscribers, err := h.useCase.GetFriends(userId, eventId)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
 	}
@@ -206,12 +211,16 @@ func (h *Delivery) Invite(w http.ResponseWriter, r *http.Request) {
 	if len(q["eventId"]) > 0 {
 		eventId = q["eventId"][0]
 	}
-	vars := r.Context().Value(response.CtxString("vars")).(map[string]string)
 	userId := r.Context().Value(response.CtxString("userId")).(string)
-	receiverId := vars["id"]
-	err := h.notificator.InvitationNotification(receiverId, userId, eventId)
+	receiversId, err := response.GetUsersIdFromRequest(r.Body)
 	if !response.CheckIfNoError(&w, err, message) {
 		return
+	}
+	for _, receiverId := range receiversId {
+		err = h.notificator.InvitationNotification(receiverId, userId, eventId)
+		if !response.CheckIfNoError(&w, err, message) {
+			return
+		}
 	}
 	response.SendResponse(w, response.OkResponse())
 	log.Debug(message + "ended")

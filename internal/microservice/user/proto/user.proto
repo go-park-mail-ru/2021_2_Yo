@@ -41,6 +41,11 @@ message IsSubscribedRequest {
     bool Result = 1;
 }
 
+message GetFriendsRequest {
+    string UserId = 1;
+    string EventId = 2;
+}
+
 message Empty {}
 
 service UserService {
@@ -49,7 +54,7 @@ service UserService {
     rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (Empty) {}
     rpc GetSubscribers(UserId) returns (Users) {}
     rpc GetSubscribes(UserId) returns (Users) {}
-    rpc GetFriends(UserId) returns (Users) {}
+    rpc GetFriends(GetFriendsRequest) returns (Users) {}
     rpc GetVisitors(EventId) returns (Users) {}
     rpc Subscribe(SubscribeRequest) returns (Empty) {}
     rpc Unsubscribe(SubscribeRequest) returns (Empty) {}

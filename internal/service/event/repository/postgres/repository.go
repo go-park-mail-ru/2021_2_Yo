@@ -92,6 +92,7 @@ func (s *Repository) CreateEvent(e *models.Event) (string, error) {
 		if err == sql2.ErrNoRows {
 			return "", error2.ErrNoRows
 		}
+		log.Error(message+"err = ", err)
 		return "", error2.ErrPostgres
 	}
 	eventIdStr := strconv.Itoa(eventId)
@@ -112,6 +113,7 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 	}
 	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return err
 	}
 	postgresEvent, err := toPostgresEvent(e)
@@ -122,7 +124,7 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 	var query string
 	if postgresEvent.ImgUrl != "" {
 		query = updateEventQuery
-		_, err = s.db.Query(query,
+		rows, err := s.db.Query(query,
 			postgresEvent.Title,
 			postgresEvent.Description,
 			postgresEvent.Text,
@@ -135,11 +137,13 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 			postgresEvent.Tag,
 			postgresEvent.ID)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return error2.ErrPostgres
 		}
+		defer rows.Close()
 	} else {
 		query = updateEventQueryWithoutImgUrl
-		_, err = s.db.Query(query,
+		rows, err := s.db.Query(query,
 			postgresEvent.Title,
 			postgresEvent.Description,
 			postgresEvent.Text,
@@ -151,8 +155,10 @@ func (s *Repository) UpdateEvent(e *models.Event, userId string) error {
 			postgresEvent.Tag,
 			postgresEvent.ID)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return error2.ErrPostgres
 		}
+		defer rows.Close()
 	}
 	log.Debug(message + "ended")
 	return nil
@@ -171,13 +177,16 @@ func (s *Repository) DeleteEvent(eventId string, userId string) error {
 	}
 	err = s.checkAuthor(eventIdInt, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return err
 	}
 	query := deleteEventQuery
-	_, err = s.db.Query(query, eventIdInt)
+	rows, err := s.db.Query(query, eventIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }
@@ -192,16 +201,19 @@ func (s *Repository) GetEventById(eventId string) (*models.Event, error) {
 		return nil, error2.ErrAtoi
 	}
 	query = incrementEventViews
-	_, err = s.db.Query(query, eventIdInt)
+	rows, err := s.db.Query(query, eventIdInt)
 	if err != nil {
-		return nil, error2.ErrQuery
+		log.Error(message+"err = ", err)
+		return nil, error2.ErrPostgres
 	}
+	defer rows.Close()
 	query = getEventQuery
 	err = s.db.Get(&e, query, eventIdInt)
 	if err != nil {
 		if err == sql2.ErrNoRows {
 			return nil, error2.ErrNoRows
 		}
+		log.Error(message+"err = ", err)
 		return nil, error2.ErrPostgres
 	}
 	modelEvent := toModelEvent(&e)
@@ -216,7 +228,6 @@ func (s *Repository) GetEvents(userId string, title string, category string, cit
 	for i := range tags {
 		postgresTags[i] = tags[i]
 	}
-
 	var userIdInt int
 	if userId == "" {
 		userIdInt = 0
@@ -227,7 +238,6 @@ func (s *Repository) GetEvents(userId string, title string, category string, cit
 		}
 		userIdInt = userIdInt1
 	}
-
 	query := `select e.*, count(v) from event as e
 				left join visitor as v on e.id = v.event_id and `
 	query += `v.user_id = $1 `
@@ -272,7 +282,8 @@ func (s *Repository) GetEvents(userId string, title string, category string, cit
          order by viewed DESC`
 	rows, err := s.db.Queryx(query, userIdInt, title, category, city, date, postgresTags)
 	if err != nil {
-		return nil, err
+		log.Error(message+"err = ", err)
+		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
 	var resultEvents []*models.Event
@@ -280,6 +291,7 @@ func (s *Repository) GetEvents(userId string, title string, category string, cit
 		var e Event
 		err := rows.StructScan(&e)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelEvent := toModelEvent(&e)
@@ -299,6 +311,7 @@ func (s *Repository) GetVisitedEvents(userId string) ([]*models.Event, error) {
 	query := visitedQuery
 	rows, err := s.db.Queryx(query, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -307,6 +320,7 @@ func (s *Repository) GetVisitedEvents(userId string) ([]*models.Event, error) {
 		var e Event
 		err := rows.StructScan(&e)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelEvent := toModelEvent(&e)
@@ -326,6 +340,7 @@ func (s *Repository) GetCreatedEvents(authorId string) ([]*models.Event, error) 
 	query := createdQuery
 	rows, err := s.db.Queryx(query, authorIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -334,6 +349,7 @@ func (s *Repository) GetCreatedEvents(authorId string) ([]*models.Event, error) 
 		var e Event
 		err := rows.StructScan(&e)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		modelEvent := toModelEvent(&e)
@@ -355,10 +371,12 @@ func (s *Repository) Visit(eventId string, userId string) error {
 		return error2.ErrAtoi
 	}
 	query := visitQuery
-	_, err = s.db.Query(query, eventIdInt, userIdInt)
+	rows, err := s.db.Query(query, eventIdInt, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }
@@ -375,10 +393,12 @@ func (s *Repository) Unvisit(eventId string, userId string) error {
 		return error2.ErrAtoi
 	}
 	query := unvisitQuery
-	_, err = s.db.Query(query, eventIdInt, userIdInt)
+	rows, err := s.db.Query(query, eventIdInt, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return error2.ErrPostgres
 	}
+	defer rows.Close()
 	log.Debug(message + "ended")
 	return nil
 }
@@ -399,6 +419,7 @@ func (s *Repository) IsVisited(eventId string, userId string) (bool, error) {
 	result := false
 	err = s.db.Get(&count, query, eventIdInt, userIdInt)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return false, error2.ErrPostgres
 	}
 	if count > 0 {
@@ -414,6 +435,7 @@ func (s *Repository) GetCities() ([]string, error) {
 	query := getCitiesQuery
 	rows, err := s.db.Queryx(query)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -422,6 +444,7 @@ func (s *Repository) GetCities() ([]string, error) {
 		var c string
 		err := rows.Scan(&c)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		resultCities = append(resultCities, c)
@@ -436,6 +459,7 @@ func (s *Repository) EmailNotify(eventId string) ([]*models.Info, error) {
 	query := getSubsInfo
 	rows, err := s.db.Queryx(query, eventId)
 	if err != nil {
+		log.Error(message+"err = ", err)
 		return nil, error2.ErrPostgres
 	}
 	defer rows.Close()
@@ -444,6 +468,7 @@ func (s *Repository) EmailNotify(eventId string) ([]*models.Info, error) {
 		var mail, name, title, img_url string
 		err := rows.Scan(&name, &mail, &title, &img_url)
 		if err != nil {
+			log.Error(message+"err = ", err)
 			return nil, error2.ErrPostgres
 		}
 		userInfo := &models.Info{

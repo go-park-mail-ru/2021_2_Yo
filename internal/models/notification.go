@@ -9,4 +9,5 @@ type Notification struct {
 	UserImgUrl  string
 	EventId     string
 	EventTitle  string
+	Seen        bool
 }

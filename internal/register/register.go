@@ -49,17 +49,16 @@ func UserHTTPEndpoints(r *mux.Router, uDelivery *userHttp.Delivery, eDelivery *e
 	r.Handle("/notifications/new", getNewNotificationsHandlerFunc).Methods("GET")
 
 	updateNotificationsStatusHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.UpdateNotificationsStatus)))
-	r.Handle("/notifications", updateNotificationsStatusHandlerFunc).Methods("UPDATE")
+	r.Handle("/notifications/all", updateNotificationsStatusHandlerFunc).Methods("POST")
 
 	getFriendsHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.GetFriends)))
 	r.Handle("/friends", getFriendsHandlerFunc).Methods("GET")
 
 	inviteHandlerFunc := mws.Auth(mws.GetVars(http.HandlerFunc(uDelivery.Invite)))
-	r.Handle("/{id:[0-9]+}/invite", inviteHandlerFunc).Methods("POST")
+	r.Handle("/invite", inviteHandlerFunc).Methods("POST")
 }
 
 func EventHTTPEndpoints(r *mux.Router, delivery *eventHttp.Delivery, mws *middleware.Middlewares) {
-	//TODO: Попросить фронт заменить "query" на "title", ибо понятно, почему.
 	r.HandleFunc("", delivery.GetEvents).Methods("GET")
 	r.HandleFunc("/cities", delivery.GetCities).Methods("GET")
 	r.HandleFunc("/{id:[0-9]+}", delivery.GetEventById).Methods("GET")

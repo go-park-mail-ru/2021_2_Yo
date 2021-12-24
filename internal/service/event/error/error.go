@@ -8,5 +8,4 @@ var (
 	ErrAtoi       = errors.New("cant cast string to int")
 	ErrNotAllowed = errors.New("user is not allowed to do this")
 	ErrNoRows     = errors.New("no rows in a query result")
-	ErrQuery      = errors.New("invalid query")
 )

@@ -5,23 +5,30 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
-	"github.com/dgrijalva/jwt-go/v4"
-	"github.com/go-redis/redis"
-	"github.com/jmoiron/sqlx"
-	uuid "github.com/satori/go.uuid"
-	"github.com/spf13/viper"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/dgrijalva/jwt-go/v4"
+	"github.com/go-redis/redis"
+	"github.com/jmoiron/sqlx"
+	uuid "github.com/satori/go.uuid"
+	"github.com/spf13/viper"
+
+	"github.com/kolesa-team/go-webp/encoder"
+	"github.com/kolesa-team/go-webp/webp"
 )
 
 const logMessage = "config:"
 
 var (
 	ErrFileExt = errors.New("wrong file extension")
+	ErrFileDec = errors.New("file decoding error")
 )
 
 func CreatePasswordHash(password string) string {
@@ -77,25 +84,74 @@ func SaveImageFromRequest(r *http.Request, key string) (string, error) {
 	fileName := fileNameParts[0] + "." + fileNameParts[1]
 	fileExtension := strings.ToLower(filepath.Ext(fileName))
 	switch fileExtension {
-	case ".jpg":
-	case ".jpeg":
+	case ".jpg",".jpeg":
 	case ".png":
-	case ".ico":
-	case ".woff":
-	case ".swg":
-	case ".webp":
-	case ".webm":
-	case ".gif":
+	case ".ico",".woff",".swg",".webp",".webm",".gif":
 	default:
 		return "", ErrFileExt
 	}
 	imgPath := viper.GetString("img_path")
-	dst, err := os.Create(filepath.Join(imgPath, filepath.Base(fileName)))
+	switch fileExtension {
+	case ".jpg",".jpeg":
+		newFileName := fileNameParts[0]+".webp"
+		output, err := os.Create(imgPath+"/"+newFileName)
+		if err != nil {
+			log.Error(err)
+		}
+		defer output.Close()
+
+		options, err := encoder.NewLossyEncoderOptions(encoder.PresetDefault, 40)
+		if err != nil {
+			log.Error(err)
+		}
+
+		img, err := jpeg.Decode(file)
+		if err != nil {
+			return "", ErrFileDec
+		}
+
+		if err := webp.Encode(output, img, options); err != nil {
+			log.Error(err)
+		}
+
+		return "https://bmstusa.ru/images/" + newFileName, nil
+
+	case ".png":
+		newFileName := fileNameParts[0]+".webp"
+		output, err := os.Create(imgPath+"/"+newFileName)
+		if err != nil {
+			log.Error(err)
+		}
+		defer output.Close()
+
+		options, err := encoder.NewLossyEncoderOptions(encoder.PresetDefault, 40)
+		if err != nil {
+			log.Error(err)
+		}
+
+		img, err := png.Decode(file)
+		if err != nil {
+			return "", ErrFileDec
+		}
+
+		if err := webp.Encode(output, img, options); err != nil {
+			log.Error(err)
+		}
+
+		return "https://bmstusa.ru/images/" + newFileName, nil
+		
+	case ".ico",".woff",".swg",".webp",".webm",".gif":
+	default:
+		return "", ErrFileDec
+	}
+
+	output, err := os.Create(filepath.Join(imgPath, filepath.Base(fileName)))
 	if err != nil {
 		return "", err
 	}
-	defer dst.Close()
-	_, err = io.Copy(dst, file)
+	defer output.Close()
+
+	_, err = io.Copy(output, file)
 	if err != nil {
 		return "", err
 	}

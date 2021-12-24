@@ -34,8 +34,8 @@ func (m *UseCaseMock) GetSubscribes(userId string) ([]*models.User, error) {
 	return args.Get(0).([]*models.User), args.Error(1)
 }
 
-func (m *UseCaseMock) GetFriends(userId string) ([]*models.User, error) {
-	args := m.Called(userId)
+func (m *UseCaseMock) GetFriends(userId string, eventId string) ([]*models.User, error) {
+	args := m.Called(userId, eventId)
 	return args.Get(0).([]*models.User), args.Error(1)
 }
 

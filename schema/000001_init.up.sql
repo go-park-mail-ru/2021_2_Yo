@@ -12,7 +12,7 @@ CREATE TABLE "event" (
                          id serial not null unique,
                          title varchar(255) not null,
                          description varchar(500) not null,
-                         text varchar(1000) not null,
+                         text varchar(2200) not null,
                          city varchar(255) not null,
                          category varchar(255) not null,
                          viewed BIGINT not null,
@@ -24,12 +24,6 @@ CREATE TABLE "event" (
                          author_id int references "user" (id) on delete cascade not null
 );
 
-/*
-Просмотр (<=> избранное)
-event_id - id мероприятия
-user_id - id посетителя
-date - для графиков
-*/
 CREATE TABLE "view" (
                         id serial not null unique,
                         event_id int references "event" (id) on delete cascade not null,
@@ -38,12 +32,6 @@ CREATE TABLE "view" (
                         date date
 );
 
-/*
-Посетитель (<=> избранное)
-event_id - id мероприятия
-user_id - id посетителя
-date - для графиков
-*/
 CREATE TABLE "visitor" (
                         id serial not null unique,
                         event_id int references "event" (id) on delete cascade not null,
@@ -52,11 +40,6 @@ CREATE TABLE "visitor" (
                         date date
 );
 
-/*
-Подписка
-subscriber_id - id пользователя, который подписался
-subscribed_id - id пользователя, на которого подписались
-*/
 CREATE TABLE "subscribe" (
                            id serial not null unique,
                            subscribed_id int references "user" (id) on delete cascade not null,
@@ -67,7 +50,7 @@ CREATE TABLE "subscribe" (
 
 CREATE TABLE "notification" (
     id serial not null unique,
-    type varchar(50) CHECK (type in ('0', '1', '2')) not null,
+    type varchar(50) CHECK (type in ('0', '1', '2', '3')) not null,
                                     receiver_id varchar(50) not null,
                                     user_id varchar(50) not null,
                                     user_name varchar(50) not null,
@@ -75,5 +58,6 @@ CREATE TABLE "notification" (
                                     user_img_url varchar(150) not null,
                                     event_id varchar(50) default '',
                                     event_title varchar(255) default '',
-                                    seen bool default false
+                                    seen bool default false,
+                                    UNIQUE(type, receiver_id, user_id, event_id)
 );

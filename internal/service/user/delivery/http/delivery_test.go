@@ -303,6 +303,7 @@ func TestGetSubscribes(t *testing.T) {
 	}
 }
 
+/*
 var getFriendsTests = []struct {
 	id         int
 	userId     string
@@ -337,6 +338,7 @@ func TestGetFriends(t *testing.T) {
 		r.ServeHTTP(w, req.WithContext(ctx))
 	}
 }
+*/
 
 var getVisitorsTests = []struct {
 	id         int

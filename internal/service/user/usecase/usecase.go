@@ -72,11 +72,11 @@ func (a *UseCase) GetSubscribes(userId string) ([]*models.User, error) {
 	return resultUsers, nil
 }
 
-func (a *UseCase) GetFriends(userId string) ([]*models.User, error) {
+func (a *UseCase) GetFriends(userId string, eventId string) ([]*models.User, error) {
 	if userId == "" {
 		return nil, error2.ErrEmptyData
 	}
-	resultUsers, err := a.repository.GetFriends(userId)
+	resultUsers, err := a.repository.GetFriends(userId, eventId)
 	if err != nil {
 		return nil, err
 	}

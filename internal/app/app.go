@@ -19,14 +19,15 @@ import (
 	"backend/internal/utils"
 	log "backend/pkg/logger"
 	"backend/pkg/notificator"
-	//"backend/pkg/prometheus"
+	"backend/pkg/prometheus"
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	sql "github.com/jmoiron/sqlx"
-	//"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -40,12 +41,13 @@ type Options struct {
 }
 
 type App struct {
-	Options      *Options
-	AuthManager  *authDelivery.Delivery
-	UserManager  *userDelivery.Delivery
-	EventManager *eventDelivery.Delivery
-	wsPool       *websocket.Pool
-	db           *sql.DB
+	Options             *Options
+	AuthManager         *authDelivery.Delivery
+	UserManager         *userDelivery.Delivery
+	EventManager        *eventDelivery.Delivery
+	wsPool              *websocket.Pool
+	notificationManager notificator.NotificationManager
+	db                  *sql.DB
 }
 
 func getGrpcAddress(portKey string, hostKey string) string {
@@ -106,21 +108,22 @@ func NewApp(opts *Options) (*App, error) {
 
 	authD := authDelivery.NewDelivery(authService)
 	userD := userDelivery.NewDelivery(userUC, notificationManager)
-	eventD := eventDelivery.NewDelivery(eventUC)
+	eventD := eventDelivery.NewDelivery(eventUC, notificationManager)
 
 	return &App{
-		Options:      opts,
-		AuthManager:  authD,
-		UserManager:  userD,
-		EventManager: eventD,
-		wsPool:       pool,
-		db:           db,
+		Options:             opts,
+		AuthManager:         authD,
+		UserManager:         userD,
+		EventManager:        eventD,
+		wsPool:              pool,
+		notificationManager: notificationManager,
+		db:                  db,
 	}, nil
 }
 
 func newRouterWithEndpoints(app *App) *mux.Router {
 	mw := middleware.NewMiddlewares(app.AuthManager.UseCase)
-	//mm := prometheus.NewMetricsMiddleware()
+	mm := prometheus.NewMetricsMiddleware()
 
 	r := mux.NewRouter()
 	rApi := r.PathPrefix("/api").Subrouter()
@@ -128,7 +131,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	rApi.Use(mw.Logging)
 	rApi.Use(mw.CORS)
 	rApi.Use(mw.Recovery)
-	//r.Use(mm.Metrics)
+	r.Use(mm.Metrics)
 	rApi.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
 	authRouter := rApi.PathPrefix("/auth").Subrouter()
 	register.AuthHTTPEndpoints(authRouter, app.AuthManager, mw)
@@ -138,9 +141,11 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	userRouter := rApi.PathPrefix("/user").Subrouter()
 	userRouter.Methods("POST").Subrouter().Use(mw.CSRF)
 	register.UserHTTPEndpoints(userRouter, app.UserManager, app.EventManager, mw)
-	r.HandleFunc("/ws", app.wsPool.WebsocketHandler).Methods("GET")
 
-	//r.Handle("/metrics", promhttp.Handler())
+	websocketHandlerFunc := mw.Auth(http.HandlerFunc(app.wsPool.WebsocketHandler))
+	r.Handle("/ws", websocketHandlerFunc).Methods("GET")
+
+	r.Handle("/metrics", promhttp.Handler())
 
 	return r
 }
@@ -160,6 +165,24 @@ func (app *App) Run() error {
 		port = "test port"
 	}
 	r := newRouterWithEndpoints(app)
+	/*
+		go func() {
+			for {
+				log.Info("connections alive: ", app.notificationManager.PingConnections())
+				time.Sleep(time.Second * 30)
+			}
+		}()
+	*/
+	go func() {
+		for {
+			time.Sleep(time.Minute)
+			err := app.notificationManager.EventTomorrowNotification()
+			if err != nil {
+				return
+			}
+			time.Sleep(time.Hour - time.Minute)
+		}
+	}()
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
 		log.Error(message+"err = ", err)

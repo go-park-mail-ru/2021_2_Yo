@@ -1,11 +1,18 @@
 package websocket
 
 import (
+	"backend/internal/response"
 	log "backend/pkg/logger"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"sync"
 )
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin:     func(r *http.Request) bool { return true },
+}
 
 type Pool struct {
 	mutex       sync.RWMutex
@@ -34,22 +41,38 @@ func (p *Pool) GetConn(userId string) *websocket.Conn {
 	return p.Connections[userId]
 }
 
+func (p *Pool) PingConnections() int {
+	res := 0
+	p.mutex.Lock()
+	for i, conn := range p.Connections {
+		if conn != nil {
+			err := conn.WriteMessage(1, nil)
+			if err != nil {
+				log.Error("pool:PingConnections: err = ", err)
+				p.Connections[i] = nil
+			} else {
+				res++
+			}
+		} else {
+			log.Error("pool:PingConnections: err = connection is nil")
+			p.Connections[i] = nil
+		}
+	}
+	p.mutex.Unlock()
+	return res
+}
+
 func (p *Pool) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	_, ok := w.(http.Hijacker)
 	if !ok {
 		log.Info(!ok)
 	}
+	userId := r.Context().Value(response.CtxString("userId")).(string)
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Error(err)
 		return
 	}
-
-	userID, err := GetID(conn)
-	if err != nil {
-		log.Error(err)
-	}
-
-	p.AddConn(userID, conn)
-	log.Info("WebsocketHandler new client with id: ", userID, " total clients: ", len(p.Connections))
+	p.AddConn(userId, conn)
+	log.Info("WebsocketHandler new client with id: ", userId, " total clients: ", len(p.Connections))
 }
