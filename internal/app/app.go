@@ -150,6 +150,7 @@ func newRouterWithEndpoints(app *App) *mux.Router {
 	return r
 }
 
+//Reborn
 func (app *App) Run() error {
 	if app.db != nil {
 		defer app.db.Close()
